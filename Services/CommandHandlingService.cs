@@ -30,7 +30,13 @@ namespace DiscordBotFanatic.Services {
             _logger = logger;
 
             _discord.MessageReceived += HandleCommandAsync;
+            _discord.UserJoined += HandleJoinAsync;
             _commands.CommandExecuted += OnCommandExecutedAsync;
+        }
+
+        private Task HandleJoinAsync(SocketGuildUser arg) {
+            //throw new NotImplementedException();
+            return Task.Delay(-1);
         }
 
         public async Task InitializeAsync(IServiceProvider provider) {
@@ -69,7 +75,7 @@ namespace DiscordBotFanatic.Services {
             int argPos = 0;
 
             // Determine if the message is a command based on the prefix and make sure no bots trigger commands
-            if (!(message.HasStringPrefix(_configuration.CustomPrefix, ref argPos) ||
+            if (!(message.HasStringPrefix(_configuration.CustomPrefix + " ", ref argPos) ||
                   message.HasMentionPrefix(_discord.CurrentUser, ref argPos)) ||
                 message.Author.IsBot)
                 return;
@@ -99,7 +105,7 @@ namespace DiscordBotFanatic.Services {
             EmbedBuilder builder = new EmbedBuilder() {Title = $"Error!"};
 
             builder.AddField(result.Error.Value.ToString(), result.ErrorReason);
-            builder.AddField($"Get more help", $"Please use `{_configuration.CustomPrefix}help` for this bot's usage");
+            builder.AddField($"Get more help", $"Please use `{_configuration.CustomPrefix} help` for this bot's usage");
 
             var resultMessage = await resultMessageTask;
             if (resultMessage != null) {

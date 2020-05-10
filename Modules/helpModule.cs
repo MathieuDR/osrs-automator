@@ -6,12 +6,14 @@ using System.Threading.Tasks;
 using Discord;
 using Discord.Commands;
 using DiscordBotFanatic.Helpers;
+using DiscordBotFanatic.Models.Configuration;
 
 namespace DiscordBotFanatic.Modules {
     public class HelpModule : ModuleBase<SocketCommandContext> {
-        public HelpModule(CommandService commandService, IServiceProvider serviceProvider) {
+        public HelpModule(CommandService commandService, IServiceProvider serviceProvider, BotConfiguration configuration) {
             _commandService = commandService;
             _serviceProvider = serviceProvider;
+            _configuration = configuration;
             _parametersToOutput = new Dictionary<string, Type>();
         }
 
@@ -23,26 +25,29 @@ namespace DiscordBotFanatic.Modules {
 
         private readonly CommandService _commandService;
         private readonly IServiceProvider _serviceProvider;
+        private readonly BotConfiguration _configuration;
 
         [Command(HelpCommand)]
         [Summary(HelpSummary)]
         [Alias(HelpAlias)]
-        public async Task Help(string path = "") {
+        public async Task Help(string module = "") {
             EmbedBuilder output = new EmbedBuilder();
-            if (path == "") {
+            if (string.IsNullOrEmpty(module)) {
                 output.Title = "Help";
 
                 foreach (var mod in _commandService.Modules.Where(m => m.Parent == null)) {
                     AddHelp(mod, ref output);
                 }
 
+                AddPrefixHelp(output);
+
                 output.Footer = new EmbedFooterBuilder {
-                    Text = "Use 'help <module>' to get help with a module."
+                    Text = $"Use '{_configuration.CustomPrefix} help <module>' to get help with a module."
                 };
             }
             else {
                 var mod = _commandService.Modules.FirstOrDefault(m =>
-                    m.Name.Replace("Module", "").ToLower() == path.ToLower());
+                    m.Name.Replace("Module", "").ToLower() == module.ToLower());
                 if (mod == null) {
                     await ReplyAsync("No module could be found with that name.");
                     return;
@@ -64,6 +69,10 @@ namespace DiscordBotFanatic.Modules {
             }
 
             await ReplyAsync("", embed: output.Build());
+        }
+
+        private void AddPrefixHelp(EmbedBuilder output) {
+            output.AddField($"All commands start with either", $"`{_configuration.CustomPrefix}` or a mention towards me!{Environment.NewLine}For example `{_configuration.CustomPrefix} help`");
         }
 
         private void AddParameterInfo(ref EmbedBuilder output) {
@@ -157,7 +166,7 @@ namespace DiscordBotFanatic.Modules {
                           (command.Aliases.Any()
                               ? $"**Aliases:** {string.Join(", ", command.Aliases.Select(x => $"`{x}`"))}\n"
                               : "") +
-                          $"**Usage:** `{GetPrefix(command)} {GetParameters(command)}`";
+                          $"**Usage:** `{_configuration.CustomPrefix} {GetPrefix(command)} {GetParameters(command)}`";
             });
         }
 

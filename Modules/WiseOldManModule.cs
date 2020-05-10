@@ -87,6 +87,7 @@ namespace DiscordBotFanatic.Modules {
         }
 
 
+        #region player
         [Command("get", RunMode = RunMode.Async)]
         [Summary("Current highscores of a player")]
         public async Task GetPlayer([Remainder] MetricOsrsArguments arguments = null) {
@@ -166,7 +167,7 @@ namespace DiscordBotFanatic.Modules {
                 x.Embed = embed;
             });
         }
-
+        #endregion
 
         #region API Wrapper
 
