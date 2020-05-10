@@ -19,6 +19,8 @@ using DiscordBotFanatic.Services;
 namespace DiscordBotFanatic.Modules {
     //[Group("stats")]
     //[Summary("Everything to do with wiseoldman.net")]
+
+    [Name("Player stats")]
     public class WiseOldManModule : ModuleBase<SocketCommandContext> {
         private readonly WiseOldManConsumer _client;
         private readonly IDiscordBotRepository _repository;
@@ -31,6 +33,8 @@ namespace DiscordBotFanatic.Modules {
         private MetricType? _metricType;
         private Period? _period;
         private IUserMessage _waitMessage;
+
+        // Don't forget to update the GET function summary!
         private int _timeToUpdate = 30;
 
         private BaseResponse _response;
@@ -106,36 +110,38 @@ namespace DiscordBotFanatic.Modules {
 
 
         #region player
-
+        [Name("Get")]
         [Command("get", RunMode = RunMode.Async)]
-        [Summary("Current highscores of a player")]
+        [Summary( "Current highscores of a player, Will try to update if older then 30 minutes.")]
         public async Task GetPlayer([Remainder] MetricOsrsArguments arguments = null) {
             ExtractMetricOsrsArguments(arguments);
             _response = await GetPlayerInfo();
         }
 
+        [Name("Delta")]
         [Command("delta", RunMode = RunMode.Async)]
         [Alias("gains", "gain")]
-        [Summary("The gains of a player")]
+        [Summary("The difference of a players stats in a period of time.")]
         public async Task GetDelta([Remainder] PeriodAndMetricOsrsArguments arguments = null) {
             _period = Period.Week;
             ExtractPeriodAndMetricOsrsArguments(arguments);
             _response = await Delta();
         }
 
-        [Command("record", RunMode = RunMode.Async)]
-        [Alias("records")]
-        [Summary("Get the record of specified time/metric")]
+        [Name("Records")]
+        [Command("records", RunMode = RunMode.Async)]
+        [Alias("record")]
+        [Summary("Record gains of a specific stat and/or period.")]
         public async Task GetRecords([Remainder] PeriodAndMetricOsrsArguments arguments = null) {
             _period = Period.Week;
             ExtractPeriodAndMetricOsrsArguments(arguments);
             _response = await GetPlayerRecord();
         }
 
-
+        [Name("Update")]
         [Command("update", RunMode = RunMode.Async)]
         [Alias("new")]
-        [Summary("Update your stats, this will also output your stats AFTER a refresh.")]
+        [Summary("Force refresh your stats if older then 1 minute, and display them like the `get` command")]
         public async Task UpdatePlayer([Summary(UsernameSummary)] string username = "") {
             _timeToUpdate = 1;
             if (!string.IsNullOrEmpty(username)) {
@@ -145,10 +151,10 @@ namespace DiscordBotFanatic.Modules {
             _response = await GetPlayerInfo();
         }
 
-
+        [Name("Set default character")]
         [Command("set", RunMode = RunMode.Async)]
         [Alias("default")]
-        [Summary("Set your standard player")]
+        [Summary("Set your standard player to use within the `player` module.")]
         public async Task SetDefaultPlayer([Summary(UsernameSummary)] string username) {
             Embed embed;
             Player fromDb = _repository.GetPlayerByDiscordId(Context.User.Id.ToString());

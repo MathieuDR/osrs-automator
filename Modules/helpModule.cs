@@ -10,6 +10,8 @@ using DiscordBotFanatic.Helpers;
 using DiscordBotFanatic.Models.Configuration;
 
 namespace DiscordBotFanatic.Modules {
+
+    [Name("Help")]
     public class HelpModule : ModuleBase<SocketCommandContext> {
         public HelpModule(CommandService commandService, IServiceProvider serviceProvider, BotConfiguration configuration) {
             _commandService = commandService;
@@ -47,7 +49,7 @@ namespace DiscordBotFanatic.Modules {
             }
             else {
                 var mod = _commandService.Modules.FirstOrDefault(m =>
-                    m.Name.Replace("Module", "").ToLower() == module.ToLower());
+                    m.Name.ToLower() == module.ToLower());
                 if (mod == null) {
                     await ReplyAsync("No module could be found with that name.");
                     return;
@@ -68,7 +70,7 @@ namespace DiscordBotFanatic.Modules {
                 }
             }
 
-            AddStandardParameterInfo(output);
+            //AddStandardParameterInfo(output);
 
             await ReplyAsync("", embed: output.Build());
         }
@@ -77,8 +79,8 @@ namespace DiscordBotFanatic.Modules {
             output.AddField($"Prefixes", $"`{_configuration.CustomPrefix}` or a mention towards me!{Environment.NewLine}For example `{_configuration.CustomPrefix} help`");
             //output.AddField($"Parameters", $"`{_configuration.CustomPrefix}` or a mention towards me!{Environment.NewLine}For example `{_configuration.CustomPrefix} help`");
         }
-        private void AddStandardParameterInfo(EmbedBuilder output) {
-            output.AddField($"Parameter parsing", $"When you have a text parameter with a space, you need to encase the parameter with quotes.{Environment.NewLine}Example: `{_configuration.CustomPrefix} get \"iron man\"`");
+        public static void AddStandardParameterInfo(EmbedBuilder output, string prefix) {
+            output.AddField($"Parameter parsing", $"When you have a text parameter with a space, you need to encase the parameter with quotes.{Environment.NewLine}Example: `{prefix} get \"iron man\"`");
         }
 
         private void AddParameterInfo(ref EmbedBuilder output) {
@@ -158,7 +160,7 @@ namespace DiscordBotFanatic.Modules {
         public void AddHelp(ModuleInfo module, ref EmbedBuilder builder) {
             foreach (var sub in module.Submodules) AddHelp(sub, ref builder);
             builder.AddField(f => {
-                f.Name = $"Module: **{module.Name.Replace("Module", "")}**";
+                f.Name = $"Module: **{module.Name}**";
                 f.Value = $"Commands: {string.Join(", ", module.Commands.Select(x => $"`{x.Name}`"))}";
             });
         }
@@ -176,9 +178,9 @@ namespace DiscordBotFanatic.Modules {
                 f.Value = $"{command.Summary}\n" +
                           (!string.IsNullOrEmpty(command.Remarks) ? $"({command.Remarks})\n" : "") +
                           (command.Aliases.Any()
-                              ? $"**Aliases:** {string.Join(", ", command.Aliases.Select(x => $"`{x}`"))}\n"
+                              ? $"**Chat commands:** {string.Join(", ", command.Aliases.Select(x => $"`{x}`"))}\n"
                               : "") +
-                          $"**Usage:** `{_configuration.CustomPrefix} {GetPrefix(command)} {GetParameters(command)}`";
+                          $"**Usage:** `{_configuration.CustomPrefix} {GetPrefix(command).Trim()} {GetParameters(command)}`";
             });
         }
 

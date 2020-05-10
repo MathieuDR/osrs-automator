@@ -9,6 +9,7 @@ using Discord;
 using Discord.Commands;
 using Discord.WebSocket;
 using DiscordBotFanatic.Models.Configuration;
+using DiscordBotFanatic.Modules;
 using DiscordBotFanatic.Modules.Parameters;
 using DiscordBotFanatic.TypeReaders;
 
@@ -108,6 +109,11 @@ namespace DiscordBotFanatic.Services {
 
             Debug.Assert(result.Error != null, "result.Error != null");
             builder.AddField(result.Error.Value.ToString(), result.ErrorReason);
+
+            if (result.Error == CommandError.BadArgCount || result.Error == CommandError.ParseFailed) {
+                HelpModule.AddStandardParameterInfo(builder, _configuration.CustomPrefix);
+            }
+
             builder.AddField($"Get more help", $"Please use `{_configuration.CustomPrefix} help` for this bot's usage");
 
             var resultMessage = await resultMessageTask;
