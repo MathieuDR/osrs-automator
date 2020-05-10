@@ -20,6 +20,7 @@ namespace DiscordBotFanatic.Modules {
         private const string HelpSummary = "Help function";
         private const string HelpCommand = "help";
         private const string HelpAlias = "?";
+        private const string HelpAlias2 = "info";
 
         private Dictionary<string, Type> _parametersToOutput;
 
@@ -29,7 +30,7 @@ namespace DiscordBotFanatic.Modules {
 
         [Command(HelpCommand)]
         [Summary(HelpSummary)]
-        [Alias(HelpAlias)]
+        [Alias("?", "info")]
         public async Task Help(string module = "") {
             EmbedBuilder output = new EmbedBuilder();
             if (string.IsNullOrEmpty(module)) {
@@ -68,11 +69,17 @@ namespace DiscordBotFanatic.Modules {
                 }
             }
 
+            AddStandardParameterInfo(output);
+
             await ReplyAsync("", embed: output.Build());
         }
 
         private void AddPrefixHelp(EmbedBuilder output) {
-            output.AddField($"All commands start with either", $"`{_configuration.CustomPrefix}` or a mention towards me!{Environment.NewLine}For example `{_configuration.CustomPrefix} help`");
+            output.AddField($"Prefixes", $"`{_configuration.CustomPrefix}` or a mention towards me!{Environment.NewLine}For example `{_configuration.CustomPrefix} help`");
+            //output.AddField($"Parameters", $"`{_configuration.CustomPrefix}` or a mention towards me!{Environment.NewLine}For example `{_configuration.CustomPrefix} help`");
+        }
+        private void AddStandardParameterInfo(EmbedBuilder output) {
+            output.AddField($"Parameter parsing", $"When you have a text parameter with a space, you need to encase the parameter with quotes.{Environment.NewLine}Example: `{_configuration.CustomPrefix} get \"iron man\"`");
         }
 
         private void AddParameterInfo(ref EmbedBuilder output) {
@@ -146,7 +153,7 @@ namespace DiscordBotFanatic.Modules {
         public void AddHelp(ModuleInfo module, ref EmbedBuilder builder) {
             foreach (var sub in module.Submodules) AddHelp(sub, ref builder);
             builder.AddField(f => {
-                f.Name = $"**{module.Name.Replace("Module", "")}**";
+                f.Name = $"Module: **{module.Name.Replace("Module", "")}**";
                 f.Value = $"Commands: {string.Join(", ", module.Commands.Select(x => $"`{x.Name}`"))}";
             });
         }

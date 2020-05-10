@@ -4,6 +4,7 @@ using Discord.Commands;
 using DiscordBotFanatic.Helpers;
 
 namespace DiscordBotFanatic.Modules {
+    [DontAutoLoad]
     public class InfoModule : ModuleBase<SocketCommandContext> {
         [Command("info")]
         [Summary("Geeft informatie over de server")]
