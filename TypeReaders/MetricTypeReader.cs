@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics;
 using System.Threading.Tasks;
 using Discord.Commands;
 using DiscordBotFanatic.Models.Enums;
@@ -11,6 +12,7 @@ namespace DiscordBotFanatic.TypeReaders {
                     return Task.FromResult(TypeReaderResult.FromSuccess((MetricType) value));
                 }
             }else if (Enum.TryParse(typeof(MetricType), input, true, out object result)) {
+                Debug.Assert(result != null, nameof(result) + " != null");
                 return Task.FromResult(TypeReaderResult.FromSuccess((MetricType) result));
             }
 

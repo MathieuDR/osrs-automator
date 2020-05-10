@@ -7,26 +7,19 @@ using Microsoft.Extensions.Logging;
 
 namespace DiscordBotFanatic.Services {
     public class LogService {
-        private readonly DiscordSocketClient _discord;
-        private readonly CommandService _commands;
-        private readonly ILoggerFactory _loggerFactory;
         private readonly ILogger _discordLogger;
         private readonly ILogger _commandsLogger;
         private readonly ILogger _debugLogger;
 
         public LogService(DiscordSocketClient discord, CommandService commands, ILoggerFactory loggerFactory)
         {
-            _discord = discord;
-            _commands = commands;
+            var loggerFactory1 = loggerFactory;
+            _discordLogger = loggerFactory1.CreateLogger("discord");
+            _commandsLogger = loggerFactory1.CreateLogger("commands");
+            _debugLogger = loggerFactory1.CreateLogger("debug");
 
-            _loggerFactory = loggerFactory;
-            _discordLogger = _loggerFactory.CreateLogger("discord");
-            _commandsLogger = _loggerFactory.CreateLogger("commands");
-            _debugLogger = _loggerFactory.CreateLogger("debug");
-
-            _discord.Log += LogDiscord;
-            _commands.Log += LogCommand;
-            //_debugLogger.Log += LogDebug;
+            discord.Log += LogDiscord;
+            commands.Log += LogCommand;
         }
         
         public Task LogDebug(LogMessage message) {

@@ -9,7 +9,7 @@
                 ValidationDictionary.Add(nameof(DiscordId),$"Discord Id is null or empty.");
             }
 
-            if (!ulong.TryParse(DiscordId, out ulong discordIdUlong)) {
+            if (!ulong.TryParse(DiscordId, out _)) {
                 ValidationDictionary.Add(nameof(DiscordId),$"Discord Id is not an ulong.");
             }
 

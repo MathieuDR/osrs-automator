@@ -1,8 +1,7 @@
 ﻿using System;
-using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Reflection;
-using System.Security.Cryptography.X509Certificates;
 using System.Threading;
 using System.Threading.Tasks;
 using Discord;
@@ -11,7 +10,6 @@ using Discord.WebSocket;
 using DiscordBotFanatic.Models.Configuration;
 using DiscordBotFanatic.Modules.Parameters;
 using DiscordBotFanatic.TypeReaders;
-using Microsoft.Extensions.Logging;
 
 namespace DiscordBotFanatic.Services {
     public class CommandHandlingService {
@@ -56,13 +54,13 @@ namespace DiscordBotFanatic.Services {
             // We can tell the user what went wrong
             if (!string.IsNullOrEmpty(result?.ErrorReason))
             {
-                CreateErrorMessage(context, result);
+                await CreateErrorMessage(context, result);
             }
 
             // ...or even log the result (the method used should fit into
             // your existing log handler)
             var commandName = command.IsSpecified ? command.Value.Name : "A command";
-            _logger.LogDebug(new LogMessage(LogSeverity.Info, "CommandExecution", $"{commandName} was executed at {DateTime.UtcNow}."));
+            await _logger.LogDebug(new LogMessage(LogSeverity.Info, "CommandExecution", $"{commandName} was executed at {DateTime.UtcNow}."));
         }
 
 
@@ -104,15 +102,16 @@ namespace DiscordBotFanatic.Services {
 
             EmbedBuilder builder = new EmbedBuilder() {Title = $"Error!"};
 
+            Debug.Assert(result.Error != null, "result.Error != null");
             builder.AddField(result.Error.Value.ToString(), result.ErrorReason);
             builder.AddField($"Get more help", $"Please use `{_configuration.CustomPrefix} help` for this bot's usage");
 
             var resultMessage = await resultMessageTask;
             if (resultMessage != null) {
-                resultMessage.ModifyAsync(x => x.Embed = builder.Build());
+                await resultMessage.ModifyAsync(x => x.Embed = builder.Build());
             }
             else {
-                context.User.SendMessageAsync(embed: builder.Build());
+                await context.User.SendMessageAsync(embed: builder.Build());
             }
         }
 

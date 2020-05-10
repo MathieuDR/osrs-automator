@@ -25,8 +25,6 @@ namespace DiscordBotFanatic.Modules {
         private readonly MessageConfiguration _messageConfiguration;
 
         private const string UsernameSummary = "The OSRS Player's username";
-        private const string FilterArgumentsSummary = "Extra named, filter arguments";
-        private const string MetricTypeSummary = "The skill metric";
 
         private string _messageUserDisplay = "";
         private string _osrsUsername = "";
@@ -81,6 +79,8 @@ namespace DiscordBotFanatic.Modules {
                         x.Content = "Please contact admin. Response type unknown.";
                     })
                 };
+
+                await t;
             }
 
             base.AfterExecute(command);
@@ -131,39 +131,40 @@ namespace DiscordBotFanatic.Modules {
         [Alias("default")]
         [Summary("Set your standard player")]
         public async Task SetDefaultPlayer([Summary(UsernameSummary)] string username) {
-            Embed embed = null;
+            Embed embed;
             Player fromDb = _repository.GetPlayerByDiscordId(Context.User.Id.ToString());
             if (fromDb == null || fromDb.DefaultPlayerUsername.ToLowerInvariant() != username.ToLowerInvariant()) {
                 var players = (await _client.SearchPlayerAsync(username)).ToList();
                 PlayerResponse player;
-                if (players == null || players.Count == 0) {
+                Player dbPlayer;
+                if (players.Count == 0) {
                     // Track player if we cant find him
                     player = await _client.TrackPlayerAsync(username);
                     ValidateResponse(player);
-                    Player dbPlayer = new Player() {
+                    dbPlayer = new Player() {
                         DiscordId = Context.User.Id.ToString(), DefaultPlayerUsername = player.Username,
                         WiseOldManDefaultPlayerId = player.Id
                     };
                 }
                 else if (players.Count == 1) {
                     var result = players.First();
-                    Player dbPlayer = new Player() {
+                    dbPlayer = new Player() {
                         DiscordId = Context.User.Id.ToString(), DefaultPlayerUsername = result.Username,
                         WiseOldManDefaultPlayerId = result.Id
                     };
-                    _repository.InsertOrUpdatePlayer(dbPlayer);
                 }
                 else {
                     throw new ArgumentException(
                         $"Please use your full OSRS name. Too many results using {_osrsUsername} ({players.Count}).");
                 }
+
+                
+                _repository.InsertOrUpdatePlayer(dbPlayer);
             }
 
             embed = GetCommonEmbedBuilder($"Done!", $"{username} is sucesfully set as your standard").Build();
 
-#pragma warning disable 4014
-            (await _waitMessageTask).ModifyAsync(x => {
-#pragma warning restore 4014
+            await (await _waitMessageTask).ModifyAsync(x => {
                 x.Embed = embed;
             });
         }
@@ -210,12 +211,12 @@ namespace DiscordBotFanatic.Modules {
 
         private void ValidateResponse(BaseResponse response) {
             if (response == null) {
-                throw new Exception(
+                throw new ArgumentException(
                     $"We did not receive a response. Pleas try again later or contact the administration.");
             }
 
             if (!string.IsNullOrEmpty(response.Message)) {
-                throw new Exception(response.Message);
+                throw new ArgumentException(response.Message);
             }
         }
 
@@ -275,13 +276,13 @@ namespace DiscordBotFanatic.Modules {
             if (!recordResponse.Records.Any(x=> x.Value > 0)) {
                 embed.Description = $"No records for {_osrsUsername} over the period of a {periodString}";
                 if (_metricType.HasValue) {
-                    embed.Description += $" in the metric {_metricType.ToString().ToLowerInvariant()}";
+                    embed.Description += $" in the metric {_metricType.ToString()?.ToLowerInvariant()}";
                 }
 
                 return embed.Build();
             }
             
-            var orderedList = recordResponse.Records.OrderBy(x => x.Period).ThenByDescending(x => x.Value);
+            var orderedList = recordResponse.Records.OrderBy(x => x.Period).ThenByDescending(x => x.Value).ToList();
             bool isInline = orderedList.Count() > 4;
 
             foreach (Record record in orderedList) {

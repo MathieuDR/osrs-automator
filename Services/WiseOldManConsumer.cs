@@ -3,10 +3,8 @@ using System.Collections.Generic;
 using System.Reflection;
 using System.Threading.Tasks;
 using Discord;
-using DiscordBotFanatic.Models.Configuration;
 using DiscordBotFanatic.Models.Enums;
 using DiscordBotFanatic.Models.WiseOldMan.Responses;
-using Microsoft.Extensions.Configuration;
 using RestSharp;
 using RestSharp.Serializers.NewtonsoftJson;
 
@@ -14,16 +12,14 @@ namespace DiscordBotFanatic.Services
 {
     public class WiseOldManConsumer {
         private readonly LogService _logger;
-        private readonly WiseOldManConfiguration _configuration;
         private const string BaseUrl = "https://wiseoldman.net/api";
         private const string PlayersBase = "players";
         private const string RecordsBase = "records";
         private const string DeltaBase = "deltas";
         private readonly RestClient _client;
 
-        public WiseOldManConsumer(IConfiguration configuration, LogService logger) {
+        public WiseOldManConsumer(LogService logger) {
             _logger = logger;
-            _configuration = configuration.GetSection("WiseOldMan").Get<WiseOldManConfiguration>();
             _client = new RestClient(BaseUrl);
             _client.UseNewtonsoftJson();
         }
@@ -96,17 +92,17 @@ namespace DiscordBotFanatic.Services
             return result;
         }
 
-        public async Task<RecordResponse> GetPlayerRecordAsync(int id, MetricType? metric, Period? Period) {
+        public async Task<RecordResponse> GetPlayerRecordAsync(int id, MetricType? metric, Period? period) {
             var request = new RestRequest($"{RecordsBase}", DataFormat.Json);
-            RecordResponse result = new RecordResponse();
+            
             request.AddParameter("playerId", id);
             request.Method = Method.GET;
 
             if (metric.HasValue) {
-                request.AddParameter("metric", metric.ToString().ToLowerInvariant());
+                request.AddParameter("metric", metric.ToString()?.ToLowerInvariant());
             }
-            if (Period.HasValue) {
-                request.AddParameter("period", Period.ToString().ToLowerInvariant());
+            if (period.HasValue) {
+                request.AddParameter("period", period.ToString()?.ToLowerInvariant());
             }
 
             LogRequest(request, MethodBase.GetCurrentMethod()?.Name);

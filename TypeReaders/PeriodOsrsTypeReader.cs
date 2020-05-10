@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
@@ -12,7 +13,6 @@ namespace DiscordBotFanatic.TypeReaders {
         public override Task<TypeReaderResult> ReadAsync(ICommandContext context, string input,
             IServiceProvider services) {
             List<string> parameters = Regex.Matches(input, @"[\""].+?[\""]|[^ ]+")
-                .Cast<Match>()
                 .Select(m => m.Value.Replace("\"",""))
                 .ToList();
 
@@ -28,6 +28,7 @@ namespace DiscordBotFanatic.TypeReaders {
 
             foreach (string parameter in parameters) {
                 if (Enum.TryParse(typeof(Period), parameter, true, out object period)) {
+                    Debug.Assert(period != null, nameof(period) + " != null");
                     result.Period = (Period) period;
                 }
                 else if (string.IsNullOrEmpty(result.Username)) {

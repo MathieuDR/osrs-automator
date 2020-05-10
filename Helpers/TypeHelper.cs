@@ -1,10 +1,15 @@
 ﻿using System;
+using System.Diagnostics;
 using DiscordBotFanatic.Models.Enums;
 using DiscordBotFanatic.Modules.Parameters;
 
 namespace DiscordBotFanatic.Helpers {
     public static class TypeHelper {
         public static string ToHumanLanguage(this Type type, bool isSpecific = false) {
+
+            if (type == null) {
+                return "Null";
+            }
 
             if (type.IsGenericType && type.GetGenericTypeDefinition() == typeof(Nullable<>))
             {
@@ -41,6 +46,7 @@ namespace DiscordBotFanatic.Helpers {
                 }
             }
 
+            Debug.Assert(type != null, nameof(type) + " != null");
             if (type.IsEnum) {
                 return "Enumeration";
             }

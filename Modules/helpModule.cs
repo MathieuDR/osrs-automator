@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -19,8 +20,6 @@ namespace DiscordBotFanatic.Modules {
 
         private const string HelpSummary = "Help function";
         private const string HelpCommand = "help";
-        private const string HelpAlias = "?";
-        private const string HelpAlias2 = "info";
 
         private Dictionary<string, Type> _parametersToOutput;
 
@@ -94,6 +93,11 @@ namespace DiscordBotFanatic.Modules {
             Dictionary<string, Type> extraTypes = new Dictionary<string, Type>();
             foreach (KeyValuePair<string, Type> keyValuePair in types) {
                 Type type = keyValuePair.Value;
+
+                if (type == null) {
+                    continue;
+                }
+
                 if (type == typeof(string)) {
                     continue;
                 }
@@ -102,6 +106,7 @@ namespace DiscordBotFanatic.Modules {
                     type = Nullable.GetUnderlyingType(type);
                 }
 
+                Debug.Assert(type != null, nameof(type) + " != null");
                 if (type.IsValueType && !type.IsEnum) {
                     continue;
                 }
@@ -125,8 +130,8 @@ namespace DiscordBotFanatic.Modules {
                         properties.Select(x => $"**{x.Name}** {x.PropertyType.ToHumanLanguage()}")));
 
                     var dictionary = properties.Where(x =>
-                            !types.ContainsKey(x.PropertyType.FullName) &&
-                            !extraTypes.ContainsKey(x.PropertyType.FullName))
+                            !types.ContainsKey(x.PropertyType.FullName ?? string.Empty) &&
+                            !extraTypes.ContainsKey(x.PropertyType.FullName ?? string.Empty))
                         .ToDictionary(x => x.PropertyType.FullName, x => x.PropertyType);
 
                     if (dictionary.Any()) {
@@ -181,8 +186,8 @@ namespace DiscordBotFanatic.Modules {
             StringBuilder output = new StringBuilder();
             if (!command.Parameters.Any()) return output.ToString();
             foreach (var param in command.Parameters) {
-                if (!_parametersToOutput.ContainsKey(param.Type.FullName)) {
-                    _parametersToOutput.Add(param.Type.FullName, param.Type);
+                if (!_parametersToOutput.ContainsKey(param.Type.FullName ?? string.Empty)) {
+                    _parametersToOutput.Add(param.Type.FullName ?? string.Empty, param.Type);
                 }
 
                 if (param.IsOptional) {

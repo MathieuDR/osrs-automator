@@ -46,7 +46,7 @@ namespace DiscordBotFanatic.Helpers {
         }
 
         public static string EndRank(this DeltaMetric metric) {
-            return metric.Rank.End.FormatNumber();;
+            return metric.Rank.End.FormatNumber();
         }
 
         public static string GainedRanks(this DeltaMetric metric) {
@@ -136,12 +136,12 @@ namespace DiscordBotFanatic.Helpers {
         public static int ToLevel(this int experience) {
             int index;
 
-            for (index = 0; index < _experiences.Length; index++) {
-                if (index + 1 == _experiences.Length) {
+            for (index = 0; index < Experiences.Length; index++) {
+                if (index + 1 == Experiences.Length) {
                     break;
                 }
 
-                if (_experiences[index + 1] > experience) {
+                if (Experiences[index + 1] > experience) {
                     break;
                 }
             }
@@ -149,7 +149,7 @@ namespace DiscordBotFanatic.Helpers {
             return index;
         }
 
-        private static readonly int[] _experiences = {
+        private static readonly int[] Experiences = {
             0, 0, 83, 174, 276, 388, 512, 650, 801, 969, 1154, 1358, 1584, 1833, 2107, 2411, 2746, 3115, 3523, 3973,
             4470, 5018, 5624, 6291, 7028, 7842, 8740, 9730, 10824, 12031, 13363, 14833, 16456, 18247, 20224, 22406,
             24815, 27473, 30408, 33648, 37224, 41171, 45529, 50339, 55649, 61512, 67983, 75127, 83014, 91721, 101333,
