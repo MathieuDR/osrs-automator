@@ -1,0 +1,250 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using Discord;
+using Discord.Commands;
+using DiscordBotFanatic.Helpers;
+
+namespace DiscordBotFanatic.Modules {
+    public class HelpModule : ModuleBase<SocketCommandContext> {
+        public HelpModule(CommandService commandService, IServiceProvider serviceProvider) {
+            _commandService = commandService;
+            _serviceProvider = serviceProvider;
+            _parametersToOutput = new Dictionary<string, Type>();
+        }
+
+        private const string HelpSummary = "Help function";
+        private const string HelpCommand = "help";
+        private const string HelpAlias = "?";
+
+        private Dictionary<string, Type> _parametersToOutput;
+
+        private readonly CommandService _commandService;
+        private readonly IServiceProvider _serviceProvider;
+
+        [Command(HelpCommand)]
+        [Summary(HelpSummary)]
+        [Alias(HelpAlias)]
+        public async Task Help(string path = "") {
+            EmbedBuilder output = new EmbedBuilder();
+            if (path == "") {
+                output.Title = "'Fanatic Helps function";
+
+                foreach (var mod in _commandService.Modules.Where(m => m.Parent == null)) {
+                    AddHelp(mod, ref output);
+                }
+
+                output.Footer = new EmbedFooterBuilder {
+                    Text = "Use 'help <module>' to get help with a module."
+                };
+            }
+            else {
+                var mod = _commandService.Modules.FirstOrDefault(m =>
+                    m.Name.Replace("Module", "").ToLower() == path.ToLower());
+                if (mod == null) {
+                    await ReplyAsync("No module could be found with that name.");
+                    return;
+                }
+
+                output.Title = mod.Name;
+                output.Description = $"{mod.Summary}\n" +
+                                     (!string.IsNullOrEmpty(mod.Remarks) ? $"({mod.Remarks})\n" : "") +
+                                     (mod.Aliases.Any(x => !string.IsNullOrEmpty(x))
+                                         ? $"Prefix(es): {string.Join(",", mod.Aliases)}\n"
+                                         : "") +
+                                     (mod.Submodules.Any()
+                                         ? $"Submodules: {mod.Submodules.Select(m => m.Name)}\n"
+                                         : "") + " ";
+                AddCommands(mod, ref output);
+                if (_parametersToOutput.Count > 0) {
+                    AddParameterInfo(ref output);
+                }
+            }
+
+            await ReplyAsync("", embed: output.Build());
+        }
+
+        private void AddParameterInfo(ref EmbedBuilder output) {
+            StringBuilder descripStringBuilder = new StringBuilder();
+            TypesToHumanLanguage(descripStringBuilder, _parametersToOutput);
+            if(descripStringBuilder.Length > 0) {
+                output.AddField($"Parameters", descripStringBuilder.ToString());
+            }
+        }
+
+        private void TypesToHumanLanguage(StringBuilder descripStringBuilder, Dictionary<string, Type> types) {
+            Dictionary<string, Type> extraTypes = new Dictionary<string, Type>();
+            foreach (KeyValuePair<string, Type> keyValuePair in types) {
+                Type type = keyValuePair.Value;
+                if (type == typeof(string)) {
+                    continue;
+                }
+
+                if (type.IsGenericType && type.GetGenericTypeDefinition() == typeof(Nullable<>)) {
+                    type = Nullable.GetUnderlyingType(type);
+                }
+
+                if (type.IsValueType && !type.IsEnum) {
+                    continue;
+                }
+
+                var properties = type.GetProperties().ToList();
+
+                descripStringBuilder.Append($"**{type.ToHumanLanguage(true)}** {Environment.NewLine}");
+
+                if (type.IsEnum) {
+                    List<string> values = new List<string>();
+                    foreach (var x in type.GetFields()) {
+                        if (!x.Name.Equals("value__")) {
+                            values.Add(Enum.Parse(type, x.Name).ToString());
+                        }
+                    }
+                    
+                    descripStringBuilder.Append(string.Join(", ", values));
+                }
+                else {
+                    descripStringBuilder.Append(string.Join(", ",
+                        properties.Select(x => $"**{x.Name}** {x.PropertyType.ToHumanLanguage()}")));
+
+                    var dictionary = properties.Where(x =>
+                            !types.ContainsKey(x.PropertyType.FullName) &&
+                            !extraTypes.ContainsKey(x.PropertyType.FullName))
+                        .ToDictionary(x => x.PropertyType.FullName, x => x.PropertyType);
+
+                    if (dictionary.Any()) {
+                        extraTypes = extraTypes.Concat(dictionary).ToDictionary(x => x.Key, x => x.Value);
+                    }
+                }
+
+                descripStringBuilder.Append(Environment.NewLine);
+                descripStringBuilder.Append(Environment.NewLine);
+            }
+
+            if (extraTypes.Any()) {
+                TypesToHumanLanguage(descripStringBuilder, extraTypes);
+            }
+        }
+
+        //[Command(HelpCommand)]
+        //[Summary(HelpSummary)]
+        //[Alias(HelpAlias)]
+        //public async Task Help(string command) {
+        //    Task.CompletedTask;
+        //}
+
+        public void AddHelp(ModuleInfo module, ref EmbedBuilder builder) {
+            foreach (var sub in module.Submodules) AddHelp(sub, ref builder);
+            builder.AddField(f => {
+                f.Name = $"**{module.Name.Replace("Module", "")}**";
+                f.Value = $"Commands: {string.Join(", ", module.Commands.Select(x => $"`{x.Name}`"))}";
+            });
+        }
+
+        public void AddCommands(ModuleInfo module, ref EmbedBuilder builder) {
+            foreach (var command in module.Commands) {
+                command.CheckPreconditionsAsync(Context, _serviceProvider).GetAwaiter().GetResult();
+                AddCommand(command, ref builder);
+            }
+        }
+
+        public void AddCommand(CommandInfo command, ref EmbedBuilder builder) {
+            builder.AddField(f => {
+                f.Name = $"**{command.Name}**";
+                f.Value = $"{command.Summary}\n" +
+                          (!string.IsNullOrEmpty(command.Remarks) ? $"({command.Remarks})\n" : "") +
+                          (command.Aliases.Any()
+                              ? $"**Aliases:** {string.Join(", ", command.Aliases.Select(x => $"`{x}`"))}\n"
+                              : "") +
+                          $"**Usage:** `{GetPrefix(command)} {GetParameters(command)}`";
+            });
+        }
+
+        public string GetParameters(CommandInfo command) {
+            StringBuilder output = new StringBuilder();
+            if (!command.Parameters.Any()) return output.ToString();
+            foreach (var param in command.Parameters) {
+                if (!_parametersToOutput.ContainsKey(param.Type.FullName)) {
+                    _parametersToOutput.Add(param.Type.FullName, param.Type);
+                }
+
+                if (param.IsOptional) {
+                    output.Append($"[{param.Name}:{param.Type.ToHumanLanguage()}");
+                    if (param.DefaultValue != null &&
+                        (param.Type == typeof(string) && !string.IsNullOrEmpty(param.DefaultValue.ToString()))) {
+                        output.Append($" = {param.DefaultValue}");
+                    }
+
+                    output.Append($"] ");
+                }
+                else if (param.IsMultiple) {
+                    output.Append($"|{param.Name}:{param.Type.ToHumanLanguage()}| ");
+                }
+                else if (param.IsRemainder) {
+                    output.Append($"...{param.Name}:{param.Type.ToHumanLanguage()} ");
+                }
+                else {
+                    output.Append($"<{param.Name}:{param.Type.ToHumanLanguage()}> ");
+                }
+            }
+
+            return output.ToString();
+        }
+
+
+        public string GetPrefix(CommandInfo command) {
+            var output = GetPrefix(command.Module);
+            output += $"{command.Aliases.FirstOrDefault()} ";
+            return output;
+        }
+
+        public string GetPrefix(ModuleInfo module) {
+            string output = "";
+            if (module.Parent != null) output = $"{GetPrefix(module.Parent)}{output}";
+            if (module.Aliases.Any())
+                output += string.Concat(module.Aliases.FirstOrDefault(), " ");
+            return output;
+        }
+
+
+        //private Embed CreateEmbedForCommandInfos(List<CommandInfo> commands) {
+        //    EmbedBuilder embedBuilder = new EmbedBuilder();
+
+        //    foreach (CommandInfo command in commands)
+        //    {
+        //        // Get the command Summary attribute information
+        //        string embedFieldText = command.Summary ?? "No description available\n";
+        //        embedBuilder.AddField(command.Name, embedFieldText);
+        //    }
+
+        //    return embedBuilder.Build();
+
+        //}
+
+
+        //private string BuildHelperText() {
+        //    string message = "";
+
+        //    foreach (CommandInfo command in _commandService.Commands) {
+        //        message += $"{command.Name} - {command.Summary} \n";
+        //        foreach (ParameterInfo commandParameter in command.Parameters) {
+        //            message += $"   P: {commandParameter.Name} ({commandParameter.Summary} - {commandParameter.Type})";
+        //            if (commandParameter.IsOptional) {
+        //                message += " (optional)";
+        //            }
+
+        //            if (commandParameter.DefaultValue != null) {
+        //                message += $" (default: {commandParameter.DefaultValue})";
+        //            }
+
+        //            message += $".\n";
+        //        }
+
+        //        message += $"\n";
+        //    }
+
+        //    return message;
+        //}
+    }
+}
