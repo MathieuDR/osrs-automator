@@ -47,7 +47,7 @@ namespace DiscordBotFanatic.Services {
 
         public async Task OnCommandExecutedAsync(Optional<CommandInfo> command, ICommandContext context, IResult result)
         {
-            // We have access to the information of the command executed,
+            // We have access to the info   rmation of the command executed,
             // the context of the command, and the result returned from the
             // execution in this event.
 

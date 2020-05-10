@@ -30,16 +30,28 @@ namespace DiscordBotFanatic.Modules {
         private string _osrsUsername = "";
         private MetricType? _metricType;
         private Period? _period;
-        private Task<IUserMessage> _waitMessageTask;
+        private IUserMessage _waitMessage;
         private int _timeToUpdate = 30;
 
         private BaseResponse _response;
+        private Task<IUserMessage> _waitMessageTask;
 
         public WiseOldManModule(WiseOldManConsumer wiseOldManClient, IDiscordBotRepository repository,
             MessageConfiguration messageConfiguration) {
             _client = wiseOldManClient;
             _repository = repository;
             _messageConfiguration = messageConfiguration;
+        }
+
+        public IUserMessage WaitMessage {
+            get {
+                try {
+                    return _waitMessage ??= _waitMessageTask.Result;
+                }
+                catch {
+                    return null;
+                }
+            }
         }
 
         protected override void BeforeExecute(CommandInfo command) {
@@ -59,28 +71,34 @@ namespace DiscordBotFanatic.Modules {
 
             _waitMessageTask = ReplyAsync(embed: PleaseWaitEmbed());
 
+
             base.BeforeExecute(command);
         }
 
-        protected override async void AfterExecute(CommandInfo command) {
+        protected override void AfterExecute(CommandInfo command) {
             if (_response != null) {
-                IUserMessage waitMessage = await _waitMessageTask;
-
+                Embed embedResponse;
                 ValidateResponse(_response);
-                var t = _response switch {
-                    PlayerResponse playerResponse => waitMessage.ModifyAsync(x =>
-                        x.Embed = new Optional<Embed>(FormatEmbeddedFromPlayerResponse(playerResponse))),
-                    DeltaResponse deltaResponse => waitMessage.ModifyAsync(x =>
-                        x.Embed = new Optional<Embed>(FormatEmbeddedFromDeltaResponse(deltaResponse))),
-                    RecordResponse recordResponse => waitMessage.ModifyAsync(x =>
-                        x.Embed = new Optional<Embed>(FormatEmbeddedFromRecordResponse(recordResponse))),
-                    _ => waitMessage.ModifyAsync(x => {
-                        x.Embed = null;
-                        x.Content = "Please contact admin. Response type unknown.";
-                    })
-                };
+                switch (_response) {
+                    case PlayerResponse playerResponse:
+                        embedResponse = FormatEmbeddedFromPlayerResponse(playerResponse);
+                        break;
+                    case DeltaResponse deltaResponse:
+                        embedResponse = FormatEmbeddedFromDeltaResponse(deltaResponse);
+                        break;
+                    case RecordResponse recordResponse:
+                        embedResponse = FormatEmbeddedFromRecordResponse(recordResponse);
+                        break;
+                    default:
+                        throw new Exception($"Response type unknown");
+                }
 
-                await t;
+                if (WaitMessage != null) {
+                    WaitMessage.ModifyAsync(x => x.Embed = new Optional<Embed>(embedResponse));
+                }
+                else {
+                    ReplyAsync(embed: embedResponse);
+                }
             }
 
             base.AfterExecute(command);
@@ -88,6 +106,7 @@ namespace DiscordBotFanatic.Modules {
 
 
         #region player
+
         [Command("get", RunMode = RunMode.Async)]
         [Summary("Current highscores of a player")]
         public async Task GetPlayer([Remainder] MetricOsrsArguments arguments = null) {
@@ -158,16 +177,15 @@ namespace DiscordBotFanatic.Modules {
                         $"Please use your full OSRS name. Too many results using {_osrsUsername} ({players.Count}).");
                 }
 
-                
+
                 _repository.InsertOrUpdatePlayer(dbPlayer);
             }
 
             embed = GetCommonEmbedBuilder($"Done!", $"{username} is sucesfully set as your standard").Build();
 
-            await (await _waitMessageTask).ModifyAsync(x => {
-                x.Embed = embed;
-            });
+            await WaitMessage.ModifyAsync(x => { x.Embed = embed; });
         }
+
         #endregion
 
         #region API Wrapper
@@ -269,11 +287,11 @@ namespace DiscordBotFanatic.Modules {
                 periodString = _period.Value.ToString().ToLowerInvariant();
             }
 
-            
+
             var embed = GetCommonEmbedBuilder($"{_osrsUsername} Records!",
                 $"The maximum experience earned over a {periodString}, What a beast!");
 
-            if (!recordResponse.Records.Any(x=> x.Value > 0)) {
+            if (!recordResponse.Records.Any(x => x.Value > 0)) {
                 embed.Description = $"No records for {_osrsUsername} over the period of a {periodString}";
                 if (_metricType.HasValue) {
                     embed.Description += $" in the metric {_metricType.ToString()?.ToLowerInvariant()}";
@@ -281,7 +299,7 @@ namespace DiscordBotFanatic.Modules {
 
                 return embed.Build();
             }
-            
+
             var orderedList = recordResponse.Records.OrderBy(x => x.Period).ThenByDescending(x => x.Value).ToList();
             bool isInline = orderedList.Count() > 4;
 
