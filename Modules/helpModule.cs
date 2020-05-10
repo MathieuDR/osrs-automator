@@ -30,7 +30,7 @@ namespace DiscordBotFanatic.Modules {
         public async Task Help(string path = "") {
             EmbedBuilder output = new EmbedBuilder();
             if (path == "") {
-                output.Title = "'Fanatic Helps function";
+                output.Title = "Help";
 
                 foreach (var mod in _commandService.Modules.Where(m => m.Parent == null)) {
                     AddHelp(mod, ref output);
