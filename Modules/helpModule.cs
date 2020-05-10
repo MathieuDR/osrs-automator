@@ -53,7 +53,7 @@ namespace DiscordBotFanatic.Modules {
                     return;
                 }
 
-                output.Title = mod.Name;
+                output.Title = mod.Name.Replace("Module", "");
                 output.Description = $"{mod.Summary}\n" +
                                      (!string.IsNullOrEmpty(mod.Remarks) ? $"({mod.Remarks})\n" : "") +
                                      (mod.Aliases.Any(x => !string.IsNullOrEmpty(x))

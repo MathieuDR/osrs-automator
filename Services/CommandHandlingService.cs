@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Reflection;
@@ -45,22 +46,22 @@ namespace DiscordBotFanatic.Services {
             await _commands.AddModulesAsync(Assembly.GetEntryAssembly(), _provider);
         }
 
-        public async Task OnCommandExecutedAsync(Optional<CommandInfo> command, ICommandContext context, IResult result)
-        {
+        public async Task OnCommandExecutedAsync(Optional<CommandInfo> command, ICommandContext context,
+            IResult result) {
             // We have access to the info   rmation of the command executed,
             // the context of the command, and the result returned from the
             // execution in this event.
 
             // We can tell the user what went wrong
-            if (!string.IsNullOrEmpty(result?.ErrorReason))
-            {
+            if (!string.IsNullOrEmpty(result?.ErrorReason)) {
                 await CreateErrorMessage(context, result);
             }
 
             // ...or even log the result (the method used should fit into
             // your existing log handler)
             var commandName = command.IsSpecified ? command.Value.Name : "A command";
-            await _logger.LogDebug(new LogMessage(LogSeverity.Info, "CommandExecution", $"{commandName} was executed at {DateTime.UtcNow}."));
+            await _logger.LogDebug(new LogMessage(LogSeverity.Info, "CommandExecution",
+                $"{commandName} was executed at {DateTime.UtcNow}."));
         }
 
 
@@ -73,10 +74,21 @@ namespace DiscordBotFanatic.Services {
             int argPos = 0;
 
             // Determine if the message is a command based on the prefix and make sure no bots trigger commands
+            if (message.Content.Trim() == _configuration.CustomPrefix.Trim() ||
+                message.Content.Trim() == _discord.CurrentUser.Mention) {
+                var commands = _commands.Search("help").Commands;
+                var result = await commands.FirstOrDefault().ExecuteAsync(new SocketCommandContext(_discord, message), new List<object>(){null}, new List<object>(){null}, _provider);
+                
+                return;
+            }
+
             if (!(message.HasStringPrefix(_configuration.CustomPrefix + " ", ref argPos) ||
                   message.HasMentionPrefix(_discord.CurrentUser, ref argPos)) ||
-                message.Author.IsBot)
+                message.Author.IsBot) {
                 return;
+            }
+            
+
 
             // Create a WebSocket-based command context based on the message
             SocketCommandContext context = new SocketCommandContext(_discord, message);
@@ -86,15 +98,7 @@ namespace DiscordBotFanatic.Services {
 
             // Keep in mind that result does not indicate a return value
             // rather an object stating if the command executed successfully.
-            IResult result = await _commands.ExecuteAsync(context: context, argPos: argPos, services: _provider);
-
-            // Optionally, we may inform the user if the command fails
-            // to be executed; however, this may not always be desired,
-            // as it may clog up the request queue should a user spam a
-            // command.
-            if (result.Error.HasValue) {
-               
-            }
+            await _commands.ExecuteAsync(context: context, argPos: argPos, services: _provider);
         }
 
         public async Task CreateErrorMessage(ICommandContext context, IResult result) {
