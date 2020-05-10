@@ -267,9 +267,19 @@ namespace DiscordBotFanatic.Modules {
                 periodString = _period.Value.ToString().ToLowerInvariant();
             }
 
+            
             var embed = GetCommonEmbedBuilder($"{_osrsUsername} Records!",
                 $"The maximum experience earned over a {periodString}, What a beast!");
 
+            if (!recordResponse.Records.Any(x=> x.Value > 0)) {
+                embed.Description = $"No records for {_osrsUsername} over the period of a {periodString}";
+                if (_metricType.HasValue) {
+                    embed.Description += $" in the metric {_metricType.ToString().ToLowerInvariant()}";
+                }
+
+                return embed.Build();
+            }
+            
             var orderedList = recordResponse.Records.OrderBy(x => x.Period).ThenByDescending(x => x.Value);
             bool isInline = orderedList.Count() > 4;
 
@@ -321,8 +331,8 @@ namespace DiscordBotFanatic.Modules {
 
             ExtractBaseOsrsArguments(arguments);
 
-            _metricType = arguments.MetricType;
-            _period = arguments.Period;
+            _metricType = arguments.MetricType ?? _metricType;
+            _period = arguments.Period ?? _period;
         }
 
         private void ExtractMetricOsrsArguments(MetricOsrsArguments arguments) {
@@ -332,7 +342,7 @@ namespace DiscordBotFanatic.Modules {
 
             ExtractBaseOsrsArguments(arguments);
 
-            _metricType = arguments.MetricType;
+            _metricType = arguments.MetricType ?? _metricType;
         }
 
         private void ExtractBaseOsrsArguments(BaseOsrsArguments baseOsrsArguments) {
