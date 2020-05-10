@@ -1,24 +1,36 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Reflection;
+using System.Security.Cryptography.X509Certificates;
+using System.Threading;
 using System.Threading.Tasks;
 using Discord;
 using Discord.Commands;
 using Discord.WebSocket;
+using DiscordBotFanatic.Models.Configuration;
 using DiscordBotFanatic.Modules.Parameters;
 using DiscordBotFanatic.TypeReaders;
+using Microsoft.Extensions.Logging;
 
 namespace DiscordBotFanatic.Services {
     public class CommandHandlingService {
         private readonly DiscordSocketClient _discord;
         private readonly CommandService _commands;
         private IServiceProvider _provider;
+        private BotConfiguration _configuration;
+        private readonly LogService _logger;
 
-        public CommandHandlingService(IServiceProvider provider, DiscordSocketClient discord, CommandService commands) {
+        public CommandHandlingService(IServiceProvider provider, DiscordSocketClient discord, CommandService commands,
+            BotConfiguration configuration, LogService logger) {
             _discord = discord;
             _commands = commands;
             _provider = provider;
+            _configuration = configuration;
+            _logger = logger;
 
-            _discord.MessageReceived += MessageReceived;
+            _discord.MessageReceived += HandleCommandAsync;
+            _commands.CommandExecuted += OnCommandExecutedAsync;
         }
 
         public async Task InitializeAsync(IServiceProvider provider) {
@@ -29,75 +41,101 @@ namespace DiscordBotFanatic.Services {
             await _commands.AddModulesAsync(Assembly.GetEntryAssembly(), _provider);
         }
 
-        private async Task MessageReceived(SocketMessage rawMessage) {
-            // Ignore system messages and messages from bots
-            if (!(rawMessage is SocketUserMessage message)) {
-                return;
+        public async Task OnCommandExecutedAsync(Optional<CommandInfo> command, ICommandContext context, IResult result)
+        {
+            // We have access to the information of the command executed,
+            // the context of the command, and the result returned from the
+            // execution in this event.
+
+            // We can tell the user what went wrong
+            if (!string.IsNullOrEmpty(result?.ErrorReason))
+            {
+                CreateErrorMessage(context, result);
             }
 
-            if (message.Source != MessageSource.User) {
-                return;
-            }
+            // ...or even log the result (the method used should fit into
+            // your existing log handler)
+            var commandName = command.IsSpecified ? command.Value.Name : "A command";
+            _logger.LogDebug(new LogMessage(LogSeverity.Info, "CommandExecution", $"{commandName} was executed at {DateTime.UtcNow}."));
+        }
 
+
+        private async Task HandleCommandAsync(SocketMessage messageParam) {
+            // Don't process the command if it was a system message
+            var message = messageParam as SocketUserMessage;
+            if (message == null) return;
+
+            // Create a number to track where the prefix ends and the command begins
             int argPos = 0;
-            if (!message.HasMentionPrefix(_discord.CurrentUser, ref argPos)) {
+
+            // Determine if the message is a command based on the prefix and make sure no bots trigger commands
+            if (!(message.HasStringPrefix(_configuration.CustomPrefix, ref argPos) ||
+                  message.HasMentionPrefix(_discord.CurrentUser, ref argPos)) ||
+                message.Author.IsBot)
                 return;
-            }
 
-            var context = new SocketCommandContext(_discord, message);
-            var result = await _commands.ExecuteAsync(context, argPos, _provider);
+            // Create a WebSocket-based command context based on the message
+            SocketCommandContext context = new SocketCommandContext(_discord, message);
 
-            if (result.Error.HasValue ) {
-                string errorResponse = "";
-                string helpMessage = "Please use the `help` command for more info.";
-                string contactMessage = "Please contact the administrator for help.";
-                switch (result.Error) {
-                    case CommandError.UnknownCommand:
-                        errorResponse = $"Command unknown. {helpMessage}";
-                        break;
-                    case CommandError.ParseFailed:
-                        errorResponse = $"Could not parse argument. {helpMessage}";
-                        break;
-                    case CommandError.BadArgCount:
-                        errorResponse = $"Could not parse argument. {helpMessage}";
-                        break;
-                    case CommandError.ObjectNotFound:
-                        errorResponse = $"Object not found. {contactMessage}";
-                        break;
-                    case CommandError.MultipleMatches:
-                        errorResponse = $"Command has multiple matches. {contactMessage}";
-                        break;
-                    case CommandError.UnmetPrecondition:
-                        errorResponse = $"Insufficient rights. {helpMessage}";
-                        break;
-                    case CommandError.Exception:
-                        errorResponse = $"Exception thrown. {contactMessage}";
-                        break;
-                    case CommandError.Unsuccessful:
-                    case null:
-                        errorResponse = $"unsuccessful, please try again later. {helpMessage} If the problem persists {contactMessage.ToLower()}";
-                        break;
-                    default:
-                        throw new ArgumentOutOfRangeException();
-                }
+            // Execute the command with the command context we just
+            // created, along with the service provider for precondition checks.
 
-                await context.User.SendMessageAsync(errorResponse);
+            // Keep in mind that result does not indicate a return value
+            // rather an object stating if the command executed successfully.
+            IResult result = await _commands.ExecuteAsync(context: context, argPos: argPos, services: _provider);
+
+            // Optionally, we may inform the user if the command fails
+            // to be executed; however, this may not always be desired,
+            // as it may clog up the request queue should a user spam a
+            // command.
+            if (result.Error.HasValue) {
+               
             }
         }
 
-        public async Task CommandExecutedAsync(Optional<CommandInfo> command, ICommandContext context, IResult result) {
-            // command is unspecified when there was a search failure (command not found); we don't care about these errors
-            if (!command.IsSpecified) {
-                return;
+        public async Task CreateErrorMessage(ICommandContext context, IResult result) {
+            var resultMessageTask = GetWaitMessage(context);
+
+            EmbedBuilder builder = new EmbedBuilder() {Title = $"Error!"};
+
+            builder.AddField(result.Error.Value.ToString(), result.ErrorReason);
+            builder.AddField($"Get more help", $"Please use `{_configuration.CustomPrefix}help` for this bot's usage");
+
+            var resultMessage = await resultMessageTask;
+            if (resultMessage != null) {
+                resultMessage.ModifyAsync(x => x.Embed = builder.Build());
+            }
+            else {
+                context.User.SendMessageAsync(embed: builder.Build());
+            }
+        }
+
+        private async Task<IUserMessage> GetWaitMessage(ICommandContext context) {
+            string toCompareId = context.Message.Id.ToString();
+            var channel = context.Message.Channel;
+            var messagesList = channel.GetMessagesAsync(context.Message, Direction.After);
+            IUserMessage resultMessage = null;
+            var foundMessage = new CancellationTokenSource();
+
+            await foreach (var messages in messagesList.WithCancellation(foundMessage.Token)) {
+                foreach (IMessage message in messages) {
+                    if (message.Embeds.Any()) {
+                        foreach (IEmbed messageEmbed in message.Embeds) {
+                            if (messageEmbed.Footer?.Text == toCompareId) {
+                                resultMessage = (IUserMessage) message;
+                                foundMessage.Cancel();
+                                break;
+                            }
+                        }
+                    }
+
+                    if (foundMessage.Token.IsCancellationRequested) {
+                        break;
+                    }
+                }
             }
 
-            // the command was successful, we don't care about this result, unless we want to log that a command succeeded.
-            if (result.IsSuccess) {
-                return;
-            }
-
-            // the command failed, let's notify the user that something happened.
-            await context.Channel.SendMessageAsync($"error: {result}");
+            return resultMessage;
         }
     }
 }

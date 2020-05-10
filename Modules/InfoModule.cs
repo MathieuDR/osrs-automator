@@ -1,4 +1,5 @@
-﻿using System.Threading.Tasks;
+﻿using System;
+using System.Threading.Tasks;
 using Discord.Commands;
 using DiscordBotFanatic.Helpers;
 
@@ -19,6 +20,15 @@ namespace DiscordBotFanatic.Modules {
         [Command("level")]
         public Task GetLevel(int number) {
             return ReplyAsync($"{number.ToLevel()}");
+        }
+
+        [Command("error")]
+        public Task GetError([Remainder] string errorMessage= "") {
+            if (string.IsNullOrEmpty(errorMessage)) {
+                throw new ArgumentException($"Wow, special error!");
+            }
+
+            throw new Exception($"bla {errorMessage}");
         }
     }
 }
