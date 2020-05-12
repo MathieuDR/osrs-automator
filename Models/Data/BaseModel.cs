@@ -6,9 +6,10 @@ using LiteDB;
 namespace DiscordBotFanatic.Models.Data {
     public class BaseModel {
         // ReSharper disable once InconsistentNaming
+        [BsonId]
         public ObjectId _id { get; set; }
 
-        public short Id => _id.Pid;
+        //public short Id => _id.Pid;
 
         protected Dictionary<string, string> ValidationDictionary = new Dictionary<string, string>();
 

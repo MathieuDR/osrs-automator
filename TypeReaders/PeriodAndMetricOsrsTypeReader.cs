@@ -2,19 +2,17 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
-using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using Discord.Commands;
+using DiscordBotFanatic.Helpers;
 using DiscordBotFanatic.Models.Enums;
-using DiscordBotFanatic.Modules.Parameters;
+using DiscordBotFanatic.Modules.DiscordCommandArguments;
 
 namespace DiscordBotFanatic.TypeReaders {
     public class PeriodAndMetricOsrsTypeReader : TypeReader {
         public override Task<TypeReaderResult> ReadAsync(ICommandContext context, string input,
             IServiceProvider services) {
-            List<string> parameters = Regex.Matches(input, @"[\""].+?[\""]|[^ ]+")
-                .Select(m => m.Value.Replace("\"",""))
-                .ToList();
+            List<string> parameters = input.ToCollectionOfParameters().ToList();
 
             if (!parameters.Any()) {
                 return Task.FromResult(TypeReaderResult.FromSuccess(null));

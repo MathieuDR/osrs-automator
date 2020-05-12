@@ -3,22 +3,22 @@ using System.Threading.Tasks;
 using Discord;
 using Discord.Commands;
 using Discord.WebSocket;
+using DiscordBotFanatic.Services.interfaces;
 using Microsoft.Extensions.Logging;
 
 namespace DiscordBotFanatic.Services {
-    public class LogService {
+    public class LogService :ILogService {
         private readonly ILogger _discordLogger;
         private readonly ILogger _commandsLogger;
         private readonly ILogger _debugLogger;
 
         public LogService(DiscordSocketClient discord, CommandService commands, ILoggerFactory loggerFactory)
         {
-            var loggerFactory1 = loggerFactory;
-            _discordLogger = loggerFactory1.CreateLogger("discord");
-            _commandsLogger = loggerFactory1.CreateLogger("commands");
-            _debugLogger = loggerFactory1.CreateLogger("debug");
+            _discordLogger = loggerFactory.CreateLogger("discord");
+            _commandsLogger = loggerFactory.CreateLogger("commands");
+            _debugLogger = loggerFactory.CreateLogger("debug");
 
-            discord.Log += LogDiscord;
+            discord.Log += LogDiscordClient;
             commands.Log += LogCommand;
         }
         
@@ -32,7 +32,7 @@ namespace DiscordBotFanatic.Services {
             return Task.CompletedTask;
         }
 
-        private Task LogDiscord(LogMessage message)
+        public Task LogDiscordClient(LogMessage message)
         {
             _discordLogger.Log(
                 LogLevelFromSeverity(message.Severity), 
@@ -43,7 +43,7 @@ namespace DiscordBotFanatic.Services {
             return Task.CompletedTask;
         }
 
-        private Task LogCommand(LogMessage message)
+        public Task LogCommand(LogMessage message)
         {
             //// Return an error message for async commands
             //if (message.Exception is CommandException command)

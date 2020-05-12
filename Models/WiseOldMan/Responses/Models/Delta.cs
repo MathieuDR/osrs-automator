@@ -5,7 +5,7 @@ namespace DiscordBotFanatic.Models.WiseOldMan.Responses.Models {
         public int Start { get; set; }
         public int End { get; set; }
 
-        [JsonProperty("Delta")]
+        [JsonProperty("delta")]
         public int Gained { get; set; }
     }
 }

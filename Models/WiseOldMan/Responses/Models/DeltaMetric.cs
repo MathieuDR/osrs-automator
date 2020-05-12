@@ -4,10 +4,23 @@ namespace DiscordBotFanatic.Models.WiseOldMan.Responses.Models {
     public class DeltaMetric {
         public Delta Rank { get; set; }
         public Delta Experience { get; set; }
+        public Delta Score { get; set; }
 
         public override string ToString() {
+            if (Rank == null || Rank.End == -1) {
+                return "-1";
+            }
+
             //return $"+{this.GainedRanks()}R, (+{this.GainedExperience()}XP)";
-            return $"+ {this.LevelGained()}L ({this.GainedExperience()} XP), {this.GainedRanks()} R";
+            if (Experience != null) {
+                return $"+{this.LevelGained()} LVL('s) ({this.GainedExperience()} XP), {this.GainedRanks()} Ranks ({this.Rank.End})";
+            }
+
+            if (Score != null) {
+                return $"+{Score.Gained} ({Score.End}), {this.GainedRanks()} Ranks ({this.Rank.End})";
+            }
+
+            return "-1";
         }
     }
 }

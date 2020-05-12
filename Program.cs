@@ -7,6 +7,7 @@ using Discord.WebSocket;
 using DiscordBotFanatic.Models.Configuration;
 using DiscordBotFanatic.Repository;
 using DiscordBotFanatic.Services;
+using DiscordBotFanatic.Services.interfaces;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
@@ -16,7 +17,7 @@ namespace DiscordBotFanatic
 {
     class Program
     {
-        static void Main(string[] args)
+        static void Main()
             => new Program().MainAsync().GetAwaiter().GetResult();
 
         public async Task MainAsync() {
@@ -24,9 +25,7 @@ namespace DiscordBotFanatic
             var services = ConfigureServices(config); // No using statement?
 
             DiscordSocketClient client = services.GetRequiredService<DiscordSocketClient>();
-
-            services.GetRequiredService<LogService>();
-
+            
             await ((CommandHandlingService) services.GetRequiredService(typeof(CommandHandlingService)))
                 .InitializeAsync(services);
 
@@ -47,15 +46,17 @@ namespace DiscordBotFanatic
                 .AddSingleton<CommandService>()
                 .AddSingleton<CommandHandlingService>()
                 // Logging
-                .AddLogging(builder => builder.AddConsole(x=>new ConsoleLoggerOptions(){LogToStandardErrorThreshold = LogLevel.Debug}))
-                .AddSingleton<LogService>()
+                // ReSharper disable once ObjectCreationAsStatement
+                .AddLogging(builder => builder.AddConsole(x=> new ConsoleLoggerOptions(){LogToStandardErrorThreshold = LogLevel.Debug}))
+                .AddSingleton<ILogService, LogService>()
                 // Extra
                 .AddSingleton(config)
                 .AddSingleton(botConfiguration)
                 .AddSingleton(botConfiguration.Messages)
                 .AddTransient<WiseOldManConsumer>()
                 .AddTransient<IDiscordBotRepository>(x=> new LiteDbRepository(configuration.DatabaseFile))
-                // Add additional services here...
+                .AddTransient<IGuildService, GuildService>()
+                // Add additional services here
                 .BuildServiceProvider();
         }
 

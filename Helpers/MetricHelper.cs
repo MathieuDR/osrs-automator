@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Globalization;
 using DiscordBotFanatic.Models.Enums;
 using DiscordBotFanatic.Models.WiseOldMan.Responses.Models;
@@ -76,13 +77,118 @@ namespace DiscordBotFanatic.Helpers {
             return number.ToString("#,#", nfi);
         }
 
+        public static bool IsBossMetric(this MetricType type) {
+            return GetBossMetrics().Contains(type);
+        }
+
+        public static bool IsActivityMetric(this MetricType type) {
+            return GetActivityMetrics().Contains(type);
+        }
+
+        public static bool IsSkillMetric(this MetricType type) {
+            return GetSkillMetrics().Contains(type);
+        }
+
+        public static List<MetricType> GetBossMetrics() {
+            return new List<MetricType>() {
+                MetricType.AbyssalSire,
+                MetricType.AlchemicalHydra,
+                MetricType.BarrowsChests,
+                MetricType.Bryophyta,
+                MetricType.Callisto,
+                MetricType.Cerberus,
+                MetricType.ChambersOfXeric,
+                MetricType.ChambersOfXericChallengeMode,
+                MetricType.ChaosElemental,
+                MetricType.ChaosFanatic,
+                MetricType.CommanderZilyana,
+                MetricType.CorporealBeast,
+                MetricType.CrazyArchaeologist,
+                MetricType.DagannothPrime,
+                MetricType.DagannothRex,
+                MetricType.DagannothSupreme,
+                MetricType.DerangedArchaeologist,
+                MetricType.GeneralGraardor,
+                MetricType.GiantMole,
+                MetricType.GrotesqueGuardians,
+                MetricType.Hespori,
+                MetricType.KalphiteQueen,
+                MetricType.KingBlackDragon,
+                MetricType.Kraken,
+                MetricType.Kreearra,
+                MetricType.KrilTsutsaroth,
+                MetricType.Mimic,
+                MetricType.Nightmare,
+                MetricType.Obor,
+                MetricType.Sarachnis,
+                MetricType.Scorpia,
+                MetricType.Skotizo,
+                MetricType.TheGauntlet,
+                MetricType.TheCorruptedGauntlet,
+                MetricType.TheatreOfBlood,
+                MetricType.ThermonuclearSmokeDevil,
+                MetricType.TzkalZuk,
+                MetricType.TztokJad,
+                MetricType.Venenatis,
+                MetricType.Vetion,
+                MetricType.Vorkath,
+                MetricType.Wintertodt,
+                MetricType.Zalcano,
+                MetricType.Zulrah,
+            };
+        }
+
+        public static List<MetricType> GetActivityMetrics() {
+            return new List<MetricType>() {
+                MetricType.LeaguePoints,
+                MetricType.BountyHunterHunter,
+                MetricType.BountyHunterRogue,
+                MetricType.ClueScrollsAll,
+                MetricType.ClueScrollsEasy,
+                MetricType.ClueScrollsMedium,
+                MetricType.ClueScrollsHard,
+                MetricType.ClueScrollsElite,
+                MetricType.ClueScrollsMaster,
+                MetricType.LastManStanding,
+            };
+        }
+
+        public static List<MetricType> GetSkillMetrics() {
+            return new List<MetricType>() {
+                MetricType.Overall,
+                MetricType.Attack,
+                MetricType.Defence,
+                MetricType.Strength,
+                MetricType.Hitpoints,
+                MetricType.Ranged,
+                MetricType.Prayer,
+                MetricType.Magic,
+                MetricType.Cooking,
+                MetricType.Woodcutting,
+                MetricType.Fletching,
+                MetricType.Fishing,
+                MetricType.Firemaking,
+                MetricType.Crafting,
+                MetricType.Smithing,
+                MetricType.Mining,
+                MetricType.Herblore,
+                MetricType.Agility,
+                MetricType.Thieving,
+                MetricType.Slayer,
+                MetricType.Farming,
+                MetricType.Runecrafting,
+                MetricType.Hunter,
+                MetricType.Construction,
+            };
+        }
+
         public static string ToEmoji(this MetricType metric) {
             //return "";
             switch (metric) {
                 case MetricType.Overall:
                     return "\uD83D\uDCCA";
                 case MetricType.Attack:
-                    return 	"\u2694";
+                    return "\u2694";
                 case MetricType.Defence:
                     return "\uD83D\uDEE1";
                 case MetricType.Strength:
@@ -127,6 +233,62 @@ namespace DiscordBotFanatic.Helpers {
                     return "\uD83D\uDC26";
                 case MetricType.Construction:
                     return "\uD83E\uDDF1";
+                case MetricType.LeaguePoints:
+                case MetricType.BountyHunterHunter:
+                case MetricType.BountyHunterRogue:
+                case MetricType.ClueScrollsAll:
+                case MetricType.ClueScrollsEasy:
+                case MetricType.ClueScrollsBeginner:
+                case MetricType.ClueScrollsMedium:
+                case MetricType.ClueScrollsHard:
+                case MetricType.ClueScrollsElite:
+                case MetricType.ClueScrollsMaster:
+                case MetricType.LastManStanding:
+                case MetricType.AbyssalSire:
+                case MetricType.AlchemicalHydra:
+                case MetricType.BarrowsChests:
+                case MetricType.Bryophyta:
+                case MetricType.Callisto:
+                case MetricType.Cerberus:
+                case MetricType.ChambersOfXeric:
+                case MetricType.ChambersOfXericChallengeMode:
+                case MetricType.ChaosElemental:
+                case MetricType.ChaosFanatic:
+                case MetricType.CommanderZilyana:
+                case MetricType.CorporealBeast:
+                case MetricType.CrazyArchaeologist:
+                case MetricType.DagannothPrime:
+                case MetricType.DagannothRex:
+                case MetricType.DagannothSupreme:
+                case MetricType.DerangedArchaeologist:
+                case MetricType.GeneralGraardor:
+                case MetricType.GiantMole:
+                case MetricType.GrotesqueGuardians:
+                case MetricType.Hespori:
+                case MetricType.KalphiteQueen:
+                case MetricType.KingBlackDragon:
+                case MetricType.Kraken:
+                case MetricType.Kreearra:
+                case MetricType.KrilTsutsaroth:
+                case MetricType.Mimic:
+                case MetricType.Nightmare:
+                case MetricType.Obor:
+                case MetricType.Sarachnis:
+                case MetricType.Scorpia:
+                case MetricType.Skotizo:
+                case MetricType.TheGauntlet:
+                case MetricType.TheCorruptedGauntlet:
+                case MetricType.TheatreOfBlood:
+                case MetricType.ThermonuclearSmokeDevil:
+                case MetricType.TzkalZuk:
+                case MetricType.TztokJad:
+                case MetricType.Venenatis:
+                case MetricType.Vetion:
+                case MetricType.Vorkath:
+                case MetricType.Wintertodt:
+                case MetricType.Zalcano:
+                case MetricType.Zulrah:
+                    return "";
                 default:
                     throw new ArgumentOutOfRangeException(nameof(metric), metric, null);
             }
@@ -161,7 +323,5 @@ namespace DiscordBotFanatic.Helpers {
             52136869, 57563718, 63555443, 70170840, 77474828, 85539082, 94442737, 104273167, 115126838, 127110260, 140341028, 154948977,
             171077457, 188884740, 200000000
         };
-
-        
     }
 }

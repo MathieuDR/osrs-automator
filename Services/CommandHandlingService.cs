@@ -10,7 +10,8 @@ using Discord.Commands;
 using Discord.WebSocket;
 using DiscordBotFanatic.Models.Configuration;
 using DiscordBotFanatic.Modules;
-using DiscordBotFanatic.Modules.Parameters;
+using DiscordBotFanatic.Modules.DiscordCommandArguments;
+using DiscordBotFanatic.Services.interfaces;
 using DiscordBotFanatic.TypeReaders;
 
 namespace DiscordBotFanatic.Services {
@@ -19,10 +20,10 @@ namespace DiscordBotFanatic.Services {
         private readonly CommandService _commands;
         private IServiceProvider _provider;
         private BotConfiguration _configuration;
-        private readonly LogService _logger;
+        private readonly ILogService _logger;
 
         public CommandHandlingService(IServiceProvider provider, DiscordSocketClient discord, CommandService commands,
-            BotConfiguration configuration, LogService logger) {
+            BotConfiguration configuration, ILogService logger) {
             _discord = discord;
             _commands = commands;
             _provider = provider;
@@ -44,6 +45,7 @@ namespace DiscordBotFanatic.Services {
             _commands.AddTypeReader<PeriodAndMetricOsrsArguments>(new PeriodAndMetricOsrsTypeReader());
             _commands.AddTypeReader<PeriodOsrsArguments>(new PeriodOsrsTypeReader());
             _commands.AddTypeReader<MetricOsrsArguments>(new MetricOsrsTypeReader());
+            _commands.AddTypeReader<UserListWithImageArguments>(new UserListWithImageArgumentsTypeReader());
             await _commands.AddModulesAsync(Assembly.GetEntryAssembly(), _provider);
         }
 
@@ -78,7 +80,7 @@ namespace DiscordBotFanatic.Services {
             if (message.Content.Trim() == _configuration.CustomPrefix.Trim() ||
                 message.Content.Trim() == _discord.CurrentUser.Mention) {
                 var commands = _commands.Search("help").Commands;
-                var result = await commands.FirstOrDefault().ExecuteAsync(new SocketCommandContext(_discord, message), new List<object>(){null}, new List<object>(){null}, _provider);
+                await commands.FirstOrDefault().ExecuteAsync(new SocketCommandContext(_discord, message), new List<object>(){null}, new List<object>(){null}, _provider);
                 
                 return;
             }

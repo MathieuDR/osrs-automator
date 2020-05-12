@@ -5,20 +5,21 @@ using System.Threading.Tasks;
 using Discord;
 using DiscordBotFanatic.Models.Enums;
 using DiscordBotFanatic.Models.WiseOldMan.Responses;
+using DiscordBotFanatic.Services.interfaces;
 using RestSharp;
 using RestSharp.Serializers.NewtonsoftJson;
 
 namespace DiscordBotFanatic.Services
 {
     public class WiseOldManConsumer {
-        private readonly LogService _logger;
+        private readonly ILogService _logger;
         private const string BaseUrl = "https://wiseoldman.net/api";
         private const string PlayersBase = "players";
         private const string RecordsBase = "records";
         private const string DeltaBase = "deltas";
         private readonly RestClient _client;
 
-        public WiseOldManConsumer(LogService logger) {
+        public WiseOldManConsumer(ILogService logger) {
             _logger = logger;
             _client = new RestClient(BaseUrl);
             _client.UseNewtonsoftJson();
@@ -71,10 +72,7 @@ namespace DiscordBotFanatic.Services
         public async Task<DeltaResponse> DeltaPlayerAsync(int id, Period period = Period.Week) {
             var request = new RestRequest($"{DeltaBase}", DataFormat.Json);
             request.AddParameter("playerId", id);
-
-            if (period != Period.Day) {
-                request.AddParameter("period", period.ToString().ToLower());
-            }
+            request.AddParameter("period", period.ToString().ToLower());
             
             LogRequest(request, MethodBase.GetCurrentMethod()?.Name);
             var result = await _client.GetAsync<DeltaResponse>(request);

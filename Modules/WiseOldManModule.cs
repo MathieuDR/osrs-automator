@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using System.Text;
 using System.Threading.Tasks;
 using Discord;
 using Discord.Commands;
@@ -12,7 +13,7 @@ using DiscordBotFanatic.Models.Data;
 using DiscordBotFanatic.Models.Enums;
 using DiscordBotFanatic.Models.WiseOldMan.Responses;
 using DiscordBotFanatic.Models.WiseOldMan.Responses.Models;
-using DiscordBotFanatic.Modules.Parameters;
+using DiscordBotFanatic.Modules.DiscordCommandArguments;
 using DiscordBotFanatic.Repository;
 using DiscordBotFanatic.Services;
 
@@ -40,8 +41,7 @@ namespace DiscordBotFanatic.Modules {
         private BaseResponse _response;
         private Task<IUserMessage> _waitMessageTask;
 
-        public WiseOldManModule(WiseOldManConsumer wiseOldManClient, IDiscordBotRepository repository,
-            MessageConfiguration messageConfiguration) {
+        public WiseOldManModule(WiseOldManConsumer wiseOldManClient, IDiscordBotRepository repository, MessageConfiguration messageConfiguration) {
             _client = wiseOldManClient;
             _repository = repository;
             _messageConfiguration = messageConfiguration;
@@ -110,9 +110,10 @@ namespace DiscordBotFanatic.Modules {
 
 
         #region player
+
         [Name("Get")]
         [Command("get", RunMode = RunMode.Async)]
-        [Summary( "Current highscores of a player, Will try to update if older then 30 minutes.")]
+        [Summary("Current highscores of a player, Will try to update if older then 30 minutes.")]
         public async Task GetPlayer([Remainder] MetricOsrsArguments arguments = null) {
             ExtractMetricOsrsArguments(arguments);
             _response = await GetPlayerInfo();
@@ -179,8 +180,7 @@ namespace DiscordBotFanatic.Modules {
                     };
                 }
                 else {
-                    throw new ArgumentException(
-                        $"Please use your full OSRS name. Too many results using {_osrsUsername} ({players.Count}).");
+                    throw new ArgumentException($"Please use your full OSRS name. Too many results using {_osrsUsername} ({players.Count}).");
                 }
 
 
@@ -203,8 +203,7 @@ namespace DiscordBotFanatic.Modules {
 
         private async Task<PlayerResponse> GetPlayerInfo() {
             if (string.IsNullOrEmpty(_osrsUsername)) {
-                throw new ArgumentException(
-                    $"{_messageUserDisplay} you don't have a default set. Use the `set` command.");
+                throw new ArgumentException($"{_messageUserDisplay} you don't have a default set. Use the `set` command.");
             }
 
             var response = await ShouldUpdate();
@@ -235,8 +234,7 @@ namespace DiscordBotFanatic.Modules {
 
         private void ValidateResponse(BaseResponse response) {
             if (response == null) {
-                throw new ArgumentException(
-                    $"We did not receive a response. Pleas try again later or contact the administration.");
+                throw new ArgumentException($"We did not receive a response. Pleas try again later or contact the administration.");
             }
 
             if (!string.IsNullOrEmpty(response.Message)) {
@@ -252,8 +250,7 @@ namespace DiscordBotFanatic.Modules {
         private Embed PleaseWaitEmbed() {
             var builder = new EmbedBuilder() {
                 Title = $"Please hang tight {_messageUserDisplay}, we're executing your command {new Emoji("\u2699")}",
-                Description =
-                    $"{FanaticHelper.GetRandomDescription(_messageConfiguration)}{Environment.NewLine}This can actually take a while!"
+                Description = $"{FanaticHelper.GetRandomDescription(_messageConfiguration)}{Environment.NewLine}This can actually take a while!"
             };
             builder.WithFooter(Context.Message.Id.ToString());
             return builder.Build();
@@ -265,24 +262,21 @@ namespace DiscordBotFanatic.Modules {
             builder.Title = title;
             builder.Description = description;
             builder.Timestamp = DateTimeOffset.UtcNow;
-            builder.Footer = new EmbedFooterBuilder()
-                {Text = $"Requested by {_messageUserDisplay}", IconUrl = Context.User.GetAvatarUrl()};
+            builder.Footer = new EmbedFooterBuilder() {Text = $"Requested by {_messageUserDisplay}", IconUrl = Context.User.GetAvatarUrl()};
 
             return builder;
         }
 
         private Embed FormatEmbeddedFromPlayerResponse(PlayerResponse player) {
-            var embed = GetCommonEmbedBuilder(
-                $"{player.Username} stats from {player.UpdatedAt:dddd, dd/MM} at {player.UpdatedAt:HH:mm:ss}");
+            var embed = GetCommonEmbedBuilder($"{player.Username} stats from {player.UpdatedAt:dddd, dd/MM} at {player.UpdatedAt:HH:mm:ss}");
             FormatMetricsInEmbed(player.LatestSnapshot.MetricDictionary, embed);
 
             return embed.Build();
         }
 
         private Embed FormatEmbeddedFromDeltaResponse(DeltaResponse delta) {
-            var embed = GetCommonEmbedBuilder($"{_osrsUsername} Gains!",
-                $"Over a period of {delta.Interval}! Stoinks!");
-            FormatMetricsInEmbed(delta.Metrics.DeltaMetricDictionary, embed);
+            var embed = GetCommonEmbedBuilder($"{_osrsUsername} Gains!", $"Over a period of {delta.Interval}! Stoinks!");
+            FormatMetricsInEmbed(delta.Metrics.AllDeltaMetrics, embed);
 
             return embed.Build();
         }
@@ -294,8 +288,7 @@ namespace DiscordBotFanatic.Modules {
             }
 
 
-            var embed = GetCommonEmbedBuilder($"{_osrsUsername} Records!",
-                $"The maximum experience earned over a {periodString}, What a beast!");
+            var embed = GetCommonEmbedBuilder($"{_osrsUsername} Records!", $"The maximum experience earned over a {periodString}, What a beast!");
 
             if (!recordResponse.Records.Any(x => x.Value > 0)) {
                 embed.Description = $"No records for {_osrsUsername} over the period of a {periodString}";
@@ -316,7 +309,11 @@ namespace DiscordBotFanatic.Modules {
                 }
 
                 if (record.Value > 0) {
-                    embed.AddField(title, record.ToString(), isInline);
+                    try {
+                        embed.AddField(title, record.ToString(), isInline);
+                    } catch {
+                        // ignored
+                    }
                 }
             }
 
@@ -324,9 +321,11 @@ namespace DiscordBotFanatic.Modules {
         }
 
         private void FormatMetricsInEmbed<T>(Dictionary<string, T> metricDictionary, EmbedBuilder embed) {
+            bool hasRecords = false;
+
             foreach (KeyValuePair<string, T> kvp in metricDictionary) {
                 MetricType type = Enum.Parse<MetricType>(kvp.Key, true);
-                if (_metricType.HasValue && type != _metricType.Value) {
+                if ((_metricType.HasValue && type != _metricType.Value)|| !type.IsSkillMetric()) {
                     continue;
                 }
 
@@ -334,8 +333,36 @@ namespace DiscordBotFanatic.Modules {
                 //embed.Description += $"{type.ToEmoji()} {kvp.Key}{Environment.NewLine}";
                 //embed.Description += $"{kvp.Value}{Environment.NewLine}";
                 //embed.AddField($"{type.ToEmoji()} {kvp.Key}", kvp.Value);
-                embed.AddField($"{type.ToEmoji()} {kvp.Key}", kvp.Value, true);
+
+                string value = kvp.Value.ToString();
+                if (string.IsNullOrEmpty(value) || value == "-1") {
+                    continue;
+                }
+
+                try {
+                    embed.AddField($"{type.ToEmoji()} {kvp.Key}", value, true);
+                    hasRecords = true;
+                } catch {
+                    // ignored
+                }
             }
+
+            if (hasRecords) {
+                return;
+            }
+
+            StringBuilder builder = new StringBuilder();
+            builder.Append($"No records or stats for {_osrsUsername}");
+
+            if (_period.HasValue) {
+                builder.Append($" over a period of {_period.Value}");
+            }
+            if (_metricType.HasValue) {
+                builder.Append($" in the metric {_metricType.ToString()?.ToLowerInvariant()}");
+            }
+
+            builder.Append(".");
+            embed.Description = builder.ToString();
         }
 
         #endregion
