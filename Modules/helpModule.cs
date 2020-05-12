@@ -35,14 +35,14 @@ namespace DiscordBotFanatic.Modules {
             EmbedBuilder output = new EmbedBuilder();
             if (string.IsNullOrEmpty(module)) {
                 output.Title = "Help";
-
+                output.AddField("**Module help**", $"Use `{_configuration.CustomPrefix} help <module>` to get help with a module.{Environment.NewLine}For example: `{_configuration.CustomPrefix} help \"player stats\"`");
                 foreach (var mod in _commandService.Modules.Where(m => m.Parent == null)) {
                     AddHelp(mod, ref output);
                 }
 
                 AddPrefixHelp(output);
 
-                output.AddField("Module help", $"Use '{_configuration.CustomPrefix} help <module>' to get help with a module.");
+                
             } else {
                 var mod = _commandService.Modules.FirstOrDefault(m => m.Name.ToLower() == module.ToLower());
                 if (mod == null) {
