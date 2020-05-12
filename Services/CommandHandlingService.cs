@@ -123,7 +123,7 @@ namespace DiscordBotFanatic.Services {
                 await resultMessage.ModifyAsync(x => x.Embed = builder.Build());
             }
             else {
-                await context.User.SendMessageAsync(embed: builder.Build());
+                await context.Channel.SendMessageAsync(embed: builder.Build());
             }
         }
 
