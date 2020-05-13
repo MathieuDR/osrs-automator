@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;
+using System.Text;
 using System.Threading.Tasks;
 using Discord;
 using Discord.Commands;
@@ -59,8 +60,13 @@ namespace DiscordBotFanatic.Modules {
             GuildEvent fromDb = GetActiveGuildEvent();
 
             EmbedBuilder embed = new EmbedBuilder() {Title = $"We found one!", Description = $"Event {fromDb.Name} is running!{Environment.NewLine}It started at {fromDb.CreatedOn}."};
-            embed.AddField("Scoring", $"If you want to add a score counter. You'll need to add a minimum of {fromDb.MinimumPerCounter} player(s) and a maximum of {fromDb.MaximumPerCounter} per score count!");
-            GuildEventTopCountersToField(fromDb.EventCounters, 10, embed);
+
+            StringBuilder builder = new StringBuilder($"If you want to add a score counter. You'll need to add a minimum of {fromDb.MinimumPerCounter} player(s) and a maximum of {fromDb.MaximumPerCounter} per score count!");
+            builder.Append($"{Environment.NewLine}");
+            builder.Append($"Total screenshots shared (Games played): {fromDb.EventCounters.Select(x => x.ImageUrl).Distinct().Count()}");
+            
+            embed.AddField("Scoring", builder.ToString());
+            GuildEventTopCountersToField(fromDb.EventCounters, 5, embed);
 
             embed.AddField("Command", $"Use the `help Events` command for more information!");
 
@@ -173,8 +179,9 @@ namespace DiscordBotFanatic.Modules {
                 throw new Exception($"You need to be in a server to use this command.");
             }
 
+            List<string> usernames = arguments.Users.Select(x => (IGuildUser) x).Select(x => x.Nickname).ToList();
             _service.AddEventCounter(user.Guild, arguments);
-            EmbedBuilder embed = new EmbedBuilder() {Title = "Success", Description = $"{string.Join(", ", arguments.Users.Select(x => x.Username))}"};
+            EmbedBuilder embed = new EmbedBuilder() {Title = "Success", Description = $"{string.Join(", ", usernames)}"};
             return ReplyAsync(embed: embed.Build());
         }
     }
