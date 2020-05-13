@@ -30,7 +30,9 @@ namespace DiscordBotFanatic.Services {
         }
 
         public bool EndGuildEvent(GuildEvent guildEvent) {
-            throw new NotImplementedException();
+            guildEvent.EndTime = DateTime.Now;
+            _repository.UpdateGuildEvent(guildEvent);
+            return true;
         }
 
         public bool DoesUserHavePermission(IGuildUser user, Permissions permission) {
@@ -81,16 +83,26 @@ namespace DiscordBotFanatic.Services {
                 throw new NullReferenceException($"Cannot find an active event!");
             }
 
+            // Check if we have enough users
             if (arguments.Users.Count() >= guildEvent.MinimumPerCounter && arguments.Users.Count() <= guildEvent.MaximumPerCounter) {
                 guildEvent.EventCounters??=new List<GuildEventCounter>();
+                
                 foreach (IUser user in arguments.Users) {
-                    guildEvent.EventCounters.Add(new GuildEventCounter(){UserId = user.Id, ImageUrl = arguments.ImageUrl,});
+                    // Check if user has image already
+                    if (!guildEvent.EventCounters.Any(x => x.UserId == user.Id && x.ImageUrl == arguments.ImageUrl)) {
+                        guildEvent.EventCounters.Add(new GuildEventCounter(){UserId = user.Id, ImageUrl = arguments.ImageUrl,});
+                    }
                 }
 
                 return _repository.UpdateGuildEvent(guildEvent) != null;
             } else {
                 throw new ArgumentException($"User count is wrong! Please use the `help` command and also check how many users the event require!");
             }
+        }
+
+        public void RemoveCounters(GuildEvent guildEvent, List<GuildEventCounter> toDelete) {
+            guildEvent.EventCounters = guildEvent.EventCounters.Except(toDelete).ToList();
+            _repository.UpdateGuildEvent(guildEvent);
         }
     }
 }

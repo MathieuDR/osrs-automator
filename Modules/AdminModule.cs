@@ -9,6 +9,7 @@ namespace DiscordBotFanatic.Modules {
 
     [Name("Administrator")]
     [Group("admin")]
+    [RequireUserPermission(GuildPermission.Administrator)]
     public class AdminModule : ModuleBase<SocketCommandContext> {
         private readonly IGuildService _guildService;
 

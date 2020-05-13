@@ -157,7 +157,20 @@ namespace DiscordBotFanatic.Repository {
         }
 
         public List<GuildEvent> GetAllActiveGuildEvents(ulong guildId) {
-            return GetAllGuildEvents(guildId).Where(x => x.EndTime == DateTime.MinValue || x.EndTime >= DateTime.UtcNow).ToList();
+            var allEvents = GetAllGuildEvents(guildId).ToList();
+            var result = new List<GuildEvent>();
+            foreach (GuildEvent guildEvent in allEvents) {
+                if (guildEvent.EndTime == DateTime.MinValue) {
+                    result.Add(guildEvent);
+                }
+
+                if (guildEvent.EndTime >= DateTime.Now) {
+                    result.Add(guildEvent);
+                }
+            }
+
+            return result;
+            //return allEvents.Where(x => x.EndTime == DateTime.MinValue || x.EndTime >= DateTime.Now).ToList();
         }
 
         public GuildEvent UpdateGuildEvent(GuildEvent guildEvent) {

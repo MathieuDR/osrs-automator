@@ -217,7 +217,7 @@ namespace DiscordBotFanatic.Modules {
 
         private async Task<PlayerResponse> ShouldUpdate() {
             var response = await _client.GetPlayerAsync(_osrsUsername);
-            if (response.UpdatedAt.AddMinutes(_timeToUpdate) >= DateTime.UtcNow) {
+            if (response.UpdatedAt.AddMinutes(_timeToUpdate) >= DateTime.Now) {
                 return response;
             }
 

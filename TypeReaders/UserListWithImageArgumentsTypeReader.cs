@@ -28,14 +28,23 @@ namespace DiscordBotFanatic.TypeReaders {
                 return await Task.FromResult(TypeReaderResult.FromError(CommandError.ParseFailed, $"No users in channel. Cannot parse user mentions"));
             }
 
+            if (parameters.Count != parameters.Distinct().Count()) {
+                return await Task.FromResult(TypeReaderResult.FromError(CommandError.ParseFailed, $"Repeating values in arguments."));
+            }
+
             foreach (string parameter in parameters) {
                 var cts = new CancellationTokenSource();
                 if (MentionUtils.TryParseUser(parameter, out var userId)) {
+                    
                     // ReSharper disable once PossibleMultipleEnumeration
                     await foreach (var users in usersCollection.WithCancellation(cts.Token)) {
                         foreach (var user in users) {
                             if (user.Id != userId) {
                                 continue;
+                            }
+
+                            if (user.IsBot) {
+                                return await Task.FromResult(TypeReaderResult.FromError(CommandError.ParseFailed, $"User is a bot ({parameter})"));
                             }
 
                             userResultList.Add(user);

@@ -13,5 +13,6 @@ namespace DiscordBotFanatic.Services.interfaces {
         bool DoesUserHavePermission(IGuildUser user, Permissions permission);
         bool ToggleRole(IRole role, Permissions permission);
         bool AddEventCounter(IGuild guild, UserListWithImageArguments arguments);
+        void RemoveCounters(GuildEvent guildEvent, List<GuildEventCounter> toDelete);
     }
 }

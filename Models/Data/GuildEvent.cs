@@ -40,7 +40,7 @@ namespace DiscordBotFanatic.Models.Data {
         public GuildEvent() { }
 
         public GuildEvent(IGuildUser user, string name, int minimumPerCounter, int maximumPerCounter) {
-            CreatedOn = DateTime.UtcNow;
+            CreatedOn = DateTime.Now;
             Name = name;
             GuildId = user.GuildId;
             CreatedByDiscordId = user.Id.ToString();

@@ -64,7 +64,7 @@ namespace DiscordBotFanatic.Services {
             // your existing log handler)
             var commandName = command.IsSpecified ? command.Value.Name : "A command";
             await _logger.LogDebug(new LogMessage(LogSeverity.Info, "CommandExecution",
-                $"{commandName} was executed at {DateTime.UtcNow}."));
+                $"{commandName} was executed at {DateTime.Now}."));
         }
 
 
