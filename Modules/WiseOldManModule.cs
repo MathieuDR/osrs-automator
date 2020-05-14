@@ -28,7 +28,8 @@ namespace DiscordBotFanatic.Modules {
         private readonly MessageConfiguration _messageConfiguration;
 
         private const string UsernameSummary = "The OSRS Player's username";
-
+        
+        private int _wiseOldManId = -1;
         private string _messageUserDisplay = "";
         private string _osrsUsername = "";
         private MetricType? _metricType;
@@ -198,6 +199,7 @@ namespace DiscordBotFanatic.Modules {
 
         private async Task<RecordResponse> GetPlayerRecord() {
             var playerResponse = await GetPlayerInfo();
+            
             return await _client.GetPlayerRecordAsync(playerResponse.Id, _metricType, _period);
         }
 
@@ -212,12 +214,14 @@ namespace DiscordBotFanatic.Modules {
                 return response;
             }
 
+
             return await _client.TrackPlayerAsync(_osrsUsername);
         }
 
         private async Task<PlayerResponse> ShouldUpdate() {
             var response = await _client.GetPlayerAsync(_osrsUsername);
-            if (response.UpdatedAt.AddMinutes(_timeToUpdate) >= DateTime.Now) {
+            _wiseOldManId = response.Id;
+            if (response.UpdatedAt.AddMinutes(_timeToUpdate) >= DateTime.UtcNow) {
                 return response;
             }
 
@@ -259,12 +263,22 @@ namespace DiscordBotFanatic.Modules {
         private EmbedBuilder GetCommonEmbedBuilder(string title, string description = null) {
             EmbedBuilder builder = new EmbedBuilder();
 
+            builder.Author = new EmbedAuthorBuilder(){Name = $"WiseOldMan - {_osrsUsername}", Url = $"{GetWiseOldManUrl()}", IconUrl = "https://wiseoldman.net/img/logo.png"};
             builder.Title = title;
+            builder.Color = Color.Purple;
             builder.Description = description;
             builder.Timestamp = DateTimeOffset.UtcNow;
             builder.Footer = new EmbedFooterBuilder() {Text = $"Requested by {_messageUserDisplay}", IconUrl = Context.User.GetAvatarUrl()};
 
             return builder;
+        }
+
+        private string GetWiseOldManUrl() {
+            if (_wiseOldManId > 0) {
+                return $"https://wiseoldman.net/players/{_wiseOldManId}";
+            }
+
+            return "https://wiseoldman.net";
         }
 
         private Embed FormatEmbeddedFromPlayerResponse(PlayerResponse player) {
