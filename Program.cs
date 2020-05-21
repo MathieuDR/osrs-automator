@@ -5,6 +5,7 @@ using Discord;
 using Discord.Commands;
 using Discord.WebSocket;
 using DiscordBotFanatic.Models.Configuration;
+using DiscordBotFanatic.Modules;
 using DiscordBotFanatic.Repository;
 using DiscordBotFanatic.Services;
 using DiscordBotFanatic.Services.interfaces;
@@ -22,7 +23,8 @@ namespace DiscordBotFanatic
 
         public async Task MainAsync() {
             IConfiguration config = BuildConfig();
-            var services = ConfigureServices(config); // No using statement?
+            IServiceProvider services = ConfigureServices(config); // No using statement?
+            //var test = services.GetService<PlayerStatsModule>();
 
             DiscordSocketClient client = services.GetRequiredService<DiscordSocketClient>();
             
@@ -56,6 +58,8 @@ namespace DiscordBotFanatic
                 .AddTransient<WiseOldManConsumer>()
                 .AddTransient<IDiscordBotRepository>(x=> new LiteDbRepository(configuration.DatabaseFile))
                 .AddTransient<IGuildService, GuildService>()
+                //Modules
+                .AddTransient<PlayerStatsModule>()
                 // Add additional services here
                 .BuildServiceProvider();
         }

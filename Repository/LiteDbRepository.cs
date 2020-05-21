@@ -28,17 +28,13 @@ namespace DiscordBotFanatic.Repository {
             }
         }
 
-        public Player GetPlayerByDiscordId(string id) {
+        public Player GetPlayerByDiscordId(ulong id) {
             lock (_dbLock) {
                 using (LiteDatabase = new LiteDatabase(FileName)) {
                     var collection = LiteDatabase.GetCollection<Player>(PlayerCollectionName);
                     return collection.Query().Where(x => x.DiscordId == id).Limit(1).SingleOrDefault();
                 }
             }
-        }
-
-        public Player GetPlayerByDiscordId(ulong id) {
-            return GetPlayerByDiscordId(id.ToString());
         }
 
         public Player InsertPlayer(Player player) {

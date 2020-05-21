@@ -1,10 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
 using Discord;
+using DiscordBotFanatic.Models.Data;
 using DiscordBotFanatic.Models.Enums;
 using DiscordBotFanatic.Models.WiseOldMan.Responses;
+using DiscordBotFanatic.Repository;
 using DiscordBotFanatic.Services.interfaces;
 using RestSharp;
 using RestSharp.Serializers.NewtonsoftJson;
@@ -13,14 +16,16 @@ namespace DiscordBotFanatic.Services
 {
     public class WiseOldManConsumer {
         private readonly ILogService _logger;
+        private readonly IDiscordBotRepository _repository;
         private const string BaseUrl = "https://wiseoldman.net/api";
         private const string PlayersBase = "players";
         private const string RecordsBase = "records";
         private const string DeltaBase = "deltas";
         private readonly RestClient _client;
 
-        public WiseOldManConsumer(ILogService logger) {
+        public WiseOldManConsumer(ILogService logger, IDiscordBotRepository repository) {
             _logger = logger;
+            _repository = repository;
             _client = new RestClient(BaseUrl);
             _client.UseNewtonsoftJson();
         }
@@ -44,7 +49,7 @@ namespace DiscordBotFanatic.Services
             request.AddParameter("username", username);
 
             LogRequest(request, MethodBase.GetCurrentMethod()?.Name);
-            var result = await _client.GetAsync<IEnumerable<SearchResponse>>(request);
+            IEnumerable<SearchResponse> result = await _client.GetAsync<IEnumerable<SearchResponse>>(request);
 
             return result;
         }
@@ -56,6 +61,7 @@ namespace DiscordBotFanatic.Services
             LogRequest(request, MethodBase.GetCurrentMethod()?.Name);
             var result = await _client.GetAsync<PlayerResponse>(request);
 
+            ValidateResponse(result);
             return result;
         }
 
@@ -66,6 +72,7 @@ namespace DiscordBotFanatic.Services
             LogRequest(request, MethodBase.GetCurrentMethod()?.Name);
             var result = await _client.PostAsync<PlayerResponse>(request);
 
+            ValidateResponse(result);
             return result;
         }
 
@@ -77,6 +84,7 @@ namespace DiscordBotFanatic.Services
             LogRequest(request, MethodBase.GetCurrentMethod()?.Name);
             var result = await _client.GetAsync<DeltaResponse>(request);
 
+            ValidateResponse(result);
             return result;
         }
 
@@ -87,6 +95,7 @@ namespace DiscordBotFanatic.Services
             LogRequest(request, MethodBase.GetCurrentMethod()?.Name);
             var result = await _client.GetAsync<PlayerResponse>(request);
 
+            ValidateResponse(result);
             return result;
         }
 
@@ -104,9 +113,62 @@ namespace DiscordBotFanatic.Services
             }
 
             LogRequest(request, MethodBase.GetCurrentMethod()?.Name);
-            var t = await _client.ExecuteAsync<RecordResponse>(request);
 
-            return t.Data;
+            var result = (await _client.ExecuteAsync<RecordResponse>(request)).Data;
+            ValidateResponse(result);
+            return result;
+        }
+
+        public string GetUserNameFromUser(IUser user) {
+            Player player = _repository.GetPlayerByDiscordId(user.Id);
+            return player?.DefaultPlayerUsername;
+        }
+
+        public async void SetDefaultPlayer(ulong userId, string username) {
+            Player fromDb = _repository.GetPlayerByDiscordId(userId);
+            if (fromDb != null && fromDb.DefaultPlayerUsername.ToLowerInvariant() == username.ToLowerInvariant()) {
+                // Already set
+                return;
+            }
+
+            // Search all players
+            var players = (await SearchPlayerAsync(username)).ToList();
+
+            PlayerResponse player;
+            Player dbPlayer;
+            switch (players.Count) {
+                case 0:
+                    // Track player if we cant find him
+                    player = await TrackPlayerAsync(username);
+                    dbPlayer = new Player() {
+                        DiscordId = userId, DefaultPlayerUsername = player.Username,
+                        WiseOldManDefaultPlayerId = player.Id
+                    };
+                    break;
+                case 1: {
+                    var result = players.First();
+                    dbPlayer = new Player() {
+                        DiscordId = userId, DefaultPlayerUsername = result.Username,
+                        WiseOldManDefaultPlayerId = result.Id
+                    };
+                    break;
+                }
+                default:
+                    throw new ArgumentException($"Please use your full OSRS name. Too many results using {username} ({players.Count}).");
+            }
+
+
+            _repository.InsertOrUpdatePlayer(dbPlayer);
+        }
+
+        private void ValidateResponse(BaseResponse response) {
+            if (response == null) {
+                throw new ArgumentException($"We did not receive a response. Pleas try again later or contact the administration.");
+            }
+
+            if (!string.IsNullOrEmpty(response.Message)) {
+                throw new ArgumentException(response.Message);
+            }
         }
     }
 }

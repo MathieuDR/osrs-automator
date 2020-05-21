@@ -13,6 +13,7 @@ using DiscordBotFanatic.Modules;
 using DiscordBotFanatic.Modules.DiscordCommandArguments;
 using DiscordBotFanatic.Services.interfaces;
 using DiscordBotFanatic.TypeReaders;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace DiscordBotFanatic.Services {
     public class CommandHandlingService {
@@ -46,7 +47,10 @@ namespace DiscordBotFanatic.Services {
             _commands.AddTypeReader<PeriodOsrsArguments>(new PeriodOsrsTypeReader());
             _commands.AddTypeReader<MetricOsrsArguments>(new MetricOsrsTypeReader());
             _commands.AddTypeReader<UserListWithImageArguments>(new UserListWithImageArgumentsTypeReader());
-            await _commands.AddModulesAsync(Assembly.GetEntryAssembly(), _provider);
+            
+            var t = _commands.AddModulesAsync(Assembly.GetEntryAssembly(), _provider);
+            await _commands.AddModuleAsync<PlayerStatsModule>(provider);
+            await t;
         }
 
         public async Task OnCommandExecutedAsync(Optional<CommandInfo> command, ICommandContext context,
