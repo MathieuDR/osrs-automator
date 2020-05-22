@@ -43,13 +43,14 @@ namespace DiscordBotFanatic.Services {
 
         public async Task InitializeAsync(IServiceProvider provider) {
             _provider = provider;
-            _commands.AddTypeReader<PeriodAndMetricOsrsArguments>(new PeriodAndMetricOsrsTypeReader());
-            _commands.AddTypeReader<PeriodOsrsArguments>(new PeriodOsrsTypeReader());
-            _commands.AddTypeReader<MetricOsrsArguments>(new MetricOsrsTypeReader());
+            _commands.AddTypeReader<PeriodAndMetricArguments>(new PeriodAndMetricOsrsTypeReader());
+            _commands.AddTypeReader<PeriodArguments>(new PeriodOsrsTypeReader());
+            _commands.AddTypeReader<MetricArguments>(new MetricOsrsTypeReader());
             _commands.AddTypeReader<UserListWithImageArguments>(new UserListWithImageArgumentsTypeReader());
             
             var t = _commands.AddModulesAsync(Assembly.GetEntryAssembly(), _provider);
             await _commands.AddModuleAsync<PlayerStatsModule>(provider);
+            await _commands.AddModuleAsync<GroupStatsModule>(provider);
             await t;
         }
 

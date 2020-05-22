@@ -41,6 +41,7 @@ namespace DiscordBotFanatic
         private IServiceProvider ConfigureServices(IConfiguration config) {
             StartupConfiguration configuration = config.GetSection("Startup").Get<StartupConfiguration>();
             BotConfiguration botConfiguration = config.GetSection("Bot").Get<BotConfiguration>();
+            WiseOldManConfiguration manConfiguration = config.GetSection("WiseOldMan").Get<WiseOldManConfiguration>();
 
             return new ServiceCollection()
                 // Base
@@ -55,11 +56,13 @@ namespace DiscordBotFanatic
                 .AddSingleton(config)
                 .AddSingleton(botConfiguration)
                 .AddSingleton(botConfiguration.Messages)
-                .AddTransient<WiseOldManConsumer>()
+                .AddSingleton(manConfiguration)
+                .AddTransient<HighscoreService>()
                 .AddTransient<IDiscordBotRepository>(x=> new LiteDbRepository(configuration.DatabaseFile))
                 .AddTransient<IGuildService, GuildService>()
-                //Modules
-                .AddTransient<PlayerStatsModule>()
+                .AddTransient<IHighscoreApiRepository, WiseOldManHighscoreRepository>()
+                .AddTransient<IOsrsHighscoreService, HighscoreService>()
+                .AddTransient<IImageService, ImageService>()
                 // Add additional services here
                 .BuildServiceProvider();
         }

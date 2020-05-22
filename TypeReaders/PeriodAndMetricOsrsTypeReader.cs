@@ -22,7 +22,7 @@ namespace DiscordBotFanatic.TypeReaders {
                 return Task.FromResult(TypeReaderResult.FromError(CommandError.BadArgCount, $"Too many arguments!"));
             }
 
-            var result = new PeriodAndMetricOsrsArguments();
+            var result = new PeriodAndMetricArguments();
 
             foreach (string parameter in parameters) {
                 if (Enum.TryParse(typeof(MetricType), parameter, true, out object metricType)) {
@@ -33,12 +33,12 @@ namespace DiscordBotFanatic.TypeReaders {
                     Debug.Assert(period != null, nameof(period) + " != null");
                     result.Period = (Period) period;
                 }
-                else if (string.IsNullOrEmpty(result.Username)) {
-                    result.Username = parameter.Replace("\"","");
+                else if (string.IsNullOrEmpty(result.Name)) {
+                    result.Name = parameter.Replace("\"","");
                 }
                 else {
                     return Task.FromResult(TypeReaderResult.FromError(CommandError.BadArgCount,
-                        $"Wrong errors, Cannot parse all parameters. Ambigious username ({result.Username} & {parameter})"));
+                        $"Wrong errors, Cannot parse all parameters. Ambigious username ({result.Name} & {parameter})"));
                 }
             }
 

@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using DiscordBotFanatic.Helpers;
+using DiscordBotFanatic.Helpers.JsonConverters;
 using DiscordBotFanatic.Models.WiseOldMan.Responses.Models;
 using Newtonsoft.Json;
 

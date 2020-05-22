@@ -1,4 +1,6 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
+using DiscordBotFanatic.Models.Enums;
 using Newtonsoft.Json;
 
 namespace DiscordBotFanatic.Models.WiseOldMan.Responses.Models {
@@ -192,6 +194,10 @@ namespace DiscordBotFanatic.Models.WiseOldMan.Responses.Models {
 
         [JsonProperty("zulrah")]
         public DeltaMetric Zulrah { get; set; }
+
+        public DeltaMetric MetricFromEnum(MetricType type) {
+            return AllDeltaMetrics.SingleOrDefault(x => x.Key == type.ToString()).Value;
+        }
 
         public Dictionary<string, DeltaMetric> AllDeltaMetrics {
             get {

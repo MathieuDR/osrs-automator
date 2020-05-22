@@ -24,19 +24,19 @@ namespace DiscordBotFanatic.TypeReaders {
                 return Task.FromResult(TypeReaderResult.FromError(CommandError.BadArgCount, $"Too many arguments!"));
             }
 
-            var result = new PeriodOsrsArguments();
+            var result = new PeriodArguments();
 
             foreach (string parameter in parameters) {
                 if (Enum.TryParse(typeof(Period), parameter, true, out object period)) {
                     Debug.Assert(period != null, nameof(period) + " != null");
                     result.Period = (Period) period;
                 }
-                else if (string.IsNullOrEmpty(result.Username)) {
-                    result.Username = parameter;
+                else if (string.IsNullOrEmpty(result.Name)) {
+                    result.Name = parameter;
                 }
                 else {
                     return Task.FromResult(TypeReaderResult.FromError(CommandError.BadArgCount,
-                        $"Wrong errors, Cannot parse all parameters. Ambigious username ({result.Username} & {parameter})"));
+                        $"Wrong errors, Cannot parse all parameters. Ambigious username ({result.Name} & {parameter})"));
                 }
             }
 

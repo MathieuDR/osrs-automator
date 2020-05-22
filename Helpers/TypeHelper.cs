@@ -10,10 +10,10 @@ namespace DiscordBotFanatic.Helpers {
     public static class TypeHelper {
         public static List<Type> WhiteListedTypesToOutput() {
             return new List<Type>() {
-                typeof(BaseOsrsArguments),
-                typeof(MetricOsrsArguments),
-                typeof(PeriodOsrsArguments),
-                typeof(PeriodAndMetricOsrsArguments),
+                typeof(BaseArguments),
+                typeof(MetricArguments),
+                typeof(PeriodArguments),
+                typeof(PeriodAndMetricArguments),
                 typeof(UserListWithImageArguments),
             };
         }
@@ -85,17 +85,17 @@ namespace DiscordBotFanatic.Helpers {
                 identified = true;
             }
 
-            if (type == typeof(MetricOsrsArguments)) {
+            if (type == typeof(MetricArguments)) {
                 builder.Append("Metric OSRS Arguments");
                 identified = true;
             }
 
-            if (type == typeof(PeriodAndMetricOsrsArguments)) {
+            if (type == typeof(PeriodAndMetricArguments)) {
                 builder.Append("Complete OSRS Arguments");
                 identified = true;
             }
 
-            if (type == typeof(PeriodAndMetricOsrsArguments)) {
+            if (type == typeof(PeriodAndMetricArguments)) {
                 builder.Append("Period OSRS Arguments");
                 identified = true;
             }
