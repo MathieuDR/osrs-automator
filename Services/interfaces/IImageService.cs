@@ -6,7 +6,6 @@ using Image = Discord.Image;
 
 namespace DiscordBotFanatic.Services.interfaces {
     public interface IImageService {
-        Image GetImageFromMetric(MetricType skill, string level, string rank, string exp);
         Image GetImageFromMetric(MetricType type, Metric metric);
         Image GetImageFromMetric(Tuple<MetricType, Metric> metricTuple);
         Image GetImageFromMetrics(IEnumerable<Tuple<MetricType, Metric>> metricEnumerable);

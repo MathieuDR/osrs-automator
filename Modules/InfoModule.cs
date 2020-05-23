@@ -51,15 +51,15 @@ namespace DiscordBotFanatic.Modules {
 
         [Command("Draw")]
         public Task DrawImage(MetricType metric) {
-            if (!metric.IsSkillMetric()) {
-                throw new ArgumentException($"Only skills for now");
-            }
+            //if (!metric.IsSkillMetric()) {
+            //    throw new ArgumentException($"Only skills for now");
+            //}
             Random r = new Random();
-            List<Tuple<MetricType, Metric>> metrics = new List<Tuple<MetricType, Metric>>();
+
             Metric spoofed = new Metric(){ Rank = r.Next(0,1000000), Experience = r.Next(0,14000000)};
             Tuple<MetricType, Metric> tuple = new Tuple<MetricType, Metric>(metric, spoofed);
-            metrics.Add(tuple);
-            var image = _imageService.GetImageFromMetrics(metrics);
+     
+            var image = _imageService.GetImageFromMetric(tuple);
             return Context.Channel.SendFileAsync(image.Stream, $"{metric.ToString()} lvl.png");
         }
 
