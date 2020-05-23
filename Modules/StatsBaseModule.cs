@@ -13,15 +13,15 @@ using DiscordBotFanatic.Services.interfaces;
 namespace DiscordBotFanatic.Modules {
     [DontAutoLoad]
     public abstract class StatsBaseModule : ModuleBase<SocketCommandContext> {
-        protected readonly IOsrsHighscoreService  HighScoreHighscoreService;
+        protected readonly IOsrsHighscoreService  Service;
         protected readonly MessageConfiguration MessageConfiguration;
         protected object Response;
 
         private IUserMessage _waitMessage;
         private Task<IUserMessage> _waitMessageTask;
 
-        public StatsBaseModule(IOsrsHighscoreService osrsHighscoreHighScoreHighscoreService, MessageConfiguration messageConfiguration) {
-            HighScoreHighscoreService = osrsHighscoreHighScoreHighscoreService;
+        public StatsBaseModule(IOsrsHighscoreService osrsHighscoreService, MessageConfiguration messageConfiguration) {
+            Service = osrsHighscoreService;
             MessageConfiguration = messageConfiguration;
         }
 

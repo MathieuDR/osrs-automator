@@ -54,6 +54,14 @@ namespace DiscordBotFanatic.Helpers {
             return (metric.Rank.Start - metric.Rank.End).FormatNumber();
         }
 
+        public static MetricType ToMetricType(this string metricType) {
+            if(Enum.TryParse<MetricType>(metricType, true, out MetricType result)) {
+                return result;
+            }
+
+            throw new ArgumentOutOfRangeException($"{metricType} is not a metric type.");
+        }
+
         public static string FormatNumber(this int number) {
             var nfi = (NumberFormatInfo) CultureInfo.InvariantCulture.NumberFormat.Clone();
             nfi.NumberGroupSeparator = " ";

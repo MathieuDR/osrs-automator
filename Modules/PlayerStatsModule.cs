@@ -13,18 +13,22 @@ using DiscordBotFanatic.Models.WiseOldMan.Responses;
 using DiscordBotFanatic.Models.WiseOldMan.Responses.Models;
 using DiscordBotFanatic.Modules.DiscordCommandArguments;
 using DiscordBotFanatic.Services;
+using DiscordBotFanatic.Services.interfaces;
 
 namespace DiscordBotFanatic.Modules {
     [Name("Player stats")]
     public class PlayerStatsModule : StatsBaseModule {
+        private readonly IImageService _imageService;
         private const string UsernameSummary = "The OSRS Player's username";
 
 
-        public PlayerStatsModule(HighscoreService osrsHighscoreHighScoreHighscoreService, MessageConfiguration messageConfiguration) : base(osrsHighscoreHighScoreHighscoreService, messageConfiguration) { }
+        public PlayerStatsModule(IImageService imageService, HighscoreService osrsHighscoreService, MessageConfiguration messageConfiguration) : base(osrsHighscoreService, messageConfiguration) {
+            _imageService = imageService;
+        }
 
         protected override void BeforeExecute(CommandInfo command) {
             if(Context != null) {
-                Name = HighScoreHighscoreService.GetUserNameFromUser(Context.User);
+                Name = Service.GetUserNameFromUser(Context.User);
             }
 
             base.BeforeExecute(command);
@@ -59,7 +63,23 @@ namespace DiscordBotFanatic.Modules {
 
         private Embed FormatEmbeddedFromPlayerResponse(PlayerResponse player) {
             var embed = GetCommonEmbedBuilder(Area, $"{player.Username} stats from {player.UpdatedAt:dddd, dd/MM} at {player.UpdatedAt:HH:mm:ss}");
-            FormatMetricsInEmbed(player.LatestSnapshot.MetricDictionary, embed);
+
+            List<Tuple<MetricType, Metric>> toImage = new List<Tuple<MetricType, Metric>>();
+            foreach (KeyValuePair<string, Metric> keyValuePair in player.LatestSnapshot.MetricDictionary) {
+                MetricType type = keyValuePair.Key.ToMetricType();
+                toImage.Add(new Tuple<MetricType, Metric>(type, keyValuePair.Value));
+            }
+
+            Image image = _imageService.GetImageFromMetrics(toImage);
+
+
+         Context.Message.Channel.SendFileAsync(image.Stream, $"{player.Id}{player.UpdatedAt.Ticks}.png" );
+            //var url = msg.Attachments.FirstOrDefault().Url;
+            //msg.DeleteAsync();
+            //embed.ImageUrl = url;
+
+            //FormatMetricsInEmbed(player.LatestSnapshot.MetricDictionary, embed);
+
 
             return embed.Build();
         }
@@ -207,7 +227,7 @@ namespace DiscordBotFanatic.Modules {
         [Alias("default")]
         [Summary("Set your standard player to use within the `player` module.")]
         public async Task SetDefaultPlayer([Summary(UsernameSummary)] string username) {
-            HighScoreHighscoreService.SetDefaultPlayer(Context.User.Id, username);
+            Service.SetDefaultPlayer(Context.User.Id, username);
             await WaitMessage.ModifyAsync(x => { x.Embed = GetCommonEmbedBuilder($"Done!", $"{username} is sucesfully set as your standard").Build(); });
         }
 
@@ -218,7 +238,7 @@ namespace DiscordBotFanatic.Modules {
         private async Task<RecordResponse> GetPlayerRecord() {
             var playerResponse = await GetPlayerInfo();
 
-            return await HighScoreHighscoreService.GetPlayerRecordAsync(playerResponse.Id, CommandMetricType, CommandPeriod);
+            return await Service.GetPlayerRecordAsync(playerResponse.Id, CommandMetricType, CommandPeriod);
         }
 
         private async Task<PlayerResponse> GetPlayerInfo() {
@@ -233,14 +253,14 @@ namespace DiscordBotFanatic.Modules {
             }
 
 
-            return await HighScoreHighscoreService.TrackPlayerAsync(Name);
+            return await Service.TrackPlayerAsync(Name);
         }
 
         // Don't forget to update the GET function summary!
         private int _timeToUpdate = 30;
 
         private async Task<PlayerResponse> ShouldUpdate() {
-            var response = await HighScoreHighscoreService.GetPlayerAsync(Name);
+            var response = await Service.GetPlayerAsync(Name);
             WiseOldManId = response.Id;
             if (response.UpdatedAt.AddMinutes(_timeToUpdate) >= DateTime.UtcNow) {
                 return response;
@@ -254,7 +274,7 @@ namespace DiscordBotFanatic.Modules {
             var response = await GetPlayerInfo();
 
             Debug.Assert(CommandPeriod != null, nameof(CommandPeriod) + " != null");
-            return await HighScoreHighscoreService.DeltaPlayerAsync(response.Id, CommandPeriod.Value);
+            return await Service.DeltaPlayerAsync(response.Id, CommandPeriod.Value);
         }
 
         #endregion

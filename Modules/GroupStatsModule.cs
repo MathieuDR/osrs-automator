@@ -19,7 +19,7 @@ namespace DiscordBotFanatic.Modules {
         private readonly WiseOldManConfiguration _wiseOldManConfiguration;
         private string _groupName = "";
 
-        public GroupStatsModule(HighscoreService osrsHighscoreHighScoreHighscoreService, MessageConfiguration messageConfiguration, WiseOldManConfiguration wiseOldManConfiguration) : base(osrsHighscoreHighScoreHighscoreService, messageConfiguration) {
+        public GroupStatsModule(HighscoreService osrsHighscoreService, MessageConfiguration messageConfiguration, WiseOldManConfiguration wiseOldManConfiguration) : base(osrsHighscoreService, messageConfiguration) {
             _wiseOldManConfiguration = wiseOldManConfiguration;
             WiseOldManId = wiseOldManConfiguration.GroupId;
         }
@@ -55,7 +55,7 @@ namespace DiscordBotFanatic.Modules {
         [Summary("Update all players of a group.")]
         public async Task UpdateGroup([Summary("Optional Id, if not filled in, use the one from settings.")]int? id = null) {
             WiseOldManId = id ?? WiseOldManId;
-            Response = await HighScoreHighscoreService.UpdateGroupAsync(WiseOldManId);
+            Response = await Service.UpdateGroupAsync(WiseOldManId);
         }
 
         [Command("top", RunMode = RunMode.Async)]
@@ -66,7 +66,7 @@ namespace DiscordBotFanatic.Modules {
                 throw new ArgumentException($"Please fill in the metric to measure.");
             }
 
-            Response = await HighScoreHighscoreService.GetPlayerRecordsForGroupAsync(CommandMetricType.Value, CommandPeriod.HasValue ? CommandPeriod.Value : Period.Week, WiseOldManId);
+            Response = await Service.GetPlayerRecordsForGroupAsync(CommandMetricType.Value, CommandPeriod.HasValue ? CommandPeriod.Value : Period.Week, WiseOldManId);
         }
 
         #endregion
@@ -79,7 +79,7 @@ namespace DiscordBotFanatic.Modules {
             base.ExtractBaseArguments(baseArguments);
 
             if (!string.IsNullOrEmpty(Name)) {
-                WiseOldManId = HighScoreHighscoreService.GetGroupIdFromName(Name);
+                WiseOldManId = Service.GetGroupIdFromName(Name);
             }
         }
 

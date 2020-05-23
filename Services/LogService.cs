@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics;
 using System.Threading.Tasks;
 using Discord;
 using Discord.Commands;
@@ -45,20 +46,18 @@ namespace DiscordBotFanatic.Services {
 
         public Task LogCommand(LogMessage message)
         {
-            //// Return an error message for async commands
-            //if (message.Exception is CommandException command)
-            //{
-            //    // Don't risk blocking the logging task by awaiting a message send; ratelimits!?
-            //    var _ = command.Context.Channel.SendMessageAsync($"Error: {command.Message}");
-            //}
-
-            _commandsLogger.Log(
+           _commandsLogger.Log(
                 LogLevelFromSeverity(message.Severity),
                 0,
                 message,
                 message.Exception,
                 (_1, _2) => message.ToString(prependTimestamp: false));
             return Task.CompletedTask;
+        }
+
+        public Task LogStopWatch(string area, Stopwatch stopwatch) {
+            LogMessage lgMessage = new LogMessage(LogSeverity.Info, area, $"Timer: {stopwatch.ElapsedMilliseconds}ms");
+            return LogDebug(lgMessage);
         }
 
         private static LogLevel LogLevelFromSeverity(LogSeverity severity)
