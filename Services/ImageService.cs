@@ -3,14 +3,12 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
-using Discord;
 using DiscordBotFanatic.Helpers;
 using DiscordBotFanatic.Models.Enums;
 using DiscordBotFanatic.Models.WiseOldMan.Responses.Models;
 using DiscordBotFanatic.Services.interfaces;
 using SixLabors.Fonts;
 using SixLabors.ImageSharp;
-using SixLabors.ImageSharp.Drawing;
 using SixLabors.ImageSharp.Drawing.Processing;
 using SixLabors.ImageSharp.PixelFormats;
 using SixLabors.ImageSharp.Processing;
@@ -24,6 +22,7 @@ namespace DiscordBotFanatic.Services {
         private readonly string _bgPath;
         private readonly string _iconPath;
         private readonly ILogService _logService;
+        private readonly int _maxScrolls = 2;
         private readonly string _scrollBase;
         private readonly string _skillBg;
         private FontCollection _collection;
@@ -56,14 +55,81 @@ namespace DiscordBotFanatic.Services {
         }
 
         public Discord.Image GetImageFromMetrics(IEnumerable<Tuple<MetricType, Metric>> metricEnumerable) {
+            var tuples = metricEnumerable.ToList();
+            var lists = new List<List<Tuple<MetricType, Metric>>>();
+
+            if (tuples.Count() > _maxScrolls * 3) {
+                int chunkSize = (int) (Math.Ceiling(tuples.Count / (double) _maxScrolls));
+                lists = tuples.Chunk(chunkSize).Select(x => x.ToList()).ToList();
+            } else {
+                lists.Add(tuples);
+            }
+
+
             Stopwatch t = new Stopwatch();
             t.Start();
-            var image = CreateMetricScroll(metricEnumerable);
-            Discord.Image discordImage = ImageToDiscordImage(image);
+            var images = new List<Image>();
+            foreach (IEnumerable<Tuple<MetricType, Metric>> list in lists) {
+                var image = CreateMetricScroll(list);
+                images.Add(image);
+            }
+
+            Image resultImage = ConcatImages(images, 3, 300, 50, 150, 0);
+            Discord.Image discordImage = ImageToDiscordImage(resultImage);
+
+            // Disposing
+            resultImage.Dispose();
+            foreach (Image image in images) {
+                image.Dispose();
+            }
+
             t.Stop();
             _logService.LogStopWatch(nameof(GetImageFromMetrics), t);
 
             return discordImage;
+        }
+
+        private Image ConcatImages(List<Image> images, int maxHorizontal, int xGutter, int yGutter, int xMargin, int yMargin) {
+            if (!images.Any())
+                return null;
+
+            List<Image> horizontalImages = new List<Image>();
+            var toConcatImages = images.Chunk(maxHorizontal);
+
+            int horizontalMargin = xMargin * 2;
+            int maxWidth = horizontalMargin;
+            int totalHeight = yMargin * 2;
+
+            foreach (IEnumerable<Image> concatImage in toConcatImages) {
+                var listOfImages = concatImage.ToList();
+
+                int width = listOfImages.Sum(x => x.Width) + (listOfImages.Count - 1) * xGutter + horizontalMargin;
+                int height = listOfImages.Max(x => x.Height);
+
+                Image horizontalImage = new Image<Rgba32>(width, height);
+                int xOffset = xMargin;
+                foreach (Image toAdd in concatImage) {
+                    horizontalImage.Mutate(x => { x.DrawImage(toAdd, new Point(xOffset, 0), new GraphicsOptions()); });
+                    xOffset += toAdd.Width + xGutter;
+
+                    toAdd.Dispose();
+                }
+
+                horizontalImages.Add(horizontalImage);
+                maxWidth = Math.Max(maxWidth, width);
+                totalHeight += height + yGutter;
+            }
+
+            Image resultImage = new Image<Rgba32>(maxWidth, totalHeight);
+            int yOffset = yMargin;
+            foreach (Image horizontalImage in horizontalImages) {
+                resultImage.Mutate(x => { x.DrawImage(horizontalImage, new Point(0, yOffset), new GraphicsOptions()); });
+                yOffset += horizontalImage.Height + yGutter;
+
+                horizontalImage.Dispose();
+            }
+
+            return resultImage;
         }
 
         private Discord.Image ImageToDiscordImage(Image image) {
@@ -85,6 +151,8 @@ namespace DiscordBotFanatic.Services {
             var headerFont = GetRunescapeChatFont(80, FontStyle.Bold);
             int shadowOffsetY = 5;
             int shadowOffsetX = 3;
+            Color fontColor = Color.Black;
+            Color shadowColor = Color.DimGrey;
 
             var metricFontOptions = new TextGraphicsOptions() {
                 TextOptions = new TextOptions() {
@@ -147,27 +215,27 @@ namespace DiscordBotFanatic.Services {
                     x.DrawImage(bg, new Point(0, yOffset), new GraphicsOptions() { });
                     x.DrawImage(iconImage, iconPlace, new GraphicsOptions() { });
 
-                    x.DrawText(metricFontOptions, tuple.Item2.ToLevel(), metricFont, Color.Black, new PointF(levelXOffset + shadowOffsetX, yMiddleText + shadowOffsetY));
-                    x.DrawText(metricFontOptions, tuple.Item2.ToLevel(), metricFont, Color.Yellow, new PointF(levelXOffset, yMiddleText));
+                    x.DrawText(metricFontOptions, tuple.Item2.ToLevel(), metricFont, shadowColor, new PointF(levelXOffset + shadowOffsetX, yMiddleText + shadowOffsetY));
+                    x.DrawText(metricFontOptions, tuple.Item2.ToLevel(), metricFont, fontColor, new PointF(levelXOffset, yMiddleText));
 
-                    x.DrawText(metricFontOptions, tuple.Item2.FormattedExperience(), metricFont, Color.Black, new PointF(expXOffset + shadowOffsetX, yMiddleText + shadowOffsetY));
-                    x.DrawText(metricFontOptions, tuple.Item2.FormattedExperience(), metricFont, Color.Yellow, new PointF(expXOffset, yMiddleText));
+                    x.DrawText(metricFontOptions, tuple.Item2.FormattedExperience(), metricFont, shadowColor, new PointF(expXOffset + shadowOffsetX, yMiddleText + shadowOffsetY));
+                    x.DrawText(metricFontOptions, tuple.Item2.FormattedExperience(), metricFont, fontColor, new PointF(expXOffset, yMiddleText));
 
-                    x.DrawText(metricFontOptions, tuple.Item2.FormattedRank(), metricFont, Color.Black, new PointF(rankXOffset + shadowOffsetX, yMiddleText + shadowOffsetY));
-                    x.DrawText(metricFontOptions, tuple.Item2.FormattedRank(), metricFont, Color.Yellow, new PointF(rankXOffset, yMiddleText));
+                    x.DrawText(metricFontOptions, tuple.Item2.FormattedRank(), metricFont, shadowColor, new PointF(rankXOffset + shadowOffsetX, yMiddleText + shadowOffsetY));
+                    x.DrawText(metricFontOptions, tuple.Item2.FormattedRank(), metricFont, fontColor, new PointF(rankXOffset, yMiddleText));
                 });
             }
 
             // Add headers
             resultImage.Mutate(x => {
-                x.DrawText(headerFontOptions, "Lvl.", headerFont, Color.Black, new PointF(levelXOffset - 60 + shadowOffsetX, yOffsetHeaderText + shadowOffsetY));
-                x.DrawText(headerFontOptions, "Lvl.", headerFont, Color.Yellow, new PointF(levelXOffset - 60, yOffsetHeaderText));
+                x.DrawText(headerFontOptions, "Lvl.", headerFont, shadowColor, new PointF(levelXOffset - 60 + shadowOffsetX, yOffsetHeaderText + shadowOffsetY));
+                x.DrawText(headerFontOptions, "Lvl.", headerFont, fontColor, new PointF(levelXOffset - 60, yOffsetHeaderText));
 
-                x.DrawText(headerFontOptions, "Exp.", headerFont, Color.Black, new PointF(expXOffset - 80 + shadowOffsetX, yOffsetHeaderText + shadowOffsetY));
-                x.DrawText(headerFontOptions, "Exp.", headerFont, Color.Yellow, new PointF(expXOffset - 80, yOffsetHeaderText));
+                x.DrawText(headerFontOptions, "Exp.", headerFont, shadowColor, new PointF(expXOffset - 80 + shadowOffsetX, yOffsetHeaderText + shadowOffsetY));
+                x.DrawText(headerFontOptions, "Exp.", headerFont, fontColor, new PointF(expXOffset - 80, yOffsetHeaderText));
 
-                x.DrawText(headerFontOptions, "Rank.", headerFont, Color.Black, new PointF(rankXOffset - 80 + shadowOffsetX, yOffsetHeaderText + shadowOffsetY));
-                x.DrawText(headerFontOptions, "Rank.", headerFont, Color.Yellow, new PointF(rankXOffset - 80, yOffsetHeaderText));
+                x.DrawText(headerFontOptions, "Rank.", headerFont, shadowColor, new PointF(rankXOffset - 80 + shadowOffsetX, yOffsetHeaderText + shadowOffsetY));
+                x.DrawText(headerFontOptions, "Rank.", headerFont, fontColor, new PointF(rankXOffset - 80, yOffsetHeaderText));
             });
 
 
@@ -282,7 +350,7 @@ namespace DiscordBotFanatic.Services {
 
             resultImage.Mutate(x => {
                 x.DrawText(fontOptions, $"Level: {metric.ToLevel()}", font, Color.Black, new PointF(textXOffset + shadowXOffset, yOffsetLevel + shadowYOffset));
-                x.DrawText(fontOptions, $"Experience: {metric.FormattedExperience()}", font, Color.Black, new PointF(textXOffset + shadowXOffset, yOffsetExperience +shadowYOffset));
+                x.DrawText(fontOptions, $"Experience: {metric.FormattedExperience()}", font, Color.Black, new PointF(textXOffset + shadowXOffset, yOffsetExperience + shadowYOffset));
                 x.DrawText(fontOptions, $"Rank: {metric.FormattedRank()}", font, Color.Black, new PointF(textXOffset + shadowXOffset, yOffsetRank + shadowYOffset));
 
                 x.DrawText(fontOptions, $"Level: {metric.ToLevel()}", font, Color.Yellow, new PointF(textXOffset, yOffsetLevel));
@@ -298,7 +366,7 @@ namespace DiscordBotFanatic.Services {
             int y = Math.Max(center.Y - (size.Height / 2), 0);
             return new Point(x, y);
         }
-        
+
         private string GetIconPath(MetricType skill) {
             return $"{_iconPath}\\{skill.ToString().ToLowerInvariant()}.png";
         }
