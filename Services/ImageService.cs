@@ -16,28 +16,27 @@ using Color = SixLabors.ImageSharp.Color;
 using FontCollection = SixLabors.Fonts.FontCollection;
 using Image = SixLabors.ImageSharp.Image;
 
+// ReSharper disable AccessToDisposedClosure
+
 namespace DiscordBotFanatic.Services {
     public class ImageService : IImageService {
         private readonly string _basePath;
         private readonly string _bgPath;
+        private readonly FontCollection _collection;
         private readonly string _iconPath;
         private readonly ILogService _logService;
         private readonly int _maxScrolls = 2;
         private readonly string _scrollBase;
-        private readonly string _skillBg;
-        private FontCollection _collection;
 
         public ImageService(ILogService logService) {
             _logService = logService;
             _basePath = Directory.GetCurrentDirectory();
             _iconPath = $"{_basePath}\\Images\\icons";
             _bgPath = $"{_basePath}\\Images\\backgrounds";
-            _skillBg = $"{_bgPath}\\skill_bg_3.png";
             _scrollBase = $"{_bgPath}\\scroll\\";
 
             _collection = new FontCollection();
         }
-
 
         public Discord.Image GetImageFromMetric(MetricType type, Metric metric) {
             Stopwatch t = new Stopwatch();
@@ -53,6 +52,66 @@ namespace DiscordBotFanatic.Services {
         public Discord.Image GetImageFromMetric(Tuple<MetricType, Metric> metricTuple) {
             return GetImageFromMetric(metricTuple.Item1, metricTuple.Item2);
         }
+
+        #region image manipulation helpers
+
+        private Image ConcatImages(List<Image> images, int maxHorizontal, int xGutter, int yGutter, int xMargin, int yMargin) {
+            if (!images.Any())
+                return null;
+
+            List<Image> horizontalImages = new List<Image>();
+            var toConcatImages = images.Chunk(maxHorizontal).Select(x => x.ToList());
+
+            int horizontalMargin = xMargin * 2;
+            int maxWidth = horizontalMargin;
+            int totalHeight = yMargin * 2;
+
+            foreach (List<Image> concatImage in toConcatImages) {
+                var listOfImages = concatImage.ToList();
+
+                int width = listOfImages.Sum(x => x.Width) + (listOfImages.Count - 1) * xGutter + horizontalMargin;
+                int height = listOfImages.Max(x => x.Height);
+
+                Image horizontalImage = new Image<Rgba32>(width, height);
+                int xOffset = xMargin;
+                foreach (Image toAdd in concatImage) {
+                    var offset = xOffset;
+                    horizontalImage.Mutate(x => { x.DrawImage(toAdd, new Point(offset, 0), new GraphicsOptions()); });
+                    xOffset += toAdd.Width + xGutter;
+
+                    toAdd.Dispose();
+                }
+
+                horizontalImages.Add(horizontalImage);
+                maxWidth = Math.Max(maxWidth, width);
+                totalHeight += height + yGutter;
+            }
+
+            Image resultImage = new Image<Rgba32>(maxWidth, totalHeight);
+            int yOffset = yMargin;
+            foreach (Image horizontalImage in horizontalImages) {
+                var offset = yOffset;
+                resultImage.Mutate(x => { x.DrawImage(horizontalImage, new Point(0, offset), new GraphicsOptions()); });
+                yOffset += horizontalImage.Height + yGutter;
+
+                horizontalImage.Dispose();
+            }
+
+            return resultImage;
+        }
+
+        #endregion
+        
+        private string GetIconPath(MetricType skill) {
+            return $"{_iconPath}\\{skill.ToString().ToLowerInvariant()}.png";
+        }
+
+        private string GetSpecificBackground(MetricType skill) {
+            return $"{_bgPath}\\{skill.ToString().ToLowerInvariant()}.png";
+        }
+
+
+        #region image creation
 
         public Discord.Image GetImageFromMetrics(IEnumerable<Tuple<MetricType, Metric>> metricEnumerable) {
             var tuples = metricEnumerable.ToList();
@@ -88,62 +147,11 @@ namespace DiscordBotFanatic.Services {
 
             return discordImage;
         }
-
-        private Image ConcatImages(List<Image> images, int maxHorizontal, int xGutter, int yGutter, int xMargin, int yMargin) {
-            if (!images.Any())
-                return null;
-
-            List<Image> horizontalImages = new List<Image>();
-            var toConcatImages = images.Chunk(maxHorizontal);
-
-            int horizontalMargin = xMargin * 2;
-            int maxWidth = horizontalMargin;
-            int totalHeight = yMargin * 2;
-
-            foreach (IEnumerable<Image> concatImage in toConcatImages) {
-                var listOfImages = concatImage.ToList();
-
-                int width = listOfImages.Sum(x => x.Width) + (listOfImages.Count - 1) * xGutter + horizontalMargin;
-                int height = listOfImages.Max(x => x.Height);
-
-                Image horizontalImage = new Image<Rgba32>(width, height);
-                int xOffset = xMargin;
-                foreach (Image toAdd in concatImage) {
-                    horizontalImage.Mutate(x => { x.DrawImage(toAdd, new Point(xOffset, 0), new GraphicsOptions()); });
-                    xOffset += toAdd.Width + xGutter;
-
-                    toAdd.Dispose();
-                }
-
-                horizontalImages.Add(horizontalImage);
-                maxWidth = Math.Max(maxWidth, width);
-                totalHeight += height + yGutter;
-            }
-
-            Image resultImage = new Image<Rgba32>(maxWidth, totalHeight);
-            int yOffset = yMargin;
-            foreach (Image horizontalImage in horizontalImages) {
-                resultImage.Mutate(x => { x.DrawImage(horizontalImage, new Point(0, yOffset), new GraphicsOptions()); });
-                yOffset += horizontalImage.Height + yGutter;
-
-                horizontalImage.Dispose();
-            }
-
-            return resultImage;
-        }
-
-        private Discord.Image ImageToDiscordImage(Image image) {
-            var outputStream = new MemoryStream();
-            image.SaveAsPng(outputStream);
-            outputStream.Position = 0;
-            image.Dispose();
-            return new Discord.Image(outputStream);
-        }
-
+        
         private Image CreateMetricScroll(IEnumerable<Tuple<MetricType, Metric>> metricEnumerable) {
             var metricList = metricEnumerable.ToList();
             int metricHeightSection = 80;
-            Image resultImage = null;
+            Image resultImage;
             Random random = new Random();
 
             // Fonts
@@ -206,14 +214,14 @@ namespace DiscordBotFanatic.Services {
                 using Image iconImage = Image.Load(GetIconPath(tuple.Item1));
                 iconImage.Mutate(x => x.Resize(new ResizeOptions() {
                     Mode = ResizeMode.Max,
-                    Size = new Size(40, 40)
+                    Size = new Size(60, 60)
                 }));
-                Point iconPlace = CalculatePointFromCenter(iconImage.Size(), new Point(60, yMiddle));
+                Point iconPlace = CalculatePointFromCenter(iconImage.Size(), new Point(55, yMiddle));
 
 
                 resultImage.Mutate(x => {
-                    x.DrawImage(bg, new Point(0, yOffset), new GraphicsOptions() { });
-                    x.DrawImage(iconImage, iconPlace, new GraphicsOptions() { });
+                    x.DrawImage(bg, new Point(0, yOffset), new GraphicsOptions());
+                    x.DrawImage(iconImage, iconPlace, new GraphicsOptions());
 
                     x.DrawText(metricFontOptions, tuple.Item2.ToLevel(), metricFont, shadowColor, new PointF(levelXOffset + shadowOffsetX, yMiddleText + shadowOffsetY));
                     x.DrawText(metricFontOptions, tuple.Item2.ToLevel(), metricFont, fontColor, new PointF(levelXOffset, yMiddleText));
@@ -249,87 +257,7 @@ namespace DiscordBotFanatic.Services {
 
             return resultImage;
         }
-
-        private Image CreateSkillSquares(IEnumerable<Tuple<MetricType, Metric>> metricEnumerable) {
-            var metricList = metricEnumerable.ToList();
-
-            Image resultImage = null;
-            int maxImagesHorizontal = 3;
-            using Image bgImage = Image.Load(_skillBg);
-
-
-            // Info
-            int width = Math.Min(bgImage.Size().Width * maxImagesHorizontal, bgImage.Size().Width * metricList.Count);
-            int height = Math.Max(bgImage.Size().Height, bgImage.Size().Height * (int) Math.Ceiling(metricList.Count / (double) maxImagesHorizontal));
-            resultImage = new Image<Rgba32>(width, height);
-            var normalDrawing = new GraphicsOptions() {ColorBlendingMode = PixelColorBlendingMode.Normal};
-
-            // Fonts
-            var bigFont = GetRunescapeChatFont(45, FontStyle.Regular);
-            var smallFont = GetRunescapeChatFont(20, FontStyle.Regular);
-
-            var fontOptions = new TextGraphicsOptions() {
-                TextOptions = new TextOptions() {
-                    HorizontalAlignment = HorizontalAlignment.Center
-                }
-            };
-
-            for (var i = 0; i < metricList.Count; i++) {
-                Tuple<MetricType, Metric> tuple = metricList[i];
-
-                // Calculating start
-                int xCoord = bgImage.Size().Width * (i % maxImagesHorizontal);
-                int yCoord = bgImage.Size().Height * (i / maxImagesHorizontal);
-
-                // Adding BG
-                resultImage.Mutate(x => x.DrawImage(bgImage, new Point(xCoord, yCoord), normalDrawing));
-
-                // Adding Icon
-                using Image iconImage = Image.Load(GetIconPath(tuple.Item1));
-                iconImage.Mutate(x => x.Resize(new ResizeOptions() {
-                    Size = new Size(61, 55),
-                    Mode = ResizeMode.Max
-                }));
-                var iconPoint = CalculatePointFromCenter(iconImage.Size(), new Point(40 + xCoord, 35 + yCoord));
-                resultImage.Mutate(x => { x.DrawImage(iconImage, iconPoint, new GraphicsOptions() {ColorBlendingMode = PixelColorBlendingMode.Normal}); });
-
-                // Adding scores
-                resultImage.Mutate(x => x.DrawText(fontOptions, tuple.Item2.ToLevel(), bigFont, Color.Yellow, new PointF(40 + xCoord, 80 + yCoord)));
-                resultImage.Mutate(x => x.DrawText(fontOptions, tuple.Item2.FormattedExperience(), bigFont, Color.Yellow, new PointF(150 + xCoord, 80 + yCoord)));
-                resultImage.Mutate(x => x.DrawText(fontOptions, tuple.Item2.FormattedRank(), bigFont, Color.Yellow, new PointF(150 + xCoord, 25 + yCoord)));
-
-                resultImage.Mutate(x => x.DrawText(new TextGraphicsOptions(), "Lvl.", smallFont, Color.Yellow, new PointF(13 + xCoord, 65 + yCoord)));
-                resultImage.Mutate(x => x.DrawText(new TextGraphicsOptions(), "Exp.", smallFont, Color.Yellow, new PointF(100 + xCoord, 65 + yCoord)));
-                resultImage.Mutate(x => x.DrawText(new TextGraphicsOptions(), "Rank.", smallFont, Color.Yellow, new PointF(100 + xCoord, 10 + yCoord)));
-            }
-
-            return resultImage;
-        }
-
-        private void InstalledFontCollection(FontCollection collection, string file) {
-            collection.Install($"{_basePath}\\Images\\fonts\\{file}");
-        }
-
-        private Font GetRunescapeChatFont(float size, FontStyle style) {
-            if (!_collection.TryFind("Runescape Chat", out FontFamily fontFamily)) {
-                InstalledFontCollection(_collection, "runescape_chat.ttf");
-
-                if (!_collection.TryFind("Runescape Chat", out fontFamily)) {
-                    throw new Exception($"Couldn't get font/install it.");
-                }
-            }
-
-            Font font = fontFamily.CreateFont(size, style);
-            return font;
-        }
-
-        private MemoryStream ImageToStream(Image image) {
-            MemoryStream resultStream = new MemoryStream();
-            image.SaveAsPng(resultStream);
-            resultStream.Position = 0;
-            return resultStream;
-        }
-
+        
         private Image CreateSpecificMetricImage(MetricType skill, Metric metric) {
             Image resultImage = Image.Load(GetSpecificBackground(skill));
 
@@ -361,18 +289,45 @@ namespace DiscordBotFanatic.Services {
             return resultImage;
         }
 
+        #endregion
+
+        #region helpers
+
+        private void InstalledFontCollection(FontCollection collection, string file) {
+            collection.Install($"{_basePath}\\Images\\fonts\\{file}");
+        }
+
+        private Font GetRunescapeChatFont(float size, FontStyle style) {
+            if (!_collection.TryFind("Runescape Chat", out FontFamily fontFamily)) {
+                InstalledFontCollection(_collection, "runescape_chat.ttf");
+
+                if (!_collection.TryFind("Runescape Chat", out fontFamily)) {
+                    throw new Exception($"Couldn't get font/install it.");
+                }
+            }
+
+            Font font = fontFamily.CreateFont(size, style);
+            return font;
+        }
+
+        private MemoryStream ImageToStream(Image image) {
+            MemoryStream resultStream = new MemoryStream();
+            image.SaveAsPng(resultStream);
+            resultStream.Position = 0;
+            return resultStream;
+        }
+
+        private Discord.Image ImageToDiscordImage(Image image) {
+            var outputStream = ImageToStream(image);
+            return new Discord.Image(outputStream);
+        }
+        
         private Point CalculatePointFromCenter(Size size, Point center) {
             int x = Math.Max(center.X - (size.Width / 2), 0);
             int y = Math.Max(center.Y - (size.Height / 2), 0);
             return new Point(x, y);
         }
 
-        private string GetIconPath(MetricType skill) {
-            return $"{_iconPath}\\{skill.ToString().ToLowerInvariant()}.png";
-        }
-
-        private string GetSpecificBackground(MetricType skill) {
-            return $"{_bgPath}\\{skill.ToString().ToLowerInvariant()}.png";
-        }
+        #endregion
     }
 }
