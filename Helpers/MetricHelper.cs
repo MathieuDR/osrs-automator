@@ -2,10 +2,18 @@
 using System.Collections.Generic;
 using System.Globalization;
 using DiscordBotFanatic.Models.Enums;
+using DiscordBotFanatic.Models.WiseOldMan.Cleaned;
 using DiscordBotFanatic.Models.WiseOldMan.Responses.Models;
 
 namespace DiscordBotFanatic.Helpers {
     public static class MetricHelper {
+
+        public static MetricInfo ToMetricInfo(this Metric metric, MetricType type) {
+            return new MetricInfo(metric, type);
+        }
+        public static MetricInfo ToMetricInfo(this Metric metric, string type) {
+            return new MetricInfo(metric, type);
+        }
         public static string ToLevel(this Metric metric) {
             return metric.Experience.ToLevel().ToString();
         }
@@ -301,7 +309,6 @@ namespace DiscordBotFanatic.Helpers {
                     throw new ArgumentOutOfRangeException(nameof(metric), metric, null);
             }
         }
-
 
         public static int ToLevel(this int experience) {
             int index;

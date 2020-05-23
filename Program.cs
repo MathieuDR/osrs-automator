@@ -5,9 +5,11 @@ using Discord;
 using Discord.Commands;
 using Discord.WebSocket;
 using DiscordBotFanatic.Models.Configuration;
+using DiscordBotFanatic.Models.WiseOldMan.Cleaned;
 using DiscordBotFanatic.Modules;
 using DiscordBotFanatic.Repository;
 using DiscordBotFanatic.Services;
+using DiscordBotFanatic.Services.Images;
 using DiscordBotFanatic.Services.interfaces;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -62,7 +64,7 @@ namespace DiscordBotFanatic
                 .AddTransient<IGuildService, GuildService>()
                 .AddTransient<IHighscoreApiRepository, WiseOldManHighscoreRepository>()
                 .AddTransient<IOsrsHighscoreService, HighscoreService>()
-                .AddTransient<IImageService, ImageService>()
+                .AddTransient<IImageService<MetricInfo>, MetricImageService>()
                 // Add additional services here
                 .BuildServiceProvider();
         }

@@ -9,6 +9,7 @@ using Discord.Commands;
 using DiscordBotFanatic.Helpers;
 using DiscordBotFanatic.Models.Configuration;
 using DiscordBotFanatic.Models.Enums;
+using DiscordBotFanatic.Models.WiseOldMan.Cleaned;
 using DiscordBotFanatic.Models.WiseOldMan.Responses;
 using DiscordBotFanatic.Models.WiseOldMan.Responses.Models;
 using DiscordBotFanatic.Modules.DiscordCommandArguments;
@@ -18,24 +19,24 @@ using DiscordBotFanatic.Services.interfaces;
 namespace DiscordBotFanatic.Modules {
     [Name("Player stats")]
     public class PlayerStatsModule : StatsBaseModule {
-        private readonly IImageService _imageService;
         private const string UsernameSummary = "The OSRS Player's username";
+        private readonly IImageService<MetricInfo> _metricImageService;
 
 
-        public PlayerStatsModule(IImageService imageService, HighscoreService osrsHighscoreService, MessageConfiguration messageConfiguration) : base(osrsHighscoreService, messageConfiguration) {
-            _imageService = imageService;
-        }
-
-        protected override void BeforeExecute(CommandInfo command) {
-            if(Context != null) {
-                Name = Service.GetUserNameFromUser(Context.User);
-            }
-
-            base.BeforeExecute(command);
+        public PlayerStatsModule(IImageService<MetricInfo> metricImageService, HighscoreService osrsHighscoreService, MessageConfiguration messageConfiguration) : base(osrsHighscoreService, messageConfiguration) {
+            _metricImageService = metricImageService;
         }
 
         public string Area {
             get { return string.IsNullOrEmpty(Name) ? "Players" : Name; }
+        }
+
+        protected override void BeforeExecute(CommandInfo command) {
+            if (Context != null) {
+                Name = Service.GetUserNameFromUser(Context.User);
+            }
+
+            base.BeforeExecute(command);
         }
 
         protected override string GetUrl() {
@@ -64,23 +65,18 @@ namespace DiscordBotFanatic.Modules {
         private Embed FormatEmbeddedFromPlayerResponse(PlayerResponse player) {
             var embed = GetCommonEmbedBuilder(Area, $"{player.Username} stats from {player.UpdatedAt:dddd, dd/MM} at {player.UpdatedAt:HH:mm:ss}");
 
-            List<Tuple<MetricType, Metric>> toImage = new List<Tuple<MetricType, Metric>>();
+            //List<Tuple<MetricType, Metric>> toImage = new List<Tuple<MetricType, Metric>>();
+            List<MetricInfo> infos = new List<MetricInfo>();
             foreach (KeyValuePair<string, Metric> keyValuePair in player.LatestSnapshot.MetricDictionary) {
                 MetricType type = keyValuePair.Key.ToMetricType();
-                toImage.Add(new Tuple<MetricType, Metric>(type, keyValuePair.Value));
+                //toImage.Add(new Tuple<MetricType, Metric>(type, keyValuePair.Value));
+                infos.Add(keyValuePair.Value.ToMetricInfo(type));
             }
 
-            Image image = _imageService.GetImageFromMetrics(toImage);
+            Image image = _metricImageService.GetImages(infos);
 
 
-         Context.Message.Channel.SendFileAsync(image.Stream, $"{player.Id}{player.UpdatedAt.Ticks}.png" );
-            //var url = msg.Attachments.FirstOrDefault().Url;
-            //msg.DeleteAsync();
-            //embed.ImageUrl = url;
-
-            //FormatMetricsInEmbed(player.LatestSnapshot.MetricDictionary, embed);
-
-
+            Context.Message.Channel.SendFileAsync(image.Stream, $"{player.Id}{player.UpdatedAt.Ticks}.png");
             return embed.Build();
         }
 
