@@ -98,7 +98,7 @@ namespace DiscordBotFanatic.Modules {
 
                 image = _deltaImageService.GetImage(deltaInfo);
             } else {
-                List<DeltaInfo> infos = delta.DeltaInfoList.RemoveUnrankedInfos();
+                List<DeltaInfo> infos = delta.DeltaInfoList.RemoveEmpty();
 
                 if (_onlyPositiveDeltas) {
                     infos = infos.RemoveNegativeInfos();
@@ -135,7 +135,6 @@ namespace DiscordBotFanatic.Modules {
         }
 
         #endregion
-
 
         #region player
 

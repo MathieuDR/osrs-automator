@@ -1,13 +1,12 @@
 ﻿using System;
-using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Discord;
 using DiscordBotFanatic.Models.Data;
 using DiscordBotFanatic.Models.Enums;
+using DiscordBotFanatic.Models.WiseOldMan.Cleaned;
 using DiscordBotFanatic.Models.WiseOldMan.Responses;
-using DiscordBotFanatic.Models.WiseOldMan.Responses.Models;
 using DiscordBotFanatic.Repository;
 using DiscordBotFanatic.Services.interfaces;
 
@@ -26,47 +25,10 @@ namespace DiscordBotFanatic.Services {
             return player?.DefaultPlayerUsername;
         }
 
-        public async Task<Dictionary<GroupMember, DeltaMetric>> GetPlayerRecordsForGroupAsync(MetricType metricType, Period period, int groupId) {
-            GroupMembersListResponse memberList = await _highscoreApiRepository.GetPlayersFromGroupId(groupId);
-            Dictionary<GroupMember, DeltaMetric> result = new Dictionary<GroupMember, DeltaMetric>();
-
-            //ConcurrentBag<Tuple<GroupMember, DeltaMetric>> concurrentBag = new ConcurrentBag<Tuple<GroupMember, DeltaMetric>>();
-            //ParallelLoopResult loop = Parallel.ForEach(memberList.Members, new ParallelOptions() { MaxDegreeOfParallelism = 8 }, async groupMember =>
-            //{
-            //    DeltaResponse response = await DeltaPlayerAsync(groupMember.Id, period, metricType);
-            //    DeltaMetric delta = response.Metrics.MetricFromEnum(metricType);
-            //    if (delta != null)
-            //    {
-            //        concurrentBag.Add(new Tuple<GroupMember, DeltaMetric>(groupMember, delta));
-            //    }
-            //});
-
-            Task[] tasks = new Task[memberList.Members.Count];
-            for (var i = 0; i < memberList.Members.Count; i++) {
-                var member = memberList.Members[i];
-                //var t = Task.Factory.StartNew(async () => {
-                //    var response = await DeltaPlayerAsync(member.Id, period, metricType);
-                //    DeltaMetric delta = response.Metrics.MetricFromEnum(metricType);
-                //    return new Tuple<GroupMember, DeltaMetric>(member, delta);
-                //});
-
-                var t = DeltaPlayerAsync(member.Id, period, metricType);
-                tasks[i] = t;
-            }
-
-            Task.WaitAll(tasks);
-
-            foreach (var task in tasks) {
-                if (!(task.AsyncState is Tuple<GroupMember, DeltaMetric> data)) {
-                    continue;
-                }
-
-                if (data.Item2 != null) {
-                    result.Add(data.Item1, data.Item2);
-                }
-            }
-
-            return result;
+        public async Task<List<LeaderboardMemberInfo>> GetPlayerRecordsForGroupAsync(MetricType metricType, Period period, int groupId) {
+            var leaderboard = await _highscoreApiRepository.GetGroupLeaderboards(metricType, period, groupId);
+            
+            return leaderboard.MemberInfos.OrderByDescending(x => x.HasGained).ToList();
         }
 
         public async void SetDefaultPlayer(ulong userId, string username) {

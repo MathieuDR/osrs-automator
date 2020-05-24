@@ -4,7 +4,7 @@ using DiscordBotFanatic.Models.WiseOldMan.Cleaned;
 
 namespace DiscordBotFanatic.Helpers {
     public static class InfoHelper {
-        public static List<DeltaInfo> RemoveUnrankedInfos(this List<DeltaInfo> list) {
+        public static List<DeltaInfo> RemoveEmpty(this List<DeltaInfo> list) {
             return list.Where(x => x.IsRanked).ToList();
         }
 
@@ -12,7 +12,7 @@ namespace DiscordBotFanatic.Helpers {
             return list.Where(x => x.Gained > 0).ToList();
         }
 
-        public static List<MetricInfo> RemoveUnrankedInfos(this List<MetricInfo> list) {
+        public static List<MetricInfo> RemoveEmpty(this List<MetricInfo> list) {
             return list.Where(x => x.IsRanked).ToList();
         }
 
@@ -22,8 +22,12 @@ namespace DiscordBotFanatic.Helpers {
             return  periods<= 1;
         }
 
-        public static List<RecordInfo> RemoveEmptyRecords(this List<RecordInfo> list) {
+        public static List<RecordInfo> RemoveEmpty(this List<RecordInfo> list) {
             return list.Where(x => !x.IsEmptyRecord).ToList();
+        }
+
+        public static List<LeaderboardMemberInfo> RemoveEmpty(this List<LeaderboardMemberInfo> list) {
+            return list.Where(x => !x.HasGained).ToList();
         }
     }
 }

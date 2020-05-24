@@ -26,6 +26,9 @@ namespace DiscordBotFanatic.Helpers {
             return new RecordInfo(record);
         }
 
+        public static LeaderboardMemberInfo ToLeaderboardMemberInfo(this LeaderboardMember leaderboardMember, MetricType requestedType) {
+            return new LeaderboardMemberInfo(leaderboardMember, requestedType);
+        }
         public static string ToLevel(this Metric metric) {
             return metric.Experience.ToLevel().ToString();
         }

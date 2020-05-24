@@ -75,7 +75,7 @@ namespace DiscordBotFanatic.Repository {
             request.AddParameter("playerId", id);
             request.AddParameter("period", period.ToString().ToLower());
             if (metric.HasValue) {
-                request.AddParameter("metric", metric.ToString().ToLower());
+                request.AddParameter("metric", metric.ToString()?.ToLower());
             }
 
             LogRequest(request, MethodBase.GetCurrentMethod()?.Name);
@@ -134,6 +134,22 @@ namespace DiscordBotFanatic.Repository {
             LogRequest(request, MethodBase.GetCurrentMethod()?.Name);
             var result = await _client.GetAsync<GroupMembersListResponse>(request);
             ValidateResponse(result);
+
+            return result;
+        }
+
+        public async Task<LeaderboardResponse> GetGroupLeaderboards(MetricType metric, Period period, int groupId) {
+            var request = new RestRequest($"{GroupBase}/{{id}}/leaderboard");
+            request.AddParameter("id", groupId, ParameterType.UrlSegment);
+            request.AddParameter("period", period.ToString().ToLower());
+            request.AddParameter("metric", metric.ToString().ToLower());
+
+            LogRequest(request, MethodBase.GetCurrentMethod()?.Name);
+            var result = await _client.GetAsync<LeaderboardResponse>(request);
+            ValidateResponse(result);
+
+            result.RequestedType = metric;
+            result.RequestedPeriod = period;
 
             return result;
         }

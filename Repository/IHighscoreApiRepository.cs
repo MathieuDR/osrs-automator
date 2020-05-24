@@ -1,9 +1,7 @@
 ﻿using System.Collections.Generic;
-using System.Reflection;
 using System.Threading.Tasks;
 using DiscordBotFanatic.Models.Enums;
 using DiscordBotFanatic.Models.WiseOldMan.Responses;
-using RestSharp;
 
 namespace DiscordBotFanatic.Repository {
     public interface IHighscoreApiRepository {
@@ -15,5 +13,6 @@ namespace DiscordBotFanatic.Repository {
         public Task<RecordResponse> GetPlayerRecordAsync(int id, MetricType? metric, Period? period);
         public Task<GroupUpdateResponse> UpdateGroupAsync(int groupId);
         public Task<GroupMembersListResponse> GetPlayersFromGroupId(int groupId);
+        public Task<LeaderboardResponse> GetGroupLeaderboards(MetricType metric, Period period, int groupId);
     }
 }

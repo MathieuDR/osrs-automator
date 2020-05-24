@@ -15,7 +15,7 @@ namespace DiscordBotFanatic.Models.WiseOldMan.Responses {
 
         public List<RecordInfo> RecordInfos {
             get {
-                return _recordInfos ??= Records.Select(x => x.ToRecordInfo()).ToList().RemoveEmptyRecords();
+                return _recordInfos ??= Records.Select(x => x.ToRecordInfo()).ToList().RemoveEmpty();
             }
         }
     }
