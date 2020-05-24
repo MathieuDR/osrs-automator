@@ -1,8 +1,15 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
+using DiscordBotFanatic.Helpers;
+using DiscordBotFanatic.Models.Enums;
+using DiscordBotFanatic.Models.WiseOldMan.Cleaned;
 
 namespace DiscordBotFanatic.Models.WiseOldMan.Responses.Models {
     public class Snapshot {
+        private Dictionary<MetricType, Metric> _metricDictionary = null;
+
+        private List<MetricInfo> _metricInfoList = null;
         public DateTime CreatedAt { get; set; }
         public object ImportedAt { get; set; }
         public Metric Overall { get; set; }
@@ -30,36 +37,38 @@ namespace DiscordBotFanatic.Models.WiseOldMan.Responses.Models {
         public Metric Hunter { get; set; }
         public Metric Construction { get; set; }
 
-        public Dictionary<string, Metric> MetricDictionary {
+        public List<MetricInfo> MetricInfoList {
+            get { return _metricInfoList ??= (MetricDictionary.Select(x => x.Value.ToMetricInfo(x.Key)).ToList()); }
+        }
+
+        public Dictionary<MetricType, Metric> MetricDictionary {
             get {
-                var result = new Dictionary<string, Metric>();
-
-                result.Add(nameof(Overall), Overall);
-                result.Add(nameof(Attack), Attack);
-                result.Add(nameof(Defence), Defence);
-                result.Add(nameof(Strength), Strength);
-                result.Add(nameof(Hitpoints), Hitpoints);
-                result.Add(nameof(Ranged), Ranged);
-                result.Add(nameof(Prayer), Prayer);
-                result.Add(nameof(Magic), Magic);
-                result.Add(nameof(Cooking), Cooking);
-                result.Add(nameof(Woodcutting), Woodcutting);
-                result.Add(nameof(Fletching), Fletching);
-                result.Add(nameof(Fishing), Fishing);
-                result.Add(nameof(Firemaking), Firemaking);
-                result.Add(nameof(Crafting), Crafting);
-                result.Add(nameof(Smithing), Smithing);
-                result.Add(nameof(Mining), Mining);
-                result.Add(nameof(Herblore), Herblore);
-                result.Add(nameof(Agility), Agility);
-                result.Add(nameof(Thieving), Thieving);
-                result.Add(nameof(Slayer), Slayer);
-                result.Add(nameof(Farming), Farming);
-                result.Add(nameof(Runecrafting), Runecrafting);
-                result.Add(nameof(Hunter), Hunter);
-                result.Add(nameof(Construction), Construction);
-
-                return result;
+                return _metricDictionary ??= new Dictionary<MetricType, Metric> {
+                    {MetricType.Overall, Overall},
+                    {MetricType.Attack, Attack},
+                    {MetricType.Defence, Defence},
+                    {MetricType.Strength, Strength},
+                    {MetricType.Hitpoints, Hitpoints},
+                    {MetricType.Ranged, Ranged},
+                    {MetricType.Prayer, Prayer},
+                    {MetricType.Magic, Magic},
+                    {MetricType.Cooking, Cooking},
+                    {MetricType.Woodcutting, Woodcutting},
+                    {MetricType.Fletching, Fletching},
+                    {MetricType.Fishing, Fishing},
+                    {MetricType.Firemaking, Firemaking},
+                    {MetricType.Crafting, Crafting},
+                    {MetricType.Smithing, Smithing},
+                    {MetricType.Mining, Mining},
+                    {MetricType.Herblore, Herblore},
+                    {MetricType.Agility, Agility},
+                    {MetricType.Thieving, Thieving},
+                    {MetricType.Slayer, Slayer},
+                    {MetricType.Farming, Farming},
+                    {MetricType.Runecrafting, Runecrafting},
+                    {MetricType.Hunter, Hunter},
+                    {MetricType.Construction, Construction}
+                };
             }
         }
     }

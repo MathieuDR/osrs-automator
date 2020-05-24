@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Text.RegularExpressions;
 using DiscordBotFanatic.Helpers;
 using DiscordBotFanatic.Models.Enums;
 using DiscordBotFanatic.Models.WiseOldMan.Cleaned;
@@ -16,11 +17,11 @@ using FontCollection = SixLabors.Fonts.FontCollection;
 using Image = SixLabors.ImageSharp.Image;
 
 namespace DiscordBotFanatic.Services.Images {
-    public abstract class ImageServiceBase<T> : IImageService<T> where T : BaseInfo {
+    public abstract class ImageServiceBase<T> : IImageService<T> where T : IBaseInfo {
         protected readonly string BasePath;
         protected readonly string IconPath;
         protected readonly ILogService LogService;
-        public readonly string _bgPath;
+        protected readonly string BgPath;
         protected readonly Point ShadowOffset;
 
         private readonly FontCollection _collection;
@@ -28,8 +29,8 @@ namespace DiscordBotFanatic.Services.Images {
         protected readonly Font HeaderFont;
         protected readonly Color FontColor;
         protected readonly Color ShadowColor;
-        protected readonly TextGraphicsOptions InfoFontOptions;
-        protected readonly TextGraphicsOptions HeaderFontOptions;
+        protected readonly TextGraphicsOptions CenterFontOptions;
+        protected readonly TextGraphicsOptions LeftAlignFontOptions;
         
 
 
@@ -37,24 +38,24 @@ namespace DiscordBotFanatic.Services.Images {
             LogService = logService;
             BasePath = Directory.GetCurrentDirectory();
             IconPath = $"{BasePath}\\Images\\icons";
-            _bgPath = $"{BasePath}\\Images\\backgrounds";
-            ShadowOffset = new Point(3,5);
+            BgPath = $"{BasePath}\\Images\\backgrounds";
+            ShadowOffset = new Point(2,3);
 
             // Fonts
             _collection = new FontCollection();
             InfoFont = GetRunescapeChatFont(64, FontStyle.Regular);
-            HeaderFont = GetRunescapeChatFont(80, FontStyle.Bold);
+            HeaderFont = GetRunescapeChatFont(70, FontStyle.Bold);
            
             FontColor = Color.Black;
             ShadowColor = Color.DimGrey;
 
-            InfoFontOptions = new TextGraphicsOptions() {
+            CenterFontOptions = new TextGraphicsOptions() {
                 TextOptions = new TextOptions() {
                     HorizontalAlignment = HorizontalAlignment.Center,
                 }
             };
 
-            HeaderFontOptions = new TextGraphicsOptions() {
+            LeftAlignFontOptions = new TextGraphicsOptions() {
                 TextOptions = new TextOptions() {
                     HorizontalAlignment = HorizontalAlignment.Left
                 }
@@ -62,6 +63,8 @@ namespace DiscordBotFanatic.Services.Images {
         }
 
         public Discord.Image GetImage(T info) {
+            BeforeGetImage(info);
+                
             Stopwatch t = new Stopwatch();
             t.Start();
             Image image = CreateImage(info);
@@ -73,9 +76,12 @@ namespace DiscordBotFanatic.Services.Images {
         }
 
         public Discord.Image GetImages(IEnumerable<T> infoEnumerable) {
+            var baseInfos = infoEnumerable.ToList();
+            BeforeGetImages(baseInfos);
+
             Stopwatch t = new Stopwatch();
             t.Start();
-            Image image = CreateImageForMultipleInfos(infoEnumerable);
+            Image image = CreateImageForMultipleInfos(baseInfos);
             Discord.Image discordImage = ImageToDiscordImage(image);
             t.Stop();
             LogService.LogStopWatch(nameof(GetImages), t);
@@ -83,6 +89,9 @@ namespace DiscordBotFanatic.Services.Images {
             return discordImage;
         }
 
+        protected virtual void BeforeGetImages(IEnumerable<T> infoEnumerable) { }
+
+        protected virtual void BeforeGetImage(T info) { }
 
         #region image manipulation helpers
 
@@ -193,11 +202,12 @@ namespace DiscordBotFanatic.Services.Images {
         }
 
         protected string GetIconPathForMetricType(MetricType skill) {
-            return $"{IconPath}\\{skill.ToString().ToLowerInvariant()}.png";
+            var fileName = Regex.Replace(skill.ToString(), @"(?<!_|^)([A-Z])", "_$1").ToLowerInvariant();
+            return $"{IconPath}\\{fileName}.png";
         }
 
         protected string GetBackgroundPathForMetricType(MetricType skill) {
-            return $"{_bgPath}\\{skill.ToString().ToLowerInvariant()}.png";
+            return $"{BgPath}\\{skill.ToString().ToLowerInvariant()}.png";
         }
 
         #endregion

@@ -1,5 +1,7 @@
 ﻿using System;
+using System.Collections.Generic;
 using DiscordBotFanatic.Models.Enums;
+using DiscordBotFanatic.Models.WiseOldMan.Cleaned;
 using DiscordBotFanatic.Models.WiseOldMan.Responses.Models;
 using Newtonsoft.Json;
 
@@ -20,5 +22,15 @@ namespace DiscordBotFanatic.Models.WiseOldMan.Responses {
 
         [JsonProperty("data")]
         public DeltaMetrics Metrics{ get; set; }
+
+        public List<DeltaInfo> DeltaInfoList {
+            get {
+                return Metrics.AllDeltaInfos;
+            }
+        }
+
+        public DeltaInfo DeltaInfoForType(MetricType type) {
+            return Metrics.InfoFromType(type);
+        }
     }
 }

@@ -1,20 +1,20 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using DiscordBotFanatic.Helpers;
-using DiscordBotFanatic.Models.Enums;
 using DiscordBotFanatic.Models.WiseOldMan.Cleaned;
-using DiscordBotFanatic.Models.WiseOldMan.Responses.Models;
 using DiscordBotFanatic.Services.interfaces;
 using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.PixelFormats;
 using SixLabors.ImageSharp.Processing;
 
 namespace DiscordBotFanatic.Services.Images {
-    public abstract class ScrollImageServiceBase<T> : ImageServiceBase<T> where T : BaseInfo {
+    public abstract class ScrollImageServiceBase<T> : ImageServiceBase<T> where T : IBaseInfo {
         private readonly string _scrollBase;
-        private int _maxScrolls = 1;
+        private int _maxScrolls;
+        private int _headerSections;
 
         protected readonly int SectionHeight = 80;
         protected readonly Size HeaderTextOffset;
@@ -22,12 +22,13 @@ namespace DiscordBotFanatic.Services.Images {
         protected Size ScrollGutter;
         protected Size ScrollMargin;
 
-        protected int CurrentSectionYOffset= 0;
-        protected int MiddleOfCurrentSectionYOffset = 0;
-        protected int MiddleOfCurrentSectionForTextYOffset = 0;
+        protected int CurrentSectionYOffset;
+        protected int MiddleOfCurrentSectionYOffset;
+        protected int MiddleOfCurrentSectionForTextYOffset;
 
         protected ScrollImageServiceBase(ILogService logService) : base(logService) {
-            _scrollBase = $"{_bgPath}\\scroll\\";
+            _maxScrolls = 1;
+            _scrollBase = $"{BgPath}\\scroll\\";
             HeaderTextOffset = new Size(0,130);
             ScrollGutter = new Size(300, 50);
             ScrollMargin = new Size(150, 0);
@@ -36,6 +37,11 @@ namespace DiscordBotFanatic.Services.Images {
         public int MaxScrolls {
             get { return _maxScrolls; }
             set { _maxScrolls = value; }
+        }
+
+        public int HeaderSections {
+            get { return _headerSections;}
+            set { _headerSections = value; }
         }
 
         protected abstract void MutateScrollWithInfo(IImageProcessingContext context, T info);
@@ -75,6 +81,7 @@ namespace DiscordBotFanatic.Services.Images {
             return resultImage;
         }
 
+       [SuppressMessage("ReSharper", "AccessToDisposedClosure")]
        protected Image CreateScrollImageForMultipleInfos(IEnumerable<T> infos) {
             var infoList = infos.ToList();
             int infoHeightSection = 80;
@@ -93,13 +100,20 @@ namespace DiscordBotFanatic.Services.Images {
             }
 
             // Create image
-            int totalHeight = topImage.Height + bottomImage.Height + (infoList.Count * infoHeightSection);
+            int offsetHeight = topImage.Height + HeaderSections * infoHeightSection;
+            int totalHeight = offsetHeight + bottomImage.Height + (infoList.Count  * infoHeightSection);
             resultImage = new Image<Rgba32>(topImage.Width, totalHeight);
-
+            
+            
             // Append scrolls
             resultImage.Mutate(x => {
                 x.DrawImage(topImage, new Point(0, 0), PixelColorBlendingMode.Normal, PixelAlphaCompositionMode.Src, 1);
                 x.DrawImage(bottomImage, new Point(0, totalHeight - bottomImage.Height), PixelColorBlendingMode.Normal, PixelAlphaCompositionMode.Src, 1);
+
+                for (int i = 0; i < HeaderSections; i++) {
+                    Image bg = randomBg[random.Next(0, randomBg.Length)];
+                    x.DrawImage(bg, new Point(0, i * SectionHeight + topImage.Height), new GraphicsOptions());
+                }
             });
 
             // Info
@@ -107,7 +121,7 @@ namespace DiscordBotFanatic.Services.Images {
                 T info = infoList.ElementAt(i);
 
                 // Calculating start
-                CurrentSectionYOffset = infoHeightSection * i + topImage.Height;
+                CurrentSectionYOffset = infoHeightSection * i + offsetHeight;
                 MiddleOfCurrentSectionYOffset = CurrentSectionYOffset + 40;
                 MiddleOfCurrentSectionForTextYOffset = CurrentSectionYOffset + 17;
 

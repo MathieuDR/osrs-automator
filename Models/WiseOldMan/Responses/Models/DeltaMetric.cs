@@ -5,6 +5,7 @@ namespace DiscordBotFanatic.Models.WiseOldMan.Responses.Models {
         public Delta Rank { get; set; }
         public Delta Experience { get; set; }
         public Delta Score { get; set; }
+        public Delta Kills{ get; set; }
 
         public override string ToString() {
             if (Rank == null || Rank.End == -1) {

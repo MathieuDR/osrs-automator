@@ -14,6 +14,18 @@ namespace DiscordBotFanatic.Helpers {
         public static MetricInfo ToMetricInfo(this Metric metric, string type) {
             return new MetricInfo(metric, type);
         }
+
+        public static DeltaInfo ToDeltaInfo(this DeltaMetric metric, MetricType type) {
+            return new DeltaInfo(metric, type);
+        }
+        public static DeltaInfo ToDeltaInfo(this DeltaMetric metric, string type) {
+            return new DeltaInfo(metric, type);
+        }
+
+        public static RecordInfo ToRecordInfo(this Record record) {
+            return new RecordInfo(record);
+        }
+
         public static string ToLevel(this Metric metric) {
             return metric.Experience.ToLevel().ToString();
         }
@@ -34,8 +46,8 @@ namespace DiscordBotFanatic.Helpers {
             return metric.Experience.End.ToLevel().ToString();
         }
 
-        public static string LevelGained(this DeltaMetric metric) {
-            return (metric.Experience.End.ToLevel() - metric.Experience.Start.ToLevel()).ToString();
+            public static string LevelGained(this DeltaMetric metric) {
+                return (metric.Experience.End.ToLevel() - metric.Experience.Start.ToLevel()).FormatConditionally();
         }
 
         public static string StartExperience(this DeltaMetric metric) {
@@ -47,7 +59,7 @@ namespace DiscordBotFanatic.Helpers {
         }
 
         public static string GainedExperience(this DeltaMetric metric) {
-            return metric.Experience.Gained.FormatNumber();
+            return metric.Experience.Gained.FormatConditionally();
         }
 
         public static string StartRank(this DeltaMetric metric) {
@@ -59,11 +71,11 @@ namespace DiscordBotFanatic.Helpers {
         }
 
         public static string GainedRanks(this DeltaMetric metric) {
-            return (metric.Rank.Start - metric.Rank.End).FormatNumber();
+            return (metric.Rank.Start - metric.Rank.End).FormatConditionally();
         }
 
         public static MetricType ToMetricType(this string metricType) {
-            if(Enum.TryParse<MetricType>(metricType, true, out MetricType result)) {
+            if(Enum.TryParse(metricType, true, out MetricType result)) {
                 return result;
             }
 
@@ -91,6 +103,29 @@ namespace DiscordBotFanatic.Helpers {
             }
 
             return number.ToString("#,#", nfi);
+        }
+
+        public static string FormatConditionally(this int number) {
+            var nfi = (NumberFormatInfo) CultureInfo.InvariantCulture.NumberFormat.Clone();
+            nfi.NumberGroupSeparator = " ";
+
+            if (number >= 100000000) {
+                return (number / 1000000).ToString("+#,0M;-#,0M", nfi);
+            }
+
+            if (number >= 10000000) {
+                return (number / 1000000).ToString("+0.#;-0.#", nfi) + "M";
+            }
+
+            if (number >= 100000) {
+                return (number / 1000).ToString("+#,0K;-#,0K", nfi);
+            }
+
+            if (number >= 10000) {
+                return (number / 1000).ToString("+0.#;-0.#", nfi) + "K";
+            }
+
+            return number.ToString("+#;-#;0", nfi);
         }
 
         public static bool IsBossMetric(this MetricType type) {

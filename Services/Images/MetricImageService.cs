@@ -34,9 +34,9 @@ namespace DiscordBotFanatic.Services.Images {
             Color textColor = Color.Yellow;
 
             resultImage.Mutate(x => {
-                x.DrawShadowedText(HeaderFontOptions, $"Level: {info.Metric.ToLevel()}", font, new Point(textXOffset, yOffsetLevel), ShadowOffset, textColor, ShadowColor);
-                x.DrawShadowedText(HeaderFontOptions, $"Experience: {info.Metric.FormattedExperience()}", font, new Point(textXOffset, yOffsetExperience), ShadowOffset, textColor, ShadowColor);
-                x.DrawShadowedText(HeaderFontOptions, $"Rank: {info.Metric.FormattedRank()}", font, new Point(textXOffset, yOffsetRank), ShadowOffset, textColor, ShadowColor);
+                x.DrawShadowedText(LeftAlignFontOptions, $"Level: {info.Info.ToLevel()}", font, new Point(textXOffset, yOffsetLevel), ShadowOffset, textColor, ShadowColor);
+                x.DrawShadowedText(LeftAlignFontOptions, $"Experience: {info.Info.FormattedExperience()}", font, new Point(textXOffset, yOffsetExperience), ShadowOffset, textColor, ShadowColor);
+                x.DrawShadowedText(LeftAlignFontOptions, $"Rank: {info.Info.FormattedRank()}", font, new Point(textXOffset, yOffsetRank), ShadowOffset, textColor, ShadowColor);
             });
 
             return resultImage;
@@ -49,16 +49,16 @@ namespace DiscordBotFanatic.Services.Images {
             context.DrawImage(iconImage, iconPlace, new GraphicsOptions());
 
             // text
-            context.DrawShadowedText(InfoFontOptions, info.Metric.ToLevel(), InfoFont, new Point(_levelXOffset, MiddleOfCurrentSectionForTextYOffset), ShadowOffset, FontColor, ShadowColor);
-            context.DrawShadowedText(InfoFontOptions, info.Metric.FormattedExperience(), InfoFont, new Point(_expXOffset, MiddleOfCurrentSectionForTextYOffset), ShadowOffset, FontColor, ShadowColor);
-            context.DrawShadowedText(InfoFontOptions, info.Metric.FormattedRank(), InfoFont, new Point(_rankXOffset, MiddleOfCurrentSectionForTextYOffset), ShadowOffset, FontColor, ShadowColor);
+            context.DrawShadowedText(CenterFontOptions, info.Info.ToLevel(), InfoFont, new Point(_levelXOffset, MiddleOfCurrentSectionForTextYOffset), ShadowOffset, FontColor, ShadowColor);
+            context.DrawShadowedText(CenterFontOptions, info.Info.FormattedExperience(), InfoFont, new Point(_expXOffset, MiddleOfCurrentSectionForTextYOffset), ShadowOffset, FontColor, ShadowColor);
+            context.DrawShadowedText(CenterFontOptions, info.Info.FormattedRank(), InfoFont, new Point(_rankXOffset, MiddleOfCurrentSectionForTextYOffset), ShadowOffset, FontColor, ShadowColor);
         }
 
         protected override void MutateScrollWithHeaders(IImageProcessingContext context) {
             // text
-            context.DrawShadowedText(HeaderFontOptions, "Lvl.", HeaderFont, new Point(_levelXOffset - 60 + HeaderTextOffset.Width, HeaderTextOffset.Height), ShadowOffset, FontColor, ShadowColor);
-            context.DrawShadowedText(HeaderFontOptions, "Exp.", HeaderFont, new Point(_expXOffset - 80 + HeaderTextOffset.Width, HeaderTextOffset.Height), ShadowOffset, FontColor, ShadowColor);
-            context.DrawShadowedText(HeaderFontOptions, "Rank.", HeaderFont, new Point(_rankXOffset - 80 + HeaderTextOffset.Width, HeaderTextOffset.Height), ShadowOffset, FontColor, ShadowColor);
+            context.DrawShadowedText(LeftAlignFontOptions, "Lvl.", HeaderFont, new Point(_levelXOffset - 60 + HeaderTextOffset.Width, HeaderTextOffset.Height), ShadowOffset, FontColor, ShadowColor);
+            context.DrawShadowedText(LeftAlignFontOptions, "Exp.", HeaderFont, new Point(_expXOffset - 80 + HeaderTextOffset.Width, HeaderTextOffset.Height), ShadowOffset, FontColor, ShadowColor);
+            context.DrawShadowedText(LeftAlignFontOptions, "Rank.", HeaderFont, new Point(_rankXOffset - 80 + HeaderTextOffset.Width, HeaderTextOffset.Height), ShadowOffset, FontColor, ShadowColor);
         }
     }
 }

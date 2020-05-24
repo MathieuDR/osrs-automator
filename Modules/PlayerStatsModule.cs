@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using Discord;
 using Discord.Commands;
@@ -11,7 +11,6 @@ using DiscordBotFanatic.Models.Configuration;
 using DiscordBotFanatic.Models.Enums;
 using DiscordBotFanatic.Models.WiseOldMan.Cleaned;
 using DiscordBotFanatic.Models.WiseOldMan.Responses;
-using DiscordBotFanatic.Models.WiseOldMan.Responses.Models;
 using DiscordBotFanatic.Modules.DiscordCommandArguments;
 using DiscordBotFanatic.Services;
 using DiscordBotFanatic.Services.interfaces;
@@ -20,11 +19,16 @@ namespace DiscordBotFanatic.Modules {
     [Name("Player stats")]
     public class PlayerStatsModule : StatsBaseModule {
         private const string UsernameSummary = "The OSRS Player's username";
+        private readonly IImageService<DeltaInfo> _deltaImageService;
         private readonly IImageService<MetricInfo> _metricImageService;
+        private readonly IImageService<RecordInfo> _recordImageService;
+        private bool _onlyPositiveDeltas;
 
 
-        public PlayerStatsModule(IImageService<MetricInfo> metricImageService, HighscoreService osrsHighscoreService, MessageConfiguration messageConfiguration) : base(osrsHighscoreService, messageConfiguration) {
+        public PlayerStatsModule(IImageService<MetricInfo> metricImageService, IImageService<DeltaInfo> deltaImageService,  IImageService<RecordInfo> recordImageService, HighscoreService osrsHighscoreService, MessageConfiguration messageConfiguration) : base(osrsHighscoreService, messageConfiguration) {
             _metricImageService = metricImageService;
+            _deltaImageService = deltaImageService;
+            _recordImageService = recordImageService;
         }
 
         public string Area {
@@ -62,114 +66,72 @@ namespace DiscordBotFanatic.Modules {
             }
         }
 
+
         private Embed FormatEmbeddedFromPlayerResponse(PlayerResponse player) {
             var embed = GetCommonEmbedBuilder(Area, $"{player.Username} stats from {player.UpdatedAt:dddd, dd/MM} at {player.UpdatedAt:HH:mm:ss}");
+            Image image;
 
-            //List<Tuple<MetricType, Metric>> toImage = new List<Tuple<MetricType, Metric>>();
-            List<MetricInfo> infos = new List<MetricInfo>();
-            foreach (KeyValuePair<string, Metric> keyValuePair in player.LatestSnapshot.MetricDictionary) {
-                MetricType type = keyValuePair.Key.ToMetricType();
-                //toImage.Add(new Tuple<MetricType, Metric>(type, keyValuePair.Value));
-                infos.Add(keyValuePair.Value.ToMetricInfo(type));
+            if (CommandMetricType.HasValue) {
+                var info = player.MetricForType(CommandMetricType.Value);
+                image = _metricImageService.GetImage(info);
+            } else {
+                List<MetricInfo> infos = player.MetricInfoList;
+                image = _metricImageService.GetImages(infos);
             }
 
-            Image image = _metricImageService.GetImages(infos);
-
-
             Context.Message.Channel.SendFileAsync(image.Stream, $"{player.Id}{player.UpdatedAt.Ticks}.png");
+
             return embed.Build();
         }
 
         private Embed FormatEmbeddedFromDeltaResponse(DeltaResponse delta) {
-            var embed = GetCommonEmbedBuilder(Area, $"{Area} Gains!", $"Over a period of {delta.Interval}! Stoinks!");
-            FormatMetricsInEmbed(delta.Metrics.AllDeltaMetrics, embed);
+            var embed = GetCommonEmbedBuilder(Area, $"{Area} Gains!", $"Over a period of a {CommandPeriod}! Stoinks~!");
 
-            return embed.Build();
-        }
-
-        private Embed FormatEmbeddedFromRecordResponse(RecordResponse recordResponse) {
-            string periodString = "period";
-            if (CommandPeriod.HasValue) {
-                periodString = CommandPeriod.Value.ToString().ToLowerInvariant();
-            }
-
-
-            var embed = GetCommonEmbedBuilder($"{Area} Records!", $"The maximum experience earned over a {periodString}, What a beast!");
-
-            if (!recordResponse.Records.Any(x => x.Value > 0)) {
-                embed.Description = $"No records for {Area} over the period of a {periodString}";
-                if (CommandMetricType.HasValue) {
-                    embed.Description += $" in the metric {CommandMetricType.ToString()?.ToLowerInvariant()}";
-                }
-
-                return embed.Build();
-            }
-
-            var orderedList = recordResponse.Records.OrderBy(x => x.Period).ThenByDescending(x => x.Value).ToList();
-            bool isInline = orderedList.Count() > 4;
-
-            foreach (Record record in orderedList) {
-                string title = $"{record.Period} record for {record.Metric.ToString().ToLowerInvariant()}";
-                if (isInline) {
-                    title = $"{record.Metric.ToEmoji()} {record.Metric.ToString().ToLowerInvariant()}";
-                }
-
-                if (record.Value > 0) {
-                    try {
-                        embed.AddField(title, record.ToString(), isInline);
-                    } catch {
-                        // ignored
-                    }
-                }
-            }
-
-            return embed.Build();
-        }
-
-        private void FormatMetricsInEmbed<T>(Dictionary<string, T> metricDictionary, EmbedBuilder embed) {
-            bool hasRecords = false;
-
-            foreach (KeyValuePair<string, T> kvp in metricDictionary) {
-                MetricType type = Enum.Parse<MetricType>(kvp.Key, true);
-                if ((CommandMetricType.HasValue && type != CommandMetricType.Value) || !type.IsSkillMetric()) {
-                    continue;
-                }
-
-                //embed.Description += $"{type.ToEmoji()} {kvp.Key}: {kvp.Value}{Environment.NewLine}{Environment.NewLine}";
-                //embed.Description += $"{type.ToEmoji()} {kvp.Key}{Environment.NewLine}";
-                //embed.Description += $"{kvp.Value}{Environment.NewLine}";
-                //embed.AddField($"{type.ToEmoji()} {kvp.Key}", kvp.Value);
-
-                string value = kvp.Value.ToString();
-                if (string.IsNullOrEmpty(value) || value == "-1") {
-                    continue;
-                }
-
-                try {
-                    embed.AddField($"{type.ToEmoji()} {kvp.Key}", value, true);
-                    hasRecords = true;
-                } catch {
-                    // ignored
-                }
-            }
-
-            if (hasRecords) {
-                return;
-            }
-
-            StringBuilder builder = new StringBuilder();
-            builder.Append($"No records or stats for {Area}");
-
-            if (CommandPeriod.HasValue) {
-                builder.Append($" over a period of {CommandPeriod.Value}");
-            }
-
+            Image image;
             if (CommandMetricType.HasValue) {
-                builder.Append($" in the metric {CommandMetricType.ToString()?.ToLowerInvariant()}");
+                var deltaInfo = delta.DeltaInfoForType(CommandMetricType.Value);
+                if (!deltaInfo.IsRanked) {
+                    throw new Exception($"Unranked! We couldn't calculate the gains.");
+                }else if (_onlyPositiveDeltas && deltaInfo.Gained <= 0) {
+                    throw new Exception($"You did not gain anything in this metric over the chosen period.");
+                }
+
+                image = _deltaImageService.GetImage(deltaInfo);
+            } else {
+                List<DeltaInfo> infos = delta.DeltaInfoList.RemoveUnrankedInfos();
+
+                if (_onlyPositiveDeltas) {
+                    infos = infos.RemoveNegativeInfos();
+                }
+
+                image = _deltaImageService.GetImages(infos);
             }
 
-            builder.Append(".");
-            embed.Description = builder.ToString();
+            Context.Message.Channel.SendFileAsync(image.Stream, $"delta_{Name}_{WiseOldManId}_{delta.UpdatedAt}.png");
+
+            return embed.Build();
+        }
+
+        [SuppressMessage("ReSharper", "PossibleInvalidOperationException")]
+        private Embed FormatEmbeddedFromRecordResponse(RecordResponse recordResponse) {
+            if (!recordResponse.RecordInfos.Any()) {
+                throw new Exception($"No records for this request!");
+            }
+
+            string description = recordResponse.RecordInfos.IsSamePeriod() ? $"Over the period of {CommandPeriod.Value}" : $"For {CommandMetricType.Value}";
+            var embed = GetCommonEmbedBuilder(Area, $"Records for {Name}", description);
+
+            Image image;
+            if (recordResponse.RecordInfos.Count == 1) {
+                var info = recordResponse.RecordInfos.FirstOrDefault();
+                image = _recordImageService.GetImage(info);
+            } else {
+                image = _recordImageService.GetImages(recordResponse.RecordInfos);
+            }
+
+            Context.Message.Channel.SendFileAsync(image.Stream, $"records_{Name}_{WiseOldManId}_{DateTime.Now.Date}.png");
+
+            return embed.Build();
         }
 
         #endregion
@@ -185,10 +147,21 @@ namespace DiscordBotFanatic.Modules {
             Response = await GetPlayerInfo();
         }
 
+        [Name("Gained")]
+        [Command("Gained", RunMode = RunMode.Async)]
+        [Alias("gains", "gain")]
+        [Summary("The difference of a players stats in a period of time, only the gains..")]
+        public async Task GetPositiveDelta([Remainder] PeriodAndMetricArguments arguments = null) {
+            CommandPeriod = Period.Week;
+            ExtractPeriodAndMetricArguments(arguments);
+            _onlyPositiveDeltas = true;
+            Response = await Delta();
+        }
+
         [Name("Delta")]
         [Command("delta", RunMode = RunMode.Async)]
-        [Alias("gains", "gain")]
-        [Summary("The difference of a players stats in a period of time.")]
+        [Alias("changes", "change")]
+        [Summary("The difference of a players stats in a period of time, full change.")]
         public async Task GetDelta([Remainder] PeriodAndMetricArguments arguments = null) {
             CommandPeriod = Period.Week;
             ExtractPeriodAndMetricArguments(arguments);
@@ -200,8 +173,11 @@ namespace DiscordBotFanatic.Modules {
         [Alias("record")]
         [Summary("Record gains of a specific stat and/or period.")]
         public async Task GetRecords([Remainder] PeriodAndMetricArguments arguments = null) {
-            CommandPeriod = Period.Week;
             ExtractPeriodAndMetricArguments(arguments);
+            if (!CommandMetricType.HasValue) {
+                CommandPeriod = Period.Week;
+            }
+
             Response = await GetPlayerRecord();
         }
 

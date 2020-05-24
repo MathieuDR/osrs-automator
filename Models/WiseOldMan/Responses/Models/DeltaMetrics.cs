@@ -1,10 +1,18 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using DiscordBotFanatic.Helpers;
 using DiscordBotFanatic.Models.Enums;
+using DiscordBotFanatic.Models.WiseOldMan.Cleaned;
 using Newtonsoft.Json;
 
 namespace DiscordBotFanatic.Models.WiseOldMan.Responses.Models {
     public class DeltaMetrics {
+        private Dictionary<MetricType, DeltaMetric> _allDeltaMetrics = null;
+        private Dictionary<MetricType, DeltaMetric> _bossDeltaMetrics = null;
+        private Dictionary<MetricType, DeltaMetric> _skillDeltaMetrics = null;
+        private List<DeltaInfo> _allDeltaMetricsInfos = null;
+        private List<DeltaInfo> _bossDeltaMetricsInfos = null;
+        private List<DeltaInfo> _skillDeltaMetricsInfos = null;
         public DeltaMetric Overall { get; set; }
         public DeltaMetric Attack { get; set; }
         public DeltaMetric Defence { get; set; }
@@ -195,191 +203,205 @@ namespace DiscordBotFanatic.Models.WiseOldMan.Responses.Models {
         [JsonProperty("zulrah")]
         public DeltaMetric Zulrah { get; set; }
 
-        public DeltaMetric MetricFromEnum(MetricType type) {
-            return AllDeltaMetrics.SingleOrDefault(x => x.Key == type.ToString()).Value;
-        }
-
-        public Dictionary<string, DeltaMetric> AllDeltaMetrics {
+        public Dictionary<MetricType, DeltaMetric> AllDeltaMetrics {
             get {
-                var result = new Dictionary<string, DeltaMetric>();
-
-                result.Add(nameof(Overall), Overall);
-                result.Add(nameof(Attack), Attack);
-                result.Add(nameof(Defence), Defence);
-                result.Add(nameof(Strength), Strength);
-                result.Add(nameof(Hitpoints), Hitpoints);
-                result.Add(nameof(Ranged), Ranged);
-                result.Add(nameof(Prayer), Prayer);
-                result.Add(nameof(Magic), Magic);
-                result.Add(nameof(Cooking), Cooking);
-                result.Add(nameof(Woodcutting), Woodcutting);
-                result.Add(nameof(Fletching), Fletching);
-                result.Add(nameof(Fishing), Fishing);
-                result.Add(nameof(Firemaking), Firemaking);
-                result.Add(nameof(Crafting), Crafting);
-                result.Add(nameof(Smithing), Smithing);
-                result.Add(nameof(Mining), Mining);
-                result.Add(nameof(Herblore), Herblore);
-                result.Add(nameof(Agility), Agility);
-                result.Add(nameof(Thieving), Thieving);
-                result.Add(nameof(Slayer), Slayer);
-                result.Add(nameof(Farming), Farming);
-                result.Add(nameof(Runecrafting), Runecrafting);
-                result.Add(nameof(Hunter), Hunter);
-                result.Add(nameof(Construction), Construction);
-
-                result.Add(nameof(LeaguePoints), LeaguePoints);
-                result.Add(nameof(BountyHunterHunter), BountyHunterHunter);
-                result.Add(nameof(BountyHunterRogue), BountyHunterRogue);
-                result.Add(nameof(ClueScrollsAll), ClueScrollsAll);
-                result.Add(nameof(ClueScrollsEasy), ClueScrollsEasy);
-                result.Add(nameof(ClueScrollsMedium), ClueScrollsMedium);
-                result.Add(nameof(ClueScrollsHard), ClueScrollsHard);
-                result.Add(nameof(ClueScrollsElite), ClueScrollsElite);
-                result.Add(nameof(ClueScrollsMaster), ClueScrollsMaster);
-                result.Add(nameof(LastManStanding), LastManStanding);
-                result.Add(nameof(AbyssalSire), AbyssalSire);
-                result.Add(nameof(AlchemicalHydra), AlchemicalHydra);
-                result.Add(nameof(BarrowsChests), BarrowsChests);
-                result.Add(nameof(Bryophyta), Bryophyta);
-                result.Add(nameof(Callisto), Callisto);
-                result.Add(nameof(Cerberus), Cerberus);
-                result.Add(nameof(ChambersOfXeric), ChambersOfXeric);
-                result.Add(nameof(ChambersOfXericChallengeMode), ChambersOfXericChallengeMode);
-                result.Add(nameof(ChaosElemental), ChaosElemental);
-                result.Add(nameof(ChaosFanatic), ChaosFanatic);
-                result.Add(nameof(CommanderZilyana), CommanderZilyana);
-                result.Add(nameof(CorporealBeast), CorporealBeast);
-                result.Add(nameof(CrazyArchaeologist), CrazyArchaeologist);
-                result.Add(nameof(DagannothPrime), DagannothPrime);
-                result.Add(nameof(DagannothRex), DagannothRex);
-                result.Add(nameof(DagannothSupreme), DagannothSupreme);
-                result.Add(nameof(DerangedArchaeologist), DerangedArchaeologist);
-                result.Add(nameof(GeneralGraardor), GeneralGraardor);
-                result.Add(nameof(GiantMole), GiantMole);
-                result.Add(nameof(GrotesqueGuardians), GrotesqueGuardians);
-                result.Add(nameof(Hespori), Hespori);
-                result.Add(nameof(KalphiteQueen), KalphiteQueen);
-                result.Add(nameof(KingBlackDragon), KingBlackDragon);
-                result.Add(nameof(Kraken), Kraken);
-                result.Add(nameof(Kreearra), Kreearra);
-                result.Add(nameof(KrilTsutsaroth), KrilTsutsaroth);
-                result.Add(nameof(Mimic), Mimic);
-                result.Add(nameof(Nightmare), Nightmare);
-                result.Add(nameof(Obor), Obor);
-                result.Add(nameof(Sarachnis), Sarachnis);
-                result.Add(nameof(Scorpia), Scorpia);
-                result.Add(nameof(Skotizo), Skotizo);
-                result.Add(nameof(TheGauntlet), TheGauntlet);
-                result.Add(nameof(TheCorruptedGauntlet), TheCorruptedGauntlet);
-                result.Add(nameof(TheatreOfBlood), TheatreOfBlood);
-                result.Add(nameof(ThermonuclearSmokeDevil), ThermonuclearSmokeDevil);
-                result.Add(nameof(TzkalZuk), TzkalZuk);
-                result.Add(nameof(TztokJad), TztokJad);
-                result.Add(nameof(Venenatis), Venenatis);
-                result.Add(nameof(Vetion), Vetion);
-                result.Add(nameof(Vorkath), Vorkath);
-                result.Add(nameof(Wintertodt), Wintertodt);
-                result.Add(nameof(Zalcano), Zalcano);
-                result.Add(nameof(Zulrah), Zulrah);
-
-                return result;
+                return _allDeltaMetrics ??= new Dictionary<MetricType, DeltaMetric> {
+                    {MetricType.Overall, Overall},
+                    {MetricType.Attack, Attack},
+                    {MetricType.Defence, Defence},
+                    {MetricType.Strength, Strength},
+                    {MetricType.Hitpoints, Hitpoints},
+                    {MetricType.Ranged, Ranged},
+                    {MetricType.Prayer, Prayer},
+                    {MetricType.Magic, Magic},
+                    {MetricType.Cooking, Cooking},
+                    {MetricType.Woodcutting, Woodcutting},
+                    {MetricType.Fletching, Fletching},
+                    {MetricType.Fishing, Fishing},
+                    {MetricType.Firemaking, Firemaking},
+                    {MetricType.Crafting, Crafting},
+                    {MetricType.Smithing, Smithing},
+                    {MetricType.Mining, Mining},
+                    {MetricType.Herblore, Herblore},
+                    {MetricType.Agility, Agility},
+                    {MetricType.Thieving, Thieving},
+                    {MetricType.Slayer, Slayer},
+                    {MetricType.Farming, Farming},
+                    {MetricType.Runecrafting, Runecrafting},
+                    {MetricType.Hunter, Hunter},
+                    {MetricType.Construction, Construction},
+                    {MetricType.LeaguePoints, LeaguePoints},
+                    {MetricType.BountyHunterHunter, BountyHunterHunter},
+                    {MetricType.BountyHunterRogue, BountyHunterRogue},
+                    {MetricType.ClueScrollsAll, ClueScrollsAll},
+                    {MetricType.ClueScrollsEasy, ClueScrollsEasy},
+                    {MetricType.ClueScrollsMedium, ClueScrollsMedium},
+                    {MetricType.ClueScrollsHard, ClueScrollsHard},
+                    {MetricType.ClueScrollsElite, ClueScrollsElite},
+                    {MetricType.ClueScrollsMaster, ClueScrollsMaster},
+                    {MetricType.LastManStanding, LastManStanding},
+                    {MetricType.AbyssalSire, AbyssalSire},
+                    {MetricType.AlchemicalHydra, AlchemicalHydra},
+                    {MetricType.BarrowsChests, BarrowsChests},
+                    {MetricType.Bryophyta, Bryophyta},
+                    {MetricType.Callisto, Callisto},
+                    {MetricType.Cerberus, Cerberus},
+                    {MetricType.ChambersOfXeric, ChambersOfXeric},
+                    {MetricType.ChambersOfXericChallengeMode, ChambersOfXericChallengeMode},
+                    {MetricType.ChaosElemental, ChaosElemental},
+                    {MetricType.ChaosFanatic, ChaosFanatic},
+                    {MetricType.CommanderZilyana, CommanderZilyana},
+                    {MetricType.CorporealBeast, CorporealBeast},
+                    {MetricType.CrazyArchaeologist, CrazyArchaeologist},
+                    {MetricType.DagannothPrime, DagannothPrime},
+                    {MetricType.DagannothRex, DagannothRex},
+                    {MetricType.DagannothSupreme, DagannothSupreme},
+                    {MetricType.DerangedArchaeologist, DerangedArchaeologist},
+                    {MetricType.GeneralGraardor, GeneralGraardor},
+                    {MetricType.GiantMole, GiantMole},
+                    {MetricType.GrotesqueGuardians, GrotesqueGuardians},
+                    {MetricType.Hespori, Hespori},
+                    {MetricType.KalphiteQueen, KalphiteQueen},
+                    {MetricType.KingBlackDragon, KingBlackDragon},
+                    {MetricType.Kraken, Kraken},
+                    {MetricType.Kreearra, Kreearra},
+                    {MetricType.KrilTsutsaroth, KrilTsutsaroth},
+                    {MetricType.Mimic, Mimic},
+                    {MetricType.Nightmare, Nightmare},
+                    {MetricType.Obor, Obor},
+                    {MetricType.Sarachnis, Sarachnis},
+                    {MetricType.Scorpia, Scorpia},
+                    {MetricType.Skotizo, Skotizo},
+                    {MetricType.TheGauntlet, TheGauntlet},
+                    {MetricType.TheCorruptedGauntlet, TheCorruptedGauntlet},
+                    {MetricType.TheatreOfBlood, TheatreOfBlood},
+                    {MetricType.ThermonuclearSmokeDevil, ThermonuclearSmokeDevil},
+                    {MetricType.TzkalZuk, TzkalZuk},
+                    {MetricType.TztokJad, TztokJad},
+                    {MetricType.Venenatis, Venenatis},
+                    {MetricType.Vetion, Vetion},
+                    {MetricType.Vorkath, Vorkath},
+                    {MetricType.Wintertodt, Wintertodt},
+                    {MetricType.Zalcano, Zalcano},
+                    {MetricType.Zulrah, Zulrah}
+                };
             }
         }
 
-         public Dictionary<string, DeltaMetric> SkillDeltaMetrics {
+        public Dictionary<MetricType, DeltaMetric> SkillDeltaMetrics {
             get {
-                var result = new Dictionary<string, DeltaMetric>();
-
-                result.Add(nameof(Overall), Overall);
-                result.Add(nameof(Attack), Attack);
-                result.Add(nameof(Defence), Defence);
-                result.Add(nameof(Strength), Strength);
-                result.Add(nameof(Hitpoints), Hitpoints);
-                result.Add(nameof(Ranged), Ranged);
-                result.Add(nameof(Prayer), Prayer);
-                result.Add(nameof(Magic), Magic);
-                result.Add(nameof(Cooking), Cooking);
-                result.Add(nameof(Woodcutting), Woodcutting);
-                result.Add(nameof(Fletching), Fletching);
-                result.Add(nameof(Fishing), Fishing);
-                result.Add(nameof(Firemaking), Firemaking);
-                result.Add(nameof(Crafting), Crafting);
-                result.Add(nameof(Smithing), Smithing);
-                result.Add(nameof(Mining), Mining);
-                result.Add(nameof(Herblore), Herblore);
-                result.Add(nameof(Agility), Agility);
-                result.Add(nameof(Thieving), Thieving);
-                result.Add(nameof(Slayer), Slayer);
-                result.Add(nameof(Farming), Farming);
-                result.Add(nameof(Runecrafting), Runecrafting);
-                result.Add(nameof(Hunter), Hunter);
-                result.Add(nameof(Construction), Construction);
-
-                return result;
+                return _skillDeltaMetrics ??= new Dictionary<MetricType, DeltaMetric> {
+                    {MetricType.Overall, Overall},
+                    {MetricType.Attack, Attack},
+                    {MetricType.Defence, Defence},
+                    {MetricType.Strength, Strength},
+                    {MetricType.Hitpoints, Hitpoints},
+                    {MetricType.Ranged, Ranged},
+                    {MetricType.Prayer, Prayer},
+                    {MetricType.Magic, Magic},
+                    {MetricType.Cooking, Cooking},
+                    {MetricType.Woodcutting, Woodcutting},
+                    {MetricType.Fletching, Fletching},
+                    {MetricType.Fishing, Fishing},
+                    {MetricType.Firemaking, Firemaking},
+                    {MetricType.Crafting, Crafting},
+                    {MetricType.Smithing, Smithing},
+                    {MetricType.Mining, Mining},
+                    {MetricType.Herblore, Herblore},
+                    {MetricType.Agility, Agility},
+                    {MetricType.Thieving, Thieving},
+                    {MetricType.Slayer, Slayer},
+                    {MetricType.Farming, Farming},
+                    {MetricType.Runecrafting, Runecrafting},
+                    {MetricType.Hunter, Hunter},
+                    {MetricType.Construction, Construction}
+                };
             }
         }
 
-          public Dictionary<string, DeltaMetric> BossDeltaMetrics {
+        public Dictionary<MetricType, DeltaMetric> BossDeltaMetrics {
             get {
-                var result = new Dictionary<string, DeltaMetric>();
-                result.Add(nameof(LeaguePoints), LeaguePoints);
-                result.Add(nameof(BountyHunterHunter), BountyHunterHunter);
-                result.Add(nameof(BountyHunterRogue), BountyHunterRogue);
-                result.Add(nameof(ClueScrollsAll), ClueScrollsAll);
-                result.Add(nameof(ClueScrollsEasy), ClueScrollsEasy);
-                result.Add(nameof(ClueScrollsMedium), ClueScrollsMedium);
-                result.Add(nameof(ClueScrollsHard), ClueScrollsHard);
-                result.Add(nameof(ClueScrollsElite), ClueScrollsElite);
-                result.Add(nameof(ClueScrollsMaster), ClueScrollsMaster);
-                result.Add(nameof(LastManStanding), LastManStanding);
-                result.Add(nameof(AbyssalSire), AbyssalSire);
-                result.Add(nameof(AlchemicalHydra), AlchemicalHydra);
-                result.Add(nameof(BarrowsChests), BarrowsChests);
-                result.Add(nameof(Bryophyta), Bryophyta);
-                result.Add(nameof(Callisto), Callisto);
-                result.Add(nameof(Cerberus), Cerberus);
-                result.Add(nameof(ChambersOfXeric), ChambersOfXeric);
-                result.Add(nameof(ChambersOfXericChallengeMode), ChambersOfXericChallengeMode);
-                result.Add(nameof(ChaosElemental), ChaosElemental);
-                result.Add(nameof(ChaosFanatic), ChaosFanatic);
-                result.Add(nameof(CommanderZilyana), CommanderZilyana);
-                result.Add(nameof(CorporealBeast), CorporealBeast);
-                result.Add(nameof(CrazyArchaeologist), CrazyArchaeologist);
-                result.Add(nameof(DagannothPrime), DagannothPrime);
-                result.Add(nameof(DagannothRex), DagannothRex);
-                result.Add(nameof(DagannothSupreme), DagannothSupreme);
-                result.Add(nameof(DerangedArchaeologist), DerangedArchaeologist);
-                result.Add(nameof(GeneralGraardor), GeneralGraardor);
-                result.Add(nameof(GiantMole), GiantMole);
-                result.Add(nameof(GrotesqueGuardians), GrotesqueGuardians);
-                result.Add(nameof(Hespori), Hespori);
-                result.Add(nameof(KalphiteQueen), KalphiteQueen);
-                result.Add(nameof(KingBlackDragon), KingBlackDragon);
-                result.Add(nameof(Kraken), Kraken);
-                result.Add(nameof(Kreearra), Kreearra);
-                result.Add(nameof(KrilTsutsaroth), KrilTsutsaroth);
-                result.Add(nameof(Mimic), Mimic);
-                result.Add(nameof(Nightmare), Nightmare);
-                result.Add(nameof(Obor), Obor);
-                result.Add(nameof(Sarachnis), Sarachnis);
-                result.Add(nameof(Scorpia), Scorpia);
-                result.Add(nameof(Skotizo), Skotizo);
-                result.Add(nameof(TheGauntlet), TheGauntlet);
-                result.Add(nameof(TheCorruptedGauntlet), TheCorruptedGauntlet);
-                result.Add(nameof(TheatreOfBlood), TheatreOfBlood);
-                result.Add(nameof(ThermonuclearSmokeDevil), ThermonuclearSmokeDevil);
-                result.Add(nameof(TzkalZuk), TzkalZuk);
-                result.Add(nameof(TztokJad), TztokJad);
-                result.Add(nameof(Venenatis), Venenatis);
-                result.Add(nameof(Vetion), Vetion);
-                result.Add(nameof(Vorkath), Vorkath);
-                result.Add(nameof(Wintertodt), Wintertodt);
-                result.Add(nameof(Zalcano), Zalcano);
-                result.Add(nameof(Zulrah), Zulrah);
-
-                return result;
+                return _bossDeltaMetrics ??= new Dictionary<MetricType, DeltaMetric> {
+                    {MetricType.LeaguePoints, LeaguePoints},
+                    {MetricType.BountyHunterHunter, BountyHunterHunter},
+                    {MetricType.BountyHunterRogue, BountyHunterRogue},
+                    {MetricType.ClueScrollsAll, ClueScrollsAll},
+                    {MetricType.ClueScrollsEasy, ClueScrollsEasy},
+                    {MetricType.ClueScrollsMedium, ClueScrollsMedium},
+                    {MetricType.ClueScrollsHard, ClueScrollsHard},
+                    {MetricType.ClueScrollsElite, ClueScrollsElite},
+                    {MetricType.ClueScrollsMaster, ClueScrollsMaster},
+                    {MetricType.LastManStanding, LastManStanding},
+                    {MetricType.AbyssalSire, AbyssalSire},
+                    {MetricType.AlchemicalHydra, AlchemicalHydra},
+                    {MetricType.BarrowsChests, BarrowsChests},
+                    {MetricType.Bryophyta, Bryophyta},
+                    {MetricType.Callisto, Callisto},
+                    {MetricType.Cerberus, Cerberus},
+                    {MetricType.ChambersOfXeric, ChambersOfXeric},
+                    {MetricType.ChambersOfXericChallengeMode, ChambersOfXericChallengeMode},
+                    {MetricType.ChaosElemental, ChaosElemental},
+                    {MetricType.ChaosFanatic, ChaosFanatic},
+                    {MetricType.CommanderZilyana, CommanderZilyana},
+                    {MetricType.CorporealBeast, CorporealBeast},
+                    {MetricType.CrazyArchaeologist, CrazyArchaeologist},
+                    {MetricType.DagannothPrime, DagannothPrime},
+                    {MetricType.DagannothRex, DagannothRex},
+                    {MetricType.DagannothSupreme, DagannothSupreme},
+                    {MetricType.DerangedArchaeologist, DerangedArchaeologist},
+                    {MetricType.GeneralGraardor, GeneralGraardor},
+                    {MetricType.GiantMole, GiantMole},
+                    {MetricType.GrotesqueGuardians, GrotesqueGuardians},
+                    {MetricType.Hespori, Hespori},
+                    {MetricType.KalphiteQueen, KalphiteQueen},
+                    {MetricType.KingBlackDragon, KingBlackDragon},
+                    {MetricType.Kraken, Kraken},
+                    {MetricType.Kreearra, Kreearra},
+                    {MetricType.KrilTsutsaroth, KrilTsutsaroth},
+                    {MetricType.Mimic, Mimic},
+                    {MetricType.Nightmare, Nightmare},
+                    {MetricType.Obor, Obor},
+                    {MetricType.Sarachnis, Sarachnis},
+                    {MetricType.Scorpia, Scorpia},
+                    {MetricType.Skotizo, Skotizo},
+                    {MetricType.TheGauntlet, TheGauntlet},
+                    {MetricType.TheCorruptedGauntlet, TheCorruptedGauntlet},
+                    {MetricType.TheatreOfBlood, TheatreOfBlood},
+                    {MetricType.ThermonuclearSmokeDevil, ThermonuclearSmokeDevil},
+                    {MetricType.TzkalZuk, TzkalZuk},
+                    {MetricType.TztokJad, TztokJad},
+                    {MetricType.Venenatis, Venenatis},
+                    {MetricType.Vetion, Vetion},
+                    {MetricType.Vorkath, Vorkath},
+                    {MetricType.Wintertodt, Wintertodt},
+                    {MetricType.Zalcano, Zalcano},
+                    {MetricType.Zulrah, Zulrah}
+                };
             }
+        }
+
+        public List<DeltaInfo> AllDeltaInfos {
+            get {
+                return _allDeltaMetricsInfos ??= AllDeltaMetrics.Select(x => x.Value.ToDeltaInfo(x.Key)).ToList();
+            }
+        }
+        public List<DeltaInfo> SkillDeltaInfos {
+            get {
+                return _skillDeltaMetricsInfos ??= SkillDeltaMetrics.Select(x => x.Value.ToDeltaInfo(x.Key)).ToList();
+            }
+        }
+        public List<DeltaInfo> BossDeltaInfos {
+            get {
+                return _bossDeltaMetricsInfos ??= BossDeltaMetrics.Select(x => x.Value.ToDeltaInfo(x.Key)).ToList();
+            }
+        }
+
+        public DeltaMetric DeltaFromType(MetricType type) {
+            return AllDeltaMetrics.SingleOrDefault(x => x.Key == type).Value;
+        }
+
+        public DeltaInfo InfoFromType(MetricType type) {
+            return AllDeltaInfos.SingleOrDefault(x => x.Type == type);
         }
     }
 }
