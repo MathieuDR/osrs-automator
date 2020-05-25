@@ -163,7 +163,7 @@ namespace DiscordBotFanatic.Modules {
             }
 
             if (searchedItem != null) {
-                embed.Description = $"The player {Name} is rank {earchedItemRank+1}/{lastRank+1}.";
+                embed.Description = $"The player {Name} is rank {earchedItemRank+1}/{lastRank}.";
             }
 
             if (_altDisplay) {
@@ -176,7 +176,7 @@ namespace DiscordBotFanatic.Modules {
             }
 
 
-            embed.AddField("Total ranks", (lastRank+1).ToString(), true);
+            embed.AddField("Total ranks", (lastRank).ToString(), true);
             Debug.Assert(CommandMetricType != null, nameof(CommandMetricType) + " != null");
             embed.AddField("Metric", CommandMetricType.Value.ToString(), true);
             Debug.Assert(CommandPeriod != null, nameof(CommandPeriod) + " != null");

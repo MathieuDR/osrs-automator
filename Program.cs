@@ -52,7 +52,7 @@ namespace DiscordBotFanatic
                 .AddSingleton<CommandHandlingService>()
                 // Logging
                 // ReSharper disable once ObjectCreationAsStatement
-                .AddLogging(builder => builder.AddConsole(x=> new ConsoleLoggerOptions(){LogToStandardErrorThreshold = LogLevel.Debug}))
+                .AddLogging(builder => builder.AddConsole(x=> new ConsoleLoggerOptions(){LogToStandardErrorThreshold = LogLevel.Information}))
                 .AddSingleton<ILogService, LogService>()
                 // Extra
                 .AddSingleton(config)
