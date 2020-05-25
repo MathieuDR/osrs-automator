@@ -1,12 +1,15 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Reflection;
+using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 using Discord;
 using DiscordBotFanatic.Helpers;
 using DiscordBotFanatic.Models.Enums;
+using DiscordBotFanatic.Models.WiseOldMan.Requests;
 using DiscordBotFanatic.Models.WiseOldMan.Responses;
 using DiscordBotFanatic.Services.interfaces;
+using Newtonsoft.Json;
 using RestSharp;
 using RestSharp.Serializers.NewtonsoftJson;
 
@@ -17,6 +20,7 @@ namespace DiscordBotFanatic.Repository {
         private const string RecordsBase = "records";
         private const string DeltaBase = "deltas";
         private const string GroupBase = "groups";
+        private const string CompeitionBase = "competitions";
         private readonly RestClient _client;
         private readonly ILogService _logger;
 
@@ -152,6 +156,16 @@ namespace DiscordBotFanatic.Repository {
             result.RequestedType = metric;
             result.RequestedPeriod = period;
 
+            return result;
+        }
+
+        public async Task<CreateGroupCompetitionResult> CreateGroupCompetition(CreateCompetitionRequest createCompetitionRequest) {
+            var request = new RestRequest($"{CompeitionBase}");
+            //request.AddJsonBody(JsonConvert.SerializeObject(createCompetitionRequest));
+            request.AddJsonBody(createCompetitionRequest);
+
+            var result = await _client.PostAsync<CreateGroupCompetitionResult>(request);
+            ValidateResponse(result);
             return result;
         }
 

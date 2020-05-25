@@ -14,6 +14,8 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Console;
+using Serilog;
+using Serilog.Events;
 
 namespace DiscordBotFanatic
 {
@@ -45,6 +47,12 @@ namespace DiscordBotFanatic
             WiseOldManConfiguration manConfiguration = config.GetSection("WiseOldMan").Get<WiseOldManConfiguration>();
             MetricSynonymsConfiguration metricSynonymsConfiguration = config.GetSection("MetricSynonyms").Get<MetricSynonymsConfiguration>();
 
+            Log.Logger = new LoggerConfiguration()
+                .MinimumLevel.Debug()
+                .WriteTo.RollingFile("logs/osrs_bot.log")
+                .WriteTo.Console(restrictedToMinimumLevel:LogEventLevel.Information)
+                .CreateLogger();
+            
             return new ServiceCollection()
                 // Base
                 .AddSingleton<DiscordSocketClient>()
@@ -52,8 +60,8 @@ namespace DiscordBotFanatic
                 .AddSingleton<CommandHandlingService>()
                 // Logging
                 // ReSharper disable once ObjectCreationAsStatement
-                .AddLogging(builder => builder.AddConsole(x=> new ConsoleLoggerOptions(){LogToStandardErrorThreshold = LogLevel.Information}))
-                .AddSingleton<ILogService, LogService>()
+                //.AddLogging(builder => builder.AddConsole(x=> new ConsoleLoggerOptions(){LogToStandardErrorThreshold = LogLevel.Information}))
+                .AddSingleton<ILogService, SerilogService>()
                 // Extra
                 .AddSingleton(config)
                 .AddSingleton(botConfiguration)

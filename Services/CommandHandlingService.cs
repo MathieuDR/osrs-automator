@@ -116,6 +116,8 @@ namespace DiscordBotFanatic.Services
 
             EmbedBuilder builder = new EmbedBuilder() {Title = $"Error!"};
 
+            await _logger.LogDebug(new LogMessage(LogSeverity.Error, "", $"{result.Error} - {result.ErrorReason} ({context.Message.Content})"));
+
             Debug.Assert(result.Error != null, "result.Error != null");
             builder.AddField(result.Error.Value.ToString(), result.ErrorReason);
 

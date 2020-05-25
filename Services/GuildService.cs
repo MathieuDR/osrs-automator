@@ -1,9 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Authentication;
+using System.Threading.Tasks;
 using Discord;
+using DiscordBotFanatic.Models.Configuration;
 using DiscordBotFanatic.Models.Data;
 using DiscordBotFanatic.Models.Enums;
+using DiscordBotFanatic.Models.WiseOldMan.Requests;
+using DiscordBotFanatic.Models.WiseOldMan.Responses;
 using DiscordBotFanatic.Modules.DiscordCommandArguments;
 using DiscordBotFanatic.Repository;
 using DiscordBotFanatic.Services.interfaces;
@@ -11,9 +16,13 @@ using DiscordBotFanatic.Services.interfaces;
 namespace DiscordBotFanatic.Services {
     public class GuildService : IGuildService{
         private readonly IDiscordBotRepository _repository;
+        private readonly IHighscoreApiRepository _highscoreApiRepository;
+        private readonly WiseOldManConfiguration _configuration;
 
-        public GuildService(IDiscordBotRepository repository) {
+        public GuildService(IDiscordBotRepository repository, IHighscoreApiRepository highscoreApiRepository, WiseOldManConfiguration configuration) {
             _repository = repository;
+            _highscoreApiRepository = highscoreApiRepository;
+            _configuration = configuration;
         }
         
         public bool HasActiveEvent(IGuild guild) {
@@ -36,6 +45,9 @@ namespace DiscordBotFanatic.Services {
         }
 
         public bool DoesUserHavePermission(IGuildUser user, Permissions permission) {
+            if (user == null) {
+                throw new AuthenticationException($"Could not find guild for user. Are you using a guild command in a direct message?");
+            }
             if (user.GuildPermissions.Administrator) {
                 // admins always have permission
                 return true;
@@ -103,6 +115,12 @@ namespace DiscordBotFanatic.Services {
         public void RemoveCounters(GuildEvent guildEvent, List<GuildEventCounter> toDelete) {
             guildEvent.EventCounters = guildEvent.EventCounters.Except(toDelete).ToList();
             _repository.UpdateGuildEvent(guildEvent);
+        }
+
+        //TODO make into info?
+        public Task<CreateGroupCompetitionResult> CreateGroupCompetition(string title, MetricType metric, DateTime startDate, DateTime endDate) {
+            var request = new CreateCompetitionRequest(){Title = title, Metric = metric, EndTime = endDate, StartTime = startDate, GroupId = _configuration.GroupId, VerificationCode = _configuration.GroupVerificationCode};
+            return _highscoreApiRepository.CreateGroupCompetition(request);
         }
     }
 }

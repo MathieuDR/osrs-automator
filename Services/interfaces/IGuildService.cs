@@ -1,7 +1,10 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using System.Threading.Tasks;
 using Discord;
 using DiscordBotFanatic.Models.Data;
 using DiscordBotFanatic.Models.Enums;
+using DiscordBotFanatic.Models.WiseOldMan.Responses;
 using DiscordBotFanatic.Modules.DiscordCommandArguments;
 
 namespace DiscordBotFanatic.Services.interfaces {
@@ -14,5 +17,6 @@ namespace DiscordBotFanatic.Services.interfaces {
         bool ToggleRole(IRole role, Permissions permission);
         bool AddEventCounter(IGuild guild, UserListWithImageArguments arguments);
         void RemoveCounters(GuildEvent guildEvent, List<GuildEventCounter> toDelete);
+        Task<CreateGroupCompetitionResult> CreateGroupCompetition(string title, MetricType metric, DateTime startDate, DateTime endDate);
     }
 }

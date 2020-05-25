@@ -13,17 +13,31 @@ using DiscordBotFanatic.Models.WiseOldMan.Cleaned;
 using DiscordBotFanatic.Models.WiseOldMan.Responses;
 using DiscordBotFanatic.Modules.DiscordCommandArguments;
 using DiscordBotFanatic.Services;
+using DiscordBotFanatic.Services.interfaces;
 
 namespace DiscordBotFanatic.Modules {
     [Name("Group")]
     //[Group("Group")]
     public class GroupStatsModule : StatsBaseModule {
+        private readonly IGuildService _guildService;
         private bool _altDisplay;
         private string _groupName = "";
+        private IGuildUser _user;
 
-        public GroupStatsModule(HighscoreService osrsHighscoreService, MessageConfiguration messageConfiguration, WiseOldManConfiguration wiseOldManConfiguration) : base(osrsHighscoreService, messageConfiguration) {
+
+        public GroupStatsModule(HighscoreService osrsHighscoreService, MessageConfiguration messageConfiguration, WiseOldManConfiguration wiseOldManConfiguration, IGuildService guildService) : base(osrsHighscoreService, messageConfiguration) {
+            _guildService = guildService;
             WiseOldManId = wiseOldManConfiguration.GroupId;
             _groupName = wiseOldManConfiguration.GroupName;
+        }
+
+        protected override void BeforeExecute(CommandInfo command) {
+            if (Context == null) {
+                return;
+            }
+
+            _user = Context.User as IGuildUser;
+            base.BeforeExecute(command);
         }
 
 
@@ -45,11 +59,14 @@ namespace DiscordBotFanatic.Modules {
                     return FormatEmbeddedFromGroupUpdateResponse(groupUpdateResponse);
                 case List<LeaderboardMemberInfo> leaderboardInfos:
                     return FormatEmbeddedFromLeaderboardResponse(leaderboardInfos);
-
+                case CreateGroupCompetitionResult createGroupCompetitionResult:
+                    return FormatEmbeddedFromCreateGroupCompetitionResult(createGroupCompetitionResult);
                 default:
                     throw new Exception($"Response type unknown");
             }
         }
+
+        
 
 
         protected override void ExtractBaseArguments(BaseArguments baseArguments) {
@@ -96,6 +113,42 @@ namespace DiscordBotFanatic.Modules {
             return GetTopPlayers(arguments);
         }
 
+        [Name("Create competition")]
+        [Command("comp create")]
+        [Summary("Creates a competition")]
+        public async Task CreateCompetition(string title, MetricType metric, DateTime startDate, DateTime endDate) {
+            if (!_guildService.DoesUserHavePermission(_user, Permissions.CompetitionManager)) {
+                throw new UnauthorizedAccessException($"You don't have access towards event management");
+            }
+
+            Response = await _guildService.CreateGroupCompetition(title, metric, startDate, endDate);
+        }
+
+        [Name("Set guild competition")]
+        [Command("comp set")]
+        [Summary("Sets a competition for the server, where players can then query their rank and the leaderboards.")]
+        public async Task SetGuildCompetition(int id) {
+            if (!_guildService.DoesUserHavePermission(_user, Permissions.CompetitionManager)) {
+                throw new UnauthorizedAccessException($"You don't have access towards competition management");
+            }
+
+            throw new NotImplementedException(nameof(SetGuildCompetition));
+            // Send toe guild server to set it active
+        }
+
+        [Name("Clear guild competition")]
+        [Command("comp clear")]
+        [Summary("Ends or clears the set competition from the guild")]
+        public async Task ClearGuildCompetition(int id) {
+            if (!_guildService.DoesUserHavePermission(_user, Permissions.CompetitionManager)) {
+                throw new UnauthorizedAccessException($"You don't have access towards competition management");
+            }
+            throw new NotImplementedException(nameof(ClearGuildCompetition));
+        }
+
+        // Time left command
+        // Leaderboards for competition (Like leaderboards for deltas)
+
         #endregion
 
         #region api wrapper
@@ -106,6 +159,21 @@ namespace DiscordBotFanatic.Modules {
 
         private Embed FormatEmbeddedFromGroupUpdateResponse(GroupUpdateResponse groupUpdateResponse) {
             var embed = GetCommonEmbedBuilder(Area, $"Update requested", groupUpdateResponse.Message);
+            return embed.Build();
+        }
+
+        private Embed FormatEmbeddedFromCreateGroupCompetitionResult(CreateGroupCompetitionResult createGroupCompetitionResult) {
+            var embed = GetCommonEmbedBuilder(Area, $"Competition created", $"Please see direct message for the verification code.");
+            embed.AddField("Title", createGroupCompetitionResult.Title);
+            embed.AddField("Metric", createGroupCompetitionResult.Metric, true);
+            embed.AddField("Starts", createGroupCompetitionResult.StartsAt, true);
+            embed.AddField("Ends", createGroupCompetitionResult.EndsAt, true);
+            embed.AddField("Participants", createGroupCompetitionResult.Participants.Count, true);
+
+            Context.User.SendMessageAsync($"Competition {createGroupCompetitionResult.Title} administrator information.{Environment.NewLine}" + 
+                                          $"Verification code: `{createGroupCompetitionResult.VerificationCode}`{Environment.NewLine}" + 
+                                          $"Competition Id: `{createGroupCompetitionResult.Id}`");
+
             return embed.Build();
         }
 
