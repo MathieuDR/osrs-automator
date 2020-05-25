@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Reflection;
 using System.Threading.Tasks;
 using Discord;
+using DiscordBotFanatic.Helpers;
 using DiscordBotFanatic.Models.Enums;
 using DiscordBotFanatic.Models.WiseOldMan.Responses;
 using DiscordBotFanatic.Services.interfaces;
@@ -73,9 +74,9 @@ namespace DiscordBotFanatic.Repository {
         public async Task<DeltaResponse> DeltaPlayerAsync(int id, Period period = Period.Week, MetricType? metric = null) {
             var request = new RestRequest($"{DeltaBase}", DataFormat.Json);
             request.AddParameter("playerId", id);
-            request.AddParameter("period", period.ToString().ToLower());
+            request.AddParameter("period", period.GetEnumValueNameOrDefault().ToLower());
             if (metric.HasValue) {
-                request.AddParameter("metric", metric.ToString()?.ToLower());
+                request.AddParameter("metric", metric.GetEnumValueNameOrDefault()?.ToLower());
             }
 
             LogRequest(request, MethodBase.GetCurrentMethod()?.Name);
@@ -103,11 +104,11 @@ namespace DiscordBotFanatic.Repository {
             request.Method = Method.GET;
 
             if (metric.HasValue) {
-                request.AddParameter("metric", metric.ToString()?.ToLowerInvariant());
+                request.AddParameter("metric", metric.GetEnumValueNameOrDefault()?.ToLowerInvariant());
             }
 
             if (period.HasValue) {
-                request.AddParameter("period", period.ToString()?.ToLowerInvariant());
+                request.AddParameter("period", period.GetEnumValueNameOrDefault()?.ToLowerInvariant());
             }
 
             LogRequest(request, MethodBase.GetCurrentMethod()?.Name);
@@ -141,8 +142,8 @@ namespace DiscordBotFanatic.Repository {
         public async Task<LeaderboardResponse> GetGroupLeaderboards(MetricType metric, Period period, int groupId) {
             var request = new RestRequest($"{GroupBase}/{{id}}/leaderboard");
             request.AddParameter("id", groupId, ParameterType.UrlSegment);
-            request.AddParameter("period", period.ToString().ToLower());
-            request.AddParameter("metric", metric.ToString().ToLower());
+            request.AddParameter("period", period.GetEnumValueNameOrDefault().ToLower());
+            request.AddParameter("metric", metric.GetEnumValueNameOrDefault().ToLower());
 
             LogRequest(request, MethodBase.GetCurrentMethod()?.Name);
             var result = await _client.GetAsync<LeaderboardResponse>(request);

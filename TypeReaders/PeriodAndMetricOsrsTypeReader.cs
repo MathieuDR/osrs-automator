@@ -5,13 +5,19 @@ using System.Linq;
 using System.Threading.Tasks;
 using Discord.Commands;
 using DiscordBotFanatic.Helpers;
+using DiscordBotFanatic.Models.Configuration;
 using DiscordBotFanatic.Models.Enums;
 using DiscordBotFanatic.Modules.DiscordCommandArguments;
 
 namespace DiscordBotFanatic.TypeReaders {
     public class PeriodAndMetricOsrsTypeReader : TypeReader {
-        public override Task<TypeReaderResult> ReadAsync(ICommandContext context, string input,
-            IServiceProvider services) {
+        private readonly MetricSynonymsConfiguration _config;
+
+        public PeriodAndMetricOsrsTypeReader(MetricSynonymsConfiguration config) {
+            _config = config;
+        }
+
+        public override Task<TypeReaderResult> ReadAsync(ICommandContext context, string input, IServiceProvider services) {
             List<string> parameters = input.ToCollectionOfParameters().ToList();
 
             if (!parameters.Any()) {
@@ -25,20 +31,16 @@ namespace DiscordBotFanatic.TypeReaders {
             var result = new PeriodAndMetricArguments();
 
             foreach (string parameter in parameters) {
-                if (Enum.TryParse(typeof(MetricType), parameter, true, out object metricType)) {
-                    Debug.Assert(metricType != null, nameof(metricType) + " != null");
-                    result.MetricType = (MetricType) metricType;
-                }
-                else if (Enum.TryParse(typeof(Period), parameter, true, out object period)) {
+                if (Enum.TryParse(typeof(Period), parameter, true, out object period)) {
                     Debug.Assert(period != null, nameof(period) + " != null");
                     result.Period = (Period) period;
-                }
-                else if (string.IsNullOrEmpty(result.Name)) {
-                    result.Name = parameter.Replace("\"","");
-                }
-                else {
-                    return Task.FromResult(TypeReaderResult.FromError(CommandError.BadArgCount,
-                        $"Wrong errors, Cannot parse all parameters. Ambigious username ({result.Name} & {parameter})"));
+                } else if (parameter.TryParseToMetricType(_config, out object metricType)) {
+                    Debug.Assert(metricType != null, nameof(metricType) + " != null");
+                    result.MetricType = (MetricType) metricType;
+                } else if (string.IsNullOrEmpty(result.Name)) {
+                    result.Name = parameter.Replace("\"", "");
+                } else {
+                    return Task.FromResult(TypeReaderResult.FromError(CommandError.BadArgCount, $"Wrong errors, Cannot parse all parameters. Ambigious username ({result.Name} & {parameter})"));
                 }
             }
 

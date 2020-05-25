@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Threading.Tasks;
-using Discord;
 using Discord.Commands;
 using DiscordBotFanatic.Helpers;
 using DiscordBotFanatic.Models.Enums;
@@ -60,7 +58,7 @@ namespace DiscordBotFanatic.Modules {
 
         [Command("draw")]
         public Task DrawImage() {
-            var metricTypes = MetricHelper.GetSkillMetrics();
+            var metricTypes = MetricTypeHelper.GetSkillMetrics();
             //List<Tuple<MetricType, Metric>> metrics = new List<Tuple<MetricType, Metric>>();
             Random r = new Random();
 

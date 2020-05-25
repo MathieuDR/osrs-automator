@@ -23,6 +23,7 @@ namespace DiscordBotFanatic.Modules {
 
         public GroupStatsModule(HighscoreService osrsHighscoreService, MessageConfiguration messageConfiguration, WiseOldManConfiguration wiseOldManConfiguration) : base(osrsHighscoreService, messageConfiguration) {
             WiseOldManId = wiseOldManConfiguration.GroupId;
+            _groupName = wiseOldManConfiguration.GroupName;
         }
 
 
@@ -55,7 +56,10 @@ namespace DiscordBotFanatic.Modules {
             base.ExtractBaseArguments(baseArguments);
 
             if (!string.IsNullOrEmpty(Name)) {
-                WiseOldManId = Service.GetGroupIdFromName(Name);
+                int newId = Service.GetGroupIdFromName(Name);
+                if(newId > 0) {
+                    WiseOldManId = Service.GetGroupIdFromName(Name);
+                }
             }
         }
 
@@ -69,6 +73,7 @@ namespace DiscordBotFanatic.Modules {
             Response = await Service.UpdateGroupAsync(WiseOldManId);
         }
 
+        [Name("Leaderboards")]
         [Command("top", RunMode = RunMode.Async)]
         [Summary("Get the top players in a metric. This will not update the group.")]
         [Alias("leaderboards", "leaderboard", "ranking")]
@@ -82,6 +87,7 @@ namespace DiscordBotFanatic.Modules {
             Response = await Service.GetPlayerRecordsForGroupAsync(CommandMetricType.Value, CommandPeriod.Value, WiseOldManId);
         }
 
+        [Name("Leaderboards - Mobile")]
         [Command("alt-top", RunMode = RunMode.Async)]
         [Summary("Get the top players in a metric. This will not update the group.")]
         [Alias("alt-leaderboards", "alt-leaderboard", "alt-ranking", "alttop", "altleaderboards", "altleaderboard", "altranking")]
@@ -104,7 +110,28 @@ namespace DiscordBotFanatic.Modules {
         }
 
         private Embed FormatEmbeddedFromLeaderboardResponse(List<LeaderboardMemberInfo> leaderboardInfos) {
-            var embed = GetCommonEmbedBuilder(Area, $"Leaderboards for <groupname>.");
+            if (!leaderboardInfos.Any()) {
+                return GetCommonEmbedBuilder($"No leaderboards for {Area}", $"For the period of {CommandPeriod.Value} and the metric {CommandMetricType.Value}.").Build();
+            }
+
+            int lastRank = leaderboardInfos.Count;
+            int maxDisplay = 20;
+            int startIndex = 0;
+            int earchedItemRank = 0;
+            LeaderboardMemberInfo searchedItem = null;
+            if (!string.IsNullOrEmpty(Name)) {
+                searchedItem = leaderboardInfos.SingleOrDefault(x => x.Info.Username.ToLowerInvariant() == Name.ToLowerInvariant());
+                if (searchedItem == null) {
+                    return GetCommonEmbedBuilder($"No rank for {Area}", $"For the period of {CommandPeriod.Value} and the metric {CommandMetricType.Value} for the user {Name}.").Build();
+                }
+
+                earchedItemRank = leaderboardInfos.IndexOf(searchedItem);
+                startIndex = Math.Max(0, earchedItemRank - 10);
+                int endIndex = Math.Min(leaderboardInfos.Count - startIndex, maxDisplay);
+                leaderboardInfos = leaderboardInfos.GetRange(startIndex, endIndex);
+            }
+
+            var embed = GetCommonEmbedBuilder(Area, $"Leaderboards for {Area}");
 
             StringBuilder numberInline = new StringBuilder();
             StringBuilder nameInline = new StringBuilder();
@@ -118,23 +145,29 @@ namespace DiscordBotFanatic.Modules {
                 description.Append(Environment.NewLine);
             }
 
-            int loops = Math.Min(20, leaderboardInfos.Count);
+            int loops = Math.Min(maxDisplay, leaderboardInfos.Count);
 
             for (int i = 0; i < loops; i++) {
                 var info = leaderboardInfos.ElementAt(i);
+                string name = searchedItem != null && (info.Info.PlayerId == searchedItem.Info.PlayerId) ? info.Info.Username.ToUpper() : info.Info.Username;
+
                 if (_altDisplay) {
-                    description.Append($"{i + 1}, ".PadLeft(5));
-                    description.Append(info.Info.Username.PadRight(14));
+                    description.Append($"{i + 1 + startIndex}, ".PadLeft(5));
+                    description.Append(name.PadRight(14));
                     description.Append(info.Info.Gained.FormatNumber().PadLeft(6) + Environment.NewLine);
                 } else {
-                    numberInline.Append($"{i + 1}{Environment.NewLine}");
-                    nameInline.Append(info.Info.Username + Environment.NewLine);
+                    numberInline.Append($"{i + 1 + startIndex}{Environment.NewLine}");
+                    nameInline.Append(name + Environment.NewLine);
                     experienceInline.Append(info.Info.Gained.FormatNumber() + Environment.NewLine);
                 }
             }
 
+            if (searchedItem != null) {
+                embed.Description = $"The player {Name} is rank {earchedItemRank+1}/{lastRank+1}.";
+            }
+
             if (_altDisplay) {
-                embed.Description = $"```{description}```";
+                embed.Description += $"```{description}```";
             } else {
                 embed.AddField("#", numberInline.ToString(), true);
                 embed.AddField("Name", nameInline.ToString(), true);
@@ -142,6 +175,8 @@ namespace DiscordBotFanatic.Modules {
                 embed.AddEmptyField();
             }
 
+
+            embed.AddField("Total ranks", (lastRank+1).ToString(), true);
             Debug.Assert(CommandMetricType != null, nameof(CommandMetricType) + " != null");
             embed.AddField("Metric", CommandMetricType.Value.ToString(), true);
             Debug.Assert(CommandPeriod != null, nameof(CommandPeriod) + " != null");

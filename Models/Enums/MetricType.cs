@@ -2,29 +2,56 @@
 
 namespace DiscordBotFanatic.Models.Enums {
     public enum MetricType {
+        [EnumMember(Value = "overall")]
         Overall = 1,
+        [EnumMember(Value = "attack")]
         Attack,
+        [EnumMember(Value = "defence")]
         Defence,
+        [EnumMember(Value = "strength")]
         Strength,
+        [EnumMember(Value = "hitpoints")]
         Hitpoints,
+        [EnumMember(Value = "ranged")]
         Ranged,
+        [EnumMember(Value = "prayer")]
         Prayer,
+        [EnumMember(Value = "magic")]
         Magic,
+        [EnumMember(Value = "cooking")]
         Cooking,
+        [EnumMember(Value = "woodcutting")]
         Woodcutting,
+        [EnumMember(Value = "fletching")]
         Fletching,
+        [EnumMember(Value = "fishing")]
         Fishing,
+        [EnumMember(Value = "firemaking")]
         Firemaking,
+        [EnumMember(Value = "crafting")]
         Crafting,
+        [EnumMember(Value = "smithing")]
         Smithing,
+        [EnumMember(Value = "mining")]
         Mining,
+        [EnumMember(Value = "herblore")]
         Herblore,
+        [EnumMember(Value = "agility")]
         Agility,
+        [EnumMember(Value = "thieving")]
         Thieving,
+        [EnumMember(Value = "slayer")]
         Slayer,
+        [EnumMember(Value = "farming")]
         Farming,
+
+        [EnumMember(Value = "runecrafting")]
         Runecrafting,
+
+        [EnumMember(Value = "hunter")]
         Hunter,
+
+        [EnumMember(Value = "league_points")]
         Construction,
 
         [EnumMember(Value = "league_points")]

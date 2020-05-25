@@ -43,6 +43,7 @@ namespace DiscordBotFanatic
             StartupConfiguration configuration = config.GetSection("Startup").Get<StartupConfiguration>();
             BotConfiguration botConfiguration = config.GetSection("Bot").Get<BotConfiguration>();
             WiseOldManConfiguration manConfiguration = config.GetSection("WiseOldMan").Get<WiseOldManConfiguration>();
+            MetricSynonymsConfiguration metricSynonymsConfiguration = config.GetSection("MetricSynonyms").Get<MetricSynonymsConfiguration>();
 
             return new ServiceCollection()
                 // Base
@@ -58,6 +59,7 @@ namespace DiscordBotFanatic
                 .AddSingleton(botConfiguration)
                 .AddSingleton(botConfiguration.Messages)
                 .AddSingleton(manConfiguration)
+                .AddSingleton(metricSynonymsConfiguration)
                 .AddTransient<HighscoreService>()
                 .AddTransient<IDiscordBotRepository>(x=> new LiteDbRepository(configuration.DatabaseFile))
                 .AddTransient<IGuildService, GuildService>()

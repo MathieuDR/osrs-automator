@@ -10,11 +10,8 @@ using DiscordBotFanatic.Modules.DiscordCommandArguments;
 
 namespace DiscordBotFanatic.TypeReaders {
     public class PeriodOsrsTypeReader : TypeReader {
-        public override Task<TypeReaderResult> ReadAsync(ICommandContext context, string input,
-            IServiceProvider services) {
-            List<string> parameters = Regex.Matches(input, @"[\""].+?[\""]|[^ ]+")
-                .Select(m => m.Value.Replace("\"",""))
-                .ToList();
+        public override Task<TypeReaderResult> ReadAsync(ICommandContext context, string input, IServiceProvider services) {
+            List<string> parameters = Regex.Matches(input, @"[\""].+?[\""]|[^ ]+").Select(m => m.Value.Replace("\"", "")).ToList();
 
             if (!parameters.Any()) {
                 return Task.FromResult(TypeReaderResult.FromSuccess(null));
@@ -30,13 +27,10 @@ namespace DiscordBotFanatic.TypeReaders {
                 if (Enum.TryParse(typeof(Period), parameter, true, out object period)) {
                     Debug.Assert(period != null, nameof(period) + " != null");
                     result.Period = (Period) period;
-                }
-                else if (string.IsNullOrEmpty(result.Name)) {
+                } else if (string.IsNullOrEmpty(result.Name)) {
                     result.Name = parameter;
-                }
-                else {
-                    return Task.FromResult(TypeReaderResult.FromError(CommandError.BadArgCount,
-                        $"Wrong errors, Cannot parse all parameters. Ambigious username ({result.Name} & {parameter})"));
+                } else {
+                    return Task.FromResult(TypeReaderResult.FromError(CommandError.BadArgCount, $"Wrong errors, Cannot parse all parameters. Ambigious username ({result.Name} & {parameter})"));
                 }
             }
 

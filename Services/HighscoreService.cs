@@ -97,7 +97,8 @@ namespace DiscordBotFanatic.Services {
         }
 
         public int GetGroupIdFromName(string name) {
-            throw new NotImplementedException();
+            return -1;
+            //throw new NotImplementedException();
         }
     }
 }

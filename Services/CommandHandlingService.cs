@@ -21,14 +21,16 @@ namespace DiscordBotFanatic.Services {
         private readonly CommandService _commands;
         private IServiceProvider _provider;
         private BotConfiguration _configuration;
+        private readonly MetricSynonymsConfiguration _metricSynonymsConfiguration;
         private readonly ILogService _logger;
 
         public CommandHandlingService(IServiceProvider provider, DiscordSocketClient discord, CommandService commands,
-            BotConfiguration configuration, ILogService logger) {
+            BotConfiguration configuration, MetricSynonymsConfiguration metricSynonymsConfiguration, ILogService logger) {
             _discord = discord;
             _commands = commands;
             _provider = provider;
             _configuration = configuration;
+            _metricSynonymsConfiguration = metricSynonymsConfiguration;
             _logger = logger;
 
             _discord.MessageReceived += HandleCommandAsync;
@@ -43,7 +45,7 @@ namespace DiscordBotFanatic.Services {
 
         public async Task InitializeAsync(IServiceProvider provider) {
             _provider = provider;
-            _commands.AddTypeReader<PeriodAndMetricArguments>(new PeriodAndMetricOsrsTypeReader());
+            _commands.AddTypeReader<PeriodAndMetricArguments>(new PeriodAndMetricOsrsTypeReader(_metricSynonymsConfiguration));
             _commands.AddTypeReader<PeriodArguments>(new PeriodOsrsTypeReader());
             _commands.AddTypeReader<MetricArguments>(new MetricOsrsTypeReader());
             _commands.AddTypeReader<UserListWithImageArguments>(new UserListWithImageArgumentsTypeReader());
