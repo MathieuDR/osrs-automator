@@ -48,6 +48,7 @@ namespace DiscordBotFanatic.Services
             _commands.AddTypeReader<PeriodAndMetricArguments>(new PeriodAndMetricOsrsTypeReader(_metricSynonymsConfiguration));
             _commands.AddTypeReader<PeriodArguments>(new PeriodOsrsTypeReader());
             _commands.AddTypeReader<UserListWithImageArguments>(new UserListWithImageArgumentsTypeReader());
+            _commands.AddTypeReader<MetricArguments>(new MetricOsrsTypeReader(_metricSynonymsConfiguration));
             
             var t = _commands.AddModulesAsync(Assembly.GetEntryAssembly(), _provider);
             await _commands.AddModuleAsync<PlayerStatsModule>(provider);
