@@ -16,7 +16,7 @@ using DiscordBotFanatic.Services;
 
 namespace DiscordBotFanatic.Modules {
     [Name("Group")]
-    [Group("Group")]
+    //[Group("Group")]
     public class GroupStatsModule : StatsBaseModule {
         private bool _altDisplay;
         private string _groupName = "";
@@ -65,7 +65,7 @@ namespace DiscordBotFanatic.Modules {
 
         #region commands
 
-        [Command("update", RunMode = RunMode.Async)]
+        [Command("group update", RunMode = RunMode.Async)]
         [Summary("Update all players of a group.")]
         public async Task UpdateGroup([Summary("Optional Id, if not filled in, use the one from settings.")]
             int? id = null) {
