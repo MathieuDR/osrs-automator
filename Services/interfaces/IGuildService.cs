@@ -10,13 +10,15 @@ using DiscordBotFanatic.Modules.DiscordCommandArguments;
 namespace DiscordBotFanatic.Services.interfaces {
     public interface IGuildService {
         bool HasActiveEvent(IGuild guild);
-        List<GuildEvent> GetActiveGuildEvents(IGuild guild);
-        GuildEvent InsertGuildEvent(GuildEvent guildEvent);
-        bool EndGuildEvent(GuildEvent guildEvent);
+        List<GuildCustomEvent> GetActiveGuildEvents(IGuild guild);
+        GuildCustomEvent InsertGuildEvent(GuildCustomEvent guildCustomEvent);
+        bool EndGuildEvent(GuildCustomEvent guildCustomEvent);
         bool DoesUserHavePermission(IGuildUser user, Permissions permission);
         bool ToggleRole(IRole role, Permissions permission);
         bool AddEventCounter(IGuild guild, UserListWithImageArguments arguments);
-        void RemoveCounters(GuildEvent guildEvent, List<GuildEventCounter> toDelete);
+        void RemoveCounters(GuildCustomEvent guildCustomEvent, List<GuildEventCounter> toDelete);
         Task<CreateGroupCompetitionResult> CreateGroupCompetition(string title, MetricType metric, DateTime startDate, DateTime endDate);
+        Task<bool> CreateGuildCompetition(IGuildUser user, int id);
+        Task<bool> DeleteGuildCompetition(int id, DateTime endDate);
     }
 }

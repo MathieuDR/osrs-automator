@@ -31,6 +31,11 @@ namespace DiscordBotFanatic.Modules {
             _groupName = wiseOldManConfiguration.GroupName;
         }
 
+
+        public string Area {
+            get { return string.IsNullOrEmpty(_groupName) ? "Group" : _groupName; }
+        }
+
         protected override void BeforeExecute(CommandInfo command) {
             if (Context == null) {
                 return;
@@ -38,11 +43,6 @@ namespace DiscordBotFanatic.Modules {
 
             _user = Context.User as IGuildUser;
             base.BeforeExecute(command);
-        }
-
-
-        public string Area {
-            get { return string.IsNullOrEmpty(_groupName) ? "Group" : _groupName; }
         }
 
         protected override string GetUrl() {
@@ -61,20 +61,21 @@ namespace DiscordBotFanatic.Modules {
                     return FormatEmbeddedFromLeaderboardResponse(leaderboardInfos);
                 case CreateGroupCompetitionResult createGroupCompetitionResult:
                     return FormatEmbeddedFromCreateGroupCompetitionResult(createGroupCompetitionResult);
+                case bool result:
+                    return FormatEmbeddedFromBool(result);
+                case List<CompetitionInfo> competitionInfos:
+                    return FormatEmbeddedFromCompetition(competitionInfos);
                 default:
                     throw new Exception($"Response type unknown");
             }
         }
-
-        
-
 
         protected override void ExtractBaseArguments(BaseArguments baseArguments) {
             base.ExtractBaseArguments(baseArguments);
 
             if (!string.IsNullOrEmpty(Name)) {
                 int newId = Service.GetGroupIdFromName(Name);
-                if(newId > 0) {
+                if (newId > 0) {
                     WiseOldManId = Service.GetGroupIdFromName(Name);
                 }
             }
@@ -93,22 +94,25 @@ namespace DiscordBotFanatic.Modules {
         [Name("Leaderboards")]
         [Command("top", RunMode = RunMode.Async)]
         [Summary("Get the top players in a metric. This will not update the group.")]
-        [Alias("leaderboards", "leaderboard", "ranking")]
-        public async Task GetTopPlayers([Remainder] PeriodAndMetricArguments arguments) {
-            ExtractPeriodAndMetricArguments(arguments);
-            if (!CommandMetricType.HasValue) {
-                throw new ArgumentException($"Please fill in the metric to measure.");
+        public async Task GetTopPlayers([Remainder] PeriodAndMetricArguments arguments = null) {
+            if (arguments == null) {
+                Response = await Service.GetGuildCompetitionLeaderboard(_user.Guild);
             }
 
-            CommandPeriod ??= Period.Week;
-            Response = await Service.GetPlayerRecordsForGroupAsync(CommandMetricType.Value, CommandPeriod.Value, WiseOldManId);
+            ExtractPeriodAndMetricArguments(arguments);
+            if (!CommandMetricType.HasValue) {
+                Response = await Service.GetGuildCompetitionLeaderboard(_user.Guild);
+            } else {
+                CommandPeriod ??= Period.Week;
+                Response = await Service.GetPlayerRecordsForGroupAsync(CommandMetricType.Value, CommandPeriod.Value, WiseOldManId);
+            }
         }
 
         [Name("Leaderboards - Mobile")]
         [Command("alt-top", RunMode = RunMode.Async)]
         [Summary("Get the top players in a metric. This will not update the group.")]
-        [Alias("alt-leaderboards", "alt-leaderboard", "alt-ranking", "alttop", "altleaderboards", "altleaderboard", "altranking")]
-        public Task GetTopPlayersAlt([Remainder] PeriodAndMetricArguments arguments) {
+        [Alias("alttop", "alt top")]
+        public Task GetTopPlayersAlt([Remainder] PeriodAndMetricArguments arguments = null) {
             _altDisplay = true;
             return GetTopPlayers(arguments);
         }
@@ -132,19 +136,44 @@ namespace DiscordBotFanatic.Modules {
                 throw new UnauthorizedAccessException($"You don't have access towards competition management");
             }
 
-            throw new NotImplementedException(nameof(SetGuildCompetition));
+            Response = await _guildService.CreateGuildCompetition(_user, id);
+
             // Send toe guild server to set it active
         }
 
         [Name("Clear guild competition")]
         [Command("comp clear")]
         [Summary("Ends or clears the set competition from the guild")]
-        public async Task ClearGuildCompetition(int id) {
+        public async Task ClearGuildCompetition(int id, DateTime? endDate = null) {
             if (!_guildService.DoesUserHavePermission(_user, Permissions.CompetitionManager)) {
                 throw new UnauthorizedAccessException($"You don't have access towards competition management");
             }
-            throw new NotImplementedException(nameof(ClearGuildCompetition));
+
+            DateTime endDateTime = DateTime.UtcNow;
+            if (endDate.HasValue) {
+                endDateTime = endDate.Value;
+            }
+
+            Response = await _guildService.DeleteGuildCompetition(id, endDateTime);
         }
+
+        //[Name("Competition leaderboards")]
+        //[Command("comp", RunMode = RunMode.Async)]
+        //[Summary("Get the top players of the current competition")]
+        //[Alias( "comp")]
+        //public async Task GetTopPlayersForCompetition(BaseArguments arguments = null) {
+        //    ExtractBaseArguments(arguments);
+        //    Response = await Service.GetGuildCompetitionLeaderboard(_user.Guild);
+        //}
+
+        //[Name("Competition leaderboards - Mobile")]
+        //[Command("alt-top comp", RunMode = RunMode.Async)]
+        //[Summary("Get the top players of the current competition")]
+        //[Alias("alt comp", "alttop comp", "alt top comp")]
+        //public Task GetTopPlayersForCompetitionAlt(BaseArguments arguments = null) {
+        //    _altDisplay = true;
+        //    return GetTopPlayersForCompetition(arguments);
+        //}
 
         // Time left command
         // Leaderboards for competition (Like leaderboards for deltas)
@@ -157,8 +186,93 @@ namespace DiscordBotFanatic.Modules {
 
         #region formatting
 
+        private Embed FormatEmbeddedFromBool(in bool result) {
+            var embed = GetCommonEmbedBuilder(Area, "Request", result ? "Successful" : "Failed");
+            return embed.Build();
+        }
+
         private Embed FormatEmbeddedFromGroupUpdateResponse(GroupUpdateResponse groupUpdateResponse) {
             var embed = GetCommonEmbedBuilder(Area, $"Update requested", groupUpdateResponse.Message);
+            return embed.Build();
+        }
+
+        private Embed FormatEmbeddedFromCompetition(List<CompetitionInfo> competitionInfos) {
+            if (!competitionInfos.Any()) {
+                return GetCommonEmbedBuilder($"No competition leaderboards for {Area}", $"Perhaps nothing was gained, or the group isn't updated yet.").Build();
+            }
+
+            int lastRank = competitionInfos.Count;
+            int maxDisplay = 20;
+            int startIndex = 0;
+            int earchedItemRank = 0;
+            CompetitionInfo searchedItem = null;
+            var compInfoObject = competitionInfos.FirstOrDefault();
+            if (!string.IsNullOrEmpty(Name)) {
+                searchedItem = competitionInfos.SingleOrDefault(x => x.Info.Username.ToLowerInvariant() == Name.ToLowerInvariant());
+                if (searchedItem == null) {
+                    return GetCommonEmbedBuilder($"No rank in the competition of {compInfoObject.Name}", $"The user `{Name}` hasn't been ranked in the competition of {compInfoObject.Name}.").Build();
+                }
+
+                earchedItemRank = competitionInfos.IndexOf(searchedItem);
+                startIndex = Math.Max(0, earchedItemRank - 10);
+                int endIndex = Math.Min(competitionInfos.Count - startIndex, maxDisplay);
+                competitionInfos = competitionInfos.GetRange(startIndex, endIndex);
+            }
+
+            var embed = GetCommonEmbedBuilder(Area, $"Leaderboards for {compInfoObject.Name}");
+
+            StringBuilder numberInline = new StringBuilder();
+            StringBuilder nameInline = new StringBuilder();
+            StringBuilder experienceInline = new StringBuilder();
+            StringBuilder description = new StringBuilder();
+
+            if (_altDisplay) {
+                description.Append("#".PadLeft(3).PadRight(5));
+                description.Append("Name".PadRight(14));
+                description.Append("Experience");
+                description.Append(Environment.NewLine);
+            }
+
+            int loops = Math.Min(maxDisplay, competitionInfos.Count);
+
+            for (int i = 0; i < loops; i++) {
+                var info = competitionInfos.ElementAt(i);
+                string name = searchedItem != null && (info.Info.Id == searchedItem.Info.Id) ? info.Info.Username.ToUpper() : info.Info.Username;
+
+                if (_altDisplay) {
+                    description.Append($"{i + 1 + startIndex}, ".PadLeft(5));
+                    description.Append(name.PadRight(14));
+                    description.Append(info.Info.Progress.Gained.FormatNumber().PadLeft(6) + Environment.NewLine);
+                } else {
+                    numberInline.Append($"{i + 1 + startIndex}{Environment.NewLine}");
+                    nameInline.Append(name + Environment.NewLine);
+                    experienceInline.Append(info.Info.Progress.Gained.FormatNumber() + Environment.NewLine);
+                }
+            }
+
+            if (searchedItem != null) {
+                embed.Description = $"The player {Name} is rank {earchedItemRank + 1}/{lastRank}.";
+            }
+
+            if (_altDisplay) {
+                embed.Description += $"```{description}```";
+            } else {
+                embed.AddField("#", numberInline.ToString(), true);
+                embed.AddField("Name", nameInline.ToString(), true);
+                embed.AddField("Experience", experienceInline.ToString(), true);
+                embed.AddEmptyField();
+            }
+
+
+            embed.AddField("Total ranks", (lastRank).ToString(), true);
+            embed.AddField("Metric", compInfoObject.Type, true);
+            embed.AddField("Time left", "to calculate", true);
+
+            if (!_altDisplay) {
+                embed.AddField("Unreadable?", "For mobile users please use the command `group alt-top`");
+            }
+
+
             return embed.Build();
         }
 
@@ -170,9 +284,7 @@ namespace DiscordBotFanatic.Modules {
             embed.AddField("Ends", createGroupCompetitionResult.EndsAt, true);
             embed.AddField("Participants", createGroupCompetitionResult.Participants.Count, true);
 
-            Context.User.SendMessageAsync($"Competition {createGroupCompetitionResult.Title} administrator information.{Environment.NewLine}" + 
-                                          $"Verification code: `{createGroupCompetitionResult.VerificationCode}`{Environment.NewLine}" + 
-                                          $"Competition Id: `{createGroupCompetitionResult.Id}`");
+            Context.User.SendMessageAsync($"Competition {createGroupCompetitionResult.Title} administrator information.{Environment.NewLine}" + $"Verification code: `{createGroupCompetitionResult.VerificationCode}`{Environment.NewLine}" + $"Competition Id: `{createGroupCompetitionResult.Id}`");
 
             return embed.Build();
         }
@@ -231,7 +343,7 @@ namespace DiscordBotFanatic.Modules {
             }
 
             if (searchedItem != null) {
-                embed.Description = $"The player {Name} is rank {earchedItemRank+1}/{lastRank}.";
+                embed.Description = $"The player {Name} is rank {earchedItemRank + 1}/{lastRank}.";
             }
 
             if (_altDisplay) {
@@ -249,12 +361,12 @@ namespace DiscordBotFanatic.Modules {
             embed.AddField("Metric", CommandMetricType.Value.ToString(), true);
             Debug.Assert(CommandPeriod != null, nameof(CommandPeriod) + " != null");
             embed.AddField("Period", CommandPeriod.Value.ToString(), true);
-           
+
 
             if (!_altDisplay) {
                 embed.AddField("Unreadable?", "For mobile users please use the command `group alt-top`");
             }
-            
+
 
             return embed.Build();
         }

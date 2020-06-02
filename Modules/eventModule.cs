@@ -48,8 +48,8 @@ namespace DiscordBotFanatic.Modules {
                 throw new Exception($"An guild event is already running on this guild.");
             }
 
-            GuildEvent guildEvent = new GuildEvent(_user, name, minimumPlayersPerCounter, maximumPlayersPerCounter);
-            var fromDb = _service.InsertGuildEvent(guildEvent);
+            GuildCustomEvent guildCustomEvent = new GuildCustomEvent(_user, name, minimumPlayersPerCounter, maximumPlayersPerCounter);
+            var fromDb = _service.InsertGuildEvent(guildCustomEvent);
             EmbedBuilder embed = new EmbedBuilder() {Title = $"Success!", Description = $"Event {fromDb.Name} created!"};
             return ReplyAsync(embed: embed.Build());
         }
@@ -57,7 +57,7 @@ namespace DiscordBotFanatic.Modules {
         [Command("running")]
         [Summary("See the running command")]
         public Task OutputRunning() {
-            GuildEvent fromDb = GetActiveGuildEvent();
+            GuildCustomEvent fromDb = GetActiveGuildEvent();
 
             EmbedBuilder embed = new EmbedBuilder() {Title = $"We found one!", Description = $"Event {fromDb.Name} is running!{Environment.NewLine}It started at {fromDb.CreatedOn}."};
 
@@ -76,7 +76,7 @@ namespace DiscordBotFanatic.Modules {
         [Command("top")]
         [Summary("See the top of the event")]
         public Task OutputTop(int top) {
-            GuildEvent fromDb = GetActiveGuildEvent();
+            GuildCustomEvent fromDb = GetActiveGuildEvent();
 
             EmbedBuilder embed = new EmbedBuilder() {Title = $"Top results"};
             GuildEventTopCountersToField(fromDb.EventCounters, top, embed);
@@ -87,7 +87,7 @@ namespace DiscordBotFanatic.Modules {
         [Command("end")]
         [Summary("Ends an event")]
         public Task EndEvent() {
-            GuildEvent fromDb = GetActiveGuildEvent();
+            GuildCustomEvent fromDb = GetActiveGuildEvent();
 
             if (!_service.EndGuildEvent(fromDb)) {
                 throw new Exception($"Something went wrong with ending the event.");
@@ -109,7 +109,7 @@ namespace DiscordBotFanatic.Modules {
                 throw new UnauthorizedAccessException($"You don't have acces towards event management");
             }
 
-            GuildEvent fromDb = GetActiveGuildEvent();
+            GuildCustomEvent fromDb = GetActiveGuildEvent();
 
             var counts = fromDb.EventCounters.Where(x => x.UserId == user.Id).Select(x => x.ImageUrl).ToList();
             foreach (string url in counts) {
@@ -129,7 +129,7 @@ namespace DiscordBotFanatic.Modules {
                 throw new UnauthorizedAccessException($"You don't have acces towards event management");
             }
 
-            GuildEvent fromDb = GetActiveGuildEvent();
+            GuildCustomEvent fromDb = GetActiveGuildEvent();
 
             var toDeleteQuery = fromDb.EventCounters.Where(x => x.ImageUrl == url);
             if (user != null) {
@@ -161,8 +161,8 @@ namespace DiscordBotFanatic.Modules {
             }
         }
 
-        private GuildEvent GetActiveGuildEvent() {
-            GuildEvent fromDb = _service.GetActiveGuildEvents(_user.Guild).FirstOrDefault();
+        private GuildCustomEvent GetActiveGuildEvent() {
+            GuildCustomEvent fromDb = _service.GetActiveGuildEvents(_user.Guild).FirstOrDefault();
 
             if (fromDb == null) {
                 throw new Exception($"No event running. Please create one.");

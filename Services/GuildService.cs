@@ -28,19 +28,19 @@ namespace DiscordBotFanatic.Services {
         public bool HasActiveEvent(IGuild guild) {
             return _repository.GetAllActiveGuildEvents(guild.Id).Any();
         }
-        public List<GuildEvent> GetActiveGuildEvents(IGuild guild) {
+        public List<GuildCustomEvent> GetActiveGuildEvents(IGuild guild) {
             return _repository.GetAllActiveGuildEvents(guild.Id).ToList();
         }
 
-        public GuildEvent InsertGuildEvent(GuildEvent guildEvent) {
-            guildEvent.IsValid();
+        public GuildCustomEvent InsertGuildEvent(GuildCustomEvent guildCustomEvent) {
+            guildCustomEvent.IsValid();
 
-            return _repository.InsertGuildEvent(guildEvent);
+            return _repository.InsertGuildEvent(guildCustomEvent);
         }
 
-        public bool EndGuildEvent(GuildEvent guildEvent) {
-            guildEvent.EndTime = DateTime.Now;
-            _repository.UpdateGuildEvent(guildEvent);
+        public bool EndGuildEvent(GuildCustomEvent guildCustomEvent) {
+            guildCustomEvent.EndTime = DateTime.Now;
+            _repository.UpdateGuildEvent(guildCustomEvent);
             return true;
         }
 
@@ -112,15 +112,32 @@ namespace DiscordBotFanatic.Services {
             }
         }
 
-        public void RemoveCounters(GuildEvent guildEvent, List<GuildEventCounter> toDelete) {
-            guildEvent.EventCounters = guildEvent.EventCounters.Except(toDelete).ToList();
-            _repository.UpdateGuildEvent(guildEvent);
+        public void RemoveCounters(GuildCustomEvent guildCustomEvent, List<GuildEventCounter> toDelete) {
+            guildCustomEvent.EventCounters = guildCustomEvent.EventCounters.Except(toDelete).ToList();
+            _repository.UpdateGuildEvent(guildCustomEvent);
         }
 
         //TODO make into info?
         public Task<CreateGroupCompetitionResult> CreateGroupCompetition(string title, MetricType metric, DateTime startDate, DateTime endDate) {
             var request = new CreateCompetitionRequest(){Title = title, Metric = metric, EndTime = endDate, StartTime = startDate, GroupId = _configuration.GroupId, VerificationCode = _configuration.GroupVerificationCode};
             return _highscoreApiRepository.CreateGroupCompetition(request);
+        }
+
+        public Task<bool> CreateGuildCompetition(IGuildUser user, int id) {
+            if (_repository.GetAllActiveGuildCompetitions(user.GuildId).Any()) {
+                throw new Exception($"There is already a competition running for this guild. Please clear this competition first.");
+            }
+
+            GuildCompetition comp = new GuildCompetition(user, id);
+            _repository.InsertGuildCompetition(comp);
+            return Task.FromResult(true);
+        }
+
+        public Task<bool> DeleteGuildCompetition(int id, DateTime endDate) {
+            GuildCompetition comp = _repository.GetGuildCompetitionById(id);
+            comp.EndTime = endDate;
+            _repository.UpdateGuildCompetition(comp);
+            return Task.FromResult(true);
         }
     }
 }

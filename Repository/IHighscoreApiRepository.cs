@@ -16,5 +16,6 @@ namespace DiscordBotFanatic.Repository {
         public Task<GroupMembersListResponse> GetPlayersFromGroupId(int groupId);
         public Task<LeaderboardResponse> GetGroupLeaderboards(MetricType metric, Period period, int groupId);
         Task<CreateGroupCompetitionResult> CreateGroupCompetition(CreateCompetitionRequest createCompetitionRequest);
+        Task<CompetitionResponse> ViewCompetitionDetails(int id);
     }
 }

@@ -1,7 +1,9 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Globalization;
 using DiscordBotFanatic.Models.Enums;
 using DiscordBotFanatic.Models.WiseOldMan.Cleaned;
+using DiscordBotFanatic.Models.WiseOldMan.Responses;
 using DiscordBotFanatic.Models.WiseOldMan.Responses.Models;
 
 namespace DiscordBotFanatic.Helpers {
@@ -29,6 +31,17 @@ namespace DiscordBotFanatic.Helpers {
             return new LeaderboardMemberInfo(leaderboardMember, requestedType);
         }
 
+        public static List<CompetitionInfo> ToCompetitionInfos(this CompetitionResponse competitionResponse) {
+            var result = new List<CompetitionInfo>();
+
+            var type = competitionResponse.Metric.ToMetricType();
+            foreach (Participant participant in competitionResponse.Participants) {
+                var info = new CompetitionInfo(competitionResponse.Title, competitionResponse.StartsAt, competitionResponse.EndsAt, competitionResponse.Group, participant, type);
+                result.Add(info);
+            }
+
+            return result;
+        }
         
         public static string ToLevel(this Metric metric) {
             return metric.Experience.ToLevel().ToString();

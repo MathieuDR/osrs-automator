@@ -3,25 +3,14 @@ using System.Collections.Generic;
 using Discord;
 
 namespace DiscordBotFanatic.Models.Data {
-    public class GuildEvent : BaseModel {
-        public ulong GuildId { get; set; }
-        public string CreatedByDiscordId { get; set; }
-        public DateTime CreatedOn { get; set; }
-        public DateTime EndTime { get; set; }
+    public class GuildCustomEvent : BaseGuildModel {
         public string Name { get; set; }
         public List<GuildEventCounter> EventCounters { get; set; }
         public int MinimumPerCounter { get; set; }
         public int MaximumPerCounter { get; set; }
+        public DateTime EndTime { get; set; }
 
         public override void IsValid() {
-            if (string.IsNullOrEmpty(CreatedByDiscordId)) {
-                ValidationDictionary.Add(nameof(CreatedByDiscordId), $"Null or empty.");
-            }
-
-            if (!ulong.TryParse(CreatedByDiscordId, out _)) {
-                ValidationDictionary.Add(nameof(CreatedByDiscordId), $"Not an ulong.");
-            }
-
             if (string.IsNullOrEmpty(Name)) {
                 ValidationDictionary.Add(nameof(Name), $"No name.");
             }
@@ -37,13 +26,10 @@ namespace DiscordBotFanatic.Models.Data {
             base.IsValid();
         }
 
-        public GuildEvent() { }
+        public GuildCustomEvent() { }
 
-        public GuildEvent(IGuildUser user, string name, int minimumPerCounter, int maximumPerCounter) {
-            CreatedOn = DateTime.Now;
+        public GuildCustomEvent(IGuildUser user, string name, int minimumPerCounter, int maximumPerCounter) :base(user) {
             Name = name;
-            GuildId = user.GuildId;
-            CreatedByDiscordId = user.Id.ToString();
             MinimumPerCounter = minimumPerCounter;
             MaximumPerCounter = maximumPerCounter;
         }

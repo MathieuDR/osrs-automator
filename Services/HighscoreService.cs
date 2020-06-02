@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Discord;
+using DiscordBotFanatic.Helpers;
 using DiscordBotFanatic.Models.Data;
 using DiscordBotFanatic.Models.Enums;
 using DiscordBotFanatic.Models.WiseOldMan.Cleaned;
@@ -29,6 +30,16 @@ namespace DiscordBotFanatic.Services {
             var leaderboard = await _highscoreApiRepository.GetGroupLeaderboards(metricType, period, groupId);
             
             return leaderboard.MemberInfos.OrderByDescending(x => x.HasGained).ToList();
+        }
+
+        public async Task<List<CompetitionInfo>> GetGuildCompetitionLeaderboard(IGuild guild) {
+            var currentComp = _repository.GetAllActiveGuildCompetitions(guild.Id).FirstOrDefault();
+            if (currentComp == null) {
+                throw new ArgumentException($"Could not find a running competition for this guild. Did you create/set the competition?");
+            }
+
+            var infos = (await _highscoreApiRepository.ViewCompetitionDetails(currentComp.Id)).ToCompetitionInfos();
+            return infos;
         }
 
         public async void SetDefaultPlayer(ulong userId, string username) {

@@ -12,14 +12,23 @@ namespace DiscordBotFanatic.Repository {
         Player InsertOrUpdatePlayer(Player player);
 
         bool HasActiveEvent(IGuild guild);
-        GuildEvent GetGuildEventById(ObjectId id);
-        GuildEvent InsertGuildEvent(GuildEvent guildEvent);
+        GuildCustomEvent GetGuildEventById(ObjectId id);
+        GuildCustomEvent InsertGuildEvent(GuildCustomEvent guildCustomEvent);
         GuildConfiguration GetGuildConfigurationById(ulong guildId);
         GuildConfiguration UpdateOrInsertGuildConfiguration(GuildConfiguration guildConfiguration);
         GuildConfiguration UpdateGuildConfiguration(GuildConfiguration guildConfiguration);
         GuildConfiguration InsertGuildConfiguration(GuildConfiguration guildConfiguration);
-        List<GuildEvent> GetAllGuildEvents(ulong guildId);
-        List<GuildEvent> GetAllActiveGuildEvents(ulong guildId);
-        GuildEvent UpdateGuildEvent(GuildEvent guildEvent);
+        List<GuildCustomEvent> GetAllGuildEvents(ulong guildId);
+        List<GuildCustomEvent> GetAllActiveGuildEvents(ulong guildId);
+        GuildCustomEvent UpdateGuildEvent(GuildCustomEvent guildCustomEvent);
+
+
+        
+        GuildCompetition InsertGuildCompetition(GuildCompetition guildCompetition);
+        GuildCompetition GetGuildCompetitionById(ObjectId id);
+        GuildCompetition GetGuildCompetitionById(int id);
+        List<GuildCompetition> GetAllGuildCompetitions(ulong guildId);
+        List<GuildCompetition> GetAllActiveGuildCompetitions(ulong guildId);
+        GuildCompetition UpdateGuildCompetition(GuildCompetition guildCompetition);
     }
 }

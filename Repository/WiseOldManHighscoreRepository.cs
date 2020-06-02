@@ -20,7 +20,7 @@ namespace DiscordBotFanatic.Repository {
         private const string RecordsBase = "records";
         private const string DeltaBase = "deltas";
         private const string GroupBase = "groups";
-        private const string CompeitionBase = "competitions";
+        private const string CompetitionBase = "competitions";
         private readonly RestClient _client;
         private readonly ILogService _logger;
 
@@ -160,13 +160,30 @@ namespace DiscordBotFanatic.Repository {
         }
 
         public async Task<CreateGroupCompetitionResult> CreateGroupCompetition(CreateCompetitionRequest createCompetitionRequest) {
-            var request = new RestRequest($"{CompeitionBase}");
+            var request = new RestRequest($"{CompetitionBase}");
             //request.AddJsonBody(JsonConvert.SerializeObject(createCompetitionRequest));
             request.AddJsonBody(createCompetitionRequest);
 
             var result = await _client.PostAsync<CreateGroupCompetitionResult>(request);
             ValidateResponse(result);
             return result;
+        }
+
+        public async Task<CompetitionResponse> ViewCompetitionDetails(int id) {
+            try {
+                var request = new RestRequest($"{CompetitionBase}/{{id}}");
+                //request.AddJsonBody(JsonConvert.SerializeObject(createCompetitionRequest));
+                request.AddParameter("id", id, ParameterType.UrlSegment);
+
+                LogRequest(request);
+                IRestResponse response = _client.Get(request);
+                var result = JsonConvert.DeserializeObject<CompetitionResponse>(response.Content);
+                ValidateResponse(result);
+                return result;
+            } catch (Exception e) {
+                Console.WriteLine(e.Message);
+                throw e;
+            }
         }
 
         private void ValidateResponse(BaseResponse response) {
