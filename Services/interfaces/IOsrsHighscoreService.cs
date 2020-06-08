@@ -11,7 +11,7 @@ namespace DiscordBotFanatic.Services.interfaces {
         Task<List<LeaderboardMemberInfo>> GetPlayerRecordsForGroupAsync(MetricType metricType, Period period, int groupId);
         Task<List<CompetitionInfo>> GetGuildCompetitionLeaderboard(IGuild guild);
 
-        void SetDefaultPlayer(ulong userId, string username);
+        Task SetDefaultPlayer(ulong userId, string username);
         Task<IEnumerable<SearchResponse>> SearchPlayerAsync(string username);
         Task<PlayerResponse> GetPlayerAsync(string username);
         Task<PlayerResponse> TrackPlayerAsync(string username);

@@ -44,10 +44,15 @@ namespace DiscordBotFanatic.Services {
             return true;
         }
 
-        public bool DoesUserHavePermission(IGuildUser user, Permissions permission) {
+        public void AssertUserInGuild(IGuildUser user) {
             if (user == null) {
                 throw new AuthenticationException($"Could not find guild for user. Are you using a guild command in a direct message?");
             }
+        }
+
+        public bool DoesUserHavePermission(IGuildUser user, Permissions permission) {
+            AssertUserInGuild(user);
+
             if (user.GuildPermissions.Administrator) {
                 // admins always have permission
                 return true;

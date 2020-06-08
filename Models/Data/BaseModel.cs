@@ -13,25 +13,23 @@ namespace DiscordBotFanatic.Models.Data {
             CreatedOn = DateTime.Now;
         }
 
-        public BaseModel(IUser user) : this() {
-            CreatedByDiscordId = user.Id.ToString();
+        public BaseModel(IUser user) : this(user.Id) { }
+
+        public BaseModel(ulong userId) : this() {
+            CreatedByDiscordId = userId;
         }
 
         // ReSharper disable once InconsistentNaming
         [BsonId]
         public ObjectId _id { get; set; }
 
-        public string CreatedByDiscordId { get; set; }
+        public ulong CreatedByDiscordId { get; set; }
         public DateTime CreatedOn { get; set; }
 
         public virtual void IsValid() {
-            if (string.IsNullOrEmpty(CreatedByDiscordId)) {
-                ValidationDictionary.Add(nameof(CreatedByDiscordId), $"Null or empty.");
-            }
-
-            if (!ulong.TryParse(CreatedByDiscordId, out _)) {
-                ValidationDictionary.Add(nameof(CreatedByDiscordId), $"Not an ulong.");
-            }
+            if (CreatedByDiscordId <= 0){
+                ValidationDictionary.Add(nameof(CreatedByDiscordId), $"created by Id must be higher then 0");
+            } 
 
             if (ValidationDictionary.Any()) {
                 throw new ValidationException(ValidationDictionary.Select(x => $"{x.Key} - {x.Value}").Aggregate((i, j) => i + ", " + j));

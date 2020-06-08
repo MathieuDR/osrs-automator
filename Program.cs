@@ -12,33 +12,30 @@ using DiscordBotFanatic.Services.Images;
 using DiscordBotFanatic.Services.interfaces;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Logging.Console;
+using Microsoft.Extensions.Configuration.EnvironmentVariables;
 using Serilog;
 using Serilog.Events;
+using Serilog.Formatting.Json;
 
-namespace DiscordBotFanatic
-{
-    class Program
-    {
-        static void Main()
-            => new Program().MainAsync().GetAwaiter().GetResult();
+namespace DiscordBotFanatic {
+    class Program {
+        static void Main() => new Program().MainAsync().GetAwaiter().GetResult();
 
         public async Task MainAsync() {
             IConfiguration config = BuildConfig();
             IServiceProvider services = ConfigureServices(config); // No using statement?
-            //var test = services.GetService<PlayerStatsModule>();
+            try {
+                DiscordSocketClient client = services.GetRequiredService<DiscordSocketClient>();
+                await ((CommandHandlingService) services.GetRequiredService(typeof(CommandHandlingService))).InitializeAsync(services);
 
-            DiscordSocketClient client = services.GetRequiredService<DiscordSocketClient>();
-            
-            await ((CommandHandlingService) services.GetRequiredService(typeof(CommandHandlingService)))
-                .InitializeAsync(services);
+                var botConfig = config.GetSection("Bot").Get<BotConfiguration>();
+                await client.LoginAsync(TokenType.Bot, botConfig.Token);
+                await client.StartAsync();
 
-            var botConfig = config.GetSection("Bot").Get<BotConfiguration>();
-            await client.LoginAsync(TokenType.Bot, botConfig.Token);
-            await client.StartAsync();
-
-            await Task.Delay(-1);
+                await Task.Delay(-1);
+            } catch (Exception e) {
+                Log.Fatal(e, $"FATAL ERROR: ");
+            }
         }
 
         private IServiceProvider ConfigureServices(IConfiguration config) {
@@ -48,45 +45,35 @@ namespace DiscordBotFanatic
             MetricSynonymsConfiguration metricSynonymsConfiguration = config.GetSection("MetricSynonyms").Get<MetricSynonymsConfiguration>();
 
             Log.Logger = new LoggerConfiguration()
-                .MinimumLevel.Debug()
-                .WriteTo.RollingFile("logs/osrs_bot.log")
-                .WriteTo.Console(restrictedToMinimumLevel:LogEventLevel.Information)
+                .Enrich.FromLogContext()
+                .MinimumLevel
+                .Debug()
+                .WriteTo.RollingFile(new JsonFormatter(),"logs/osrs_bot.log")
+                .WriteTo.Console(restrictedToMinimumLevel: LogEventLevel.Information)
                 .CreateLogger();
-            
+
             return new ServiceCollection()
                 // Base
-                .AddSingleton<DiscordSocketClient>()
-                .AddSingleton<CommandService>()
-                .AddSingleton<CommandHandlingService>()
+                .AddSingleton<DiscordSocketClient>().AddSingleton<CommandService>().AddSingleton<CommandHandlingService>()
                 // Logging
                 // ReSharper disable once ObjectCreationAsStatement
                 //.AddLogging(builder => builder.AddConsole(x=> new ConsoleLoggerOptions(){LogToStandardErrorThreshold = LogLevel.Information}))
                 .AddSingleton<ILogService, SerilogService>()
                 // Extra
-                .AddSingleton(config)
-                .AddSingleton(botConfiguration)
-                .AddSingleton(botConfiguration.Messages)
-                .AddSingleton(manConfiguration)
-                .AddSingleton(metricSynonymsConfiguration)
-                .AddTransient<HighscoreService>()
-                .AddTransient<IDiscordBotRepository>(x=> new LiteDbRepository(configuration.DatabaseFile))
-                .AddTransient<IGuildService, GuildService>()
-                .AddTransient<IHighscoreApiRepository, WiseOldManHighscoreRepository>()
-                .AddTransient<IOsrsHighscoreService, HighscoreService>()
+                .AddSingleton(config).AddSingleton(botConfiguration).AddSingleton(botConfiguration.Messages).AddSingleton(manConfiguration).AddSingleton(metricSynonymsConfiguration).AddTransient<HighscoreService>().AddTransient<IDiscordBotRepository>(x => new LiteDbRepository(configuration.DatabaseFile)).AddTransient<IGuildService, GuildService>().AddTransient<IHighscoreApiRepository, WiseOldManHighscoreRepository>().AddTransient<IOsrsHighscoreService, HighscoreService>()
                 //Omage services
-                .AddTransient<IImageService<MetricInfo>, MetricImageService>()
-                .AddTransient<IImageService<DeltaInfo>, DeltaImageService>()
-                .AddTransient<IImageService<RecordInfo>, RecordImageService>()
+                .AddTransient<IImageService<MetricInfo>, MetricImageService>().AddTransient<IImageService<DeltaInfo>, DeltaImageService>().AddTransient<IImageService<RecordInfo>, RecordImageService>()
                 // Add additional services here
                 .BuildServiceProvider();
         }
 
-        private IConfiguration BuildConfig()
-        {
+        private IConfiguration BuildConfig() {
+            var environmentName = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT");
+
             return new ConfigurationBuilder()
                 .SetBasePath(Directory.GetCurrentDirectory())
                 .AddJsonFile("appsettings.json")
-                .Build();
+                .AddJsonFile($"appsettings.{environmentName}.json", optional: true).Build();
         }
     }
 }

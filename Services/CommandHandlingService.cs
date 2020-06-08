@@ -13,19 +13,20 @@ using System.Linq;
 using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
+using DiscordBotFanatic.Models;
+using Serilog.Context;
+using Serilog.Events;
 
-namespace DiscordBotFanatic.Services
-{
+namespace DiscordBotFanatic.Services {
     public class CommandHandlingService {
-        private readonly DiscordSocketClient _discord;
         private readonly CommandService _commands;
-        private IServiceProvider _provider;
-        private BotConfiguration _configuration;
-        private readonly MetricSynonymsConfiguration _metricSynonymsConfiguration;
+        private readonly DiscordSocketClient _discord;
         private readonly ILogService _logger;
+        private readonly MetricSynonymsConfiguration _metricSynonymsConfiguration;
+        private BotConfiguration _configuration;
+        private IServiceProvider _provider;
 
-        public CommandHandlingService(IServiceProvider provider, DiscordSocketClient discord, CommandService commands,
-            BotConfiguration configuration, MetricSynonymsConfiguration metricSynonymsConfiguration, ILogService logger) {
+        public CommandHandlingService(IServiceProvider provider, DiscordSocketClient discord, CommandService commands, BotConfiguration configuration, MetricSynonymsConfiguration metricSynonymsConfiguration, ILogService logger) {
             _discord = discord;
             _commands = commands;
             _provider = provider;
@@ -40,7 +41,7 @@ namespace DiscordBotFanatic.Services
 
         private Task HandleJoinAsync(SocketGuildUser arg) {
             //throw new NotImplementedException();
-            return Task.Delay(-1);
+            return Task.CompletedTask;
         }
 
         public async Task InitializeAsync(IServiceProvider provider) {
@@ -50,15 +51,14 @@ namespace DiscordBotFanatic.Services
             _commands.AddTypeReader<UserListWithImageArguments>(new UserListWithImageArgumentsTypeReader());
             _commands.AddTypeReader<MetricArguments>(new MetricOsrsTypeReader(_metricSynonymsConfiguration));
             _commands.AddTypeReader<BaseArguments>(new BaseArgumentsTypeReader());
-            
+
             var t = _commands.AddModulesAsync(Assembly.GetEntryAssembly(), _provider);
             await _commands.AddModuleAsync<PlayerStatsModule>(provider);
             await _commands.AddModuleAsync<GroupStatsModule>(provider);
             await t;
         }
 
-        public async Task OnCommandExecutedAsync(Optional<CommandInfo> command, ICommandContext context,
-            IResult result) {
+        public async Task OnCommandExecutedAsync(Optional<CommandInfo> command, ICommandContext context, IResult result) {
             // We have access to the info   rmation of the command executed,
             // the context of the command, and the result returned from the
             // execution in this event.
@@ -70,9 +70,7 @@ namespace DiscordBotFanatic.Services
 
             // ...or even log the result (the method used should fit into
             // your existing log handler)
-            var commandName = command.IsSpecified ? command.Value.Name : "A command";
-            await _logger.LogDebug(new LogMessage(LogSeverity.Info, "CommandExecution",
-                $"{commandName} was executed at {DateTime.Now}."));
+            await _logger.LogWithCommandInfoLine($"Command executed.", LogEventLevel.Information, null);
         }
 
 
@@ -85,31 +83,32 @@ namespace DiscordBotFanatic.Services
             int argPos = 0;
 
             // Determine if the message is a command based on the prefix and make sure no bots trigger commands
-            if (message.Content.Trim() == _configuration.CustomPrefix.Trim() ||
-                message.Content.Trim() == _discord.CurrentUser.Mention) {
+            if (message.Content.Trim() == _configuration.CustomPrefix.Trim() || message.Content.Trim() == _discord.CurrentUser.Mention) {
                 var commands = _commands.Search("help").Commands;
-                await commands.FirstOrDefault().ExecuteAsync(new SocketCommandContext(_discord, message), new List<object>(){null}, new List<object>(){null}, _provider);
-                
+                await commands.FirstOrDefault().ExecuteAsync(new SocketCommandContext(_discord, message), new List<object>() {null}, new List<object>() {null}, _provider);
+
                 return;
             }
 
-            if (!(message.HasStringPrefix(_configuration.CustomPrefix + " ", ref argPos) ||
-                  message.HasMentionPrefix(_discord.CurrentUser, ref argPos)) ||
-                message.Author.IsBot) {
+            if (!(message.HasStringPrefix(_configuration.CustomPrefix + " ", ref argPos) || message.HasMentionPrefix(_discord.CurrentUser, ref argPos)) || message.Author.IsBot) {
                 return;
             }
-            
 
 
             // Create a WebSocket-based command context based on the message
             SocketCommandContext context = new SocketCommandContext(_discord, message);
 
-            // Execute the command with the command context we just
-            // created, along with the service provider for precondition checks.
+            // Setting logging information.
+            using (LogContext.PushProperty("CommandContextDto", new SerilogCommandContextDto(context))) {
+                _logger.LogWithCommandInfoLine($"Command received.", LogEventLevel.Information, null);
 
-            // Keep in mind that result does not indicate a return value
-            // rather an object stating if the command executed successfully.
-            await _commands.ExecuteAsync(context: context, argPos: argPos, services: _provider);
+                // Execute the command with the command context we just
+                // created, along with the service provider for precondition checks.
+
+                // Keep in mind that result does not indicate a return value
+                // rather an object stating if the command executed successfully.
+                await _commands.ExecuteAsync(context: context, argPos: argPos, services: _provider);
+            }
         }
 
         public async Task CreateErrorMessage(ICommandContext context, IResult result) {
@@ -117,7 +116,7 @@ namespace DiscordBotFanatic.Services
 
             EmbedBuilder builder = new EmbedBuilder() {Title = $"Error!"};
 
-            await _logger.LogDebug(new LogMessage(LogSeverity.Error, "", $"{result.Error} - {result.ErrorReason} ({context.Message.Content})"));
+            await _logger.Log(new LogMessage(LogSeverity.Error, "", $"{result.Error} - {result.ErrorReason} ({context.Message.Content})"));
 
             Debug.Assert(result.Error != null, "result.Error != null");
             builder.AddField(result.Error.Value.ToString(), result.ErrorReason);
@@ -131,8 +130,7 @@ namespace DiscordBotFanatic.Services
             var resultMessage = await resultMessageTask;
             if (resultMessage != null) {
                 await resultMessage.ModifyAsync(x => x.Embed = builder.Build());
-            }
-            else {
+            } else {
                 await context.Channel.SendMessageAsync(embed: builder.Build());
             }
         }

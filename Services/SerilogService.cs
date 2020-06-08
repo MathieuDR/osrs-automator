@@ -6,6 +6,7 @@ using Discord.Commands;
 using Discord.WebSocket;
 using DiscordBotFanatic.Services.interfaces;
 using Serilog;
+using Serilog.Events;
 
 namespace DiscordBotFanatic.Services {
     public class SerilogService : ILogService {
@@ -14,7 +15,7 @@ namespace DiscordBotFanatic.Services {
             commands.Log += LogCommand;
         }
 
-        public Task LogDebug(LogMessage message) {
+        public Task Log(LogMessage message) {
             LogFromLogMessage(message);
             return Task.CompletedTask;
         }
@@ -30,29 +31,39 @@ namespace DiscordBotFanatic.Services {
         }
 
         public Task LogStopWatch(string area, Stopwatch stopwatch) {
-            Log.Information($"{area} - {stopwatch.ElapsedMilliseconds}ms");
+            Serilog.Log.Information($"{area} - {stopwatch.ElapsedMilliseconds}ms");
             return Task.CompletedTask;
+        }
+
+        public Task Log(string message, LogEventLevel level, Exception exception, params object[] arguments) {
+            Serilog.Log.Write(level, exception, message, arguments);
+            return Task.CompletedTask;
+        }
+
+        public Task LogWithCommandInfoLine(string message, LogEventLevel level, Exception exception, params object[] arguments) {
+            var formattedMessage = "[{CommandContextDto}] " + message;
+            return Log(formattedMessage, level, exception, arguments);
         }
 
         private void LogFromLogMessage(LogMessage message) {
             switch (message.Severity) {
                 case LogSeverity.Critical:
-                    Log.Fatal(message.Exception, message.Message, message.Source);
+                    Serilog.Log.Fatal(message.Exception, message.Message, message.Source);
                     break;
                 case LogSeverity.Error:
-                    Log.Error(message.Exception, message.Message, message.Source);
+                    Serilog.Log.Error(message.Exception, message.Message, message.Source);
                     break;
                 case LogSeverity.Warning:
-                    Log.Warning(message.Exception, message.Message, message.Source);
+                    Serilog.Log.Warning(message.Exception, message.Message, message.Source);
                     break;
                 case LogSeverity.Info:
-                    Log.Information(message.Exception, message.Message, message.Source);
+                    Serilog.Log.Information(message.Exception, message.Message, message.Source);
                     break;
                 case LogSeverity.Verbose:
-                    Log.Verbose(message.Exception, message.Message, message.Source);
+                    Serilog.Log.Verbose(message.Exception, message.Message, message.Source);
                     break;
                 case LogSeverity.Debug:
-                    Log.Debug(message.Exception, message.Message, message.Source);
+                    Serilog.Log.Debug(message.Exception, message.Message, message.Source);
                     break;
                 default:
                     throw new ArgumentOutOfRangeException();

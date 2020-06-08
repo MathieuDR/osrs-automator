@@ -36,7 +36,7 @@ namespace DiscordBotFanatic.Helpers {
 
             var type = competitionResponse.Metric.ToMetricType();
             foreach (Participant participant in competitionResponse.Participants) {
-                var info = new CompetitionInfo(competitionResponse.Title, competitionResponse.StartsAt, competitionResponse.EndsAt, competitionResponse.Group, participant, type);
+                var info = new CompetitionInfo(competitionResponse.Id, competitionResponse.Title, competitionResponse.StartsAt, competitionResponse.EndsAt, competitionResponse.Group, participant, type);
                 result.Add(info);
             }
 
@@ -99,7 +99,11 @@ namespace DiscordBotFanatic.Helpers {
             throw new ArgumentOutOfRangeException($"{metricType} is not a metric type.");
         }
 
-        public static string FormatNumber(this int number) {
+        public static string FormatNumber(this int number, bool ZeroAsStripe = false) {
+            if (ZeroAsStripe && number == 0) {
+                return "-";
+            }
+
             var nfi = (NumberFormatInfo) CultureInfo.InvariantCulture.NumberFormat.Clone();
             nfi.NumberGroupSeparator = " ";
 
@@ -119,7 +123,7 @@ namespace DiscordBotFanatic.Helpers {
                 return (number / 1000).ToString("0.#", nfi) + "K";
             }
 
-            return number.ToString("#,#", nfi);
+            return number.ToString("0", nfi);
         }
 
         public static string FormatConditionally(this int number) {

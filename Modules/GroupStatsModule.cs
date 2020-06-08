@@ -20,8 +20,10 @@ namespace DiscordBotFanatic.Modules {
     //[Group("Group")]
     public class GroupStatsModule : StatsBaseModule {
         private readonly IGuildService _guildService;
-        private bool _altDisplay;
+        private bool _altDisplay = true;
         private string _groupName = "";
+        private string _competitionName = "";
+        private int _competitionId = -1;
         private IGuildUser _user;
 
 
@@ -33,7 +35,13 @@ namespace DiscordBotFanatic.Modules {
 
 
         public string Area {
-            get { return string.IsNullOrEmpty(_groupName) ? "Group" : _groupName; }
+            get {
+                if (!string.IsNullOrEmpty(_competitionName)) {
+                    return _competitionName;
+                }
+
+                return string.IsNullOrEmpty(_groupName) ? "Group" : _groupName;
+            }
         }
 
         protected override void BeforeExecute(CommandInfo command) {
@@ -46,6 +54,10 @@ namespace DiscordBotFanatic.Modules {
         }
 
         protected override string GetUrl() {
+            if (_competitionId > 0) {
+                return $"https://wiseoldman.net/competitions/{_competitionId}";
+            }
+
             return WiseOldManId > 0 ? $"https://wiseoldman.net/groups/{WiseOldManId}" : base.GetUrl();
         }
 
@@ -87,6 +99,7 @@ namespace DiscordBotFanatic.Modules {
         [Summary("Update all players of a group.")]
         public async Task UpdateGroup([Summary("Optional Id, if not filled in, use the one from settings.")]
             int? id = null) {
+            _guildService.AssertUserInGuild(_user);
             WiseOldManId = id ?? WiseOldManId;
             Response = await Service.UpdateGroupAsync(WiseOldManId);
         }
@@ -95,8 +108,11 @@ namespace DiscordBotFanatic.Modules {
         [Command("top", RunMode = RunMode.Async)]
         [Summary("Get the top players in a metric. This will not update the group.")]
         public async Task GetTopPlayers([Remainder] PeriodAndMetricArguments arguments = null) {
+            _guildService.AssertUserInGuild(_user);
+
             if (arguments == null) {
                 Response = await Service.GetGuildCompetitionLeaderboard(_user.Guild);
+                return;
             }
 
             ExtractPeriodAndMetricArguments(arguments);
@@ -113,7 +129,8 @@ namespace DiscordBotFanatic.Modules {
         [Summary("Get the top players in a metric. This will not update the group.")]
         [Alias("alttop", "alt top")]
         public Task GetTopPlayersAlt([Remainder] PeriodAndMetricArguments arguments = null) {
-            _altDisplay = true;
+            _guildService.AssertUserInGuild(_user);
+            _altDisplay = false;
             return GetTopPlayers(arguments);
         }
 
@@ -156,25 +173,7 @@ namespace DiscordBotFanatic.Modules {
 
             Response = await _guildService.DeleteGuildCompetition(id, endDateTime);
         }
-
-        //[Name("Competition leaderboards")]
-        //[Command("comp", RunMode = RunMode.Async)]
-        //[Summary("Get the top players of the current competition")]
-        //[Alias( "comp")]
-        //public async Task GetTopPlayersForCompetition(BaseArguments arguments = null) {
-        //    ExtractBaseArguments(arguments);
-        //    Response = await Service.GetGuildCompetitionLeaderboard(_user.Guild);
-        //}
-
-        //[Name("Competition leaderboards - Mobile")]
-        //[Command("alt-top comp", RunMode = RunMode.Async)]
-        //[Summary("Get the top players of the current competition")]
-        //[Alias("alt comp", "alttop comp", "alt top comp")]
-        //public Task GetTopPlayersForCompetitionAlt(BaseArguments arguments = null) {
-        //    _altDisplay = true;
-        //    return GetTopPlayersForCompetition(arguments);
-        //}
-
+        
         // Time left command
         // Leaderboards for competition (Like leaderboards for deltas)
 
@@ -207,6 +206,10 @@ namespace DiscordBotFanatic.Modules {
             int earchedItemRank = 0;
             CompetitionInfo searchedItem = null;
             var compInfoObject = competitionInfos.FirstOrDefault();
+
+            _competitionName = compInfoObject.Name;
+            _competitionId = compInfoObject.Id;
+
             if (!string.IsNullOrEmpty(Name)) {
                 searchedItem = competitionInfos.SingleOrDefault(x => x.Info.Username.ToLowerInvariant() == Name.ToLowerInvariant());
                 if (searchedItem == null) {
@@ -219,7 +222,7 @@ namespace DiscordBotFanatic.Modules {
                 competitionInfos = competitionInfos.GetRange(startIndex, endIndex);
             }
 
-            var embed = GetCommonEmbedBuilder(Area, $"Leaderboards for {compInfoObject.Name}");
+            var embed = GetCommonEmbedBuilder(Area, $"Leaderboards");
 
             StringBuilder numberInline = new StringBuilder();
             StringBuilder nameInline = new StringBuilder();
@@ -266,10 +269,19 @@ namespace DiscordBotFanatic.Modules {
 
             embed.AddField("Total ranks", (lastRank).ToString(), true);
             embed.AddField("Metric", compInfoObject.Type, true);
-            embed.AddField("Time left", "to calculate", true);
+
+            if (compInfoObject.StartTime.UtcDateTime > DateTime.UtcNow) {
+                embed.AddField("Starts at", compInfoObject.StartTime.LocalDateTime.ToString("hh:mm dd/MM"), true);
+            }else if (compInfoObject.EndTime.UtcDateTime > DateTime.UtcNow) {
+                TimeSpan tte = (compInfoObject.EndTime - DateTime.UtcNow);
+                embed.AddField("Time left", $"{Math.Floor(tte.TotalHours)}h {tte.Minutes}m {tte.Seconds}s", true);
+            } else {
+                embed.AddField("Ended at", compInfoObject.EndTime.LocalDateTime.ToString("hh:mm dd/MM"), true);
+            }
+            
 
             if (!_altDisplay) {
-                embed.AddField("Unreadable?", "For mobile users please use the command `group alt-top`");
+                embed.AddField("Unreadable?", "For mobile users please use the command `alt-top`");
             }
 
 

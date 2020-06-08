@@ -195,7 +195,7 @@ namespace DiscordBotFanatic.Repository {
             lock (_dbLock) {
                 using (LiteDatabase = new LiteDatabase(FileName)) {
                     var collection = LiteDatabase.GetCollection<GuildCompetition>(GuildCompetitionCollectionName);
-                    return collection.Query().Where(x => x._id == id).SingleOrDefault();
+                    return collection.Query().Where(x => x._id == id && x.EndTime >= DateTime.UtcNow).SingleOrDefault();
                 }
             }
         }
@@ -204,7 +204,7 @@ namespace DiscordBotFanatic.Repository {
             lock (_dbLock) {
                 using (LiteDatabase = new LiteDatabase(FileName)) {
                     var collection = LiteDatabase.GetCollection<GuildCompetition>(GuildCompetitionCollectionName);
-                    return collection.Query().Where(x => x.Id == id).SingleOrDefault();
+                    return collection.Query().Where(x => x.Id == id && x.EndTime >= DateTime.UtcNow).SingleOrDefault();
                 }
             }
         }
@@ -213,21 +213,18 @@ namespace DiscordBotFanatic.Repository {
             lock (_dbLock) {
                 using (LiteDatabase = new LiteDatabase(FileName)) {
                     var collection = LiteDatabase.GetCollection<GuildCompetition>(GuildCompetitionCollectionName);
-                    return collection.Query().Where(x => x.GuildId == guildId).ToList();
+                    return collection.Query().Where(x => x.GuildId == guildId ).ToList();
                 }
             }
         }
 
         public List<GuildCompetition> GetAllActiveGuildCompetitions(ulong guildId) {
-            var allEvents = GetAllGuildCompetitions(guildId).ToList();
-            var result = new List<GuildCompetition>();
-            foreach (GuildCompetition competition in allEvents) {
-                if (competition.IsActive) {
-                    result.Add(competition);
+            lock (_dbLock) {
+                using (LiteDatabase = new LiteDatabase(FileName)) {
+                    var collection = LiteDatabase.GetCollection<GuildCompetition>(GuildCompetitionCollectionName);
+                    return collection.Query().Where(x => x.GuildId == guildId && x.EndTime >= DateTime.UtcNow).ToList();
                 }
             }
-
-            return result;
         }
 
         public GuildCompetition UpdateGuildCompetition(GuildCompetition guildCompetition) {

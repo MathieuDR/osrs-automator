@@ -31,6 +31,7 @@ namespace DiscordBotFanatic.Models.Data {
 
         public GuildCompetition(IGuildUser user, int id) : base(user) {
             Id = id;
+            EndTime = DateTime.MaxValue;
         }
     }
 }

@@ -12,6 +12,7 @@ using DiscordBotFanatic.Services.interfaces;
 using Newtonsoft.Json;
 using RestSharp;
 using RestSharp.Serializers.NewtonsoftJson;
+using Serilog.Events;
 
 namespace DiscordBotFanatic.Repository {
     public class WiseOldManHighscoreRepository : IHighscoreApiRepository {
@@ -31,15 +32,18 @@ namespace DiscordBotFanatic.Repository {
         }
 
         private void LogRequest(RestRequest request, string source = nameof(WiseOldManHighscoreRepository)) {
-            string message = $"Request url: {request.Resource}";
+            ;
+            _logger.Log("Request sent to Wise old man API. [{Resource}, {Parameters:j}]", LogEventLevel.Information, null, request.Resource, request.Parameters);
 
-            if (request.Parameters != null) {
-                foreach (Parameter parameter in request.Parameters) {
-                    message += $"{Environment.NewLine} Request Parameter ({parameter.Name}, {parameter.Value})";
-                }
-            }
+            //string message = $"Request url: {request.Resource}";
 
-            _logger.LogDebug(new LogMessage(LogSeverity.Info, source, message));
+            //if (request.Parameters != null) {
+            //    foreach (Parameter parameter in request.Parameters) {
+            //        message += $"{Environment.NewLine} Request Parameter ({parameter.Name}, {parameter.Value})";
+            //    }
+            //}
+
+            //_logger.LogDebug(new LogMessage(LogSeverity.Info, source, message));
         }
 
         // might be broken if username results into more then one players.
@@ -144,10 +148,11 @@ namespace DiscordBotFanatic.Repository {
         }
 
         public async Task<LeaderboardResponse> GetGroupLeaderboards(MetricType metric, Period period, int groupId) {
-            var request = new RestRequest($"{GroupBase}/{{id}}/leaderboard");
+            var request = new RestRequest($"{GroupBase}/{{id}}/deltas");
             request.AddParameter("id", groupId, ParameterType.UrlSegment);
             request.AddParameter("period", period.GetEnumValueNameOrDefault().ToLower());
             request.AddParameter("metric", metric.GetEnumValueNameOrDefault().ToLower());
+            request.AddParameter("limit", 500);
 
             LogRequest(request, MethodBase.GetCurrentMethod()?.Name);
             var result = await _client.GetAsync<LeaderboardResponse>(request);
@@ -174,6 +179,7 @@ namespace DiscordBotFanatic.Repository {
                 var request = new RestRequest($"{CompetitionBase}/{{id}}");
                 //request.AddJsonBody(JsonConvert.SerializeObject(createCompetitionRequest));
                 request.AddParameter("id", id, ParameterType.UrlSegment);
+                request.AddParameter("limit", 500);
 
                 LogRequest(request);
                 IRestResponse response = _client.Get(request);

@@ -6,18 +6,20 @@ using DiscordBotFanatic.Models.WiseOldMan.Responses.Models;
 namespace DiscordBotFanatic.Models.WiseOldMan.Cleaned {
     public class CompetitionInfo : BaseInfo<Participant> {
         public string Name { get; set; }
-        public DateTime StartTime { get; set; }
-        public DateTime EndTime { get; set; }
+        public DateTimeOffset StartTime { get; set; }
+        public DateTimeOffset EndTime { get; set; }
         public Group Group { get; set; }
+        public int Id { get; set; }
 
-        public CompetitionInfo(string competitionName, DateTime competitionStartTime, DateTime competitionEndTime, Group competitionGroup, Participant info, MetricType type) : base(info, type) {
+        public CompetitionInfo(int id, string competitionName, DateTime competitionStartTime, DateTime competitionEndTime, Group competitionGroup, Participant info, MetricType type) : base(info, type) {
             Name = competitionName;
             StartTime = competitionStartTime;
             EndTime = competitionEndTime;
             Group = competitionGroup;
+            Id = id;
         }
 
-        public CompetitionInfo(string competitionName, DateTime competitionStartTime, DateTime competitionEndTime, Group competitionGroup, Participant info, string type)  : this(competitionName, competitionStartTime, competitionEndTime, competitionGroup, info, type.ToMetricType()){ }
+        public CompetitionInfo(int id, string competitionName, DateTime competitionStartTime, DateTime competitionEndTime, Group competitionGroup, Participant info, string type)  : this(id, competitionName, competitionStartTime, competitionEndTime, competitionGroup, info, type.ToMetricType()){ }
 
         public bool HasGained {
             get {

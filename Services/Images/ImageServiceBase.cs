@@ -31,14 +31,16 @@ namespace DiscordBotFanatic.Services.Images {
         protected readonly Color ShadowColor;
         protected readonly TextGraphicsOptions CenterFontOptions;
         protected readonly TextGraphicsOptions LeftAlignFontOptions;
+        protected const string ResourcePath = "Images";
         
 
 
         public ImageServiceBase(ILogService logService) {
             LogService = logService;
             BasePath = Directory.GetCurrentDirectory();
-            IconPath = $"{BasePath}\\Images\\icons";
-            BgPath = $"{BasePath}\\Images\\backgrounds";
+            
+            IconPath = Path.Join(BasePath, ResourcePath, "icons");
+            BgPath = Path.Join(BasePath, ResourcePath, "backgrounds");
             ShadowOffset = new Point(2,3);
 
             // Fonts
@@ -167,7 +169,8 @@ namespace DiscordBotFanatic.Services.Images {
         #region helpers
 
         private void InstalledFontCollection(FontCollection collection, string file) {
-            collection.Install($"{BasePath}\\Images\\fonts\\{file}");
+            var path = Path.Join(BasePath, ResourcePath, "fonts", file);
+            collection.Install(path);
         }
 
         protected Font GetRunescapeChatFont(float size, FontStyle style) {
@@ -203,11 +206,11 @@ namespace DiscordBotFanatic.Services.Images {
 
         protected string GetIconPathForMetricType(MetricType skill) {
             var fileName = Regex.Replace(skill.ToString(), @"(?<!_|^)([A-Z])", "_$1").ToLowerInvariant();
-            return $"{IconPath}\\{fileName}.png";
+            return Path.Join(IconPath, $"{fileName}.png");
         }
 
         protected string GetBackgroundPathForMetricType(MetricType skill) {
-            return $"{BgPath}\\{skill.ToString().ToLowerInvariant()}.png";
+            return Path.Join(BgPath, $"{skill.ToString().ToLowerInvariant()}.png");
         }
 
         #endregion

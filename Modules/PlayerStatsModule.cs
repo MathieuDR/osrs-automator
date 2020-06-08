@@ -198,7 +198,7 @@ namespace DiscordBotFanatic.Modules {
         [Alias("default")]
         [Summary("Set your standard player to use within the `player` module.")]
         public async Task SetDefaultPlayer([Summary(UsernameSummary)] string username) {
-            Service.SetDefaultPlayer(Context.User.Id, username);
+            await Service.SetDefaultPlayer(Context.User.Id, username);
             await WaitMessage.ModifyAsync(x => { x.Embed = GetCommonEmbedBuilder($"Done!", $"{username} is sucesfully set as your standard").Build(); });
         }
 

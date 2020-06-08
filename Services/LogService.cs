@@ -6,6 +6,7 @@ using Discord.Commands;
 using Discord.WebSocket;
 using DiscordBotFanatic.Services.interfaces;
 using Microsoft.Extensions.Logging;
+using Serilog.Events;
 
 namespace DiscordBotFanatic.Services {
     public class LogService :ILogService {
@@ -23,7 +24,7 @@ namespace DiscordBotFanatic.Services {
             commands.Log += LogCommand;
         }
         
-        public Task LogDebug(LogMessage message) {
+        public Task Log(LogMessage message) {
             _debugLogger.Log(
                 LogLevelFromSeverity(message.Severity), 
                 0, 
@@ -57,7 +58,15 @@ namespace DiscordBotFanatic.Services {
 
         public Task LogStopWatch(string area, Stopwatch stopwatch) {
             LogMessage lgMessage = new LogMessage(LogSeverity.Info, area, $"Timer: {stopwatch.ElapsedMilliseconds}ms");
-            return LogDebug(lgMessage);
+            return Log(lgMessage);
+        }
+
+        public Task Log(string message, LogEventLevel level, Exception exception, params object[] arguments) {
+            throw new NotImplementedException();
+        }
+
+        public Task LogWithCommandInfoLine(string message, LogEventLevel level, Exception exception, params object[] arguments) {
+            throw new NotImplementedException();
         }
 
         private static LogLevel LogLevelFromSeverity(LogSeverity severity)

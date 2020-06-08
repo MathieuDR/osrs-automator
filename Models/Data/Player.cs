@@ -1,5 +1,14 @@
-﻿namespace DiscordBotFanatic.Models.Data {
+﻿using Discord;
+
+namespace DiscordBotFanatic.Models.Data {
     public class Player : BaseModel {
+        public Player() { }
+        public Player(IUser user) : base(user) { }
+
+        public Player(ulong userId) : base(userId) {
+            DiscordId = userId;
+        }
+
         public ulong DiscordId { get; set; }
         public int WiseOldManDefaultPlayerId { get; set; }
         public string DefaultPlayerUsername { get; set; }

@@ -20,5 +20,6 @@ namespace DiscordBotFanatic.Services.interfaces {
         Task<CreateGroupCompetitionResult> CreateGroupCompetition(string title, MetricType metric, DateTime startDate, DateTime endDate);
         Task<bool> CreateGuildCompetition(IGuildUser user, int id);
         Task<bool> DeleteGuildCompetition(int id, DateTime endDate);
+        void AssertUserInGuild(IGuildUser user);
     }
 }

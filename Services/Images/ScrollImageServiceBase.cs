@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
+using System.IO;
 using System.Linq;
 using DiscordBotFanatic.Helpers;
 using DiscordBotFanatic.Models.WiseOldMan.Cleaned;
@@ -28,7 +29,7 @@ namespace DiscordBotFanatic.Services.Images {
 
         protected ScrollImageServiceBase(ILogService logService) : base(logService) {
             _maxScrolls = 1;
-            _scrollBase = $"{BgPath}\\scroll\\";
+            _scrollBase = Path.Join(BgPath, "scroll");
             HeaderTextOffset = new Size(0,130);
             ScrollGutter = new Size(300, 50);
             ScrollMargin = new Size(150, 0);
@@ -92,11 +93,11 @@ namespace DiscordBotFanatic.Services.Images {
             
 
             // Load start and end of the scroll
-            using Image topImage = Image.Load($"{_scrollBase}scroll_start.png");
-            using Image bottomImage = Image.Load($"{_scrollBase}scroll_end.png");
+            using Image topImage = Image.Load(Path.Join(_scrollBase, "scroll_start.png"));
+            using Image bottomImage = Image.Load(Path.Join(_scrollBase, "scroll_end.png"));
             Image[] randomBg = new Image[1];
             for (int i = 0; i < randomBg.Length; i++) {
-                randomBg[i] = Image.Load($"{_scrollBase}scroll_repeat_{i}.png");
+                randomBg[i] = Image.Load(Path.Join(_scrollBase, $"scroll_repeat_{i}.png"));
             }
 
             // Create image

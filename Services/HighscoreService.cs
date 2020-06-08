@@ -42,7 +42,7 @@ namespace DiscordBotFanatic.Services {
             return infos;
         }
 
-        public async void SetDefaultPlayer(ulong userId, string username) {
+        public async Task SetDefaultPlayer(ulong userId, string username) {
             Player fromDb = _repository.GetPlayerByDiscordId(userId);
             if (fromDb != null && fromDb.DefaultPlayerUsername.ToLowerInvariant() == username.ToLowerInvariant()) {
                 // Already set
@@ -58,15 +58,15 @@ namespace DiscordBotFanatic.Services {
                 case 0:
                     // Track player if we cant find him
                     player = await _highscoreApiRepository.TrackPlayerAsync(username);
-                    dbPlayer = new Player() {
-                        DiscordId = userId, DefaultPlayerUsername = player.Username,
+                    dbPlayer = new Player(userId) {
+                        DefaultPlayerUsername = player.Username,
                         WiseOldManDefaultPlayerId = player.Id
                     };
                     break;
                 case 1: {
                     var result = players.First();
-                    dbPlayer = new Player() {
-                        DiscordId = userId, DefaultPlayerUsername = result.Username,
+                    dbPlayer = new Player(userId) {
+                        DefaultPlayerUsername = result.Username,
                         WiseOldManDefaultPlayerId = result.Id
                     };
                     break;
@@ -77,6 +77,7 @@ namespace DiscordBotFanatic.Services {
 
 
             _repository.InsertOrUpdatePlayer(dbPlayer);
+            await Task.Delay(-1);
         }
 
         public Task<IEnumerable<SearchResponse>> SearchPlayerAsync(string username) {
