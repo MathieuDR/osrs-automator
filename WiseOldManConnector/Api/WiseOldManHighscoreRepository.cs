@@ -46,8 +46,8 @@ namespace WiseOldManConnector.Api {
         }
 
         public async Task<PlayerResponse> GetPlayerAsync(string username) {
-            var request = new RestRequest($"{PlayersBase}", DataFormat.Json);
-            request.AddParameter("username", username);
+            var request = new RestRequest($"{PlayersBase}/username/{{username}}", DataFormat.Json);
+            request.AddParameter("username", username, ParameterType.UrlSegment);
 
             LogRequest(request, MethodBase.GetCurrentMethod()?.Name);
             var result = await _client.GetAsync<PlayerResponse>(request);
@@ -68,8 +68,8 @@ namespace WiseOldManConnector.Api {
         }
 
         public async Task<DeltaResponse> DeltaPlayerAsync(int id, Period period = Period.Week, MetricType? metric = null) {
-            var request = new RestRequest($"{DeltaBase}", DataFormat.Json);
-            request.AddParameter("playerId", id);
+            var request = new RestRequest($"{PlayersBase}/{{id}}/gained", DataFormat.Json);
+            request.AddParameter("id", id, ParameterType.UrlSegment);
             request.AddParameter("period", period.GetEnumValueNameOrDefault().ToLower());
             if (metric.HasValue) {
                 request.AddParameter("metric", metric.GetEnumValueNameOrDefault()?.ToLower());
@@ -83,8 +83,8 @@ namespace WiseOldManConnector.Api {
         }
 
         public async Task<PlayerResponse> GetPlayerAsync(int id) {
-            var request = new RestRequest($"{PlayersBase}", DataFormat.Json);
-            request.AddParameter("id", id);
+            var request = new RestRequest($"{PlayersBase}/{{id}}", DataFormat.Json);
+            request.AddParameter("id", id, ParameterType.UrlSegment);
 
             LogRequest(request, MethodBase.GetCurrentMethod()?.Name);
             var result = await _client.GetAsync<PlayerResponse>(request);
@@ -94,9 +94,9 @@ namespace WiseOldManConnector.Api {
         }
 
         public async Task<RecordResponse> GetPlayerRecordAsync(int id, MetricType? metric, Period? period) {
-            var request = new RestRequest($"{RecordsBase}", DataFormat.Json);
+            var request = new RestRequest($"{PlayersBase}/{{id}}/records", DataFormat.Json);
 
-            request.AddParameter("playerId", id);
+            request.AddParameter("id", id, ParameterType.UrlSegment);
             request.Method = Method.GET;
 
             if (metric.HasValue) {
@@ -136,7 +136,7 @@ namespace WiseOldManConnector.Api {
         }
 
         public async Task<LeaderboardResponse> GetGroupLeaderboards(MetricType metric, Period period, int groupId) {
-            var request = new RestRequest($"{GroupBase}/{{id}}/deltas");
+            var request = new RestRequest($"{GroupBase}/{{id}}/gained");
             request.AddParameter("id", groupId, ParameterType.UrlSegment);
             request.AddParameter("period", period.GetEnumValueNameOrDefault().ToLower());
             request.AddParameter("metric", metric.GetEnumValueNameOrDefault().ToLower());
