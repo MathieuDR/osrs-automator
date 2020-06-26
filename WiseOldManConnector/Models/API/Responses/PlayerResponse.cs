@@ -5,7 +5,7 @@ using WiseOldManConnector.Models.API.Responses.Models;
 using WiseOldManConnector.Models.WiseOldMan.Enums;
 
 namespace WiseOldManConnector.Models.API.Responses {
-    public class PlayerResponse : BaseResponse {
+    internal class PlayerResponse : BaseResponse {
         public int Id { get; set; }
         public string Username { get; set; }
         public string Type { get; set; }

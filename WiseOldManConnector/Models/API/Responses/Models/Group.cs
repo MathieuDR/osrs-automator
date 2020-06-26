@@ -2,7 +2,7 @@
 using Newtonsoft.Json;
 
 namespace WiseOldManConnector.Models.API.Responses.Models {
-    public class Group {
+    internal class Group {
         [JsonProperty("id")]
         public int Id { get; set; }
 

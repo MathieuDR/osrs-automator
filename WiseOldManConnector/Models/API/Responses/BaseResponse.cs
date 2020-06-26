@@ -1,5 +1,5 @@
 ﻿namespace WiseOldManConnector.Models.API.Responses {
-    public class BaseResponse {
+    internal class BaseResponse {
         public string Message { get; set; }
     }
 }

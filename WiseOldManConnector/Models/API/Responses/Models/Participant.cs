@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using Newtonsoft.Json;
 
 namespace WiseOldManConnector.Models.API.Responses.Models {
-    public class Participant {
+    internal class Participant {
         [JsonProperty("id")]
         public int Id { get; set; }
 

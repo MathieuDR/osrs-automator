@@ -1,5 +1,5 @@
 ﻿namespace WiseOldManConnector.Models {
-    public abstract class ConnectorResponseBase {
+    internal abstract class ConnectorResponseBase {
 
         internal ConnectorResponseBase(string message) {
             WiseOldManMessage = message;

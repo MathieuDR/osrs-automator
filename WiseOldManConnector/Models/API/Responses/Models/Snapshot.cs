@@ -4,7 +4,7 @@ using System.Linq;
 using WiseOldManConnector.Models.WiseOldMan.Enums;
 
 namespace WiseOldManConnector.Models.API.Responses.Models {
-    public class Snapshot {
+    internal class Snapshot {
         private Dictionary<MetricType, Metric> _metricDictionary = null;
 
         private List<MetricInfo> _metricInfoList = null;

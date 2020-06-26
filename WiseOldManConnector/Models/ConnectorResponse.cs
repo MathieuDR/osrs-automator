@@ -1,4 +1,4 @@
-﻿using WiseOldManConnector.Models.WiseOldMan;
+﻿using WiseOldManConnector.Models.Output;
 
 namespace WiseOldManConnector.Models {
     public class ConnectorResponse<T> : ConnectorResponseBase where T : WiseOldManObject {

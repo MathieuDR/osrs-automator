@@ -1,4 +1,4 @@
-﻿namespace WiseOldManConnector.Models.WiseOldMan {
+﻿namespace WiseOldManConnector.Models.Output {
     public abstract class WiseOldManObject {
         
     }

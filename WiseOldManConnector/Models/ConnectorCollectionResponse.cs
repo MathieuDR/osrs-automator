@@ -1,7 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using WiseOldManConnector.Models.WiseOldMan;
-using WiseOldManConnector.Models.WiseOldMan.Enums;
+﻿using System.Collections.Generic;
+using WiseOldManConnector.Models.Output;
 
 namespace WiseOldManConnector.Models {
     public class ConnectorCollectionResponse<T> : ConnectorResponseBase where T : WiseOldManObject {

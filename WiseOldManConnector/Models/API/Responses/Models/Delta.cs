@@ -1,7 +1,7 @@
 ﻿using Newtonsoft.Json;
 
 namespace WiseOldManConnector.Models.API.Responses.Models {
-    public class Delta {
+    internal class Delta {
         public int Start { get; set; }
         public int End { get; set; }
 

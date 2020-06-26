@@ -1,5 +1,5 @@
 ﻿namespace WiseOldManConnector.Models.API.Responses.Models {
-    public class Metric {
+    internal class Metric {
         public int Rank { get; set; }
         public int Experience { get; set; }
 

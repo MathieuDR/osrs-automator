@@ -13,7 +13,7 @@ using WiseOldManConnector.Models.API.Responses;
 using WiseOldManConnector.Models.WiseOldMan.Enums;
 
 namespace WiseOldManConnector.Api {
-    public class WiseOldManHighscoreRepository : IWiseOldManApi {
+    public class WiseOldManHighscoreRepository  {
         private const string BaseUrl = "https://wiseoldman.net/api";
         private const string PlayersBase = "players";
         private const string RecordsBase = "records";

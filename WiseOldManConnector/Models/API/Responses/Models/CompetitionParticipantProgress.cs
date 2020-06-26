@@ -1,7 +1,7 @@
 ﻿using Newtonsoft.Json;
 
 namespace WiseOldManConnector.Models.API.Responses.Models {
-    public class CompetitionParticipantProgress {
+    internal class CompetitionParticipantProgress {
     
 
             [JsonProperty("start")]

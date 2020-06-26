@@ -2,7 +2,7 @@
 using Newtonsoft.Json;
 
 namespace WiseOldManConnector.Models.API.Responses.Models {
-    public class CompetitionParticipantHistory {
+    internal class CompetitionParticipantHistory {
         [JsonProperty("date")]
         public DateTime Date { get; set; }
 

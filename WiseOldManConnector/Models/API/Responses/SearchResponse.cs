@@ -1,7 +1,7 @@
 ﻿using System;
 
 namespace WiseOldManConnector.Models.API.Responses {
-    public class SearchResponse : BaseResponse {
+    internal class SearchResponse : BaseResponse {
             public int Id { get; set; }
             public string Username { get; set; }
             public string Type { get; set; }

@@ -4,7 +4,7 @@ using Newtonsoft.Json;
 using WiseOldManConnector.Models.API.Responses.Models;
 
 namespace WiseOldManConnector.Models.API.Responses {
-    public class CompetitionResponse :BaseResponse {
+    internal class CompetitionResponse :BaseResponse {
        
             [JsonProperty("id")]
             public int Id { get; set; }

@@ -3,7 +3,7 @@ using Newtonsoft.Json;
 using WiseOldManConnector.Models.WiseOldMan.Enums;
 
 namespace WiseOldManConnector.Models.API.Responses.Models {
-    public class LeaderboardMember {
+    internal class LeaderboardMember {
         [JsonProperty("playerId")]
         public int PlayerId { get; set; }
 

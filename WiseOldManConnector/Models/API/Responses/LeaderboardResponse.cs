@@ -1,12 +1,13 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using DiscordBotFanatic.Helpers.JsonConverters;
 using Newtonsoft.Json;
 using WiseOldManConnector.Models.API.Responses.Models;
 using WiseOldManConnector.Models.WiseOldMan.Enums;
 
 namespace WiseOldManConnector.Models.API.Responses {
     [JsonConverter(typeof(LeaderboardConverter))]
-    public class LeaderboardResponse : BaseResponse {
+    internal class LeaderboardResponse : BaseResponse {
         private List<LeaderboardMemberInfo> _memberInfos;
         public List<LeaderboardMember> Members { get; set; }
         public MetricType RequestedType { get; set; }

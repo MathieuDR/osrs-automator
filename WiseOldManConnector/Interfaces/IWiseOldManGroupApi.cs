@@ -2,9 +2,10 @@
 using System.Threading.Tasks;
 using WiseOldManConnector.Models;
 using WiseOldManConnector.Models.API.Responses.Models;
-using WiseOldManConnector.Models.WiseOldMan;
+using WiseOldManConnector.Models.Output;
+using WiseOldManConnector.Models.Requests;
 using WiseOldManConnector.Models.WiseOldMan.Enums;
-using Group = WiseOldManConnector.Models.WiseOldMan.Group;
+using Group = WiseOldManConnector.Models.Output.Group;
 
 namespace WiseOldManConnector.Interfaces {
     public interface IWiseOldManGroupApi {
@@ -18,8 +19,8 @@ namespace WiseOldManConnector.Interfaces {
         Task<ConnectorResponse<Player>> GetMonthTopMember(int groupId);
         Task<ConnectorResponse<Leaderboard>> GetDeltaLeaderboard(int groupId, MetricType metric, Period period);
         Task<ConnectorResponse<Leaderboard>> GetDeltaLeaderboard(int groupId, MetricType metric, Period period, int limit, int offset);
-        Task<ConnectorResponse<Hiscore>> GetHiscores(int groupId, MetricType metric);
-        Task<ConnectorResponse<Hiscore>> GetHiscores(int groupId, MetricType metric, int limit, int offset);
+        Task<ConnectorResponse<Highscore>> GetHiscores(int groupId, MetricType metric);
+        Task<ConnectorResponse<Highscore>> GetHiscores(int groupId, MetricType metric, int limit, int offset);
         Task<ConnectorResponse<Leaderboard>> GetRecordLeaderboard(int groupId, MetricType metric, Period period);
         Task<ConnectorResponse<Leaderboard>> GetRecordLeaderboard(int groupId, MetricType metric, Period period, int limit, int offset);
         Task<ConnectorCollectionResponse<Achievement>> GetRecentAchievements(int groupId);

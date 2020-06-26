@@ -5,7 +5,7 @@ using WiseOldManConnector.Models.API.Responses.Models;
 using WiseOldManConnector.Models.WiseOldMan.Enums;
 
 namespace WiseOldManConnector.Models.API.Responses {
-    public class CreateGroupCompetitionResult:BaseResponse
+    internal class CreateGroupCompetitionResult:BaseResponse
     {
 
         [JsonProperty("id")]

@@ -2,7 +2,7 @@
 using System.Runtime.Serialization;
 
 namespace WiseOldManConnector.Helpers {
-    public static class EnumHelper {
+    internal static class EnumHelper {
         public static string GetEnumValueNameOrDefault<T>(this T enumVal) {
             var enumType = typeof(T);
             var memInfo = enumType.GetMember(enumVal.ToString());

@@ -1,5 +1,5 @@
 ﻿namespace WiseOldManConnector.Models.API.Responses.Models {
-    public class Error {
+    internal class Error {
         public string Message { get; set; }
     }
 }

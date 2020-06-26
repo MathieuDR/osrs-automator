@@ -4,7 +4,7 @@ using Newtonsoft.Json;
 using WiseOldManConnector.Models.WiseOldMan.Enums;
 
 namespace WiseOldManConnector.Models.API.Responses.Models {
-    public class DeltaMetrics {
+    internal class DeltaMetrics {
         private Dictionary<MetricType, DeltaMetric> _allDeltaMetrics = null;
         private Dictionary<MetricType, DeltaMetric> _bossDeltaMetrics = null;
         private Dictionary<MetricType, DeltaMetric> _skillDeltaMetrics = null;

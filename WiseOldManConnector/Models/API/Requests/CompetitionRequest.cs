@@ -3,7 +3,7 @@ using Newtonsoft.Json;
 using WiseOldManConnector.Models.WiseOldMan.Enums;
 
 namespace WiseOldManConnector.Models.API.Requests {
-    public class CompetitionRequest {
+    internal class CompetitionRequest {
         [JsonProperty("title")]
         public string Title { get; set; }
 
