@@ -11,6 +11,7 @@ namespace DiscordBotFanatic.Repository {
         protected const string GuildConfigurationCollectionName = "guildConfig";
         protected const string GuildEventCollectionName = "guildEvents";
         protected const string GuildCompetitionCollectionName= "guildCompetitions";
+        protected const string GuildCompetitionFixesCollectionName = "guildCompetitionFix";
         private readonly object _dbLock = new object();
 
         public LiteDbRepository(string fileName) {

@@ -77,6 +77,8 @@ namespace DiscordBotFanatic.Modules {
                     return FormatEmbeddedFromBool(result);
                 case List<CompetitionInfo> competitionInfos:
                     return FormatEmbeddedFromCompetition(competitionInfos);
+                case string result:
+                    return GetCommonEmbedBuilder(Area, "Response", result).Build();
                 default:
                     throw new Exception($"Response type unknown");
             }
@@ -154,6 +156,26 @@ namespace DiscordBotFanatic.Modules {
             }
 
             Response = await _guildService.CreateGuildCompetition(_user, id);
+
+            // Send toe guild server to set it active
+        }
+
+        [Name("Fix Leaderboard")]
+        [Command("comp fix")]
+        [Summary("Sets an offset for a player")]
+        public async Task FixCompetitionForUser(string username, int offset) {
+            if (!_guildService.DoesUserHavePermission(_user, Permissions.CompetitionManager)) {
+                throw new UnauthorizedAccessException($"You don't have access towards competition management");
+            }
+
+            
+            var guild = _user.Guild;
+            if (guild == null) {
+                throw new NullReferenceException("Guild is null, do it in a server!");
+            }
+
+            await _guildService.FixPlayerForCompetition(guild, username, offset);
+            Response = $"Player {username} has an offset of {offset}.";
 
             // Send toe guild server to set it active
         }

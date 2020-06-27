@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Globalization;
+using System.Linq;
+using DiscordBotFanatic.Models.Data;
 using DiscordBotFanatic.Models.Enums;
 using DiscordBotFanatic.Models.WiseOldMan.Cleaned;
 using DiscordBotFanatic.Models.WiseOldMan.Responses;
@@ -31,15 +33,22 @@ namespace DiscordBotFanatic.Helpers {
             return new LeaderboardMemberInfo(leaderboardMember, requestedType);
         }
 
-        public static List<CompetitionInfo> ToCompetitionInfos(this CompetitionResponse competitionResponse) {
+        public static List<CompetitionInfo> ToCompetitionInfos(this CompetitionResponse competitionResponse, GuildCompetition competition) {
             var result = new List<CompetitionInfo>();
 
             var type = competitionResponse.Metric.ToMetricType();
             foreach (Participant participant in competitionResponse.Participants) {
-                var info = new CompetitionInfo(competitionResponse.Id, competitionResponse.Title, competitionResponse.StartsAt, competitionResponse.EndsAt, competitionResponse.Group, participant, type);
+                int offset = 0;
+                if (competition.Offsets.ContainsKey(participant.Username.ToLowerInvariant())) {
+                    offset = competition.Offsets[participant.Username.ToLowerInvariant()];
+                }
+
+                participant.Progress.Gained += offset;
+                var info = new CompetitionInfo(competitionResponse.Id, competitionResponse.Title, competitionResponse.StartsAt, competitionResponse.EndsAt , competitionResponse.Group, participant, type);
                 result.Add(info);
             }
 
+            result = result.OrderByDescending(x => x.Info.Progress.Gained).ToList();
             return result;
         }
         

@@ -21,5 +21,7 @@ namespace DiscordBotFanatic.Services.interfaces {
         Task<bool> CreateGuildCompetition(IGuildUser user, int id);
         Task<bool> DeleteGuildCompetition(int id, DateTime endDate);
         void AssertUserInGuild(IGuildUser user);
+
+        Task FixPlayerForCompetition(IGuild guild, string username, int offset);
     }
 }

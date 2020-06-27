@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using Discord;
 
 namespace DiscordBotFanatic.Models.Data {
@@ -6,6 +7,8 @@ namespace DiscordBotFanatic.Models.Data {
 
         public int Id { get; set; }
         public DateTime EndTime { get; set; }
+
+        public Dictionary<string, int> Offsets { get; set; } = new Dictionary<string, int>();
 
         public bool IsActive {
             get {

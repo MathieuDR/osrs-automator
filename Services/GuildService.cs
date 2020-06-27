@@ -50,6 +50,19 @@ namespace DiscordBotFanatic.Services {
             }
         }
 
+        public Task FixPlayerForCompetition(IGuild guild, string username, int offset) {
+            var comps = _repository.GetAllActiveGuildCompetitions(guild.Id);
+            if (comps.Count != 1) {
+                throw new Exception($"No Competition running or multiple running.");
+            }
+
+            var competition = comps.FirstOrDefault();
+            competition.Offsets[username.ToLowerInvariant()] = offset;
+            _repository.UpdateGuildCompetition(competition);
+
+            return Task.CompletedTask;
+        }
+
         public bool DoesUserHavePermission(IGuildUser user, Permissions permission) {
             AssertUserInGuild(user);
 

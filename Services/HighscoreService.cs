@@ -38,7 +38,7 @@ namespace DiscordBotFanatic.Services {
                 throw new ArgumentException($"Could not find a running competition for this guild. Did you create/set the competition?");
             }
 
-            var infos = (await _highscoreApiRepository.ViewCompetitionDetails(currentComp.Id)).ToCompetitionInfos();
+            var infos = (await _highscoreApiRepository.ViewCompetitionDetails(currentComp.Id)).ToCompetitionInfos(currentComp);
             return infos;
         }
 
