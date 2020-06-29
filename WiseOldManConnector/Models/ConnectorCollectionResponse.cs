@@ -2,7 +2,7 @@
 using WiseOldManConnector.Models.Output;
 
 namespace WiseOldManConnector.Models {
-    public class ConnectorCollectionResponse<T> : ConnectorResponseBase where T : WiseOldManObject {
+    public class ConnectorCollectionResponse<T> : ConnectorResponseBase {
         internal ConnectorCollectionResponse(T data) : this(new List<T>() {data}, null) { }
         internal ConnectorCollectionResponse(IEnumerable<T> data) : this(data, null) { }
 

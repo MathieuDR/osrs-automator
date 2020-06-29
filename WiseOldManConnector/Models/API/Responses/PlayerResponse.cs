@@ -1,25 +1,34 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
+using Newtonsoft.Json;
 using WiseOldManConnector.Models.API.Responses.Models;
-using WiseOldManConnector.Models.WiseOldMan.Enums;
 
 namespace WiseOldManConnector.Models.API.Responses {
     internal class PlayerResponse : BaseResponse {
+        [JsonProperty("id")]
         public int Id { get; set; }
+
+        [JsonProperty("username")]
         public string Username { get; set; }
+
+        [JsonProperty("displayName")]
+        public string DisplayName { get; set; }
+
+        [JsonProperty("type")]
         public string Type { get; set; }
+
+        [JsonProperty("lastImportedAt")]
         public DateTime LastImportedAt { get; set; }
+
+        [JsonProperty("registeredAt")]
         public DateTime RegisteredAt { get; set; }
+
+        [JsonProperty("updatedAt")]
         public DateTime UpdatedAt { get; set; }
+
+        [JsonProperty("latestSnapshot")]
         public Snapshot LatestSnapshot { get; set; }
 
-        public List<MetricInfo> MetricInfoList {
-            get { return this.LatestSnapshot.MetricInfoList; }
-        }
-
-        public MetricInfo MetricForType(MetricType type) {
-            return MetricInfoList.SingleOrDefault(x => x.Type == type);
-        }
+        [JsonProperty("combatLevel")]
+        public int CombatLevel { get; set; }
     }
 }

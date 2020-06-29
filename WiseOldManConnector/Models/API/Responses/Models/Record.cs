@@ -8,8 +8,5 @@ namespace WiseOldManConnector.Models.API.Responses.Models {
         public MetricType Metric { get; set; }
         public DateTime UpdatedAt { get; set; }
 
-        public override string ToString() {
-            return $"Gained {Value.FormatNumber()} experience in the period of a {Period.ToString().ToLowerInvariant()}.";
-        }
     }
 }

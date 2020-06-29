@@ -15,6 +15,9 @@ namespace WiseOldManConnector.Models.API.Responses {
             [JsonProperty("metric")]
             public string Metric { get; set; }
 
+            [JsonProperty("score")]
+            public int Score { get; set; }
+
             [JsonProperty("startsAt")]
             public DateTime StartsAt { get; set; }
 
@@ -22,7 +25,7 @@ namespace WiseOldManConnector.Models.API.Responses {
             public DateTime EndsAt { get; set; }
 
             [JsonProperty("groupId")]
-            public int GroupId { get; set; }
+            public int? GroupId { get; set; }
 
             [JsonProperty("createdAt")]
             public DateTime CreatedAt { get; set; }
@@ -30,17 +33,21 @@ namespace WiseOldManConnector.Models.API.Responses {
             [JsonProperty("updatedAt")]
             public DateTime UpdatedAt { get; set; }
 
-            [JsonProperty("group")]
-            public Group Group { get; set; }
+            //[JsonProperty("group")]
+            //public Group Group { get; set; }
 
             [JsonProperty("duration")]
             public string Duration { get; set; }
 
-            [JsonProperty("totalGained")]
-            public int TotalGained { get; set; }
+            [JsonProperty("participantCount")]
+            public int ParticipantCount { get; set; }
 
-            [JsonProperty("participants")]
-            public List<Participant> Participants { get; set; }
+
+            //[JsonProperty("totalGained")]
+            //public int TotalGained { get; set; }
+
+            //[JsonProperty("participants")]
+            //public List<Participant> Participants { get; set; }
         
     }
 }

@@ -7,7 +7,6 @@ using WiseOldManConnector.Models.WiseOldMan.Enums;
 namespace WiseOldManConnector.Models.API.Responses {
     internal class CreateGroupCompetitionResult:BaseResponse
     {
-
         [JsonProperty("id")]
         public int Id { get; set; }
 
@@ -16,17 +15,6 @@ namespace WiseOldManConnector.Models.API.Responses {
 
         [JsonProperty("metric")]
         public string Metric { get; set; }
-
-        [JsonIgnore]
-        public MetricType MetricType{
-            get {
-                if (Enum.TryParse(typeof(MetricType), Metric, true, out object value)) {
-                    return (MetricType)value;
-                }
-
-                return (MetricType) 0;
-            }
-        }
 
         [JsonProperty("verificationCode")]
         public string VerificationCode { get; set; }

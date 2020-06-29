@@ -6,7 +6,7 @@ using WiseOldManConnector.Models.API.Responses;
 using WiseOldManConnector.Models.API.Responses.Models;
 
 namespace WiseOldManConnector.Helpers.JsonConverters {
-    internal class GroupMemberConverter : JsonConverter {
+    internal class AchievementsConverter : JsonConverter {
         public override bool CanConvert(Type objectType) {
             return (objectType == typeof(List<Record>));
         }
@@ -16,7 +16,7 @@ namespace WiseOldManConnector.Helpers.JsonConverters {
             JToken token = JToken.Load(reader);
             switch (token.Type) {
                 case JTokenType.Array:
-                    return new GroupMembersListResponse() {Members = token.ToObject<List<GroupMember>>()};
+                    return new AchievementResponse() {Achievements = token.ToObject<List<Achievement>>()};
                 case JTokenType.Object:
                     var defaultCreator = serializer.ContractResolver.ResolveContract(objectType).DefaultCreator;
                     if (defaultCreator != null) {

@@ -5,6 +5,7 @@ using WiseOldManConnector.Models.API.Responses.Models;
 using WiseOldManConnector.Models.Output;
 using WiseOldManConnector.Models.Requests;
 using WiseOldManConnector.Models.WiseOldMan.Enums;
+using Achievement = WiseOldManConnector.Models.Output.Achievement;
 using Group = WiseOldManConnector.Models.Output.Group;
 
 namespace WiseOldManConnector.Interfaces {
@@ -29,7 +30,7 @@ namespace WiseOldManConnector.Interfaces {
         Task<ConnectorResponse<Group>> Create(CreateGroupRequest request);
         Task<ConnectorResponse<Group>> Edit(EditGroupRequest request);
         Task<ConnectorResponse<MessageResponse>> Delete(int groupId, string verificationCode);
-        Task<ConnectorResponse<Group>> AddMembers(string verificationCode, IEnumerable<GroupMember> members);
+        //Task<ConnectorResponse<Group>> AddMembers(string verificationCode, IEnumerable<GroupMember> members);
         Task<ConnectorResponse<Group>> AddMembers(string verificationCode, IEnumerable<string> members);
         Task<ConnectorResponse<Group>> RemoveMembers(string verificationCode, IEnumerable<string> members);
         Task<ConnectorResponse<Player>> ChangeMemberRole(string verificationCode, string username, GroupRole role);

@@ -46,7 +46,7 @@ namespace WiseOldManConnector.Api {
         #region import
 
         public async Task<ConnectorResponse<MessageResponse>> Import(string username) {
-            var request = GetNewRestRequest("track");
+            var request = GetNewRestRequest("import");
             request.AddJsonBody(new {username});
 
             var result = await ExecuteRequest<WOMMessageResponse>(request);
@@ -60,7 +60,7 @@ namespace WiseOldManConnector.Api {
         #region competitions
 
         public async Task<ConnectorCollectionResponse<Competition>> Competitions(int id) {
-            var request = GetNewRestRequest("/{{id}}/competitions");
+            var request = GetNewRestRequest("/{id}/competitions");
             request.AddParameter("id", id, ParameterType.UrlSegment);
 
             var result = await ExecuteCollectionRequest<CompetitionResponse>(request);
@@ -68,7 +68,11 @@ namespace WiseOldManConnector.Api {
         }
 
         public async Task<ConnectorCollectionResponse<Competition>> Competitions(string username) {
-            throw new NotImplementedException();
+            var request = GetNewRestRequest("/username/{username}/competitions");
+            request.AddParameter("username", username, ParameterType.UrlSegment);
+
+            var result = await ExecuteCollectionRequest<CompetitionResponse>(request);
+            return GetResponse<Competition>(result);
         }
 
         #endregion
@@ -76,31 +80,49 @@ namespace WiseOldManConnector.Api {
         #region asserting
 
         public async Task<ConnectorResponse<MessageResponse>> AssertPlayerType(string username) {
-            throw new NotImplementedException();
+            var request = GetNewRestRequest("/assert-type");
+            request.AddJsonBody(new {username});
+
+            var result = await ExecuteRequest<WOMMessageResponse>(request);
+            return GetResponse<MessageResponse>(result);
         }
 
         public async Task<ConnectorResponse<MessageResponse>> AssertDisplayName(string username) {
-            throw new NotImplementedException();
+            var request = GetNewRestRequest("/assert-name");
+            request.AddJsonBody(new {username});
+
+            var result = await ExecuteRequest<WOMMessageResponse>(request);
+            return GetResponse<MessageResponse>(result);
         }
 
         #endregion
 
         #region achievements
 
-        public async Task<ConnectorCollectionResponse<Achievement>> Achievements(int id) {
-            throw new NotImplementedException();
+        public Task<ConnectorCollectionResponse<Achievement>> Achievements(int id) {
+            return Achievements(id, false);
         }
 
         public async Task<ConnectorCollectionResponse<Achievement>> Achievements(int id, bool includeMissing) {
-            throw new NotImplementedException();
+            var request = GetNewRestRequest("/{id}/achievements");
+            request.AddParameter("id", id, ParameterType.UrlSegment);
+            request.AddParameter("includeMissing", includeMissing, ParameterType.UrlSegment);
+
+            var result = await ExecuteCollectionRequest<AchievementResponse>(request);
+            return GetResponse<Achievement>(result);
         }
 
-        public async Task<ConnectorCollectionResponse<Achievement>> Achievements(string username) {
-            throw new NotImplementedException();
+        public Task<ConnectorCollectionResponse<Achievement>> Achievements(string username) {
+            return Achievements(username, false);
         }
 
         public async Task<ConnectorCollectionResponse<Achievement>> Achievements(string username, bool includeMissing) {
-            throw new NotImplementedException();
+            var request = GetNewRestRequest("/username/{username}/achievements");
+            request.AddParameter("username", username, ParameterType.UrlSegment);
+            request.AddParameter("includeMissing", includeMissing, ParameterType.UrlSegment);
+
+            var result = await ExecuteCollectionRequest<AchievementResponse>(request);
+            return GetResponse<Achievement>(result);
         }
 
         #endregion
@@ -184,11 +206,20 @@ namespace WiseOldManConnector.Api {
         #region view
 
         public async Task<ConnectorResponse<Player>> View(string username) {
-            throw new NotImplementedException();
+            var request = GetNewRestRequest("username/{username}");
+            request.AddParameter("username", username, ParameterType.UrlSegment);
+            request.Method = Method.GET;
+
+            var result = await ExecuteRequest<PlayerResponse>(request);
+            return GetResponse<Player>(result);
         }
 
         public async Task<ConnectorResponse<Player>> View(int id) {
-            throw new NotImplementedException();
+            var request = GetNewRestRequest("{id}");
+            request.AddParameter("id", id, ParameterType.UrlSegment);
+
+            var result = await ExecuteRequest<PlayerResponse>(request);
+            return GetResponse<Player>(result);
         }
 
         #endregion

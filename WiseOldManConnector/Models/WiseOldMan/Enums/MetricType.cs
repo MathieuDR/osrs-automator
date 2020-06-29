@@ -51,7 +51,7 @@ namespace WiseOldManConnector.Models.WiseOldMan.Enums {
         [EnumMember(Value = "hunter")]
         Hunter,
 
-        [EnumMember(Value = "league_points")]
+        [EnumMember(Value = "Construction")]
         Construction,
 
         [EnumMember(Value = "league_points")]

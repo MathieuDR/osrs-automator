@@ -1,12 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
-using DiscordBotFanatic.Models.WiseOldMan.Responses;
-using DiscordBotFanatic.Models.WiseOldMan.Responses.Models;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using WiseOldManConnector.Models.API.Responses;
+using WiseOldManConnector.Models.API.Responses.Models;
 
-namespace DiscordBotFanatic.Helpers.JsonConverters {
-    public class RecordsConverter : JsonConverter {
+namespace WiseOldManConnector.Helpers.JsonConverters {
+    internal class RecordsConverter : JsonConverter {
         public override bool CanConvert(Type objectType) {
             return (objectType == typeof(List<Record>));
         }

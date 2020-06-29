@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using Newtonsoft.Json;
 using WiseOldManConnector.Models.API.Responses.Models;
 using WiseOldManConnector.Models.WiseOldMan.Enums;
@@ -21,15 +20,5 @@ namespace WiseOldManConnector.Models.API.Responses {
 
         [JsonProperty("data")]
         public DeltaMetrics Metrics{ get; set; }
-
-        public List<DeltaInfo> DeltaInfoList {
-            get {
-                return Metrics.AllDeltaInfos;
-            }
-        }
-
-        public DeltaInfo DeltaInfoForType(MetricType type) {
-            return Metrics.InfoFromType(type);
-        }
     }
 }

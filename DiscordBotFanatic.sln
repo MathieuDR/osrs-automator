@@ -5,7 +5,9 @@ VisualStudioVersion = 16.0.30011.22
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DiscordBotFanatic", "DiscordBot\DiscordBotFanatic.csproj", "{03AF046B-63E5-413A-8957-7046668CC934}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WiseOldManConnector", "WiseOldManConnector\WiseOldManConnector.csproj", "{45E122BA-FF26-4CA1-A486-0888EBE3E1DF}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WiseOldManConnector", "WiseOldManConnector\WiseOldManConnector.csproj", "{45E122BA-FF26-4CA1-A486-0888EBE3E1DF}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WiseOldManConnectorTests", "WiseOldManConnectorTests\WiseOldManConnectorTests.csproj", "{82AEFA8D-4B01-4335-9C2A-093C38D53060}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -21,6 +23,10 @@ Global
 		{45E122BA-FF26-4CA1-A486-0888EBE3E1DF}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{45E122BA-FF26-4CA1-A486-0888EBE3E1DF}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{45E122BA-FF26-4CA1-A486-0888EBE3E1DF}.Release|Any CPU.Build.0 = Release|Any CPU
+		{82AEFA8D-4B01-4335-9C2A-093C38D53060}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{82AEFA8D-4B01-4335-9C2A-093C38D53060}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{82AEFA8D-4B01-4335-9C2A-093C38D53060}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{82AEFA8D-4B01-4335-9C2A-093C38D53060}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

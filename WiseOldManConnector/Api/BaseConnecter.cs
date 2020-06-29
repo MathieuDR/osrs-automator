@@ -25,7 +25,7 @@ namespace WiseOldManConnector.Api {
             Logger = provider.GetService(typeof(IWiseOldManLogger)) as IWiseOldManLogger;
             Client = new RestClient(BaseUrl);
             Client.UseNewtonsoftJson();
-            Mapper = Configuration.GetMapper();
+            Mapper = Transformers.Configuration.GetMapper();
         }
 
         protected abstract string Area { get; }
@@ -38,7 +38,7 @@ namespace WiseOldManConnector.Api {
             LogRequest(request);
             IRestResponse<T> result = await Client.ExecuteAsync<T>(request);
 
-            ValidateResponse(result as IRestResponse<object>);
+            ValidateResponse(result);
             return result.Data;
         }
 
@@ -70,8 +70,8 @@ namespace WiseOldManConnector.Api {
             return new RestRequest(resource, DataFormat.Json);
         }
 
-        private void ValidateResponse(IRestResponse<object> response) {
-            if (response?.Data == null) {
+        private void ValidateResponse<T>(IRestResponse<T> response) {
+            if (response == null || response.Data == null) {
                 throw new ValidationException($"We did not receive a response. Please try again later or contact the administration.");
             }
 
