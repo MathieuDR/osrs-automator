@@ -35,9 +35,11 @@ namespace WiseOldManConnector.Api {
 
         public async Task<ConnectorResponse<Player>> Track(string username) {
             var request = GetNewRestRequest("track");
+            request.Method = Method.POST;
+            username = username.ToLowerInvariant();
             request.AddJsonBody(new {username});
 
-            var result = await ExecuteRequest<PlayerResponse>(request);
+            PlayerResponse result = await ExecuteRequest<PlayerResponse>(request);
             return GetResponse<Player>(result);
         }
 
@@ -108,8 +110,8 @@ namespace WiseOldManConnector.Api {
             request.AddParameter("id", id, ParameterType.UrlSegment);
             request.AddParameter("includeMissing", includeMissing, ParameterType.UrlSegment);
 
-            var result = await ExecuteCollectionRequest<AchievementResponse>(request);
-            return GetResponse<Achievement>(result);
+            var result = await ExecuteRequest<AchievementResponse>(request);
+            return GetCollectionResponse<Achievement>(result);
         }
 
         public Task<ConnectorCollectionResponse<Achievement>> Achievements(string username) {
@@ -121,28 +123,48 @@ namespace WiseOldManConnector.Api {
             request.AddParameter("username", username, ParameterType.UrlSegment);
             request.AddParameter("includeMissing", includeMissing, ParameterType.UrlSegment);
 
-            var result = await ExecuteCollectionRequest<AchievementResponse>(request);
-            return GetResponse<Achievement>(result);
+            var result = await ExecuteRequest<AchievementResponse>(request);
+            return GetCollectionResponse<Achievement>(result);
         }
 
         #endregion
 
         #region snapshots
 
-        public async Task<ConnectorCollectionResponse<Snapshot>> Snapshots(int id) {
-            throw new NotImplementedException();
+        public async Task<ConnectorResponse<Snapshots>> Snapshots(int id) {
+            var request = GetNewRestRequest("/{id}/snapshots");
+            request.AddParameter("id", id, ParameterType.UrlSegment);
+            
+            var result = await ExecuteRequest<SnapshotsResponse>(request);
+
+
+            return GetResponse<Snapshots>(result);
         }
 
-        public async Task<ConnectorCollectionResponse<Snapshot>> Snapshots(int id, Period period) {
-            throw new NotImplementedException();
+        public async Task<ConnectorResponse<Snapshots>> Snapshots(int id, Period period) {
+            var request = GetNewRestRequest("/{id}/snapshots");
+            request.AddParameter("id", id, ParameterType.UrlSegment);
+            request.AddParameter("period", period, ParameterType.UrlSegment);
+
+            var result = await ExecuteRequest<SnapshotsResponse>(request);
+            return GetResponse<Snapshots>(result);
         }
 
-        public async Task<ConnectorCollectionResponse<Snapshot>> Snapshots(string username) {
-            throw new NotImplementedException();
+        public async Task<ConnectorResponse<Snapshots>> Snapshots(string username) {
+            var request = GetNewRestRequest("/username/{username}/snapshots");
+            request.AddParameter("username", username, ParameterType.UrlSegment);
+
+            var result = await ExecuteRequest<PeriodSpecificSnapshotsResponse>(request);
+            return GetResponse<Snapshots>(result);
         }
 
-        public async Task<ConnectorCollectionResponse<Snapshot>> Snapshots(string username, Period period) {
-            throw new NotImplementedException();
+        public async Task<ConnectorResponse<Snapshots>> Snapshots(string username, Period period) {
+            var request = GetNewRestRequest("/username/{username}/snapshots");
+            request.AddParameter("username", username, ParameterType.UrlSegment);
+            request.AddParameter("period", period, ParameterType.UrlSegment);
+
+            var result = await ExecuteRequest<PeriodSpecificSnapshotsResponse>(request);
+            return GetResponse<Snapshots>(result);
         }
 
         #endregion
@@ -150,19 +172,39 @@ namespace WiseOldManConnector.Api {
         #region gained
 
         public async Task<ConnectorCollectionResponse<Delta>> Gained(int id) {
-            throw new NotImplementedException();
+            var request = GetNewRestRequest("/{id}/gained");
+            request.AddParameter("id", id, ParameterType.UrlSegment);
+            
+            var result = await ExecuteRequest<DeltaFullResponse>(request);
+
+
+            return GetCollectionResponse<Delta>(result);
         }
 
         public async Task<ConnectorResponse<Delta>> Gained(int id, Period period) {
-            throw new NotImplementedException();
+            var request = GetNewRestRequest("/{id}/gained");
+            request.AddParameter("id", id, ParameterType.UrlSegment);
+            request.AddParameter("period", period, ParameterType.UrlSegment);
+
+            var result = await ExecuteRequest<DeltaResponse>(request);
+            return GetResponse<Delta>(result);
         }
 
         public async Task<ConnectorCollectionResponse<Delta>> Gained(string username) {
-            throw new NotImplementedException();
+            var request = GetNewRestRequest("/username/{username}/gained");
+            request.AddParameter("username", username, ParameterType.UrlSegment);
+
+            var result = await ExecuteRequest<DeltaResponse>(request);
+            return GetCollectionResponse<Delta>(result);
         }
 
         public async Task<ConnectorResponse<Delta>> Gained(string username, Period period) {
-            throw new NotImplementedException();
+            var request = GetNewRestRequest("/username/{username}/gained");
+            request.AddParameter("username", username, ParameterType.UrlSegment);
+            request.AddParameter("period", period, ParameterType.UrlSegment);
+
+            var result = await ExecuteRequest<DeltaFullResponse>(request);
+            return GetResponse<Delta>(result);
         }
 
         #endregion

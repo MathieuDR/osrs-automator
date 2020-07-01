@@ -12,6 +12,7 @@ using WiseOldManConnector.Interfaces;
 using WiseOldManConnector.Models;
 using WiseOldManConnector.Models.API.Responses;
 using WiseOldManConnector.Models.Output;
+using WiseOldManConnector.Models.Output.Exceptions;
 using Configuration = WiseOldManConnector.Transformers.Configuration;
 
 namespace WiseOldManConnector.Api {
@@ -42,16 +43,22 @@ namespace WiseOldManConnector.Api {
             return result.Data;
         }
 
-        protected async Task<IEnumerable<T>> ExecuteCollectionRequest<T>(RestRequest request) where T : BaseResponse {
+        protected async Task<IEnumerable<T>> ExecuteCollectionRequest<T>(RestRequest request) where T : BaseResponse
+        {
             LogRequest(request);
             IRestResponse<List<T>> result = await Client.ExecuteAsync<List<T>>(request);
 
-            ValidateResponse(result as IRestResponse<object>);
+            ValidateResponse(result);
             return result.Data;
         }
 
         protected ConnectorCollectionResponse<T> GetResponse<T>(IEnumerable<object> collection) where T : WiseOldManObject  {
             var mappedCollection =  Mapper.Map<IEnumerable<T>>(collection);
+            return new ConnectorCollectionResponse<T>(mappedCollection);
+        }
+
+        protected ConnectorCollectionResponse<T> GetCollectionResponse<T>(object data) where T : WiseOldManObject  {
+            var mappedCollection =  Mapper.Map<IEnumerable<T>>(data);
             return new ConnectorCollectionResponse<T>(mappedCollection);
         }
 
@@ -71,8 +78,8 @@ namespace WiseOldManConnector.Api {
         }
 
         private void ValidateResponse<T>(IRestResponse<T> response) {
-            if (response == null || response.Data == null) {
-                throw new ValidationException($"We did not receive a response. Please try again later or contact the administration.");
+            if (response == null) {
+                throw new BadRequestException($"We did not receive a response. Please try again later or contact the administration.", response);
             }
 
             switch (response.StatusCode) {
@@ -135,7 +142,7 @@ namespace WiseOldManConnector.Api {
                         message += Environment.NewLine + $"Message(s): {responseMessage}";
                     }
 
-                    throw new ValidationException(message);
+                    throw new BadRequestException(message, response);
                 default:
                     throw new ArgumentOutOfRangeException();
             }

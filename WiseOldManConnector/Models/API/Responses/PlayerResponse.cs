@@ -17,7 +17,7 @@ namespace WiseOldManConnector.Models.API.Responses {
         public string Type { get; set; }
 
         [JsonProperty("lastImportedAt")]
-        public DateTime LastImportedAt { get; set; }
+        public DateTime? LastImportedAt { get; set; }
 
         [JsonProperty("registeredAt")]
         public DateTime RegisteredAt { get; set; }

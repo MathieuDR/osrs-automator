@@ -14,6 +14,8 @@ namespace WiseOldManConnector.Transformers {
                 cfg.CreateMap<WiseOldManConnector.Models.API.Responses.Models.Metric, Metric>();
                 cfg.CreateMap<Models.API.Responses.Models.Snapshot, Snapshot>()
                     .ForMember(dest => dest.AllMetrics, opt => opt.MapFrom<MetricToDictionaryResolver>());
+
+                cfg.CreateMap<SearchResponse, Player>();
             });
 
             return new Mapper(config);

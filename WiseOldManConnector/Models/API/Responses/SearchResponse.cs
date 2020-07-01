@@ -2,6 +2,7 @@
 
 namespace WiseOldManConnector.Models.API.Responses {
     internal class SearchResponse : BaseResponse {
+        // TODO ADD JSONPROPERTTIES!
             public int Id { get; set; }
             public string Username { get; set; }
             public string Type { get; set; }
