@@ -6,6 +6,7 @@ using System.Net;
 using System.Threading.Tasks;
 using AutoMapper;
 using Microsoft.Extensions.Logging;
+using Newtonsoft.Json;
 using RestSharp;
 using RestSharp.Serializers.NewtonsoftJson;
 using WiseOldManConnector.Interfaces;
@@ -32,7 +33,8 @@ namespace WiseOldManConnector.Api {
         protected abstract string Area { get; }
 
         private void LogRequest(RestRequest request) {
-            Logger?.Log(LogLevel.Information, null, "Request sent to Wise old man API. [{Resource}, {Parameters:j}]", request.Resource, request.Parameters);
+            Logger?.Log(LogLevel.Information, null, "Request sent to Wise old man API. [{Resource}, {Parameters:j}]",
+                request.Resource, request.Parameters);
         }
 
         protected async Task<T> ExecuteRequest<T>(RestRequest request) where T : BaseResponse {
@@ -43,8 +45,7 @@ namespace WiseOldManConnector.Api {
             return result.Data;
         }
 
-        protected async Task<IEnumerable<T>> ExecuteCollectionRequest<T>(RestRequest request) where T : BaseResponse
-        {
+        protected async Task<IEnumerable<T>> ExecuteCollectionRequest<T>(RestRequest request) where T : BaseResponse {
             LogRequest(request);
             IRestResponse<List<T>> result = await Client.ExecuteAsync<List<T>>(request);
 
@@ -52,21 +53,21 @@ namespace WiseOldManConnector.Api {
             return result.Data;
         }
 
-        protected ConnectorCollectionResponse<T> GetResponse<T>(IEnumerable<object> collection) where T : WiseOldManObject  {
-            var mappedCollection =  Mapper.Map<IEnumerable<T>>(collection);
+        protected ConnectorCollectionResponse<T> GetResponse<TU, T>(IEnumerable<TU> collection) where TU : BaseResponse {
+            var mappedCollection = Mapper.Map<IEnumerable<TU>, IEnumerable<T>>(collection);
             return new ConnectorCollectionResponse<T>(mappedCollection);
         }
 
-        protected ConnectorCollectionResponse<T> GetCollectionResponse<T>(object data) where T : WiseOldManObject  {
-            var mappedCollection =  Mapper.Map<IEnumerable<T>>(data);
+        protected ConnectorCollectionResponse<T> GetCollectionResponse<T>(object data) {
+            var mappedCollection = Mapper.Map<IEnumerable<T>>(data);
             return new ConnectorCollectionResponse<T>(mappedCollection);
         }
 
-        protected ConnectorResponse<T> GetResponse<T>(object data) where T : WiseOldManObject{
-            var mapped =  Mapper.Map<T>(data);
+        protected ConnectorResponse<T> GetResponse<T>(object data) {
+            var mapped = Mapper.Map<T>(data);
             return new ConnectorResponse<T>(mapped);
         }
-        
+
 
         protected RestRequest GetNewRestRequest(string resourcePath) {
             string resource = $"{Area}";
@@ -79,7 +80,8 @@ namespace WiseOldManConnector.Api {
 
         private void ValidateResponse<T>(IRestResponse<T> response) {
             if (response == null) {
-                throw new BadRequestException($"We did not receive a response. Please try again later or contact the administration.", response);
+                throw new BadRequestException(
+                    $"We did not receive a response. Please try again later or contact the administration.", response);
             }
 
             switch (response.StatusCode) {
@@ -127,7 +129,9 @@ namespace WiseOldManConnector.Api {
                 case HttpStatusCode.UpgradeRequired:
                 case HttpStatusCode.UseProxy:
                     string responseMessage = "";
-                    switch (response.Data) {
+                    object data = response.Data ?? (object) JsonConvert.DeserializeObject<BaseResponse>(response.Content);
+
+                    switch (data) {
                         case BaseResponse baseResponse:
                             responseMessage = baseResponse.Message;
                             break;
@@ -136,13 +140,7 @@ namespace WiseOldManConnector.Api {
                             break;
                     }
 
-                    string message = $"code: {response.StatusCode}";
-
-                    if (!string.IsNullOrEmpty(responseMessage)) {
-                        message += Environment.NewLine + $"Message(s): {responseMessage}";
-                    }
-
-                    throw new BadRequestException(message, response);
+                    throw new BadRequestException(responseMessage, response);
                 default:
                     throw new ArgumentOutOfRangeException();
             }

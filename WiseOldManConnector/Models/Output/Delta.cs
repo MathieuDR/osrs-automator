@@ -1,5 +1,5 @@
 ﻿namespace WiseOldManConnector.Models.Output {
-    public class Delta : WiseOldManObject{
+    public class Delta {
         
     }
 }

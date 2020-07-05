@@ -218,5 +218,8 @@ namespace WiseOldManConnector.Models.WiseOldMan.Enums {
 
         [EnumMember(Value = "zulrah")]
         Zulrah,
+
+        [EnumMember(Value = "combat")]
+        Combat,
     }
 }

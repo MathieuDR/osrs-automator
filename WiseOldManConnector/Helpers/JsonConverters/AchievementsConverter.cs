@@ -16,7 +16,7 @@ namespace WiseOldManConnector.Helpers.JsonConverters {
             JToken token = JToken.Load(reader);
             switch (token.Type) {
                 case JTokenType.Array:
-                    return new AchievementResponse() {Achievements = token.ToObject<List<Achievement>>()};
+                    return new AchievementResponse() {Achievements = token.ToObject<List<WOMAchievement>>()};
                 case JTokenType.Object:
                     var defaultCreator = serializer.ContractResolver.ResolveContract(objectType).DefaultCreator;
                     if (defaultCreator != null) {

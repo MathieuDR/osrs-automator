@@ -1,3 +1,18 @@
-﻿namespace WiseOldManConnector.Models.Output {
-    public class Competition : WiseOldManObject { }
+﻿using System;
+using WiseOldManConnector.Models.WiseOldMan.Enums;
+
+namespace WiseOldManConnector.Models.Output {
+    public class Competition {
+        public int Id { get; set; }
+        public string Title { get; set; }
+        public MetricType Metric { get; set; }
+        public int Score { get; set; }
+        public DateTimeOffset StartDate { get; set; }
+        public DateTimeOffset EndDate { get; set; }
+        public int? GroupId { get; set; }
+        public DateTimeOffset CreateDate { get; set; }
+        public DateTimeOffset? UpdatedDate { get; set; }
+        public string Duration { get; set; }
+        public int Participants { get; set; }
+    }
 }

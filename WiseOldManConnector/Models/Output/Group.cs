@@ -1,5 +1,5 @@
 ﻿namespace WiseOldManConnector.Models.Output {
-    public class Group :WiseOldManObject {
+    public class Group {
         
     }
 }

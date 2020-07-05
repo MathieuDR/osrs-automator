@@ -26,8 +26,8 @@ namespace WiseOldManConnector.Interfaces {
 
         #region assert
 
-        Task<ConnectorResponse<MessageResponse>> AssertPlayerType(string username);
-        Task<ConnectorResponse<MessageResponse>> AssertDisplayName(string username);
+        Task<ConnectorResponse<PlayerType>> AssertPlayerType(string username);
+        Task<ConnectorResponse<string>> AssertDisplayName(string username);
 
         #endregion
 

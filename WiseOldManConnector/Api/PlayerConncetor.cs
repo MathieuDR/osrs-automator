@@ -5,6 +5,7 @@ using RestSharp;
 using WiseOldManConnector.Interfaces;
 using WiseOldManConnector.Models;
 using WiseOldManConnector.Models.API.Responses;
+using WiseOldManConnector.Models.API.Responses.Models;
 using WiseOldManConnector.Models.Output;
 using WiseOldManConnector.Models.WiseOldMan.Enums;
 using Delta = WiseOldManConnector.Models.Output.Delta;
@@ -26,7 +27,7 @@ namespace WiseOldManConnector.Api {
             request.AddParameter("username", username);
 
             var result = await ExecuteCollectionRequest<SearchResponse>(request);
-            return GetResponse<Player>(result);
+            return GetResponse<SearchResponse, Player>(result);
         }
 
         #endregion
@@ -46,17 +47,14 @@ namespace WiseOldManConnector.Api {
         #endregion
 
         #region import
-
         public async Task<ConnectorResponse<MessageResponse>> Import(string username) {
             var request = GetNewRestRequest("import");
+            request.Method = Method.POST;
             request.AddJsonBody(new {username});
 
             var result = await ExecuteRequest<WOMMessageResponse>(request);
             return GetResponse<MessageResponse>(result);
         }
-
-        
-
         #endregion
 
         #region competitions
@@ -65,8 +63,8 @@ namespace WiseOldManConnector.Api {
             var request = GetNewRestRequest("/{id}/competitions");
             request.AddParameter("id", id, ParameterType.UrlSegment);
 
-            var result = await ExecuteCollectionRequest<CompetitionResponse>(request);
-            return GetResponse<Competition>(result);
+            IEnumerable<CompetitionResponse> result = await ExecuteCollectionRequest<CompetitionResponse>(request);
+            return GetResponse<CompetitionResponse, Competition>(result);
         }
 
         public async Task<ConnectorCollectionResponse<Competition>> Competitions(string username) {
@@ -74,27 +72,29 @@ namespace WiseOldManConnector.Api {
             request.AddParameter("username", username, ParameterType.UrlSegment);
 
             var result = await ExecuteCollectionRequest<CompetitionResponse>(request);
-            return GetResponse<Competition>(result);
+            return GetResponse<CompetitionResponse, Competition>(result);
         }
 
         #endregion
 
         #region asserting
 
-        public async Task<ConnectorResponse<MessageResponse>> AssertPlayerType(string username) {
+        public async Task<ConnectorResponse<PlayerType>> AssertPlayerType(string username) {
             var request = GetNewRestRequest("/assert-type");
+            request.Method = Method.POST;
             request.AddJsonBody(new {username});
 
-            var result = await ExecuteRequest<WOMMessageResponse>(request);
-            return GetResponse<MessageResponse>(result);
+            var result = await ExecuteRequest<AssertPlayerTypeResponse>(request);
+            return GetResponse<PlayerType>(result);
         }
 
-        public async Task<ConnectorResponse<MessageResponse>> AssertDisplayName(string username) {
+        public async Task<ConnectorResponse<string>> AssertDisplayName(string username) {
             var request = GetNewRestRequest("/assert-name");
+            request.Method = Method.POST;
             request.AddJsonBody(new {username});
 
-            var result = await ExecuteRequest<WOMMessageResponse>(request);
-            return GetResponse<MessageResponse>(result);
+            var result = await ExecuteRequest<AssertDisplayNameResponse>(request);
+            return GetResponse<string>(result);
         }
 
         #endregion
@@ -108,10 +108,10 @@ namespace WiseOldManConnector.Api {
         public async Task<ConnectorCollectionResponse<Achievement>> Achievements(int id, bool includeMissing) {
             var request = GetNewRestRequest("/{id}/achievements");
             request.AddParameter("id", id, ParameterType.UrlSegment);
-            request.AddParameter("includeMissing", includeMissing, ParameterType.UrlSegment);
+            request.AddParameter("includeMissing", includeMissing);
 
-            var result = await ExecuteRequest<AchievementResponse>(request);
-            return GetCollectionResponse<Achievement>(result);
+            var result = await ExecuteCollectionRequest<WOMAchievement>(request);
+            return GetResponse<WOMAchievement, Achievement>(result);
         }
 
         public Task<ConnectorCollectionResponse<Achievement>> Achievements(string username) {
@@ -121,10 +121,10 @@ namespace WiseOldManConnector.Api {
         public async Task<ConnectorCollectionResponse<Achievement>> Achievements(string username, bool includeMissing) {
             var request = GetNewRestRequest("/username/{username}/achievements");
             request.AddParameter("username", username, ParameterType.UrlSegment);
-            request.AddParameter("includeMissing", includeMissing, ParameterType.UrlSegment);
+            request.AddParameter("includeMissing", includeMissing);
 
-            var result = await ExecuteRequest<AchievementResponse>(request);
-            return GetCollectionResponse<Achievement>(result);
+            var result = await ExecuteCollectionRequest<WOMAchievement>(request);
+            return GetResponse<WOMAchievement, Achievement>(result);
         }
 
         #endregion

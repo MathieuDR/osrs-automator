@@ -2,9 +2,9 @@
 using Newtonsoft.Json;
 
 namespace WiseOldManConnector.Models.API.Responses.Models {
-    public class Achievement {
+    internal class WOMAchievement : BaseResponse {
         [JsonProperty("threshold")]
-        public int Threshold { get; set; }
+        public long Threshold { get; set; }
 
         [JsonProperty("playerId")]
         public int PlayerId { get; set; }
@@ -16,6 +16,9 @@ namespace WiseOldManConnector.Models.API.Responses.Models {
         public string Metric { get; set; }
 
         [JsonProperty("createdAt")]
-        public DateTime CreatedAt { get; set; }
+        public DateTime? CreatedAt { get; set; }
+
+        [JsonProperty("missing")]
+        public Boolean Missing { get; set; }
     }
 }
