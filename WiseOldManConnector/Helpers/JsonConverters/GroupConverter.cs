@@ -8,7 +8,7 @@ using WiseOldManConnector.Models.API.Responses.Models;
 namespace WiseOldManConnector.Helpers.JsonConverters {
     internal class GroupMemberConverter : JsonConverter {
         public override bool CanConvert(Type objectType) {
-            return (objectType == typeof(List<Record>));
+            return (objectType == typeof(List<WOMRecord>));
         }
 
         public override object ReadJson(JsonReader reader, Type objectType, object existingValue,

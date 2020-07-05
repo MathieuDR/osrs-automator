@@ -1,4 +1,4 @@
-﻿using System.Runtime.Serialization;
+﻿    using System.Runtime.Serialization;
 
 namespace WiseOldManConnector.Models.WiseOldMan.Enums {
     public enum CompetitionStatus {

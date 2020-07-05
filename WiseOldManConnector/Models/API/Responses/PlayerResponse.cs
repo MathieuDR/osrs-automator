@@ -26,7 +26,7 @@ namespace WiseOldManConnector.Models.API.Responses {
         public DateTime UpdatedAt { get; set; }
 
         [JsonProperty("latestSnapshot")]
-        public Snapshot LatestSnapshot { get; set; }
+        public WOMSnapshot LatestSnapshot { get; set; }
 
         [JsonProperty("combatLevel")]
         public int CombatLevel { get; set; }

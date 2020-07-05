@@ -2,7 +2,7 @@
 using Newtonsoft.Json;
 
 namespace WiseOldManConnector.Models.API.Responses.Models {
-    internal class Snapshot {
+    internal class WOMSnapshot : BaseResponse {
         [JsonProperty("createdAt")]
         public DateTime CreatedAt { get; set; }
 

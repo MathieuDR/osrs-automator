@@ -5,194 +5,194 @@ using WiseOldManConnector.Models.WiseOldMan.Enums;
 
 namespace WiseOldManConnector.Models.API.Responses.Models {
     internal class DeltaMetrics {
-      public DeltaMetric Overall { get; set; }
-        public DeltaMetric Attack { get; set; }
-        public DeltaMetric Defence { get; set; }
-        public DeltaMetric Strength { get; set; }
-        public DeltaMetric Hitpoints { get; set; }
-        public DeltaMetric Ranged { get; set; }
-        public DeltaMetric Prayer { get; set; }
-        public DeltaMetric Magic { get; set; }
-        public DeltaMetric Cooking { get; set; }
-        public DeltaMetric Woodcutting { get; set; }
-        public DeltaMetric Fletching { get; set; }
-        public DeltaMetric Fishing { get; set; }
-        public DeltaMetric Firemaking { get; set; }
-        public DeltaMetric Crafting { get; set; }
-        public DeltaMetric Smithing { get; set; }
-        public DeltaMetric Mining { get; set; }
-        public DeltaMetric Herblore { get; set; }
-        public DeltaMetric Agility { get; set; }
-        public DeltaMetric Thieving { get; set; }
-        public DeltaMetric Slayer { get; set; }
-        public DeltaMetric Farming { get; set; }
-        public DeltaMetric Runecrafting { get; set; }
-        public DeltaMetric Hunter { get; set; }
-        public DeltaMetric Construction { get; set; }
+      public WOMDeltaMetric Overall { get; set; }
+        public WOMDeltaMetric Attack { get; set; }
+        public WOMDeltaMetric Defence { get; set; }
+        public WOMDeltaMetric Strength { get; set; }
+        public WOMDeltaMetric Hitpoints { get; set; }
+        public WOMDeltaMetric Ranged { get; set; }
+        public WOMDeltaMetric Prayer { get; set; }
+        public WOMDeltaMetric Magic { get; set; }
+        public WOMDeltaMetric Cooking { get; set; }
+        public WOMDeltaMetric Woodcutting { get; set; }
+        public WOMDeltaMetric Fletching { get; set; }
+        public WOMDeltaMetric Fishing { get; set; }
+        public WOMDeltaMetric Firemaking { get; set; }
+        public WOMDeltaMetric Crafting { get; set; }
+        public WOMDeltaMetric Smithing { get; set; }
+        public WOMDeltaMetric Mining { get; set; }
+        public WOMDeltaMetric Herblore { get; set; }
+        public WOMDeltaMetric Agility { get; set; }
+        public WOMDeltaMetric Thieving { get; set; }
+        public WOMDeltaMetric Slayer { get; set; }
+        public WOMDeltaMetric Farming { get; set; }
+        public WOMDeltaMetric Runecrafting { get; set; }
+        public WOMDeltaMetric Hunter { get; set; }
+        public WOMDeltaMetric Construction { get; set; }
 
         [JsonProperty("league_points")]
-        public DeltaMetric LeaguePoints { get; set; }
+        public WOMDeltaMetric LeaguePoints { get; set; }
 
         [JsonProperty("bounty_hunter_hunter")]
-        public DeltaMetric BountyHunterHunter { get; set; }
+        public WOMDeltaMetric BountyHunterHunter { get; set; }
 
         [JsonProperty("bounty_hunter_rogue")]
-        public DeltaMetric BountyHunterRogue { get; set; }
+        public WOMDeltaMetric BountyHunterRogue { get; set; }
 
         [JsonProperty("clue_scrolls_all")]
-        public DeltaMetric ClueScrollsAll { get; set; }
+        public WOMDeltaMetric ClueScrollsAll { get; set; }
 
         [JsonProperty("clue_scrolls_beginner")]
-        public DeltaMetric ClueScrollsBeginner { get; set; }
+        public WOMDeltaMetric ClueScrollsBeginner { get; set; }
 
         [JsonProperty("clue_scrolls_easy")]
-        public DeltaMetric ClueScrollsEasy { get; set; }
+        public WOMDeltaMetric ClueScrollsEasy { get; set; }
 
         [JsonProperty("clue_scrolls_medium")]
-        public DeltaMetric ClueScrollsMedium { get; set; }
+        public WOMDeltaMetric ClueScrollsMedium { get; set; }
 
         [JsonProperty("clue_scrolls_hard")]
-        public DeltaMetric ClueScrollsHard { get; set; }
+        public WOMDeltaMetric ClueScrollsHard { get; set; }
 
         [JsonProperty("clue_scrolls_elite")]
-        public DeltaMetric ClueScrollsElite { get; set; }
+        public WOMDeltaMetric ClueScrollsElite { get; set; }
 
         [JsonProperty("clue_scrolls_master")]
-        public DeltaMetric ClueScrollsMaster { get; set; }
+        public WOMDeltaMetric ClueScrollsMaster { get; set; }
 
         [JsonProperty("last_man_standing")]
-        public DeltaMetric LastManStanding { get; set; }
+        public WOMDeltaMetric LastManStanding { get; set; }
 
         [JsonProperty("abyssal_sire")]
-        public DeltaMetric AbyssalSire { get; set; }
+        public WOMDeltaMetric AbyssalSire { get; set; }
 
         [JsonProperty("alchemical_hydra")]
-        public DeltaMetric AlchemicalHydra { get; set; }
+        public WOMDeltaMetric AlchemicalHydra { get; set; }
 
         [JsonProperty("barrows_chests")]
-        public DeltaMetric BarrowsChests { get; set; }
+        public WOMDeltaMetric BarrowsChests { get; set; }
 
         [JsonProperty("bryophyta")]
-        public DeltaMetric Bryophyta { get; set; }
+        public WOMDeltaMetric Bryophyta { get; set; }
 
         [JsonProperty("callisto")]
-        public DeltaMetric Callisto { get; set; }
+        public WOMDeltaMetric Callisto { get; set; }
 
         [JsonProperty("cerberus")]
-        public DeltaMetric Cerberus { get; set; }
+        public WOMDeltaMetric Cerberus { get; set; }
 
         [JsonProperty("chambers_of_xeric")]
-        public DeltaMetric ChambersOfXeric { get; set; }
+        public WOMDeltaMetric ChambersOfXeric { get; set; }
 
         [JsonProperty("chambers_of_xeric_challenge_mode")]
-        public DeltaMetric ChambersOfXericChallengeMode { get; set; }
+        public WOMDeltaMetric ChambersOfXericChallengeMode { get; set; }
 
         [JsonProperty("chaos_elemental")]
-        public DeltaMetric ChaosElemental { get; set; }
+        public WOMDeltaMetric ChaosElemental { get; set; }
 
         [JsonProperty("chaos_fanatic")]
-        public DeltaMetric ChaosFanatic { get; set; }
+        public WOMDeltaMetric ChaosFanatic { get; set; }
 
         [JsonProperty("commander_zilyana")]
-        public DeltaMetric CommanderZilyana { get; set; }
+        public WOMDeltaMetric CommanderZilyana { get; set; }
 
         [JsonProperty("corporeal_beast")]
-        public DeltaMetric CorporealBeast { get; set; }
+        public WOMDeltaMetric CorporealBeast { get; set; }
 
         [JsonProperty("crazy_archaeologist")]
-        public DeltaMetric CrazyArchaeologist { get; set; }
+        public WOMDeltaMetric CrazyArchaeologist { get; set; }
 
         [JsonProperty("dagannoth_prime")]
-        public DeltaMetric DagannothPrime { get; set; }
+        public WOMDeltaMetric DagannothPrime { get; set; }
 
         [JsonProperty("dagannoth_rex")]
-        public DeltaMetric DagannothRex { get; set; }
+        public WOMDeltaMetric DagannothRex { get; set; }
 
         [JsonProperty("dagannoth_supreme")]
-        public DeltaMetric DagannothSupreme { get; set; }
+        public WOMDeltaMetric DagannothSupreme { get; set; }
 
         [JsonProperty("deranged_archaeologist")]
-        public DeltaMetric DerangedArchaeologist { get; set; }
+        public WOMDeltaMetric DerangedArchaeologist { get; set; }
 
         [JsonProperty("general_graardor")]
-        public DeltaMetric GeneralGraardor { get; set; }
+        public WOMDeltaMetric GeneralGraardor { get; set; }
 
         [JsonProperty("giant_mole")]
-        public DeltaMetric GiantMole { get; set; }
+        public WOMDeltaMetric GiantMole { get; set; }
 
         [JsonProperty("grotesque_guardians")]
-        public DeltaMetric GrotesqueGuardians { get; set; }
+        public WOMDeltaMetric GrotesqueGuardians { get; set; }
 
         [JsonProperty("hespori")]
-        public DeltaMetric Hespori { get; set; }
+        public WOMDeltaMetric Hespori { get; set; }
 
         [JsonProperty("kalphite_queen")]
-        public DeltaMetric KalphiteQueen { get; set; }
+        public WOMDeltaMetric KalphiteQueen { get; set; }
 
         [JsonProperty("king_black_dragon")]
-        public DeltaMetric KingBlackDragon { get; set; }
+        public WOMDeltaMetric KingBlackDragon { get; set; }
 
         [JsonProperty("kraken")]
-        public DeltaMetric Kraken { get; set; }
+        public WOMDeltaMetric Kraken { get; set; }
 
         [JsonProperty("kreearra")]
-        public DeltaMetric Kreearra { get; set; }
+        public WOMDeltaMetric Kreearra { get; set; }
 
         [JsonProperty("kril_tsutsaroth")]
-        public DeltaMetric KrilTsutsaroth { get; set; }
+        public WOMDeltaMetric KrilTsutsaroth { get; set; }
 
         [JsonProperty("mimic")]
-        public DeltaMetric Mimic { get; set; }
+        public WOMDeltaMetric Mimic { get; set; }
 
         [JsonProperty("nightmare")]
-        public DeltaMetric Nightmare { get; set; }
+        public WOMDeltaMetric Nightmare { get; set; }
 
         [JsonProperty("obor")]
-        public DeltaMetric Obor { get; set; }
+        public WOMDeltaMetric Obor { get; set; }
 
         [JsonProperty("sarachnis")]
-        public DeltaMetric Sarachnis { get; set; }
+        public WOMDeltaMetric Sarachnis { get; set; }
 
         [JsonProperty("scorpia")]
-        public DeltaMetric Scorpia { get; set; }
+        public WOMDeltaMetric Scorpia { get; set; }
 
         [JsonProperty("skotizo")]
-        public DeltaMetric Skotizo { get; set; }
+        public WOMDeltaMetric Skotizo { get; set; }
 
         [JsonProperty("the_gauntlet")]
-        public DeltaMetric TheGauntlet { get; set; }
+        public WOMDeltaMetric TheGauntlet { get; set; }
 
         [JsonProperty("the_corrupted_gauntlet")]
-        public DeltaMetric TheCorruptedGauntlet { get; set; }
+        public WOMDeltaMetric TheCorruptedGauntlet { get; set; }
 
         [JsonProperty("theatre_of_blood")]
-        public DeltaMetric TheatreOfBlood { get; set; }
+        public WOMDeltaMetric TheatreOfBlood { get; set; }
 
         [JsonProperty("thermonuclear_smoke_devil")]
-        public DeltaMetric ThermonuclearSmokeDevil { get; set; }
+        public WOMDeltaMetric ThermonuclearSmokeDevil { get; set; }
 
         [JsonProperty("tzkal_zuk")]
-        public DeltaMetric TzkalZuk { get; set; }
+        public WOMDeltaMetric TzkalZuk { get; set; }
 
         [JsonProperty("tztok_jad")]
-        public DeltaMetric TztokJad { get; set; }
+        public WOMDeltaMetric TztokJad { get; set; }
 
         [JsonProperty("venenatis")]
-        public DeltaMetric Venenatis { get; set; }
+        public WOMDeltaMetric Venenatis { get; set; }
 
         [JsonProperty("vetion")]
-        public DeltaMetric Vetion { get; set; }
+        public WOMDeltaMetric Vetion { get; set; }
 
         [JsonProperty("vorkath")]
-        public DeltaMetric Vorkath { get; set; }
+        public WOMDeltaMetric Vorkath { get; set; }
 
         [JsonProperty("wintertodt")]
-        public DeltaMetric Wintertodt { get; set; }
+        public WOMDeltaMetric Wintertodt { get; set; }
 
         [JsonProperty("zalcano")]
-        public DeltaMetric Zalcano { get; set; }
+        public WOMDeltaMetric Zalcano { get; set; }
 
         [JsonProperty("zulrah")]
-        public DeltaMetric Zulrah { get; set; }
+        public WOMDeltaMetric Zulrah { get; set; }
     }
 }

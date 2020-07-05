@@ -2,13 +2,13 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using RestSharp;
+using WiseOldManConnector.Helpers;
 using WiseOldManConnector.Interfaces;
 using WiseOldManConnector.Models;
 using WiseOldManConnector.Models.API.Responses;
 using WiseOldManConnector.Models.API.Responses.Models;
 using WiseOldManConnector.Models.Output;
 using WiseOldManConnector.Models.WiseOldMan.Enums;
-using Delta = WiseOldManConnector.Models.Output.Delta;
 using Record = WiseOldManConnector.Models.Output.Record;
 using Snapshot = WiseOldManConnector.Models.Output.Snapshot;
 
@@ -132,7 +132,7 @@ namespace WiseOldManConnector.Api {
         #region snapshots
 
         public async Task<ConnectorResponse<Snapshots>> Snapshots(int id) {
-            var request = GetNewRestRequest("/{id}/snapshots");
+            var request = GetNewRestRequest("/{id}/snapshots"); 
             request.AddParameter("id", id, ParameterType.UrlSegment);
             
             var result = await ExecuteRequest<SnapshotsResponse>(request);
@@ -141,106 +141,136 @@ namespace WiseOldManConnector.Api {
             return GetResponse<Snapshots>(result);
         }
 
-        public async Task<ConnectorResponse<Snapshots>> Snapshots(int id, Period period) {
+        public async Task<ConnectorCollectionResponse<Snapshot>> Snapshots(int id, Period period) {
             var request = GetNewRestRequest("/{id}/snapshots");
             request.AddParameter("id", id, ParameterType.UrlSegment);
-            request.AddParameter("period", period, ParameterType.UrlSegment);
+            request.AddParameter("period", period.GetEnumValueNameOrDefault());
 
-            var result = await ExecuteRequest<SnapshotsResponse>(request);
-            return GetResponse<Snapshots>(result);
+            var result = await ExecuteCollectionRequest<WOMSnapshot>(request);
+            return GetResponse<WOMSnapshot, Snapshot>(result);
         }
 
         public async Task<ConnectorResponse<Snapshots>> Snapshots(string username) {
             var request = GetNewRestRequest("/username/{username}/snapshots");
             request.AddParameter("username", username, ParameterType.UrlSegment);
 
-            var result = await ExecuteRequest<PeriodSpecificSnapshotsResponse>(request);
+            var result = await ExecuteRequest<SnapshotsResponse>(request);
             return GetResponse<Snapshots>(result);
         }
 
-        public async Task<ConnectorResponse<Snapshots>> Snapshots(string username, Period period) {
+        public async Task<ConnectorCollectionResponse<Snapshot>> Snapshots(string username, Period period) {
             var request = GetNewRestRequest("/username/{username}/snapshots");
             request.AddParameter("username", username, ParameterType.UrlSegment);
-            request.AddParameter("period", period, ParameterType.UrlSegment);
+            request.AddParameter("period", period.GetEnumValueNameOrDefault());
 
-            var result = await ExecuteRequest<PeriodSpecificSnapshotsResponse>(request);
-            return GetResponse<Snapshots>(result);
+            var result = await ExecuteCollectionRequest<WOMSnapshot>(request);
+            return GetResponse<WOMSnapshot, Snapshot>(result);
         }
 
         #endregion
 
         #region gained
 
-        public async Task<ConnectorCollectionResponse<Delta>> Gained(int id) {
+        public async Task<ConnectorCollectionResponse<Deltas>> Gained(int id) {
             var request = GetNewRestRequest("/{id}/gained");
             request.AddParameter("id", id, ParameterType.UrlSegment);
             
             var result = await ExecuteRequest<DeltaFullResponse>(request);
-
-
-            return GetCollectionResponse<Delta>(result);
+            return GetCollectionResponse<Deltas>(result);
         }
 
-        public async Task<ConnectorResponse<Delta>> Gained(int id, Period period) {
+        public async Task<ConnectorResponse<Deltas>> Gained(int id, Period period) {
             var request = GetNewRestRequest("/{id}/gained");
             request.AddParameter("id", id, ParameterType.UrlSegment);
-            request.AddParameter("period", period, ParameterType.UrlSegment);
+            request.AddParameter("period", period.GetEnumValueNameOrDefault());
 
             var result = await ExecuteRequest<DeltaResponse>(request);
-            return GetResponse<Delta>(result);
+            return GetResponse<Deltas>(result);
         }
 
-        public async Task<ConnectorCollectionResponse<Delta>> Gained(string username) {
+        public async Task<ConnectorCollectionResponse<Deltas>> Gained(string username) {
             var request = GetNewRestRequest("/username/{username}/gained");
             request.AddParameter("username", username, ParameterType.UrlSegment);
-
-            var result = await ExecuteRequest<DeltaResponse>(request);
-            return GetCollectionResponse<Delta>(result);
-        }
-
-        public async Task<ConnectorResponse<Delta>> Gained(string username, Period period) {
-            var request = GetNewRestRequest("/username/{username}/gained");
-            request.AddParameter("username", username, ParameterType.UrlSegment);
-            request.AddParameter("period", period, ParameterType.UrlSegment);
 
             var result = await ExecuteRequest<DeltaFullResponse>(request);
-            return GetResponse<Delta>(result);
+            return GetCollectionResponse<Deltas>(result);
+        }
+
+        public async Task<ConnectorResponse<Deltas>> Gained(string username, Period period) {
+            var request = GetNewRestRequest("/username/{username}/gained");
+            request.AddParameter("username", username, ParameterType.UrlSegment);
+            request.AddParameter("period", period.GetEnumValueNameOrDefault());
+
+            var result = await ExecuteRequest<DeltaResponse>(request);
+            return GetResponse<Deltas>(result);
         }
 
         #endregion
 
         #region records
 
-        public async Task<ConnectorCollectionResponse<Record>> Records(int id) {
-            throw new NotImplementedException();
+        public Task<ConnectorCollectionResponse<Record>> Records(int id) {
+            return QueryRecords(id);
         }
 
-        public async Task<ConnectorCollectionResponse<Record>> Records(int id, MetricType metric) {
-            throw new NotImplementedException();
+        public Task<ConnectorCollectionResponse<Record>> Records(int id, MetricType metric) {
+            return QueryRecords(id, metric);
         }
 
-        public async Task<ConnectorCollectionResponse<Record>> Records(int id, Period period) {
-            throw new NotImplementedException();
+        public Task<ConnectorCollectionResponse<Record>> Records(int id, Period period) {
+            return QueryRecords(id, null, period);
         }
 
-        public async Task<ConnectorCollectionResponse<Record>> Records(int id, MetricType metric, Period period) {
-            throw new NotImplementedException();
+        public Task<ConnectorCollectionResponse<Record>> Records(int id, MetricType metric, Period period) {
+            return QueryRecords(id, metric, period);
         }
 
-        public async Task<ConnectorCollectionResponse<Record>> Records(string username) {
-            throw new NotImplementedException();
+        public Task<ConnectorCollectionResponse<Record>> Records(string username) {
+            return QueryRecords(username);
         }
 
-        public async Task<ConnectorCollectionResponse<Record>> Records(string username, MetricType metric) {
-            throw new NotImplementedException();
+        public Task<ConnectorCollectionResponse<Record>> Records(string username, MetricType metric) {
+            return QueryRecords(username, metric);
         }
 
-        public async Task<ConnectorCollectionResponse<Record>> Records(string username, Period period) {
-            throw new NotImplementedException();
+        public Task<ConnectorCollectionResponse<Record>> Records(string username, Period period) {
+            return QueryRecords(username, null, period);
         }
 
-        public async Task<ConnectorCollectionResponse<Record>> Records(string username, MetricType metric, Period period) {
-            throw new NotImplementedException();
+        public Task<ConnectorCollectionResponse<Record>> Records(string username, MetricType metric, Period period) {
+            return QueryRecords(username, metric, period);
+        }
+
+        private async Task<ConnectorCollectionResponse<Record>> QueryRecords(string username, MetricType? metric = null, Period? period = null) {
+            var request = GetNewRestRequest("/username/{username}/records");
+            request.AddParameter("username", username, ParameterType.UrlSegment);
+
+            if (metric.HasValue) {
+                request.AddParameter("metric", metric.Value.GetEnumValueNameOrDefault());
+            }
+
+            if (period.HasValue) {
+                request.AddParameter("period", period.Value.GetEnumValueNameOrDefault());
+            }
+
+            var result = await ExecuteCollectionRequest<WOMRecord>(request);
+            return GetResponse<WOMRecord, Record>(result);
+        }
+
+        private async Task<ConnectorCollectionResponse<Record>> QueryRecords(int id, MetricType? metric = null, Period? period = null) {
+            var request = GetNewRestRequest("/{id}/records");
+            request.AddParameter("id", id, ParameterType.UrlSegment);
+
+            if (metric.HasValue) {
+                request.AddParameter("metric", metric.Value.GetEnumValueNameOrDefault());
+            }
+
+            if (period.HasValue) {
+                request.AddParameter("period", period.Value.GetEnumValueNameOrDefault());
+            }
+
+            var result = await ExecuteCollectionRequest<WOMRecord>(request);
+            return GetResponse<WOMRecord, Record>(result);
         }
 
         #endregion

@@ -1,10 +1,12 @@
 ﻿using System.Collections.Generic;
 using AutoMapper;
 using WiseOldManConnector.Models.API.Responses;
+using WiseOldManConnector.Models.API.Responses.Models;
 using WiseOldManConnector.Models.Output;
 using WiseOldManConnector.Models.WiseOldMan.Enums;
 using WiseOldManConnector.Transformers.Resolvers;
 using WiseOldManConnector.Transformers.TypeConverters;
+using Metric = WiseOldManConnector.Models.Output.Metric;
 
 
 namespace WiseOldManConnector.Transformers {
@@ -14,7 +16,7 @@ namespace WiseOldManConnector.Transformers {
                 //cfg.CreateMap<string, MetricType>().ConvertUsing<StringToMetricTypeConverter>();
                 cfg.CreateMap<PlayerResponse, Player>();
                 cfg.CreateMap<WiseOldManConnector.Models.API.Responses.Models.Metric, Metric>();
-                cfg.CreateMap<Models.API.Responses.Models.Snapshot, Snapshot>()
+                cfg.CreateMap<Models.API.Responses.Models.WOMSnapshot, Snapshot>()
                     .ForMember(dest => dest.AllMetrics, opt => opt.MapFrom<MetricToDictionaryResolver>());
 
                 cfg.CreateMap<CompetitionResponse, Competition>()
@@ -37,6 +39,32 @@ namespace WiseOldManConnector.Transformers {
                     .ForMember(dest => dest.AchievedAt, opt => opt.MapFrom(src => src.CreatedAt))
                     .ForMember(dest => dest.Title, opt => opt.MapFrom(src => src.Type))
                     .ForMember(dest => dest.IsMissing, opt => opt.MapFrom(src => src.Missing));
+
+                cfg.CreateMap<SnapshotsResponse, Snapshots>();
+
+                cfg.CreateMap<DeltaResponse, Deltas>()
+                    .ForMember(dest => dest.StartDateTime, opt => opt.MapFrom(src => src.StartsAt))
+                    .ForMember(dest => dest.EndDateTime, opt => opt.MapFrom(src => src.EndsAt))
+                    .ForMember(dest => dest.Period, opt => opt.MapFrom(src => src.Period))
+                    .ForMember(dest => dest.DeltaMetrics, opt => opt.MapFrom(src => src.Metrics));
+
+                cfg.CreateMap<DeltaFullResponse, IEnumerable<Deltas>>()
+                    .ConvertUsing<DeltaFullResponseToCollectionOfDeltasConverter>();
+                cfg.CreateMap<DeltaFullResponse, Deltas>().ConvertUsing<DeltaFullResponseToDeltasConverter>();
+
+
+                cfg.CreateMap<DeltaMetrics, Dictionary<MetricType, DeltaMetric>>()
+                    .ConvertUsing<DeltaMetricsToDeltaDictionaryConverter>();
+
+                cfg.CreateMap<WOMDeltaMetric, DeltaMetric>()
+                    .ForMember(dest => dest.Deltas, opt => opt.MapFrom<WOMDeltaToDeltaDictionaryResolver>());
+
+                cfg.CreateMap<WOMDelta, Delta>();
+
+                cfg.CreateMap<WOMRecord, Record>()
+                    .ForMember(dest => dest.MetricType, opt => opt.MapFrom(src => src.Metric))
+                    .ForMember(dest => dest.UpdateDateTime, opt => opt.MapFrom(src => src.UpdatedAt));
+                //cfg.CreateMap<>()
             });
 
             return new Mapper(config);

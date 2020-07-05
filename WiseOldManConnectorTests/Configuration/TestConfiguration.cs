@@ -3,6 +3,7 @@
         public static string ValidPlayerUsernameWithValidCapatilization = "ErkendRserke";
         public static string ValidAccomplishedPlayer = "Den Badjas";
         public static string SecondaryValidPlayerUserName = "WouterPils";
+        public static int ValidAccomplishedPlayerId = 5613;
         public static int ValidPlayerId = 4029;
         public static string ValidRegularPlayer = ValidPlayerUsernameWithValidCapatilization;
         public static string ValidIronMan = "Elite HIT";

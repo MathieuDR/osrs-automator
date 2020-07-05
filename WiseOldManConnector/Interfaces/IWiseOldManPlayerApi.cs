@@ -56,19 +56,19 @@ namespace WiseOldManConnector.Interfaces {
         #region snapshots
 
         Task<ConnectorResponse<Snapshots>> Snapshots(int id);
-        Task<ConnectorResponse<Snapshots>> Snapshots(int id, Period period);
+        Task<ConnectorCollectionResponse<Snapshot>> Snapshots(int id, Period period);
         Task<ConnectorResponse<Snapshots>> Snapshots(string username);
-        Task<ConnectorResponse<Snapshots>> Snapshots(string username, Period period);
+        Task<ConnectorCollectionResponse<Snapshot>> Snapshots(string username, Period period);
 
         #endregion
 
 
         #region gained
 
-        Task<ConnectorCollectionResponse<Delta>> Gained(int id);
-        Task<ConnectorResponse<Delta>> Gained(int id, Period period);
-        Task<ConnectorCollectionResponse<Delta>> Gained(string username);
-        Task<ConnectorResponse<Delta>> Gained(string username, Period period);
+        Task<ConnectorCollectionResponse<Deltas>> Gained(int id);
+        Task<ConnectorResponse<Deltas>> Gained(int id, Period period);
+        Task<ConnectorCollectionResponse<Deltas>> Gained(string username);
+        Task<ConnectorResponse<Deltas>> Gained(string username, Period period);
 
         #endregion
 

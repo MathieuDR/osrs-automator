@@ -7,10 +7,10 @@ namespace WiseOldManConnector.Interfaces {
     public interface IWiseOldManDeltaApi {
         #region Deltas
   
-        Task<ConnectorCollectionResponse<Delta>> ViewLeaderboard(MetricType metric);
-        Task<ConnectorCollectionResponse<Delta>> ViewLeaderboard(MetricType metric, Period period);
-        Task<ConnectorCollectionResponse<Delta>> ViewLeaderboard(MetricType metric, PlayerType playertype);
-        Task<ConnectorCollectionResponse<Delta>> ViewLeaderboard(MetricType metric, Period period, PlayerType playertype);
+        Task<ConnectorCollectionResponse<Deltas>> ViewLeaderboard(MetricType metric);
+        Task<ConnectorCollectionResponse<Deltas>> ViewLeaderboard(MetricType metric, Period period);
+        Task<ConnectorCollectionResponse<Deltas>> ViewLeaderboard(MetricType metric, PlayerType playertype);
+        Task<ConnectorCollectionResponse<Deltas>> ViewLeaderboard(MetricType metric, Period period, PlayerType playertype);
 
         #endregion
     }

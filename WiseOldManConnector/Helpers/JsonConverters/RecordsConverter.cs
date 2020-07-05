@@ -8,7 +8,7 @@ using WiseOldManConnector.Models.API.Responses.Models;
 namespace WiseOldManConnector.Helpers.JsonConverters {
     internal class RecordsConverter : JsonConverter {
         public override bool CanConvert(Type objectType) {
-            return (objectType == typeof(List<Record>));
+            return (objectType == typeof(List<WOMRecord>));
         }
 
         public override object ReadJson(JsonReader reader, Type objectType, object existingValue,
@@ -16,7 +16,7 @@ namespace WiseOldManConnector.Helpers.JsonConverters {
             JToken token = JToken.Load(reader);
             switch (token.Type) {
                 case JTokenType.Array:
-                    return new RecordResponse() {Records = token.ToObject<List<Record>>()};
+                    return new RecordResponse() {Records = token.ToObject<List<WOMRecord>>()};
                 case JTokenType.Object:
                     var defaultCreator = serializer.ContractResolver.ResolveContract(objectType).DefaultCreator;
                     if (defaultCreator != null) {

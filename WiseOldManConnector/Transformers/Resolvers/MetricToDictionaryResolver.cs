@@ -4,8 +4,8 @@ using WiseOldManConnector.Models.Output;
 using WiseOldManConnector.Models.WiseOldMan.Enums;
 
 namespace WiseOldManConnector.Transformers.Resolvers {
-    internal class MetricToDictionaryResolver : IValueResolver<Models.API.Responses.Models.Snapshot, Snapshot, Dictionary<MetricType, Metric>> {
-        public Dictionary<MetricType, Metric> Resolve(Models.API.Responses.Models.Snapshot source, Snapshot destination, Dictionary<MetricType, Metric> destMember, ResolutionContext context) {
+    internal class MetricToDictionaryResolver : IValueResolver<Models.API.Responses.Models.WOMSnapshot, Snapshot, Dictionary<MetricType, Metric>> {
+        public Dictionary<MetricType, Metric> Resolve(Models.API.Responses.Models.WOMSnapshot source, Snapshot destination, Dictionary<MetricType, Metric> destMember, ResolutionContext context) {
             var result = new Dictionary<MetricType, Metric>() {
                 {MetricType.Overall, context.Mapper.Map<Metric>(source.Overall)},
                 {MetricType.Attack, context.Mapper.Map<Metric>(source.Attack)},

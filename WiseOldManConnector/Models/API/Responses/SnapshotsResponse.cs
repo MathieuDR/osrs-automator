@@ -6,16 +6,16 @@ using WiseOldManConnector.Models.API.Responses.Models;
 namespace WiseOldManConnector.Models.API.Responses {
     internal class SnapshotsResponse : BaseResponse {
         [JsonProperty("day")]
-        public List<Snapshot> Day { get; set; }
+        public List<WOMSnapshot> Day { get; set; }
 
         [JsonProperty("week")]
-        public List<Snapshot> Week { get; set; }
+        public List<WOMSnapshot> Week { get; set; }
 
         [JsonProperty("month")]
-        public List<Snapshot> Month { get; set; }
+        public List<WOMSnapshot> Month { get; set; }
 
         [JsonProperty("year")]
-        public List<Snapshot> Year { get; set; }
+        public List<WOMSnapshot> Year { get; set; }
 
     }
 }
