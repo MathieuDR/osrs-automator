@@ -15,7 +15,7 @@ using WiseOldManConnectorTests.Fixtures;
 using Xunit;
 using Record = WiseOldManConnector.Models.Output.Record;
 
-namespace WiseOldManConnectorTests.Connectors.Player {
+namespace WiseOldManConnectorTests.Connectors {
     public class PlayerConnectorTests : ConnectorTests {
         public PlayerConnectorTests(APIFixture fixture) : base(fixture) {
             _playerApi = fixture.ServiceProvider.GetService<IWiseOldManPlayerApi>();
@@ -142,7 +142,7 @@ namespace WiseOldManConnectorTests.Connectors.Player {
             Assert.False(competition.StartDate == DateTimeOffset.MinValue);
             Assert.False(competition.EndDate == DateTimeOffset.MinValue);
             Assert.False(competition.CreateDate == DateTimeOffset.MinValue);
-            ;
+            
             Assert.True(competition.StartDate < competition.EndDate);
             Assert.NotEmpty(competition.Duration);
             Assert.True(competition.Participants > 1);
@@ -162,8 +162,8 @@ namespace WiseOldManConnectorTests.Connectors.Player {
         public async void CompetitionWithInvalidUserResultsIntoExceptionWithMessage() {
             var username = TestConfiguration.InvalidUser;
 
-            Task act() => _playerApi.Competitions(username);
-            var exception = await Assert.ThrowsAnyAsync<BadRequestException>(act);
+            Task Act() => _playerApi.Competitions(username);
+            var exception = await Assert.ThrowsAnyAsync<BadRequestException>(Act);
 
             Assert.NotNull(exception);
             Assert.NotEmpty(exception.WiseOldManMessage);
@@ -182,24 +182,24 @@ namespace WiseOldManConnectorTests.Connectors.Player {
         public async void DisplayNameAssertionByCorrectDisplayNameThrowsException() {
             var username = TestConfiguration.ValidPlayerUsernameWithValidCapatilization.ToLowerInvariant();
 
-            Task act() => _playerApi.AssertDisplayName(username);
-            var error = await Assert.ThrowsAsync<BadRequestException>(act);
-            Assert.Contains("No change required", error.Message);
+            Task Act() => _playerApi.AssertDisplayName(username);
+            var error = await Assert.ThrowsAsync<BadRequestException>(Act);
+            Assert.Contains("No change required", error.Message); 
         }
 
         [Fact]
-        public async void DisplayNameAssertionWithoutUsernameThrowsException() {
+        public void DisplayNameAssertionWithoutUsernameThrowsException() {
             var username = "";
 
-            Task act() => _playerApi.AssertDisplayName(username);
-            var error = await Assert.ThrowsAsync<BadRequestException>(act);
+            Task Act() => _playerApi.AssertDisplayName(username);
+            Assert.ThrowsAsync<BadRequestException>(Act);
         }
 
         [Fact]
-        public async void ImportingPlayerWithoutUsernameResultsIntoException() {
+        public void ImportingPlayerWithoutUsernameResultsIntoException() {
             string username = "";
-            Task act() => _playerApi.Import(username);
-            Assert.ThrowsAsync<BadRequestException>(act);
+            Task Act() => _playerApi.Import(username);
+            Assert.ThrowsAsync<BadRequestException>(Act);
         }
 
         [Fact]
@@ -232,8 +232,8 @@ namespace WiseOldManConnectorTests.Connectors.Player {
         [Fact]
         public async void SearchPlayerWithNoUsernameResultsIntoException() {
             string username = "";
-            Task act() => _playerApi.Search(username);
-            Assert.ThrowsAsync<BadRequestException>(act);
+            Task Act() => _playerApi.Search(username);
+            await Assert.ThrowsAsync<BadRequestException>(Act);
         }
 
         [Fact]
@@ -396,8 +396,8 @@ namespace WiseOldManConnectorTests.Connectors.Player {
             Assert.Equal(username, response.Data.Username, StringComparer.InvariantCultureIgnoreCase);
 
             Thread.Sleep(10000);
-            Task act() => _playerApi.Track(username);
-            Assert.ThrowsAsync<BadRequestException>(act);
+            Task Act() => _playerApi.Track(username);
+            await Assert.ThrowsAsync<BadRequestException>(Act);
         }
 
         [Fact]
@@ -412,16 +412,16 @@ namespace WiseOldManConnectorTests.Connectors.Player {
         [Fact]
         public async void TrackingPlayerWithoutUsernameResultsInException() {
             string username = "";
-            Task act() => _playerApi.Track(username);
-            Assert.ThrowsAsync<BadRequestException>(act);
+            Task Act() => _playerApi.Track(username);
+            await Assert.ThrowsAsync<BadRequestException>(Act);
         }
 
         [Fact]
         public async void TypeAssertionForHardcoreIronmanIsCorrect() {
             var username = TestConfiguration.ValidHardcoreIronMan;
 
-            Task act() => _playerApi.AssertPlayerType(username);
-            var error = await Assert.ThrowsAsync<BadRequestException>(act);
+            Task Act() => _playerApi.AssertPlayerType(username);
+            var error = await Assert.ThrowsAsync<BadRequestException>(Act);
 
             Assert.Contains("hardcore", error.WiseOldManMessage, StringComparison.InvariantCultureIgnoreCase);
         }
@@ -430,8 +430,8 @@ namespace WiseOldManConnectorTests.Connectors.Player {
         public async void TypeAssertionForHardcoreIronmanIsWrong() {
             var username = TestConfiguration.ValidRegularPlayer;
 
-            Task act() => _playerApi.AssertPlayerType(username);
-            var error = await Assert.ThrowsAsync<BadRequestException>(act);
+            Task Act() => _playerApi.AssertPlayerType(username);
+            var error = await Assert.ThrowsAsync<BadRequestException>(Act);
 
             Assert.DoesNotContain("hardcore", error.WiseOldManMessage, StringComparison.InvariantCultureIgnoreCase);
         }
@@ -440,8 +440,8 @@ namespace WiseOldManConnectorTests.Connectors.Player {
         public async void TypeAssertionForIronmanIsCorrect() {
             var username = TestConfiguration.ValidIronMan;
 
-            Task act() => _playerApi.AssertPlayerType(username);
-            var error = await Assert.ThrowsAsync<BadRequestException>(act);
+            Task Act() => _playerApi.AssertPlayerType(username);
+            var error = await Assert.ThrowsAsync<BadRequestException>(Act);
 
             Assert.Contains("ironman", error.WiseOldManMessage, StringComparison.InvariantCultureIgnoreCase);
         }
@@ -450,8 +450,8 @@ namespace WiseOldManConnectorTests.Connectors.Player {
         public async void TypeAssertionForIronmanIsWrong() {
             var username = TestConfiguration.ValidRegularPlayer;
 
-            Task act() => _playerApi.AssertPlayerType(username);
-            var error = await Assert.ThrowsAsync<BadRequestException>(act);
+            Task Act() => _playerApi.AssertPlayerType(username);
+            var error = await Assert.ThrowsAsync<BadRequestException>(Act);
 
             Assert.DoesNotContain("ironman", error.WiseOldManMessage, StringComparison.InvariantCultureIgnoreCase);
         }
@@ -460,8 +460,8 @@ namespace WiseOldManConnectorTests.Connectors.Player {
         public async void TypeAssertionForRegularPlayerIsCorrect() {
             var username = TestConfiguration.ValidRegularPlayer;
 
-            Task act() => _playerApi.AssertPlayerType(username);
-            var error = await Assert.ThrowsAsync<BadRequestException>(act);
+            Task Act() => _playerApi.AssertPlayerType(username);
+            var error = await Assert.ThrowsAsync<BadRequestException>(Act);
 
             Assert.Contains("regular", error.WiseOldManMessage, StringComparison.InvariantCultureIgnoreCase);
         }
@@ -470,8 +470,8 @@ namespace WiseOldManConnectorTests.Connectors.Player {
         public async void TypeAssertionForRegularPlayerIsWrong() {
             var username = TestConfiguration.ValidHardcoreIronMan;
 
-            Task act() => _playerApi.AssertPlayerType(username);
-            var error = await Assert.ThrowsAsync<BadRequestException>(act);
+            Task Act() => _playerApi.AssertPlayerType(username);
+            var error = await Assert.ThrowsAsync<BadRequestException>(Act);
 
             Assert.DoesNotContain("regular", error.WiseOldManMessage, StringComparison.InvariantCultureIgnoreCase);
         }
@@ -480,8 +480,8 @@ namespace WiseOldManConnectorTests.Connectors.Player {
         public async void TypeAssertionForUltimateIronManIsCorrect() {
             var username = TestConfiguration.ValidUltimateIronMan;
 
-            Task act() => _playerApi.AssertPlayerType(username);
-            var error = await Assert.ThrowsAsync<BadRequestException>(act);
+            Task Act() => _playerApi.AssertPlayerType(username);
+            var error = await Assert.ThrowsAsync<BadRequestException>(Act);
 
             Assert.Contains("ultimate", error.WiseOldManMessage, StringComparison.InvariantCultureIgnoreCase);
         }
@@ -490,8 +490,8 @@ namespace WiseOldManConnectorTests.Connectors.Player {
         public async void TypeAssertionForUltimateIronManIsWrong() {
             var username = TestConfiguration.ValidRegularPlayer;
 
-            Task act() => _playerApi.AssertPlayerType(username);
-            var error = await Assert.ThrowsAsync<BadRequestException>(act);
+            Task Act() => _playerApi.AssertPlayerType(username);
+            var error = await Assert.ThrowsAsync<BadRequestException>(Act);
 
             Assert.DoesNotContain("ultimate", error.WiseOldManMessage, StringComparison.InvariantCultureIgnoreCase);
         }
@@ -511,9 +511,9 @@ namespace WiseOldManConnectorTests.Connectors.Player {
         public void ViewPlayerByInvalidIdResultsInBadRequestException() {
             int id = -1;
 
-            Task act() => _playerApi.View(id);
+            Task Act() => _playerApi.View(id);
 
-            Assert.ThrowsAsync<BadRequestException>(act);
+            Assert.ThrowsAsync<BadRequestException>(Act);
         }
 
         [Fact]
@@ -597,7 +597,7 @@ namespace WiseOldManConnectorTests.Connectors.Player {
         [InlineData(new object[] {"ErkendRserke", null, Period.Week})]
         [InlineData(new object[] {"ErkendRserke", MetricType.Fishing, Period.Week})]
         public async void RecordsByUsernameAndParametersResultInCollection(string username, MetricType? metric, Period? period) {
-            ConnectorCollectionResponse<Record> response = null;
+            ConnectorCollectionResponse<Record> response;
 
             if (metric.HasValue && period.HasValue) {
                 response = await _playerApi.Records(username, metric.Value, period.Value);
@@ -611,6 +611,7 @@ namespace WiseOldManConnectorTests.Connectors.Player {
 
             Assert.NotNull(response);
             Assert.NotEmpty(response.Data);
+            Assert.Equal(response.Data.Count(), response.Data.Count(x=> x.Username == username));
 
             if (metric.HasValue) {
                 var nonMetric = response.Data.Where(x => x.MetricType != metric.Value).ToList();
@@ -629,7 +630,7 @@ namespace WiseOldManConnectorTests.Connectors.Player {
         [InlineData(new object[] {4029, null, Period.Week})]
         [InlineData(new object[] {4029, MetricType.Fishing, Period.Week})]
         public async void RecordsByUserIdAndParametersResultInCollection(int id, MetricType? metric, Period? period) {
-            ConnectorCollectionResponse<Record> response = null;
+            ConnectorCollectionResponse<Record> response;
 
             if (metric.HasValue && period.HasValue) {
                 response = await _playerApi.Records(id, metric.Value, period.Value);

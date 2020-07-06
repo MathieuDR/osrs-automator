@@ -13,8 +13,8 @@ using Record = WiseOldManConnector.Models.Output.Record;
 using Snapshot = WiseOldManConnector.Models.Output.Snapshot;
 
 namespace WiseOldManConnector.Api {
-    internal class PlayerConncetor : BaseConnecter, IWiseOldManPlayerApi {
-        public PlayerConncetor(IServiceProvider provider) : base(provider) {
+    internal class PlayerConnector : BaseConnecter, IWiseOldManPlayerApi {
+        public PlayerConnector(IServiceProvider provider) : base(provider) {
             Area = "players";
         }
 
@@ -253,8 +253,14 @@ namespace WiseOldManConnector.Api {
                 request.AddParameter("period", period.Value.GetEnumValueNameOrDefault());
             }
 
-            var result = await ExecuteCollectionRequest<WOMRecord>(request);
-            return GetResponse<WOMRecord, Record>(result);
+            var queryResult  = await ExecuteCollectionRequest<WOMRecord>(request);
+            
+            var result = GetResponse<WOMRecord, Record>(queryResult);
+            foreach (var item in result.Data) {
+                item.Username = username;
+            }
+
+            return result;
         }
 
         private async Task<ConnectorCollectionResponse<Record>> QueryRecords(int id, MetricType? metric = null, Period? period = null) {

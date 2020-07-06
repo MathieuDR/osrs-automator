@@ -5,7 +5,7 @@ using WiseOldManConnector.Models.Output.Exceptions;
 using WiseOldManConnectorTests.Fixtures;
 using Xunit;
 
-namespace WiseOldManConnectorTests.Connectors.Base {
+namespace WiseOldManConnectorTests.Connectors {
     public class BaseConnectorTests : ConnectorTests {
         public BaseConnectorTests(APIFixture fixture) : base(fixture) {
             _playerApi = fixture.ServiceProvider.GetService<IWiseOldManPlayerApi>();

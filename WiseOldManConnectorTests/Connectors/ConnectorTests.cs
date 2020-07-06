@@ -1,5 +1,4 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
-using WiseOldManConnector.Interfaces;
 using WiseOldManConnectorTests.Fixtures;
 using Xunit;
 

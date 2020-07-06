@@ -17,6 +17,12 @@ namespace WiseOldManConnector.Interfaces {
 
         #endregion
 
+        #region import
+
+        Task<ConnectorResponse<MessageResponse>> Import(string username);
+
+        #endregion
+
         #region view
 
         Task<ConnectorResponse<Player>> View(string username);
@@ -28,12 +34,6 @@ namespace WiseOldManConnector.Interfaces {
 
         Task<ConnectorResponse<PlayerType>> AssertPlayerType(string username);
         Task<ConnectorResponse<string>> AssertDisplayName(string username);
-
-        #endregion
-
-        #region import
-
-        Task<ConnectorResponse<MessageResponse>> Import(string username);
 
         #endregion
 

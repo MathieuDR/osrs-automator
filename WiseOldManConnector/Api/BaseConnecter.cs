@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
@@ -12,9 +11,7 @@ using RestSharp.Serializers.NewtonsoftJson;
 using WiseOldManConnector.Interfaces;
 using WiseOldManConnector.Models;
 using WiseOldManConnector.Models.API.Responses;
-using WiseOldManConnector.Models.Output;
 using WiseOldManConnector.Models.Output.Exceptions;
-using Configuration = WiseOldManConnector.Transformers.Configuration;
 
 namespace WiseOldManConnector.Api {
     internal abstract class BaseConnecter {
@@ -80,8 +77,8 @@ namespace WiseOldManConnector.Api {
 
         private void ValidateResponse<T>(IRestResponse<T> response) {
             if (response == null) {
-                throw new BadRequestException(
-                    $"We did not receive a response. Please try again later or contact the administration.", response);
+                // SHOULD NEVER HAPPEN I THINK
+                throw new NullReferenceException($"We did not receive a response. Please try again later or contact the administration.");
             }
 
             switch (response.StatusCode) {
