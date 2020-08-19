@@ -20,5 +20,9 @@ namespace WiseOldManConnector.Models.API.Responses.Models {
 
         [JsonProperty("missing")]
         public Boolean Missing { get; set; }
+
+        [JsonProperty("player")]
+        public PlayerResponse Player { get; set; }
+
     }
 }

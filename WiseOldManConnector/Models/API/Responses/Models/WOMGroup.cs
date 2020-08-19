@@ -2,12 +2,18 @@
 using Newtonsoft.Json;
 
 namespace WiseOldManConnector.Models.API.Responses.Models {
-    internal class Group {
+    internal class WOMGroup :BaseResponse{
         [JsonProperty("id")]
         public int Id { get; set; }
 
         [JsonProperty("name")]
         public string Name { get; set; }
+
+        [JsonProperty("score")]
+        public int Score { get; set; }
+
+        [JsonProperty("memberCount")]
+        public int MemberCount { get; set; }
 
         [JsonProperty("clanChat")]
         public string ClanChat { get; set; }

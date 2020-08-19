@@ -9,5 +9,6 @@ namespace WiseOldManConnector.Models.Output {
         public DateTimeOffset UpdateDateTime { get; set; }
         public PlayerType PlayerType { get; set; }
         public string Username { get; set; }
+        public int PlayerId { get; set; }
     }
 }

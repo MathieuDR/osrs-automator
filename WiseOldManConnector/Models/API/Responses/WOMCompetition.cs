@@ -1,10 +1,8 @@
 ﻿using System;
-using System.Collections.Generic;
 using Newtonsoft.Json;
-using WiseOldManConnector.Models.API.Responses.Models;
 
 namespace WiseOldManConnector.Models.API.Responses {
-    internal class CompetitionResponse :BaseResponse {
+    internal class WOMCompetition : IResponse {
        
             [JsonProperty("id")]
             public int Id { get; set; }
@@ -34,7 +32,7 @@ namespace WiseOldManConnector.Models.API.Responses {
             public DateTime UpdatedAt { get; set; }
 
             //[JsonProperty("group")]
-            //public Group Group { get; set; }
+            //public WOMGroup WOMGroup { get; set; }
 
             [JsonProperty("duration")]
             public string Duration { get; set; }

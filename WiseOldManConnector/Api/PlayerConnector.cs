@@ -63,16 +63,16 @@ namespace WiseOldManConnector.Api {
             var request = GetNewRestRequest("/{id}/competitions");
             request.AddParameter("id", id, ParameterType.UrlSegment);
 
-            IEnumerable<CompetitionResponse> result = await ExecuteCollectionRequest<CompetitionResponse>(request);
-            return GetResponse<CompetitionResponse, Competition>(result);
+            IEnumerable<WOMCompetition> result = await ExecuteCollectionRequest<WOMCompetition>(request);
+            return GetResponse<WOMCompetition, Competition>(result);
         }
 
         public async Task<ConnectorCollectionResponse<Competition>> Competitions(string username) {
             var request = GetNewRestRequest("/username/{username}/competitions");
             request.AddParameter("username", username, ParameterType.UrlSegment);
 
-            var result = await ExecuteCollectionRequest<CompetitionResponse>(request);
-            return GetResponse<CompetitionResponse, Competition>(result);
+            var result = await ExecuteCollectionRequest<WOMCompetition>(request);
+            return GetResponse<WOMCompetition, Competition>(result);
         }
 
         #endregion

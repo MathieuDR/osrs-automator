@@ -34,7 +34,7 @@ namespace WiseOldManConnector.Api {
                 request.Resource, request.Parameters);
         }
 
-        protected async Task<T> ExecuteRequest<T>(RestRequest request) where T : BaseResponse {
+        protected async Task<T> ExecuteRequest<T>(RestRequest request) where T : IResponse {
             LogRequest(request);
             IRestResponse<T> result = await Client.ExecuteAsync<T>(request);
 
@@ -42,7 +42,7 @@ namespace WiseOldManConnector.Api {
             return result.Data;
         }
 
-        protected async Task<IEnumerable<T>> ExecuteCollectionRequest<T>(RestRequest request) where T : BaseResponse {
+        protected async Task<IEnumerable<T>> ExecuteCollectionRequest<T>(RestRequest request) where T : IResponse {
             LogRequest(request);
             IRestResponse<List<T>> result = await Client.ExecuteAsync<List<T>>(request);
 
@@ -50,7 +50,7 @@ namespace WiseOldManConnector.Api {
             return result.Data;
         }
 
-        protected ConnectorCollectionResponse<T> GetResponse<TU, T>(IEnumerable<TU> collection) where TU : BaseResponse {
+        protected ConnectorCollectionResponse<T> GetResponse<TU, T>(IEnumerable<TU> collection) where TU : IResponse {
             var mappedCollection = Mapper.Map<IEnumerable<TU>, IEnumerable<T>>(collection);
             return new ConnectorCollectionResponse<T>(mappedCollection);
         }

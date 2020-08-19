@@ -19,7 +19,7 @@ namespace WiseOldManConnector.Transformers {
                 cfg.CreateMap<Models.API.Responses.Models.WOMSnapshot, Snapshot>()
                     .ForMember(dest => dest.AllMetrics, opt => opt.MapFrom<MetricToDictionaryResolver>());
 
-                cfg.CreateMap<CompetitionResponse, Competition>()
+                cfg.CreateMap<WOMCompetition, Competition>()
                     .ForMember(dest => dest.StartDate, opt => opt.MapFrom(src => src.StartsAt))
                     .ForMember(dest => dest.EndDate, opt => opt.MapFrom(src => src.EndsAt))
                     .ForMember(dest => dest.CreateDate, opt => opt.MapFrom(src => src.CreatedAt))
@@ -32,7 +32,7 @@ namespace WiseOldManConnector.Transformers {
                     .ConvertUsing<AssertPlayerTypeResponseToPlayerTypeConverter>();
 
                 cfg.CreateMap<AssertDisplayNameResponse, string>().ConvertUsing<AssertDisplayNameResponseToStringConverter>();
-                cfg.CreateMap<string, PlayerType>().ConvertUsing<StringToPlayerTypeConverter>();
+                
 
 
                 cfg.CreateMap<Models.API.Responses.Models.WOMAchievement, Achievement>()
@@ -60,12 +60,14 @@ namespace WiseOldManConnector.Transformers {
                     .ForMember(dest => dest.Deltas, opt => opt.MapFrom<WOMDeltaToDeltaDictionaryResolver>());
 
                 cfg.CreateMap<WOMDelta, Delta>();
-
+                cfg.CreateMap<string, PlayerType>().ConvertUsing<StringToPlayerTypeConverter>();
                 cfg.CreateMap<WOMRecord, Record>()
                     .ForMember(dest => dest.MetricType, opt => opt.MapFrom(src => src.MetricType))
                     .ForMember(dest => dest.UpdateDateTime, opt => opt.MapFrom(src => src.UpdatedAt))
                     .ForMember(dest => dest.Username, opt => opt.MapFrom(src => src.DisplayName))
-                    .ForMember(dest => dest.PlayerType, opt => opt.MapFrom(src => src.PlayerType));
+                    .ForMember(dest => dest.PlayerType, opt => opt.MapFrom(src=>src.PlayerType));
+                    //.ForMember(dest => dest.PlayerType, opt => opt.MapFrom(src => src.PlayerType));
+                    //.ForMember(dest => dest.PlayerType, opt => opt.NullSubstitute(PlayerType.Unknown));
 
                 cfg.CreateMap<RecordResponse, IEnumerable<Record>>().ConvertUsing<RecordResponseToRecordCollectionConverter>();
 

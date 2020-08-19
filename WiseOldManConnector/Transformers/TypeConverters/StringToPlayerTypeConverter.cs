@@ -1,7 +1,5 @@
 ﻿using System;
 using AutoMapper;
-using WiseOldManConnector.Models.API.Responses;
-using WiseOldManConnector.Models.Output;
 using WiseOldManConnector.Models.WiseOldMan.Enums;
 
 namespace WiseOldManConnector.Transformers.TypeConverters {
@@ -13,20 +11,19 @@ namespace WiseOldManConnector.Transformers.TypeConverters {
                 return destination;
             }
 
-            var lowerInvariant = source.ToLowerInvariant();
 
-            if (lowerInvariant == "hardcore") {
-                destination = PlayerType.HardcoreIronMan;
-            } else if (lowerInvariant == "ultimate") {
-                destination = PlayerType.UltimateIronMan;
-            } else if (lowerInvariant == "ironman") {
-                destination = PlayerType.IronMan;
-            } else if (lowerInvariant == "regular") {
-                destination = PlayerType.Regular;
-            } else if (lowerInvariant == "unknown") {
+            if (string.IsNullOrWhiteSpace(source)) {
                 destination = PlayerType.Unknown;
             } else {
-                throw new ArgumentOutOfRangeException(nameof(source), source, null);
+                var lowerInvariant = source.ToLowerInvariant();
+                destination = lowerInvariant switch {
+                    "hardcore" => PlayerType.HardcoreIronMan,
+                    "ultimate" => PlayerType.UltimateIronMan,
+                    "ironman" => PlayerType.IronMan,
+                    "regular" => PlayerType.Regular,
+                    "unknown" => PlayerType.Unknown,
+                    _ => throw new ArgumentOutOfRangeException(nameof(source), source, null)
+                };
             }
 
             return destination;

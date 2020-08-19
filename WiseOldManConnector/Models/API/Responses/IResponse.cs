@@ -1,5 +1,9 @@
 ﻿namespace WiseOldManConnector.Models.API.Responses {
-    internal abstract class BaseResponse : IMessageResponse {
+internal interface IResponse {
+        
+    }
+
+    internal interface IMessageResponse : IResponse {
         public string Message { get; set; }
     }
 }
