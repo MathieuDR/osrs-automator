@@ -125,14 +125,15 @@ namespace WiseOldManConnector.Api {
                 case HttpStatusCode.Unused:
                 case HttpStatusCode.UpgradeRequired:
                 case HttpStatusCode.UseProxy:
+                case HttpStatusCode.TooManyRequests:
                     string responseMessage = "";
-                    object data = response.Data ?? (object) JsonConvert.DeserializeObject<BaseResponse>(response.Content);
+                    object data = response.Data ?? (object) JsonConvert.DeserializeObject<WOMMessageResponse>(response.Content);
 
                     switch (data) {
-                        case BaseResponse baseResponse:
-                            responseMessage = baseResponse.Message;
+                        case BaseResponse messageResponse:
+                            responseMessage = messageResponse.Message;
                             break;
-                        case IEnumerable<BaseResponse> collectionBaseResponses:
+                        case IEnumerable<WOMMessageResponse> collectionBaseResponses:
                             responseMessage = string.Join(", ", collectionBaseResponses.Select(x => x.Message).ToArray());
                             break;
                     }

@@ -256,8 +256,10 @@ namespace WiseOldManConnector.Api {
             var queryResult  = await ExecuteCollectionRequest<WOMRecord>(request);
             
             var result = GetResponse<WOMRecord, Record>(queryResult);
+
+            // We fill in username ourselves. Since it's not added by the response
             foreach (var item in result.Data) {
-                item.Username = username;
+                item.Player = new Player(){Username = username};
             }
 
             return result;

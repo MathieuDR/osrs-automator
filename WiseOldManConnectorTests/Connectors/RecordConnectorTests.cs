@@ -1,8 +1,9 @@
 ﻿using System.Linq;
+using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
 using WiseOldManConnector.Interfaces;
 using WiseOldManConnector.Models;
-using WiseOldManConnector.Models.Output;
+using WiseOldManConnector.Models.Output.Exceptions;
 using WiseOldManConnector.Models.WiseOldMan.Enums;
 using WiseOldManConnectorTests.Fixtures;
 using Xunit;
@@ -32,17 +33,7 @@ namespace WiseOldManConnectorTests.Connectors {
             Assert.NotNull(response);
             Assert.Equal(20, response.Data.Count());
         }   
-
-        [Fact]
-        public async void RecordWithoutPeriodHasResultOf80Records() {
-            var metric = MetricType.Fishing;
-
-            var response = await _recordApi.View(metric);
-
-            Assert.NotNull(response);
-            Assert.Equal(80, response.Data.Count());
-        }
-
+        
         [Fact]
         public async void RecordByPeriodOnlyResultsOfSaidPeriod() {
             var metric = MetricType.Overall;
@@ -61,13 +52,29 @@ namespace WiseOldManConnectorTests.Connectors {
 
             var metric = MetricType.Agility;
             var type = PlayerType.HardcoreIronMan;
+            var period = Period.Month;
 
-            var response = await _recordApi.View(metric, type);
+            var response = await _recordApi.View(metric, period, type);
             
             Assert.NotNull(response);
             Assert.NotEmpty(response.Data);
 
-            Assert.Empty(response.Data.Where(x=> x.PlayerType != type));
+            Assert.Empty(response.Data.Where(x=> x.Player.Type != type));
+        }
+
+        [Fact]
+        public async void RecordByParametersResultInRecordsWithDisplayName() {
+
+            var metric = MetricType.Agility;
+            var type = PlayerType.HardcoreIronMan;
+            var period = Period.Month;
+
+            ConnectorCollectionResponse<Record> response = await _recordApi.View(metric, period, type);
+            
+            Assert.NotNull(response);
+            Assert.NotEmpty(response.Data);
+
+            Assert.Empty(response.Data.Where(x=> string.IsNullOrWhiteSpace(x.Player.DisplayName)));
         }
     }
 }

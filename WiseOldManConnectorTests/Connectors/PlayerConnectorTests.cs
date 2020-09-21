@@ -420,80 +420,70 @@ namespace WiseOldManConnectorTests.Connectors {
         public async void TypeAssertionForHardcoreIronmanIsCorrect() {
             var username = TestConfiguration.ValidHardcoreIronMan;
 
-            Task Act() => _playerApi.AssertPlayerType(username);
-            var error = await Assert.ThrowsAsync<BadRequestException>(Act);
+            var response = _playerApi.AssertPlayerType(username);
+            Assert.Equal(PlayerType.HardcoreIronMan, response.Result.Data);
 
-            Assert.Contains("hardcore", error.WiseOldManMessage, StringComparison.InvariantCultureIgnoreCase);
+            //Task Act() => _playerApi.AssertPlayerType(username);
+            //var error = await Assert.ThrowsAsync<BadRequestException>(Act);
+
+            //Assert.Contains("hardcore", error.WiseOldManMessage, StringComparison.InvariantCultureIgnoreCase);
         }
 
         [Fact]
         public async void TypeAssertionForHardcoreIronmanIsWrong() {
             var username = TestConfiguration.ValidRegularPlayer;
 
-            Task Act() => _playerApi.AssertPlayerType(username);
-            var error = await Assert.ThrowsAsync<BadRequestException>(Act);
+            var response = _playerApi.AssertPlayerType(username);
+            Assert.NotEqual(PlayerType.HardcoreIronMan, response.Result.Data);
 
-            Assert.DoesNotContain("hardcore", error.WiseOldManMessage, StringComparison.InvariantCultureIgnoreCase);
         }
 
         [Fact]
         public async void TypeAssertionForIronmanIsCorrect() {
             var username = TestConfiguration.ValidIronMan;
 
-            Task Act() => _playerApi.AssertPlayerType(username);
-            var error = await Assert.ThrowsAsync<BadRequestException>(Act);
-
-            Assert.Contains("ironman", error.WiseOldManMessage, StringComparison.InvariantCultureIgnoreCase);
+            var response = _playerApi.AssertPlayerType(username);
+            Assert.Equal(PlayerType.IronMan, response.Result.Data);
         }
 
         [Fact]
         public async void TypeAssertionForIronmanIsWrong() {
             var username = TestConfiguration.ValidRegularPlayer;
 
-            Task Act() => _playerApi.AssertPlayerType(username);
-            var error = await Assert.ThrowsAsync<BadRequestException>(Act);
-
-            Assert.DoesNotContain("ironman", error.WiseOldManMessage, StringComparison.InvariantCultureIgnoreCase);
+            var response = _playerApi.AssertPlayerType(username);
+            Assert.NotEqual(PlayerType.IronMan, response.Result.Data);
         }
 
         [Fact]
         public async void TypeAssertionForRegularPlayerIsCorrect() {
             var username = TestConfiguration.ValidRegularPlayer;
 
-            Task Act() => _playerApi.AssertPlayerType(username);
-            var error = await Assert.ThrowsAsync<BadRequestException>(Act);
-
-            Assert.Contains("regular", error.WiseOldManMessage, StringComparison.InvariantCultureIgnoreCase);
+            var response = _playerApi.AssertPlayerType(username);
+            Assert.Equal(PlayerType.Regular, response.Result.Data);
         }
 
         [Fact]
         public async void TypeAssertionForRegularPlayerIsWrong() {
             var username = TestConfiguration.ValidHardcoreIronMan;
 
-            Task Act() => _playerApi.AssertPlayerType(username);
-            var error = await Assert.ThrowsAsync<BadRequestException>(Act);
-
-            Assert.DoesNotContain("regular", error.WiseOldManMessage, StringComparison.InvariantCultureIgnoreCase);
+            var response = _playerApi.AssertPlayerType(username);
+            Assert.NotEqual(PlayerType.Regular, response.Result.Data);
         }
 
         [Fact]
         public async void TypeAssertionForUltimateIronManIsCorrect() {
             var username = TestConfiguration.ValidUltimateIronMan;
 
-            Task Act() => _playerApi.AssertPlayerType(username);
-            var error = await Assert.ThrowsAsync<BadRequestException>(Act);
-
-            Assert.Contains("ultimate", error.WiseOldManMessage, StringComparison.InvariantCultureIgnoreCase);
+            var response = _playerApi.AssertPlayerType(username);
+            Assert.Equal(PlayerType.UltimateIronMan, response.Result.Data);
         }
 
         [Fact]
         public async void TypeAssertionForUltimateIronManIsWrong() {
             var username = TestConfiguration.ValidRegularPlayer;
 
-            Task Act() => _playerApi.AssertPlayerType(username);
-            var error = await Assert.ThrowsAsync<BadRequestException>(Act);
-
-            Assert.DoesNotContain("ultimate", error.WiseOldManMessage, StringComparison.InvariantCultureIgnoreCase);
+            var response = _playerApi.AssertPlayerType(username);
+            Assert.NotEqual(PlayerType.UltimateIronMan, response.Result.Data);
         }
 
         [Fact]
@@ -595,7 +585,7 @@ namespace WiseOldManConnectorTests.Connectors {
         [InlineData(new object[] {"ErkendRserke",null, null})]
         [InlineData(new object[] {"ErkendRserke", MetricType.Fishing, null})]
         [InlineData(new object[] {"ErkendRserke", null, Period.Week})]
-        [InlineData(new object[] {"ErkendRserke", MetricType.Fishing, Period.Week})]
+        [InlineData(new object[] {"ErkendRserke", MetricType.Thieving, Period.Month})]
         public async void RecordsByUsernameAndParametersResultInCollection(string username, MetricType? metric, Period? period) {
             ConnectorCollectionResponse<Record> response;
 
@@ -611,7 +601,10 @@ namespace WiseOldManConnectorTests.Connectors {
 
             Assert.NotNull(response);
             Assert.NotEmpty(response.Data);
-            Assert.Equal(response.Data.Count(), response.Data.Count(x=> x.Username == username));
+
+            //No player Data!
+            Assert.Empty(response.Data.Where(x=>x.Player == null));
+            Assert.Equal(response.Data.Count(), response.Data.Count(x => x.Player.Username == username));
 
             if (metric.HasValue) {
                 var nonMetric = response.Data.Where(x => x.MetricType != metric.Value).ToList();

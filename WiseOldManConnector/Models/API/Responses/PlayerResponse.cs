@@ -4,6 +4,13 @@ using WiseOldManConnector.Models.API.Responses.Models;
 
 namespace WiseOldManConnector.Models.API.Responses {
     internal class PlayerResponse : BaseResponse {
+
+        [JsonProperty("build")]
+        public string Build { get; set; }
+
+        [JsonProperty("flagged")]
+        public bool Flagged { get; set; }
+
         [JsonProperty("id")]
         public int Id { get; set; }
 

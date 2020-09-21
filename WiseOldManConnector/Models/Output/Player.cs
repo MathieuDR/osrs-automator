@@ -8,6 +8,8 @@ namespace WiseOldManConnector.Models.Output {
         public string DisplayName { get; set; }
         public int CombatLevel { get; set; }
         public PlayerType Type { get; set; }
+        public PlayerBuild Build { get; set; }
+        public bool Flagged { get; set; }
         public DateTimeOffset? LastImportedAt { get; set; }
         public DateTimeOffset RegisteredAt { get; set; }
         public DateTimeOffset UpdatedAt { get; set; }

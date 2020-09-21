@@ -17,10 +17,19 @@ namespace WiseOldManConnector.Models.API.Responses.Models {
         [JsonProperty("updatedAt")]
         public DateTime UpdatedAt { get; set; }
 
-        [JsonProperty("type")]
-        public string PlayerType { get; set; }
+        [JsonProperty("id")]
+        public int Id{ get; set; }
 
-        [JsonProperty("displayName")]
-        public string DisplayName { get; set; }
+        [JsonProperty("playerId")]
+        public int PlayerId{ get; set; }
+        
+        [JsonProperty("player")]
+        public PlayerResponse Player{ get; set; }
+
+        //[JsonProperty("type")]
+        //public string PlayerType { get; set; }
+
+        //[JsonProperty("displayName")]
+        //public string DisplayName { get; set; }
     }
 }

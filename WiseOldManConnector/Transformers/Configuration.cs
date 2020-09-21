@@ -61,15 +61,15 @@ namespace WiseOldManConnector.Transformers {
 
                 cfg.CreateMap<WOMDelta, Delta>();
                 cfg.CreateMap<string, PlayerType>().ConvertUsing<StringToPlayerTypeConverter>();
+                cfg.CreateMap<string, PlayerBuild>().ConvertUsing<StringToPlayerBuildConverter>();
                 cfg.CreateMap<WOMRecord, Record>()
                     .ForMember(dest => dest.MetricType, opt => opt.MapFrom(src => src.MetricType))
                     .ForMember(dest => dest.UpdateDateTime, opt => opt.MapFrom(src => src.UpdatedAt))
-                    .ForMember(dest => dest.Username, opt => opt.MapFrom(src => src.DisplayName))
-                    .ForMember(dest => dest.PlayerType, opt => opt.MapFrom(src=>src.PlayerType));
-                    //.ForMember(dest => dest.PlayerType, opt => opt.MapFrom(src => src.PlayerType));
-                    //.ForMember(dest => dest.PlayerType, opt => opt.NullSubstitute(PlayerType.Unknown));
+                    .ForMember(dest => dest.Player, opt => opt.MapFrom(src => src.Player));
 
                 cfg.CreateMap<RecordResponse, IEnumerable<Record>>().ConvertUsing<RecordResponseToRecordCollectionConverter>();
+
+                cfg.CreateMap<WOMMessageResponse, MessageResponse>();
 
                 //cfg.CreateMap<>()
             });
