@@ -14,9 +14,12 @@ namespace WiseOldManConnector.Models.API.Responses.Models {
 
         [JsonProperty("memberCount")]
         public int MemberCount { get; set; }
-
+        
         [JsonProperty("clanChat")]
         public string ClanChat { get; set; }
+        
+        [JsonProperty("verified")]
+        public Boolean Verified { get; set; }
 
         [JsonProperty("createdAt")]
         public DateTime CreatedAt { get; set; }

@@ -10,5 +10,9 @@
         public static string ValidHardcoreIronMan = "Zxhc";
         public static string ValidUltimateIronMan = "Hold My Item";
         public static string InvalidUser = "kljhsdvgfjlhgdsfjhkldgsfhjklfsdgjlhksgdfjkhlgfdsjhkfgd";
+        public static string SpecificGroupName = "Fanatics";
+        public static string UnspecificGroupName = "OS";
+        public static int ValidGroupId = 51;
+        public static int InvalidGroupId = -1;
     }
 }

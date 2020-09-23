@@ -15,6 +15,7 @@ namespace WiseOldManConnector.Models.Output {
         public DateTimeOffset UpdatedAt { get; set; }
         public Snapshot LatestSnapshot { get; set; }
         public int OverallExperience { get; set; }
+        public GroupRole? Role{ get; set; }
 
     }
 }

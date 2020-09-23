@@ -24,7 +24,7 @@ namespace WiseOldManConnectorTests.Connectors {
         private readonly IWiseOldManPlayerApi _playerApi;
 
         [Fact]
-        public async void AchievementByAccomplishedUserIdResultsInCollectionWithMultiple() {
+        public async Task AchievementByAccomplishedUserIdResultsInCollectionWithMultiple() {
             var username = TestConfiguration.ValidAccomplishedPlayerId;
 
             var response = await _playerApi.Achievements(username);
@@ -35,7 +35,7 @@ namespace WiseOldManConnectorTests.Connectors {
         }
 
         [Fact]
-        public async void AchievementByAccomplishedUsernameResultsInCollectionWithMultiple() {
+        public async Task AchievementByAccomplishedUsernameResultsInCollectionWithMultiple() {
             var username = TestConfiguration.ValidAccomplishedPlayer;
 
             var response = await _playerApi.Achievements(username);
@@ -46,7 +46,7 @@ namespace WiseOldManConnectorTests.Connectors {
         }
 
         [Fact]
-        public async void AchievementByValidUserIdResultsInCollection() {
+        public async Task AchievementByValidUserIdResultsInCollection() {
             var username = TestConfiguration.ValidPlayerId;
 
             var response = await _playerApi.Achievements(username);
@@ -56,7 +56,7 @@ namespace WiseOldManConnectorTests.Connectors {
         }
 
         [Fact]
-        public async void AchievementByValidUsernameResultsInCollection() {
+        public async Task AchievementByValidUsernameResultsInCollection() {
             var username = TestConfiguration.ValidPlayerUsernameWithValidCapatilization;
 
             var response = await _playerApi.Achievements(username);
@@ -66,7 +66,7 @@ namespace WiseOldManConnectorTests.Connectors {
         }
 
         [Fact]
-        public async void AchievementByValidUserResultsInAchievementsWithMissings() {
+        public async Task AchievementByValidUserResultsInAchievementsWithMissings() {
             var username = TestConfiguration.ValidPlayerUsernameWithValidCapatilization;
 
             var response = await _playerApi.Achievements(username, true);
@@ -77,7 +77,7 @@ namespace WiseOldManConnectorTests.Connectors {
         }
 
         [Fact]
-        public async void AchievementByValidUserIdResultsInAchievementsWithMissings() {
+        public async Task AchievementByValidUserIdResultsInAchievementsWithMissings() {
             var id = TestConfiguration.ValidPlayerId;
 
             var response = await _playerApi.Achievements(id, true);
@@ -88,7 +88,7 @@ namespace WiseOldManConnectorTests.Connectors {
         }
 
         [Fact]
-        public async void AchievementsAreCorrectlyMapped() {
+        public async Task AchievementsAreCorrectlyMapped() {
             var username = TestConfiguration.ValidPlayerUsernameWithValidCapatilization;
 
             var response = await _playerApi.Achievements(username);
@@ -103,7 +103,7 @@ namespace WiseOldManConnectorTests.Connectors {
 
 
         [Fact]
-        public async void AchievementsWithMissingsResultsInCollectionWithAllMetricsAndCombat() {
+        public async Task AchievementsWithMissingsResultsInCollectionWithAllMetricsAndCombat() {
             var username = TestConfiguration.ValidPlayerUsernameWithValidCapatilization;
 
             var response = await _playerApi.Achievements(username, true);
@@ -119,7 +119,7 @@ namespace WiseOldManConnectorTests.Connectors {
         }
 
         [Fact]
-        public async void CompetitionByIdResultsInCollection() {
+        public async Task CompetitionByIdResultsInCollection() {
             var id = TestConfiguration.ValidPlayerId;
 
             ConnectorCollectionResponse<Competition> response = await _playerApi.Competitions(id);
@@ -129,7 +129,7 @@ namespace WiseOldManConnectorTests.Connectors {
         }
 
         [Fact]
-        public async void CompetitionMappingIsCorrect() {
+        public async Task CompetitionMappingIsCorrect() {
             var username = TestConfiguration.ValidPlayerUsernameWithValidCapatilization;
 
             ConnectorCollectionResponse<Competition> response = await _playerApi.Competitions(username);
@@ -149,7 +149,7 @@ namespace WiseOldManConnectorTests.Connectors {
         }
 
         [Fact]
-        public async void CompetitionsByUsernameResultsIntoCollection() {
+        public async Task CompetitionsByUsernameResultsIntoCollection() {
             var username = TestConfiguration.ValidPlayerUsernameWithValidCapatilization;
 
             ConnectorCollectionResponse<Competition> response = await _playerApi.Competitions(username);
@@ -159,7 +159,7 @@ namespace WiseOldManConnectorTests.Connectors {
         }
 
         [Fact]
-        public async void CompetitionWithInvalidUserResultsIntoExceptionWithMessage() {
+        public async Task CompetitionWithInvalidUserResultsIntoExceptionWithMessage() {
             var username = TestConfiguration.InvalidUser;
 
             Task Act() => _playerApi.Competitions(username);
@@ -171,7 +171,7 @@ namespace WiseOldManConnectorTests.Connectors {
 
         // Cannot Test
         //[Fact]
-        //public async void DisplayNameAssertionIsCorrectlyCapatalized() {
+        //public async Task DisplayNameAssertionIsCorrectlyCapatalized() {
         //    var username = TestConfiguration.ValidPlayerUsernameWithValidCapatilization.ToLowerInvariant();
 
         //    var response = await _playerApi.AssertDisplayName(username);
@@ -179,7 +179,7 @@ namespace WiseOldManConnectorTests.Connectors {
         //}
 
         [Fact]
-        public async void DisplayNameAssertionByCorrectDisplayNameThrowsException() {
+        public async Task DisplayNameAssertionByCorrectDisplayNameThrowsException() {
             var username = TestConfiguration.ValidPlayerUsernameWithValidCapatilization.ToLowerInvariant();
 
             Task Act() => _playerApi.AssertDisplayName(username);
@@ -203,7 +203,7 @@ namespace WiseOldManConnectorTests.Connectors {
         }
 
         [Fact]
-        public async void ImportValidPlayerResultsWithNoExceptionAndMessageResult() {
+        public async Task ImportValidPlayerResultsWithNoExceptionAndMessageResult() {
             string username = TestConfiguration.ValidPlayerUsernameWithValidCapatilization;
             try {
                 ConnectorResponse<MessageResponse> response = await _playerApi.Import(username);
@@ -219,7 +219,7 @@ namespace WiseOldManConnectorTests.Connectors {
         }
 
         [Fact]
-        public async void SearchPlayerWithInvalidUsernameResultsEmptyCollection() {
+        public async Task SearchPlayerWithInvalidUsernameResultsEmptyCollection() {
             string username = "sghsdfgwe";
 
             ConnectorCollectionResponse<WiseOldManConnector.Models.Output.Player> response = await _playerApi.Search(username);
@@ -230,14 +230,14 @@ namespace WiseOldManConnectorTests.Connectors {
         }
 
         [Fact]
-        public async void SearchPlayerWithNoUsernameResultsIntoException() {
+        public async Task SearchPlayerWithNoUsernameResultsIntoException() {
             string username = "";
             Task Act() => _playerApi.Search(username);
             await Assert.ThrowsAsync<BadRequestException>(Act);
         }
 
         [Fact]
-        public async void SearchPlayerWithSpecificUsernameResultsIntoCollectionWithOnePlayer() {
+        public async Task SearchPlayerWithSpecificUsernameResultsIntoCollectionWithOnePlayer() {
             string username = TestConfiguration.ValidPlayerUsernameWithValidCapatilization;
 
             ConnectorCollectionResponse<WiseOldManConnector.Models.Output.Player> response = await _playerApi.Search(username);
@@ -250,7 +250,26 @@ namespace WiseOldManConnectorTests.Connectors {
         }
 
         [Fact]
-        public async void SearchPlayerWithUnspecificUserNameResultsInCollectionWithMultiplePlayers() {
+        public async Task SearchPlayerResultsInValidPlayer() {
+            string username = TestConfiguration.ValidPlayerUsernameWithValidCapatilization;
+
+            ConnectorCollectionResponse<Player> response = await _playerApi.Search(username);
+
+           
+            var player = response.Data.FirstOrDefault();
+            
+            Assert.NotEmpty(player.DisplayName);
+            Assert.NotEmpty(player.Username);
+            Assert.True(player.Id > 0);
+            Assert.Null(player.LatestSnapshot);
+            Assert.Null(player.Role);
+            Assert.Equal(0, player.OverallExperience);
+            Assert.True(player.UpdatedAt < DateTimeOffset.Now);
+            Assert.True(player.RegisteredAt < DateTimeOffset.Now);
+        }
+
+        [Fact]
+        public async Task SearchPlayerWithUnspecificUserNameResultsInCollectionWithMultiplePlayers() {
             string username = "iron";
 
             ConnectorCollectionResponse<WiseOldManConnector.Models.Output.Player> response = await _playerApi.Search(username);
@@ -262,7 +281,7 @@ namespace WiseOldManConnectorTests.Connectors {
         }
 
         [Fact]
-        public async void SearchPlayerWithUsernameResultsIntoCollectionWithPlayer() {
+        public async Task SearchPlayerWithUsernameResultsIntoCollectionWithPlayer() {
             string username = TestConfiguration.ValidPlayerUsernameWithValidCapatilization;
 
             ConnectorCollectionResponse<WiseOldManConnector.Models.Output.Player> response = await _playerApi.Search(username);
@@ -274,7 +293,7 @@ namespace WiseOldManConnectorTests.Connectors {
         }
 
         [Fact]
-        public async void SnapshotByIdAndDayPeriodResultsInMultipleSnapshots() {
+        public async Task SnapshotByIdAndDayPeriodResultsInMultipleSnapshots() {
             int id = TestConfiguration.ValidPlayerId;
 
             ConnectorCollectionResponse<Snapshot> response = await _playerApi.Snapshots(id, Period.Day);
@@ -284,7 +303,7 @@ namespace WiseOldManConnectorTests.Connectors {
         }
 
         [Fact]
-        public async void SnapshotByIdAndMonthPeriodResultsInMultipleSnapshots() {
+        public async Task SnapshotByIdAndMonthPeriodResultsInMultipleSnapshots() {
             int id = TestConfiguration.ValidPlayerId;
 
             var response = await _playerApi.Snapshots(id, Period.Month);
@@ -294,7 +313,7 @@ namespace WiseOldManConnectorTests.Connectors {
         }
 
         [Fact]
-        public async void SnapshotByIdAndWeekPeriodResultsInMultipleSnapshots() {
+        public async Task SnapshotByIdAndWeekPeriodResultsInMultipleSnapshots() {
             int id = TestConfiguration.ValidPlayerId;
 
             var response = await _playerApi.Snapshots(id, Period.Week);
@@ -304,7 +323,7 @@ namespace WiseOldManConnectorTests.Connectors {
         }
 
         [Fact]
-        public async void SnapshotByIdAndYearPeriodResultsInMultipleSnapshots() {
+        public async Task SnapshotByIdAndYearPeriodResultsInMultipleSnapshots() {
             int id = TestConfiguration.ValidPlayerId;
 
             var response = await _playerApi.Snapshots(id, Period.Year);
@@ -314,7 +333,7 @@ namespace WiseOldManConnectorTests.Connectors {
         }
 
         [Fact]
-        public async void SnapshotByIdResultsInMultipleSnapshots() {
+        public async Task SnapshotByIdResultsInMultipleSnapshots() {
             int id = TestConfiguration.ValidPlayerId;
 
             ConnectorResponse<Snapshots> response = await _playerApi.Snapshots(id);
@@ -331,7 +350,7 @@ namespace WiseOldManConnectorTests.Connectors {
         }
 
         [Fact]
-        public async void SnapshotByUsernameAndDayPeriodResultsInMultipleSnapshots() {
+        public async Task SnapshotByUsernameAndDayPeriodResultsInMultipleSnapshots() {
             string username = TestConfiguration.ValidPlayerUsernameWithValidCapatilization;
 
             var response = await _playerApi.Snapshots(username, Period.Day);
@@ -341,7 +360,7 @@ namespace WiseOldManConnectorTests.Connectors {
         }
 
         [Fact]
-        public async void SnapshotByUsernameAndMonthPeriodResultsInMultipleSnapshots() {
+        public async Task SnapshotByUsernameAndMonthPeriodResultsInMultipleSnapshots() {
             string username = TestConfiguration.ValidPlayerUsernameWithValidCapatilization;
 
             var response = await _playerApi.Snapshots(username, Period.Month);
@@ -351,7 +370,7 @@ namespace WiseOldManConnectorTests.Connectors {
         }
 
         [Fact]
-        public async void SnapshotByUsernameAndWeekPeriodResultsInMultipleSnapshots() {
+        public async Task SnapshotByUsernameAndWeekPeriodResultsInMultipleSnapshots() {
             string username = TestConfiguration.ValidPlayerUsernameWithValidCapatilization;
 
             var response = await _playerApi.Snapshots(username, Period.Week);
@@ -361,7 +380,7 @@ namespace WiseOldManConnectorTests.Connectors {
         }
 
         [Fact]
-        public async void SnapshotByUsernameAndYearPeriodResultsInMultipleSnapshots() {
+        public async Task SnapshotByUsernameAndYearPeriodResultsInMultipleSnapshots() {
             string username = TestConfiguration.ValidPlayerUsernameWithValidCapatilization;
 
             var response = await _playerApi.Snapshots(username, Period.Year);
@@ -371,7 +390,7 @@ namespace WiseOldManConnectorTests.Connectors {
         }
 
         [Fact]
-        public async void SnapshotByUsernameResultsInMultipleSnapshots() {
+        public async Task SnapshotByUsernameResultsInMultipleSnapshots() {
             string username = TestConfiguration.ValidPlayerUsernameWithValidCapatilization;
 
             ConnectorResponse<Snapshots> response = await _playerApi.Snapshots(username);
@@ -388,7 +407,7 @@ namespace WiseOldManConnectorTests.Connectors {
         }
 
         [Fact]
-        public async void TrackingMultipleTimesInShortPeriodResultsInException() {
+        public async Task TrackingMultipleTimesInShortPeriodResultsInException() {
             string username = TestConfiguration.SecondaryValidPlayerUserName;
             ConnectorResponse<WiseOldManConnector.Models.Output.Player> response = await _playerApi.Track(username);
             Assert.NotNull(response);
@@ -401,7 +420,7 @@ namespace WiseOldManConnectorTests.Connectors {
         }
 
         [Fact]
-        public async void TrackingPlayerByUsernameResultsInPlayer() {
+        public async Task TrackingPlayerByUsernameResultsInPlayer() {
             string username = TestConfiguration.ValidPlayerUsernameWithValidCapatilization;
             ConnectorResponse<WiseOldManConnector.Models.Output.Player> response = await _playerApi.Track(username);
             Assert.NotNull(response);
@@ -410,14 +429,14 @@ namespace WiseOldManConnectorTests.Connectors {
         }
 
         [Fact]
-        public async void TrackingPlayerWithoutUsernameResultsInException() {
+        public async Task TrackingPlayerWithoutUsernameResultsInException() {
             string username = "";
             Task Act() => _playerApi.Track(username);
             await Assert.ThrowsAsync<BadRequestException>(Act);
         }
 
         [Fact]
-        public async void TypeAssertionForHardcoreIronmanIsCorrect() {
+        public async Task TypeAssertionForHardcoreIronmanIsCorrect() {
             var username = TestConfiguration.ValidHardcoreIronMan;
 
             var response = _playerApi.AssertPlayerType(username);
@@ -430,7 +449,7 @@ namespace WiseOldManConnectorTests.Connectors {
         }
 
         [Fact]
-        public async void TypeAssertionForHardcoreIronmanIsWrong() {
+        public async Task TypeAssertionForHardcoreIronmanIsWrong() {
             var username = TestConfiguration.ValidRegularPlayer;
 
             var response = _playerApi.AssertPlayerType(username);
@@ -439,7 +458,7 @@ namespace WiseOldManConnectorTests.Connectors {
         }
 
         [Fact]
-        public async void TypeAssertionForIronmanIsCorrect() {
+        public async Task TypeAssertionForIronmanIsCorrect() {
             var username = TestConfiguration.ValidIronMan;
 
             var response = _playerApi.AssertPlayerType(username);
@@ -447,7 +466,7 @@ namespace WiseOldManConnectorTests.Connectors {
         }
 
         [Fact]
-        public async void TypeAssertionForIronmanIsWrong() {
+        public async Task TypeAssertionForIronmanIsWrong() {
             var username = TestConfiguration.ValidRegularPlayer;
 
             var response = _playerApi.AssertPlayerType(username);
@@ -455,7 +474,7 @@ namespace WiseOldManConnectorTests.Connectors {
         }
 
         [Fact]
-        public async void TypeAssertionForRegularPlayerIsCorrect() {
+        public async Task TypeAssertionForRegularPlayerIsCorrect() {
             var username = TestConfiguration.ValidRegularPlayer;
 
             var response = _playerApi.AssertPlayerType(username);
@@ -463,7 +482,7 @@ namespace WiseOldManConnectorTests.Connectors {
         }
 
         [Fact]
-        public async void TypeAssertionForRegularPlayerIsWrong() {
+        public async Task TypeAssertionForRegularPlayerIsWrong() {
             var username = TestConfiguration.ValidHardcoreIronMan;
 
             var response = _playerApi.AssertPlayerType(username);
@@ -471,7 +490,7 @@ namespace WiseOldManConnectorTests.Connectors {
         }
 
         [Fact]
-        public async void TypeAssertionForUltimateIronManIsCorrect() {
+        public async Task TypeAssertionForUltimateIronManIsCorrect() {
             var username = TestConfiguration.ValidUltimateIronMan;
 
             var response = _playerApi.AssertPlayerType(username);
@@ -479,7 +498,7 @@ namespace WiseOldManConnectorTests.Connectors {
         }
 
         [Fact]
-        public async void TypeAssertionForUltimateIronManIsWrong() {
+        public async Task TypeAssertionForUltimateIronManIsWrong() {
             var username = TestConfiguration.ValidRegularPlayer;
 
             var response = _playerApi.AssertPlayerType(username);
@@ -487,15 +506,33 @@ namespace WiseOldManConnectorTests.Connectors {
         }
 
         [Fact]
-        public async void ViewPlayerByIdResultsIntoPlayerResult() {
+        public async Task ViewPlayerByIdResultsIntoPlayerResult() {
             int id = TestConfiguration.ValidPlayerId;
 
-            ConnectorResponse<WiseOldManConnector.Models.Output.Player> response = await _playerApi.View(id);
+            ConnectorResponse<Player> response = await _playerApi.View(id);
 
             Assert.NotNull(response);
             Assert.NotNull(response.Data);
             Assert.Equal(id, response.Data.Id);
         }
+
+        [Fact]
+        public async Task ViewPlayerByIdResultsInValidPlayer() {
+            int id = TestConfiguration.ValidPlayerId;
+
+            ConnectorResponse<Player> response = await _playerApi.View(id);
+
+            var player = response.Data;
+
+            Assert.NotEmpty(player.DisplayName);
+            Assert.NotEmpty(player.Username);
+            Assert.True(player.Id > 0);
+            Assert.True(player.CombatLevel > 3);
+            Assert.NotNull(player.LatestSnapshot);
+            Assert.True(player.UpdatedAt < DateTimeOffset.Now);
+            Assert.True(player.RegisteredAt < DateTimeOffset.Now);
+        }
+
 
         [Fact]
         public void ViewPlayerByInvalidIdResultsInBadRequestException() {
@@ -507,7 +544,7 @@ namespace WiseOldManConnectorTests.Connectors {
         }
 
         [Fact]
-        public async void ViewPlayerByUsernameResultsIntoPlayerWithSameUsername() {
+        public async Task ViewPlayerByUsernameResultsIntoPlayerWithSameUsername() {
             string username = TestConfiguration.ValidPlayerUsernameWithValidCapatilization;
 
             ConnectorResponse<WiseOldManConnector.Models.Output.Player> response = await _playerApi.View(username);
@@ -518,7 +555,7 @@ namespace WiseOldManConnectorTests.Connectors {
         }
 
         [Fact]
-        public async void ViewPlayerSnapshotHasAllMetrics() {
+        public async Task ViewPlayerSnapshotHasAllMetrics() {
             int id = TestConfiguration.ValidPlayerId;
 
             ConnectorResponse<WiseOldManConnector.Models.Output.Player> response = await _playerApi.View(id);
@@ -531,7 +568,7 @@ namespace WiseOldManConnectorTests.Connectors {
         }
 
         [Fact]
-        public async void GainedByUserIdResultsInCollection() {
+        public async Task GainedByUserIdResultsInCollection() {
             int id = TestConfiguration.ValidPlayerId;
 
             var response = await _playerApi.Gained(id);
@@ -542,7 +579,7 @@ namespace WiseOldManConnectorTests.Connectors {
         }
 
         [Fact]
-        public async void GainedByUsernameResultsInCollection() {
+        public async Task GainedByUsernameResultsInCollection() {
             string username = TestConfiguration.ValidPlayerUsernameWithValidCapatilization;
 
             var response = await _playerApi.Gained(username);
@@ -557,7 +594,7 @@ namespace WiseOldManConnectorTests.Connectors {
         [InlineData(Period.Week)]
         [InlineData(Period.Month)]
         [InlineData(Period.Year)]
-        public async void GainedByUserIdAndPeriodResultsInCollection(Period period) {
+        public async Task GainedByUserIdAndPeriodResultsInCollection(Period period) {
             int id = TestConfiguration.ValidPlayerId;
 
             var response = await _playerApi.Gained(id, period);
@@ -572,7 +609,7 @@ namespace WiseOldManConnectorTests.Connectors {
         [InlineData(Period.Week)]
         [InlineData(Period.Month)]
         [InlineData(Period.Year)]
-        public async void GainedByUsernameAndPeriodResultsInCollection(Period period) {
+        public async Task GainedByUsernameAndPeriodResultsInCollection(Period period) {
             string username = TestConfiguration.ValidPlayerUsernameWithValidCapatilization;
             var response = await _playerApi.Gained(username, period);
 
@@ -586,7 +623,7 @@ namespace WiseOldManConnectorTests.Connectors {
         [InlineData(new object[] {"ErkendRserke", MetricType.Fishing, null})]
         [InlineData(new object[] {"ErkendRserke", null, Period.Week})]
         [InlineData(new object[] {"ErkendRserke", MetricType.Thieving, Period.Month})]
-        public async void RecordsByUsernameAndParametersResultInCollection(string username, MetricType? metric, Period? period) {
+        public async Task RecordsByUsernameAndParametersResultInCollection(string username, MetricType? metric, Period? period) {
             ConnectorCollectionResponse<Record> response;
 
             if (metric.HasValue && period.HasValue) {
@@ -622,7 +659,7 @@ namespace WiseOldManConnectorTests.Connectors {
         [InlineData(new object[] {4029, MetricType.Fishing, null})]
         [InlineData(new object[] {4029, null, Period.Week})]
         [InlineData(new object[] {4029, MetricType.Fishing, Period.Week})]
-        public async void RecordsByUserIdAndParametersResultInCollection(int id, MetricType? metric, Period? period) {
+        public async Task RecordsByUserIdAndParametersResultInCollection(int id, MetricType? metric, Period? period) {
             ConnectorCollectionResponse<Record> response;
 
             if (metric.HasValue && period.HasValue) {

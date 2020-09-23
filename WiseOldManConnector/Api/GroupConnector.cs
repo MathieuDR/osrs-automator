@@ -57,8 +57,8 @@ namespace WiseOldManConnector.Api {
 
             request.AddParameter("id", id, ParameterType.UrlSegment);
 
-            var result = await ExecuteCollectionRequest<GroupMember>(request);
-            return GetResponse<GroupMember, Player>(result);
+            var result = await ExecuteCollectionRequest<PlayerResponse>(request);
+            return GetResponse<PlayerResponse, Player>(result);
         }
 
         public async Task<ConnectorResponse<Player>> GetMonthTopMember(int id) {
@@ -66,7 +66,7 @@ namespace WiseOldManConnector.Api {
 
             request.AddParameter("id", id, ParameterType.UrlSegment);
 
-            var result = await ExecuteRequest<GroupMember>(request);
+            var result = await ExecuteRequest<PlayerResponse>(request);
             return GetResponse<Player>(result);
         }
 

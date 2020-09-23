@@ -8,6 +8,7 @@ namespace WiseOldManConnector.Configuration {
         public static void AddWiseOldManApi(this IServiceCollection services) {
             services.AddTransient<IWiseOldManPlayerApi, PlayerConnector>();
             services.AddTransient<IWiseOldManRecordApi, RecordConnector>();
+            services.AddTransient<IWiseOldManGroupApi, GroupConnector>();
         }
     }
 }

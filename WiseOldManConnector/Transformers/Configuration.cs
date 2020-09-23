@@ -26,10 +26,12 @@ namespace WiseOldManConnector.Transformers {
                     .ForMember(dest => dest.UpdatedDate, opt => opt.MapFrom(src => src.UpdatedAt))
                     .ForMember(dest => dest.Participants, opt => opt.MapFrom(src => src.ParticipantCount));
 
-                cfg.CreateMap<SearchResponse, Player>();
+                //cfg.CreateMap<SearchResponse, Player>();
+                cfg.CreateMap<WOMGroup, Group>();
 
                 cfg.CreateMap<AssertPlayerTypeResponse, PlayerType>()
                     .ConvertUsing<AssertPlayerTypeResponseToPlayerTypeConverter>();
+                
 
                 cfg.CreateMap<AssertDisplayNameResponse, string>().ConvertUsing<AssertDisplayNameResponseToStringConverter>();
                 
@@ -62,6 +64,8 @@ namespace WiseOldManConnector.Transformers {
                 cfg.CreateMap<WOMDelta, Delta>();
                 cfg.CreateMap<string, PlayerType>().ConvertUsing<StringToPlayerTypeConverter>();
                 cfg.CreateMap<string, PlayerBuild>().ConvertUsing<StringToPlayerBuildConverter>();
+                cfg.CreateMap<string, GroupRole?>().ConvertUsing<StringToGroupRoleConvertor>();
+
                 cfg.CreateMap<WOMRecord, Record>()
                     .ForMember(dest => dest.MetricType, opt => opt.MapFrom(src => src.MetricType))
                     .ForMember(dest => dest.UpdateDateTime, opt => opt.MapFrom(src => src.UpdatedAt))

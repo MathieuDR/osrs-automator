@@ -37,5 +37,11 @@ namespace WiseOldManConnector.Models.API.Responses {
 
         [JsonProperty("combatLevel")]
         public int CombatLevel { get; set; }
+
+        [JsonProperty("role")]
+        public string Role { get; set; }
+
+        [JsonProperty("overallExperience")]
+        public int OverallExperience { get; set; }
     }
 }

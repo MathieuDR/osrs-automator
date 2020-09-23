@@ -20,7 +20,7 @@ namespace WiseOldManConnectorTests.Connectors {
         [Theory]
         [InlineData(new object[] {Period.Week, null})]
         [InlineData(new object[] {Period.Week, PlayerType.IronMan})]
-        public async void RecordsByParametersResultsInCollectionOf20Records(Period period, PlayerType? playerType) {
+        public async Task RecordsByParametersResultsInCollectionOf20Records(Period period, PlayerType? playerType) {
             var metric = MetricType.TheCorruptedGauntlet;
 
             ConnectorCollectionResponse<Record> response = null;
@@ -35,7 +35,7 @@ namespace WiseOldManConnectorTests.Connectors {
         }   
         
         [Fact]
-        public async void RecordByPeriodOnlyResultsOfSaidPeriod() {
+        public async Task RecordByPeriodOnlyResultsOfSaidPeriod() {
             var metric = MetricType.Overall;
             var period = Period.Week;
 
@@ -48,7 +48,7 @@ namespace WiseOldManConnectorTests.Connectors {
         }
 
         [Fact]
-        public async void RecordByPlayerTypeOnlyResultsOfSaidPlayerType() {
+        public async Task RecordByPlayerTypeOnlyResultsOfSaidPlayerType() {
 
             var metric = MetricType.Agility;
             var type = PlayerType.HardcoreIronMan;
@@ -63,7 +63,7 @@ namespace WiseOldManConnectorTests.Connectors {
         }
 
         [Fact]
-        public async void RecordByParametersResultInRecordsWithDisplayName() {
+        public async Task RecordByParametersResultInRecordsWithDisplayName() {
 
             var metric = MetricType.Agility;
             var type = PlayerType.HardcoreIronMan;

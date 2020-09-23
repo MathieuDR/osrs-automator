@@ -14,7 +14,7 @@ namespace WiseOldManConnectorTests.Connectors {
         private readonly IWiseOldManPlayerApi _playerApi;
 
         [Fact]
-        public async void ViewPlayerByInvalidId() {
+        public async Task ViewPlayerByInvalidId() {
             int id = -1;
 
             Task act() => _playerApi.View(id);

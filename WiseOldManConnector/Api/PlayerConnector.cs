@@ -26,8 +26,8 @@ namespace WiseOldManConnector.Api {
             var request = GetNewRestRequest("search");
             request.AddParameter("username", username);
 
-            var result = await ExecuteCollectionRequest<SearchResponse>(request);
-            return GetResponse<SearchResponse, Player>(result);
+            var result = await ExecuteCollectionRequest<PlayerResponse>(request);
+            return GetResponse<PlayerResponse, Player>(result);
         }
 
         #endregion
