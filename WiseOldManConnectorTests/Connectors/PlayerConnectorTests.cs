@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
@@ -407,6 +408,19 @@ namespace WiseOldManConnectorTests.Connectors {
         }
 
         [Fact]
+        public async Task SnapshotByUsernameHoldsAllMetrics() {
+            string username = TestConfiguration.ValidPlayerUsernameWithValidCapatilization;
+
+            var response = await _playerApi.Snapshots(username);
+
+            var types = EnumHelper.GetMetricTypes(MetricTypeCategory.All);
+            var typesInResponse = response.Data.Combined.SelectMany(x => x.AllMetrics.Select(x=>x.Key)).Distinct().ToList();
+            foreach (var type in types) {
+                Assert.Contains(type, typesInResponse);
+            }
+        }
+
+        [Fact]
         public async Task TrackingMultipleTimesInShortPeriodResultsInException() {
             string username = TestConfiguration.SecondaryValidPlayerUserName;
             ConnectorResponse<WiseOldManConnector.Models.Output.Player> response = await _playerApi.Track(username);
@@ -441,11 +455,6 @@ namespace WiseOldManConnectorTests.Connectors {
 
             var response = _playerApi.AssertPlayerType(username);
             Assert.Equal(PlayerType.HardcoreIronMan, response.Result.Data);
-
-            //Task Act() => _playerApi.AssertPlayerType(username);
-            //var error = await Assert.ThrowsAsync<BadRequestException>(Act);
-
-            //Assert.Contains("hardcore", error.WiseOldManMessage, StringComparison.InvariantCultureIgnoreCase);
         }
 
         [Fact]

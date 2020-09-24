@@ -15,13 +15,13 @@ namespace WiseOldManConnector.Interfaces {
         Task<ConnectorCollectionResponse<Group>> Search(string name, int limit, int offset);
         Task<ConnectorResponse<Group>> View(int id);
         Task<ConnectorCollectionResponse<Player>> GetMembers(int id);
-        Task<ConnectorResponse<Player>> GetMonthTopMember(int id);
+        Task<ConnectorResponse<DeltaMember>> GetMonthTopMember(int id);
 
         Task<ConnectorCollectionResponse<Competition>> Competitions(int id);
         Task<ConnectorResponse<DeltaLeaderboard>> GainedLeaderboards(int id, MetricType metric, Period period);
         Task<ConnectorResponse<DeltaLeaderboard>> GainedLeaderboards(int id, MetricType metric, Period period, int limit, int offset);
-        Task<ConnectorResponse<HiscoreLeaderboard>> Highscores(int id, MetricType metric);
-        Task<ConnectorResponse<HiscoreLeaderboard>> Highscores(int id, MetricType metric, int limit, int offset);
+        Task<ConnectorResponse<HighscoreLeaderboard>> Highscores(int id, MetricType metric);
+        Task<ConnectorResponse<HighscoreLeaderboard>> Highscores(int id, MetricType metric, int limit, int offset);
         Task<ConnectorResponse<RecordLeaderboard>> RecordLeaderboards(int id, MetricType metric, Period period);
         Task<ConnectorResponse<RecordLeaderboard>> RecordLeaderboards(int id, MetricType metric, Period period, int limit, int offset);
         Task<ConnectorCollectionResponse<Achievement>> RecentAchievements(int id);

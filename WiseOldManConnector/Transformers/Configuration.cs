@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using AutoMapper;
 using WiseOldManConnector.Models.API.Responses;
 using WiseOldManConnector.Models.API.Responses.Models;
@@ -28,6 +29,7 @@ namespace WiseOldManConnector.Transformers {
 
                 //cfg.CreateMap<SearchResponse, Player>();
                 cfg.CreateMap<WOMGroup, Group>();
+                cfg.CreateMap<WOMGroupDeltaMember, DeltaMember>().ConvertUsing<WOMGroupTopMemberToDeltaMemberConverter>();
 
                 cfg.CreateMap<AssertPlayerTypeResponse, PlayerType>()
                     .ConvertUsing<AssertPlayerTypeResponseToPlayerTypeConverter>();
@@ -75,7 +77,41 @@ namespace WiseOldManConnector.Transformers {
 
                 cfg.CreateMap<WOMMessageResponse, MessageResponse>();
 
-                //cfg.CreateMap<>()
+                cfg.CreateMap<IEnumerable<WOMGroupDeltaMember>, DeltaLeaderboard>()
+                    .ForMember(dest => dest.Members, opt => opt.MapFrom(src => src));
+
+                cfg.CreateMap<LeaderboardMember, Player>();
+                cfg.CreateMap<LeaderboardMember, Metric>();
+
+                cfg.CreateMap<IEnumerable<LeaderboardMember>, HighscoreLeaderboard>()
+                    .ForMember(dest => dest.Members, opt => opt.MapFrom(src => src));
+
+                cfg.CreateMap<LeaderboardMember, HighscoreMember>()
+                    .ForMember(dest => dest.Player, opt => opt.MapFrom(src => src))
+                    .ForMember(dest => dest.Metric, opt => opt.MapFrom(src => src));
+
+                cfg.CreateMap<IEnumerable<LeaderboardMember>, HighscoreLeaderboard>()
+                    .ForMember(dest => dest.Members, opt => opt.MapFrom(src => src));
+
+                cfg.CreateMap<LeaderboardMember, HighscoreMember>()
+                    .ForMember(dest => dest.Player, opt => opt.MapFrom(src => src))
+                    .ForMember(dest => dest.Metric, opt => opt.MapFrom(src => src));
+
+                cfg.CreateMap<IEnumerable<LeaderboardMember>, RecordLeaderboard>()
+                    .ForMember(dest => dest.Members, opt => opt.MapFrom(src => src));
+
+                cfg.CreateMap<LeaderboardMember, Record>()
+                    .ForMember(dest => dest.Player, opt => opt.MapFrom(src => src))
+                    .ForMember(dest => dest.UpdateDateTime, opt => opt.MapFrom(src => src.UpdatedAt));
+
+                cfg.CreateMap<LeaderboardMember, Player>();
+
+                cfg.CreateMap<LeaderboardMember, Metric>();
+
+                cfg.CreateMap<StatisticsResponse, Statistics>()
+                    .ForMember(dest => dest.Maxed200MExpPlayers, opt => opt.MapFrom(src => src.Maxed200msCount))
+                    .ForMember(dest => dest.MaxedCombatPlayers, opt => opt.MapFrom(src => src.MaxedCombatCount))
+                    .ForMember(dest => dest.MaxedTotalPlayers, opt => opt.MapFrom(src => src.MaxedTotalCount));
             });
 
             return new Mapper(config);

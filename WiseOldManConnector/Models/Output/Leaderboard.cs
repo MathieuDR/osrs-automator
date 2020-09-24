@@ -38,7 +38,7 @@ namespace WiseOldManConnector.Models.Output {
         
     }
 
-    public class HiscoreLeaderboard : MetricTypeLeaderboard<HighscoreMember> {
+    public class HighscoreLeaderboard : MetricTypeLeaderboard<HighscoreMember> {
          
     }
 

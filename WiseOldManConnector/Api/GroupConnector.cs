@@ -61,13 +61,13 @@ namespace WiseOldManConnector.Api {
             return GetResponse<PlayerResponse, Player>(result);
         }
 
-        public async Task<ConnectorResponse<Player>> GetMonthTopMember(int id) {
+        public async Task<ConnectorResponse<DeltaMember>> GetMonthTopMember(int id) {
             var request = GetNewRestRequest("{id}/monthly-top");
 
             request.AddParameter("id", id, ParameterType.UrlSegment);
 
-            var result = await ExecuteRequest<PlayerResponse>(request);
-            return GetResponse<Player>(result);
+            var result = await ExecuteRequest<WOMGroupDeltaMember>(request);
+            return GetResponse<DeltaMember>(result);
         }
 
         public async Task<ConnectorCollectionResponse<Competition>> Competitions(int id) {
@@ -86,8 +86,13 @@ namespace WiseOldManConnector.Api {
             request.AddParameter("metric", metric.GetEnumValueNameOrDefault());
             request.AddParameter("period", period.GetEnumValueNameOrDefault());
 
-            var result = await ExecuteCollectionRequest<LeaderboardMember>(request);
-            return GetResponse<DeltaLeaderboard>(result);
+            var requestResult = await ExecuteCollectionRequest<WOMGroupDeltaMember>(request);
+            var result =  GetResponse<DeltaLeaderboard>(requestResult);
+            result.Data.PageSize = 20;
+            result.Data.Page = 0;
+            result.Data.MetricType = metric;
+            result.Data.Period = period;
+            return result;
         }
 
         public async Task<ConnectorResponse<DeltaLeaderboard>> GainedLeaderboards(int id, MetricType metric, Period period, int limit, int offset) {
@@ -98,29 +103,52 @@ namespace WiseOldManConnector.Api {
             request.AddParameter("period", period.GetEnumValueNameOrDefault());
             AddPaging(request, limit, offset);
 
-            var result = await ExecuteCollectionRequest<LeaderboardMember>(request);
-            return GetResponse<DeltaLeaderboard>(result);
+            var requestResult = await ExecuteCollectionRequest<WOMGroupDeltaMember>(request);
+            var result =  GetResponse<DeltaLeaderboard>(requestResult);
+            result.Data.PageSize = limit;
+            result.Data.Page = offset;
+            result.Data.MetricType = metric;
+            result.Data.Period = period;
+            return result;
         }
 
-        public async Task<ConnectorResponse<HiscoreLeaderboard>> Highscores(int id, MetricType metric) {
+        public async Task<ConnectorResponse<HighscoreLeaderboard>> Highscores(int id, MetricType metric) {
             var request = GetNewRestRequest("{id}/hiscores");
 
             request.AddParameter("id", id, ParameterType.UrlSegment);
             request.AddParameter("metric", metric.GetEnumValueNameOrDefault());
 
-            var result = await ExecuteCollectionRequest<LeaderboardMember>(request);
-            return GetResponse<HiscoreLeaderboard>(result);
+            var requestResult = await ExecuteCollectionRequest<LeaderboardMember>(request);
+            var result = GetResponse<HighscoreLeaderboard>(requestResult);
+
+            result.Data.Page = 0;
+            result.Data.PageSize = 20;
+
+            foreach (HighscoreMember member in result.Data.Members) {
+                member.MetricType = metric;
+            }
+
+            return result;
         }
 
-        public async Task<ConnectorResponse<HiscoreLeaderboard>> Highscores(int id, MetricType metric, int limit, int offset) {
+        public async Task<ConnectorResponse<HighscoreLeaderboard>> Highscores(int id, MetricType metric, int limit, int offset) {
             var request = GetNewRestRequest("{id}/hiscores");
 
             request.AddParameter("id", id, ParameterType.UrlSegment);
             request.AddParameter("metric", metric.GetEnumValueNameOrDefault());
             AddPaging(request, limit, offset);
 
-            var result = await ExecuteCollectionRequest<LeaderboardMember>(request);
-            return GetResponse<HiscoreLeaderboard>(result);
+            var requestResult = await ExecuteCollectionRequest<LeaderboardMember>(request);
+            var result = GetResponse<HighscoreLeaderboard>(requestResult);
+
+            result.Data.Page = offset;
+            result.Data.PageSize = limit;
+
+            foreach (HighscoreMember member in result.Data.Members) {
+                member.MetricType = metric;
+            }
+
+            return result;
         }
 
         public async Task<ConnectorResponse<RecordLeaderboard>> RecordLeaderboards(int id, MetricType metric, Period period) {
@@ -130,8 +158,15 @@ namespace WiseOldManConnector.Api {
             request.AddParameter("metric", metric.GetEnumValueNameOrDefault());
             request.AddParameter("period", period.GetEnumValueNameOrDefault());
 
-            var result = await ExecuteCollectionRequest<LeaderboardMember>(request);
-            return GetResponse<RecordLeaderboard>(result);
+            var requestResult = await ExecuteCollectionRequest<LeaderboardMember>(request);
+            var result = GetResponse<RecordLeaderboard>(requestResult);
+
+            result.Data.PageSize = 20;
+            result.Data.Page = 0;
+            result.Data.Period = period;
+            result.Data.MetricType = metric;
+
+            return result;
         }
 
         public async Task<ConnectorResponse<RecordLeaderboard>> RecordLeaderboards(int id, MetricType metric, Period period, int limit, int offset) {
@@ -142,8 +177,15 @@ namespace WiseOldManConnector.Api {
             request.AddParameter("period", period.GetEnumValueNameOrDefault());
             AddPaging(request, limit, offset);
 
-            var result = await ExecuteCollectionRequest<LeaderboardMember>(request);
-            return GetResponse<RecordLeaderboard>(result);
+            var requestResult = await ExecuteCollectionRequest<LeaderboardMember>(request);
+            var result = GetResponse<RecordLeaderboard>(requestResult);
+
+            result.Data.PageSize = limit;
+            result.Data.Page = offset;
+            result.Data.Period = period;
+            result.Data.MetricType = metric;
+
+            return result;
         }
 
         public async Task<ConnectorCollectionResponse<Achievement>> RecentAchievements(int id) {
