@@ -30,13 +30,18 @@ namespace WiseOldManConnector.Api {
         protected abstract string Area { get; }
 
         private void LogRequest(RestRequest request) {
-            Logger?.Log(LogLevel.Information, null, "Request sent to Wise old man API. [{Resource}, {Parameters:j}]",
-                request.Resource, request.Parameters);
+            Logger?.Log(LogLevel.Information, null, "Request sent to Wise old man API. [{Resource}, {Parameters:j}]", request.Resource, request.Parameters);
+        }
+
+
+        private void LogResponse(IRestResponse response) {
+            Logger?.Log(LogLevel.Information, null, "Response received from Wise Old Man API. [{Resource}, {Content:j}]", response.Content, response.Request.Resource);
         }
 
         protected async Task<T> ExecuteRequest<T>(RestRequest request) where T : IResponse {
             LogRequest(request);
             IRestResponse<T> result = await Client.ExecuteAsync<T>(request);
+            LogResponse(result);
 
             ValidateResponse(result);
             return result.Data;
@@ -45,6 +50,7 @@ namespace WiseOldManConnector.Api {
         protected async Task<IEnumerable<T>> ExecuteCollectionRequest<T>(RestRequest request) where T : IResponse {
             LogRequest(request);
             IRestResponse<List<T>> result = await Client.ExecuteAsync<List<T>>(request);
+            LogResponse(result);
 
             ValidateResponse(result);
             return result.Data;
@@ -65,6 +71,9 @@ namespace WiseOldManConnector.Api {
             return new ConnectorResponse<T>(mapped);
         }
 
+        protected RestRequest GetNewRestRequest() {
+            return GetNewRestRequest("");
+        }
 
         protected RestRequest GetNewRestRequest(string resourcePath) {
             string resource = $"{Area}";
@@ -72,7 +81,9 @@ namespace WiseOldManConnector.Api {
                 resource = $"{resource}/{resourcePath}";
             }
 
-            return new RestRequest(resource, DataFormat.Json);
+            var request =  new RestRequest(resource, DataFormat.Json);
+            request.JsonSerializer = new JsonNetSerializer();
+            return request;
         }
 
         private void ValidateResponse<T>(IRestResponse<T> response) {

@@ -27,8 +27,8 @@ namespace WiseOldManConnector.Interfaces {
         Task<ConnectorCollectionResponse<Achievement>> RecentAchievements(int id);
         Task<ConnectorCollectionResponse<Achievement>> RecentAchievements(int id, int limit, int offset);
         Task<ConnectorResponse<Statistics>> Statistics(int id);
-        Task<ConnectorResponse<Group>> Create(CreateGroupRequest request);
-        Task<ConnectorResponse<Group>> Edit(EditGroupRequest request);
+        Task<ConnectorResponse<VerificationGroup>> Create(CreateGroupRequest request);
+        Task<ConnectorResponse<Group>> Edit(int id, EditGroupRequest request);
         Task<ConnectorResponse<MessageResponse>> Delete(int id, string verificationCode);
         //Task<ConnectorResponse<WOMGroup>> AddMembers(string verificationCode, IEnumerable<GroupMember> members);
         Task<ConnectorResponse<Group>> AddMembers(string verificationCode, IEnumerable<string> members);

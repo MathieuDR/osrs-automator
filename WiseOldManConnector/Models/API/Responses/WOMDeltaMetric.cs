@@ -1,4 +1,4 @@
-﻿namespace WiseOldManConnector.Models.API.Responses.Models {
+﻿namespace WiseOldManConnector.Models.API.Responses {
     internal class WOMDeltaMetric {
         public WOMDelta Rank { get; set; }
         public WOMDelta Experience { get; set; }

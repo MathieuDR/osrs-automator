@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using Newtonsoft.Json;
-using WiseOldManConnector.Models.API.Responses.Models;
 
 namespace WiseOldManConnector.Models.API.Responses {
     internal class SnapshotsResponse : BaseResponse {

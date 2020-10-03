@@ -1,9 +1,7 @@
 ﻿using System;
-using System.ComponentModel;
 using Newtonsoft.Json;
-using WiseOldManConnector.Models.WiseOldMan.Enums;
 
-namespace WiseOldManConnector.Models.API.Responses.Models {
+namespace WiseOldManConnector.Models.API.Responses {
     internal class WOMRecord : BaseResponse {
 
         [JsonProperty("value")]

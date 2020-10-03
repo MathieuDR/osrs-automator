@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
 using WiseOldManConnector.Helpers;
@@ -8,6 +9,7 @@ using WiseOldManConnector.Interfaces;
 using WiseOldManConnector.Models;
 using WiseOldManConnector.Models.Output;
 using WiseOldManConnector.Models.Output.Exceptions;
+using WiseOldManConnector.Models.Requests;
 using WiseOldManConnector.Models.WiseOldMan.Enums;
 using WiseOldManConnectorTests.Configuration;
 using WiseOldManConnectorTests.Fixtures;
@@ -109,7 +111,6 @@ namespace WiseOldManConnectorTests.Connectors {
             Assert.NotEmpty(response.Data);
         }
 
-        
         [Fact]
         public async Task MembersFromGroupResultInValidPlayers() {
             int id = TestConfiguration.ValidGroupId;
@@ -125,8 +126,6 @@ namespace WiseOldManConnectorTests.Connectors {
             Assert.True(player.UpdatedAt < DateTimeOffset.Now);
             Assert.True(player.RegisteredAt < DateTimeOffset.Now);
         }
-
-     
 
         [Fact]
         public async Task MonthlyTopPlayOfValidGroupResultsInPlayer() {
@@ -446,6 +445,40 @@ namespace WiseOldManConnectorTests.Connectors {
             foreach (var type in types) {
                 Assert.Contains(type, typesInResponse);
             }
+        }
+
+        [Fact]
+        public async Task CreateGroupResultsInGroupWithVerificationCode() {
+            var request = new CreateGroupRequest(GetClanName(), "myChat", new List<MemberRequest>() {
+                new MemberRequest() {Name = "ErkendRserke"},
+                new MemberRequest() {Name = "Den Badjas", Role = GroupRole.Leader}
+            });
+
+            var response = await _groupApi.Create(request);
+
+            try {
+                Assert.NotNull(response.Data);
+                Assert.NotEmpty(response.Data.VerificationCode);
+            }
+            finally {
+                DeleteGroup(response.Data.Id, response.Data.VerificationCode);
+            }
+        }
+
+        private string GetClanName() {
+            string id = Convert.ToBase64String(Guid.NewGuid().ToByteArray());
+            id = Regex.Replace(id, "[/+=]", "");
+            string suffix = "_.NETCONNECTOR";
+
+            if (id.Length + suffix.Length > 30) {
+                id = id.Substring(0, 30 - suffix.Length);
+            }
+
+            return $"{id}{suffix}";
+        }
+
+        private void DeleteGroup(int id, string verificationCode) {
+
         }
     }
 }

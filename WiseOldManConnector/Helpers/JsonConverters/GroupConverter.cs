@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using WiseOldManConnector.Models.API.Responses;
-using WiseOldManConnector.Models.API.Responses.Models;
 
 namespace WiseOldManConnector.Helpers.JsonConverters {
     internal class GroupMemberConverter : JsonConverter {

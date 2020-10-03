@@ -1,11 +1,13 @@
 ﻿using System.Collections.Generic;
 using AutoMapper;
+using WiseOldManConnector.Models.API.Responses;
 using WiseOldManConnector.Models.Output;
 using WiseOldManConnector.Models.WiseOldMan.Enums;
+using Metric = WiseOldManConnector.Models.Output.Metric;
 
 namespace WiseOldManConnector.Transformers.Resolvers {
-    internal class MetricToDictionaryResolver : IValueResolver<Models.API.Responses.Models.WOMSnapshot, Snapshot, Dictionary<MetricType, Metric>> {
-        public Dictionary<MetricType, Metric> Resolve(Models.API.Responses.Models.WOMSnapshot source, Snapshot destination, Dictionary<MetricType, Metric> destMember, ResolutionContext context) {
+    internal class MetricToDictionaryResolver : IValueResolver<WOMSnapshot, Snapshot, Dictionary<MetricType, Metric>> {
+        public Dictionary<MetricType, Metric> Resolve(WOMSnapshot source, Snapshot destination, Dictionary<MetricType, Metric> destMember, ResolutionContext context) {
             var result = new Dictionary<MetricType, Metric>() {
                 {MetricType.Overall, context.Mapper.Map<Metric>(source.Overall)},
                 {MetricType.Attack, context.Mapper.Map<Metric>(source.Attack)},

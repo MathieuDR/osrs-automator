@@ -1,7 +1,6 @@
 ﻿using System;
 using AutoMapper;
 using WiseOldManConnector.Models.API.Responses;
-using WiseOldManConnector.Models.API.Responses.Models;
 using WiseOldManConnector.Models.Output;
 using WiseOldManConnector.Models.WiseOldMan.Enums;
 

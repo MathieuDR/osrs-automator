@@ -1,4 +1,5 @@
 ﻿using System;
+using WiseOldManConnector.Models.Requests;
 
 namespace WiseOldManConnector.Models.Output {
     public class Group {
@@ -10,5 +11,9 @@ namespace WiseOldManConnector.Models.Output {
         public Boolean Verified { get; set; }
         public DateTime CreatedAt { get; set; }
         public DateTime UpdatedAt { get; set; }
+    }
+
+    public class VerificationGroup: Group, IVerifiable {
+        public string VerificationCode { get; set; }
     }
 }

@@ -1,12 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using Newtonsoft.Json;
 using RestSharp;
 using WiseOldManConnector.Helpers;
 using WiseOldManConnector.Interfaces;
 using WiseOldManConnector.Models;
 using WiseOldManConnector.Models.API.Responses;
-using WiseOldManConnector.Models.API.Responses.Models;
 using WiseOldManConnector.Models.Output;
 using WiseOldManConnector.Models.Requests;
 using WiseOldManConnector.Models.WiseOldMan.Enums;
@@ -216,16 +216,33 @@ namespace WiseOldManConnector.Api {
             return GetResponse<Statistics>(result);
         }
 
-        public async Task<ConnectorResponse<Group>> Create(CreateGroupRequest request) {
-            throw new NotImplementedException();
+        public async Task<ConnectorResponse<VerificationGroup>> Create(CreateGroupRequest request) {
+            var restRequest = GetNewRestRequest();
+            restRequest.Method = Method.POST;
+            restRequest.AddJsonBody(request);
+
+            var restResult = await ExecuteRequest<GroupCreateResponse>(restRequest);
+            return GetResponse<VerificationGroup>(restResult);
         }
 
-        public async Task<ConnectorResponse<Group>> Edit(EditGroupRequest request) {
-            throw new NotImplementedException();
+        public async Task<ConnectorResponse<Group>> Edit(int id, EditGroupRequest request) {
+            var restRequest = GetNewRestRequest("{id}");
+            restRequest.AddParameter("id", id, ParameterType.UrlSegment);
+            restRequest.Method = Method.PUT;
+            restRequest.AddJsonBody(request);
+
+            var restResult = await ExecuteRequest<GroupEditResponse>(restRequest);
+            return GetResponse<Group>(restResult);
         }
 
         public async Task<ConnectorResponse<MessageResponse>> Delete(int id, string verificationCode) {
-            throw new NotImplementedException();
+            var restRequest = GetNewRestRequest("{id}");
+            restRequest.AddParameter("id", id, ParameterType.UrlSegment);
+            restRequest.Method = Method.DELETE;
+            restRequest.AddJsonBody(verificationCode);
+
+            var restResult = await ExecuteRequest<WOMMessageResponse>(restRequest);
+            return GetResponse<MessageResponse>(restResult);
         }
 
         public async Task<ConnectorResponse<Group>> AddMembers(string verificationCode, IEnumerable<string> members) {

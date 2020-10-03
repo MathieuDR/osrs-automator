@@ -1,9 +1,6 @@
-﻿using System.Collections.Generic;
-using System.Linq;
-using Newtonsoft.Json;
-using WiseOldManConnector.Models.WiseOldMan.Enums;
+﻿using Newtonsoft.Json;
 
-namespace WiseOldManConnector.Models.API.Responses.Models {
+namespace WiseOldManConnector.Models.API.Responses {
     internal class DeltaMetrics {
       public WOMDeltaMetric Overall { get; set; }
         public WOMDeltaMetric Attack { get; set; }

@@ -1,8 +1,7 @@
 ﻿using System;
 using Newtonsoft.Json;
-using WiseOldManConnector.Models.WiseOldMan.Enums;
 
-namespace WiseOldManConnector.Models.API.Responses.Models {
+namespace WiseOldManConnector.Models.API.Responses {
     internal class LeaderboardMember : PlayerResponse {
         [JsonProperty("playerId")]
         private int PlayerId { set => Id = value; }

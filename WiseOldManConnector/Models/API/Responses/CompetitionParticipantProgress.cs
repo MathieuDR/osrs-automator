@@ -1,6 +1,6 @@
 ﻿using Newtonsoft.Json;
 
-namespace WiseOldManConnector.Models.API.Responses.Models {
+namespace WiseOldManConnector.Models.API.Responses {
     internal class CompetitionParticipantProgress {
     
 

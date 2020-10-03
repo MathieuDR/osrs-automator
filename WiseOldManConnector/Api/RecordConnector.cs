@@ -4,7 +4,6 @@ using WiseOldManConnector.Helpers;
 using WiseOldManConnector.Interfaces;
 using WiseOldManConnector.Models;
 using WiseOldManConnector.Models.API.Responses;
-using WiseOldManConnector.Models.API.Responses.Models;
 using WiseOldManConnector.Models.Output;
 using WiseOldManConnector.Models.WiseOldMan.Enums;
 

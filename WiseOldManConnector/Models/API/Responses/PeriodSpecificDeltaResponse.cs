@@ -1,6 +1,5 @@
 ﻿using System;
 using Newtonsoft.Json;
-using WiseOldManConnector.Models.API.Responses.Models;
 using WiseOldManConnector.Models.WiseOldMan.Enums;
 
 namespace WiseOldManConnector.Models.API.Responses {

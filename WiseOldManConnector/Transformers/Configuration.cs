@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using AutoMapper;
 using WiseOldManConnector.Models.API.Responses;
-using WiseOldManConnector.Models.API.Responses.Models;
 using WiseOldManConnector.Models.Output;
 using WiseOldManConnector.Models.WiseOldMan.Enums;
 using WiseOldManConnector.Transformers.Resolvers;
@@ -16,8 +15,8 @@ namespace WiseOldManConnector.Transformers {
             var config = new MapperConfiguration(cfg => {
                 //cfg.CreateMap<string, MetricType>().ConvertUsing<StringToMetricTypeConverter>();
                 cfg.CreateMap<PlayerResponse, Player>();
-                cfg.CreateMap<WiseOldManConnector.Models.API.Responses.Models.Metric, Metric>();
-                cfg.CreateMap<Models.API.Responses.Models.WOMSnapshot, Snapshot>()
+                cfg.CreateMap<Models.API.Responses.Metric, Metric>();
+                cfg.CreateMap<WOMSnapshot, Snapshot>()
                     .ForMember(dest => dest.AllMetrics, opt => opt.MapFrom<MetricToDictionaryResolver>());
 
                 cfg.CreateMap<WOMCompetition, Competition>()
@@ -39,7 +38,7 @@ namespace WiseOldManConnector.Transformers {
                 
 
 
-                cfg.CreateMap<Models.API.Responses.Models.WOMAchievement, Achievement>()
+                cfg.CreateMap<WOMAchievement, Achievement>()
                     .ForMember(dest => dest.AchievedAt, opt => opt.MapFrom(src => src.CreatedAt))
                     .ForMember(dest => dest.Title, opt => opt.MapFrom(src => src.Type))
                     .ForMember(dest => dest.IsMissing, opt => opt.MapFrom(src => src.Missing));

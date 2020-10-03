@@ -1,7 +1,7 @@
 ﻿using System;
 using Newtonsoft.Json;
 
-namespace WiseOldManConnector.Models.API.Responses.Models {
+namespace WiseOldManConnector.Models.API.Responses {
     internal class WOMGroupDeltaMember : BaseResponse {
         [JsonProperty("startDate")]
         public DateTime StartDate { get; set; }
