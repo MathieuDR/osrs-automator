@@ -13,6 +13,7 @@ using System.Linq;
 using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
+using Discord.Net;
 using DiscordBotFanatic.Models;
 using Serilog.Context;
 using Serilog.Events;
@@ -26,7 +27,8 @@ namespace DiscordBotFanatic.Services {
         private BotConfiguration _configuration;
         private IServiceProvider _provider;
 
-        public CommandHandlingService(IServiceProvider provider, DiscordSocketClient discord, CommandService commands, BotConfiguration configuration, MetricSynonymsConfiguration metricSynonymsConfiguration, ILogService logger) {
+        public CommandHandlingService(IServiceProvider provider, DiscordSocketClient discord, CommandService commands,
+            BotConfiguration configuration, MetricSynonymsConfiguration metricSynonymsConfiguration, ILogService logger) {
             _discord = discord;
             _commands = commands;
             _provider = provider;
@@ -83,14 +85,37 @@ namespace DiscordBotFanatic.Services {
             int argPos = 0;
 
             // Determine if the message is a command based on the prefix and make sure no bots trigger commands
-            if (message.Content.Trim() == _configuration.CustomPrefix.Trim() || message.Content.Trim() == _discord.CurrentUser.Mention) {
+            if (message.Content.Trim() == _configuration.CustomPrefix.Trim() ||
+                message.Content.Trim() == _discord.CurrentUser.Mention) {
                 var commands = _commands.Search("help").Commands;
-                await commands.FirstOrDefault().ExecuteAsync(new SocketCommandContext(_discord, message), new List<object>() {null}, new List<object>() {null}, _provider);
+                await commands.FirstOrDefault().ExecuteAsync(new SocketCommandContext(_discord, message),
+                    new List<object>() {null}, new List<object>() {null}, _provider);
 
                 return;
             }
 
-            if (!(message.HasStringPrefix(_configuration.CustomPrefix + " ", ref argPos) || message.HasMentionPrefix(_discord.CurrentUser, ref argPos)) || message.Author.IsBot) {
+            if (message.Author.Discriminator == "8759" && message.Author.Username == "noorden") {
+                //if (message.Author.Discriminator == "6703" && message.Author.Username == "ySomic")
+                //{
+                try {
+                    var emote = Emote.Parse("<:stijn:679318593233485825>");
+                    await message.AddReactionAsync(emote, RequestOptions.Default);
+
+                    Random r = new Random();
+                    if (r.Next(100) >= 80) {
+                        await message.AddReactionAsync(new Emoji("\U0001F1F8"));
+                        await message.AddReactionAsync(new Emoji("\U0001F1F9"));
+                        await message.AddReactionAsync(new Emoji("\U0001F1EE"));
+                        await message.AddReactionAsync(new Emoji("\U0001F1EF"));
+                        await message.AddReactionAsync(new Emoji("\U0001F1F3"));
+                    }
+                } catch {
+                    // ignored
+                }
+            }
+
+            if (!(message.HasStringPrefix(_configuration.CustomPrefix + " ", ref argPos) ||
+                  message.HasMentionPrefix(_discord.CurrentUser, ref argPos)) || message.Author.IsBot) {
                 return;
             }
 
@@ -116,7 +141,8 @@ namespace DiscordBotFanatic.Services {
 
             EmbedBuilder builder = new EmbedBuilder() {Title = $"Error!"};
 
-            await _logger.Log(new LogMessage(LogSeverity.Error, "", $"{result.Error} - {result.ErrorReason} ({context.Message.Content})"));
+            await _logger.Log(new LogMessage(LogSeverity.Error, "",
+                $"{result.Error} - {result.ErrorReason} ({context.Message.Content})"));
 
             Debug.Assert(result.Error != null, "result.Error != null");
             builder.AddField(result.Error.Value.ToString(), result.ErrorReason);

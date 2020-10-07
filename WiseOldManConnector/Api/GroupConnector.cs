@@ -239,7 +239,7 @@ namespace WiseOldManConnector.Api {
             var restRequest = GetNewRestRequest("{id}");
             restRequest.AddParameter("id", id, ParameterType.UrlSegment);
             restRequest.Method = Method.DELETE;
-            restRequest.AddJsonBody(verificationCode);
+            restRequest.AddJsonBody(new {verificationCode});
 
             var restResult = await ExecuteRequest<WOMMessageResponse>(restRequest);
             return GetResponse<MessageResponse>(restResult);

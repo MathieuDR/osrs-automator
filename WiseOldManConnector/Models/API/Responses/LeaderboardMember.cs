@@ -2,12 +2,9 @@
 using Newtonsoft.Json;
 
 namespace WiseOldManConnector.Models.API.Responses {
-    internal class LeaderboardMember : PlayerResponse {
-        [JsonProperty("playerId")]
-        private int PlayerId { set => Id = value; }
-
-        [JsonProperty("type")]
-        public string PlayerType { get; set; }
+    internal class LeaderboardMember : BaseResponse{
+        [JsonProperty("player")]
+        public PlayerResponse Player { get; set; }
 
         [JsonProperty("startDate")]
         public DateTime StartDate { get; set; }
@@ -35,5 +32,11 @@ namespace WiseOldManConnector.Models.API.Responses {
 
         [JsonProperty("level")]
         public int Level { get; set; }
+
+        [JsonProperty("kills")]
+        public int Kills { get; set; }
+
+        [JsonProperty("score")]
+        public int Sills { get; set; }
     }
 }

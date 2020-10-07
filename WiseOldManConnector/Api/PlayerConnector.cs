@@ -130,15 +130,15 @@ namespace WiseOldManConnector.Api {
 
         #region snapshots
 
-        public async Task<ConnectorResponse<Snapshots>> Snapshots(int id) {
-            var request = GetNewRestRequest("/{id}/snapshots"); 
-            request.AddParameter("id", id, ParameterType.UrlSegment);
+        //public async Task<ConnectorResponse<Snapshots>> Snapshots(int id) {
+        //    var request = GetNewRestRequest("/{id}/snapshots"); 
+        //    request.AddParameter("id", id, ParameterType.UrlSegment);
             
-            var result = await ExecuteRequest<SnapshotsResponse>(request);
+        //    var result = await ExecuteRequest<SnapshotsResponse>(request);
 
 
-            return GetResponse<Snapshots>(result);
-        }
+        //    return GetResponse<Snapshots>(result);
+        //}
 
         public async Task<ConnectorCollectionResponse<Snapshot>> Snapshots(int id, Period period) {
             var request = GetNewRestRequest("/{id}/snapshots");
@@ -149,13 +149,13 @@ namespace WiseOldManConnector.Api {
             return GetResponse<WOMSnapshot, Snapshot>(result);
         }
 
-        public async Task<ConnectorResponse<Snapshots>> Snapshots(string username) {
-            var request = GetNewRestRequest("/username/{username}/snapshots");
-            request.AddParameter("username", username, ParameterType.UrlSegment);
+        //public async Task<ConnectorResponse<Snapshots>> Snapshots(string username) {
+        //    var request = GetNewRestRequest("/username/{username}/snapshots");
+        //    request.AddParameter("username", username, ParameterType.UrlSegment);
 
-            var result = await ExecuteRequest<SnapshotsResponse>(request);
-            return GetResponse<Snapshots>(result);
-        }
+        //    var result = await ExecuteRequest<SnapshotsResponse>(request);
+        //    return GetResponse<Snapshots>(result);
+        //}
 
         public async Task<ConnectorCollectionResponse<Snapshot>> Snapshots(string username, Period period) {
             var request = GetNewRestRequest("/username/{username}/snapshots");

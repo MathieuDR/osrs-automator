@@ -171,22 +171,24 @@ namespace WiseOldManConnectorTests.Connectors {
         }
 
         // Cannot Test
-        //[Fact]
-        //public async Task DisplayNameAssertionIsCorrectlyCapatalized() {
-        //    var username = TestConfiguration.ValidPlayerUsernameWithValidCapatilization.ToLowerInvariant();
-
-        //    var response = await _playerApi.AssertDisplayName(username);
-        //    Assert.Equal(TestConfiguration.ValidPlayerUsernameWithValidCapatilization, response.Data);
-        //}
-
         [Fact]
-        public async Task DisplayNameAssertionByCorrectDisplayNameThrowsException() {
+        public async Task DisplayNameAssertionIsCorrectlyCapatalized() {
             var username = TestConfiguration.ValidPlayerUsernameWithValidCapatilization.ToLowerInvariant();
 
-            Task Act() => _playerApi.AssertDisplayName(username);
-            var error = await Assert.ThrowsAsync<BadRequestException>(Act);
-            Assert.Contains("No change required", error.Message); 
+            var response = await _playerApi.AssertDisplayName(username);
+            Assert.Equal(TestConfiguration.ValidPlayerUsernameWithValidCapatilization, response.Data);
         }
+
+        //[Fact]
+        //public async Task DisplayNameAssertionByCorrectDisplayNameThrowsException() {
+        //    var username = TestConfiguration.ValidPlayerUsernameWithValidCapatilization.ToLowerInvariant();
+
+        //    Task Act() => _playerApi.AssertDisplayName(username);
+        //    var error = await Assert.ThrowsAsync<BadRequestException>(Act);
+        //    Assert.Contains("No change required", error.Message); 
+        //}
+
+
 
         [Fact]
         public void DisplayNameAssertionWithoutUsernameThrowsException() {
@@ -333,22 +335,22 @@ namespace WiseOldManConnectorTests.Connectors {
             Assert.NotEmpty(response.Data);
         }
 
-        [Fact]
-        public async Task SnapshotByIdResultsInMultipleSnapshots() {
-            int id = TestConfiguration.ValidPlayerId;
+        //[Fact]
+        //public async Task SnapshotByIdResultsInMultipleSnapshots() {
+        //    int id = TestConfiguration.ValidPlayerId;
 
-            ConnectorResponse<Snapshots> response = await _playerApi.Snapshots(id);
+        //    ConnectorResponse<Snapshots> response = await _playerApi.Snapshots(id);
 
-            Assert.NotNull(response);
-            Assert.NotNull(response.Data);
-            Assert.NotEmpty(response.Data.Day);
-            Assert.NotEmpty(response.Data.Week);
-            Assert.NotEmpty(response.Data.Month);
-            Assert.NotEmpty(response.Data.Year);
-            Assert.NotEmpty(response.Data.Combined);
-            Assert.True(response.Data.Combined.Count == (response.Data.Week.Count + response.Data.Day.Count +
-                                                         response.Data.Month.Count + response.Data.Year.Count));
-        }
+        //    Assert.NotNull(response);
+        //    Assert.NotNull(response.Data);
+        //    Assert.NotEmpty(response.Data.Day);
+        //    Assert.NotEmpty(response.Data.Week);
+        //    Assert.NotEmpty(response.Data.Month);
+        //    Assert.NotEmpty(response.Data.Year);
+        //    Assert.NotEmpty(response.Data.Combined);
+        //    Assert.True(response.Data.Combined.Count == (response.Data.Week.Count + response.Data.Day.Count +
+        //                                                 response.Data.Month.Count + response.Data.Year.Count));
+        //}
 
         [Fact]
         public async Task SnapshotByUsernameAndDayPeriodResultsInMultipleSnapshots() {
@@ -390,35 +392,35 @@ namespace WiseOldManConnectorTests.Connectors {
             Assert.NotEmpty(response.Data);
         }
 
-        [Fact]
-        public async Task SnapshotByUsernameResultsInMultipleSnapshots() {
-            string username = TestConfiguration.ValidPlayerUsernameWithValidCapatilization;
+        //[Fact]
+        //public async Task SnapshotByUsernameResultsInMultipleSnapshots() {
+        //    string username = TestConfiguration.ValidPlayerUsernameWithValidCapatilization;
 
-            ConnectorResponse<Snapshots> response = await _playerApi.Snapshots(username);
+        //    ConnectorResponse<Snapshots> response = await _playerApi.Snapshots(username);
 
-            Assert.NotNull(response);
-            Assert.NotNull(response.Data);
-            Assert.NotEmpty(response.Data.Day);
-            Assert.NotEmpty(response.Data.Week);
-            Assert.NotEmpty(response.Data.Month);
-            Assert.NotEmpty(response.Data.Year);
-            Assert.NotEmpty(response.Data.Combined);
-            Assert.True(response.Data.Combined.Count == (response.Data.Week.Count + response.Data.Day.Count +
-                                                         response.Data.Month.Count + response.Data.Year.Count));
-        }
+        //    Assert.NotNull(response);
+        //    Assert.NotNull(response.Data);
+        //    Assert.NotEmpty(response.Data.Day);
+        //    Assert.NotEmpty(response.Data.Week);
+        //    Assert.NotEmpty(response.Data.Month);
+        //    Assert.NotEmpty(response.Data.Year);
+        //    Assert.NotEmpty(response.Data.Combined);
+        //    Assert.True(response.Data.Combined.Count == (response.Data.Week.Count + response.Data.Day.Count +
+        //                                                 response.Data.Month.Count + response.Data.Year.Count));
+        //}
 
-        [Fact]
-        public async Task SnapshotByUsernameHoldsAllMetrics() {
-            string username = TestConfiguration.ValidPlayerUsernameWithValidCapatilization;
+        //[Fact]
+        //public async Task SnapshotByUsernameHoldsAllMetrics() {
+        //    string username = TestConfiguration.ValidPlayerUsernameWithValidCapatilization;
 
-            var response = await _playerApi.Snapshots(username);
+        //    var response = await _playerApi.Snapshots(username);
 
-            var types = EnumHelper.GetMetricTypes(MetricTypeCategory.All);
-            var typesInResponse = response.Data.Combined.SelectMany(x => x.AllMetrics.Select(x=>x.Key)).Distinct().ToList();
-            foreach (var type in types) {
-                Assert.Contains(type, typesInResponse);
-            }
-        }
+        //    var types = EnumHelper.GetMetricTypes(MetricTypeCategory.All);
+        //    var typesInResponse = response.Data.Combined.SelectMany(x => x.AllMetrics.Select(x=>x.Key)).Distinct().ToList();
+        //    foreach (var type in types) {
+        //        Assert.Contains(type, typesInResponse);
+        //    }
+        //}
 
         [Fact]
         public async Task TrackingMultipleTimesInShortPeriodResultsInException() {

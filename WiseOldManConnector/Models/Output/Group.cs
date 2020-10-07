@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using WiseOldManConnector.Models.Requests;
 
 namespace WiseOldManConnector.Models.Output {
@@ -7,6 +8,7 @@ namespace WiseOldManConnector.Models.Output {
         public string Name { get; set; }
         public int Score { get; set; }
         public int MemberCount { get; set; }
+        public List<Player> Members { get; set; }
         public string ClanChat { get; set; }
         public Boolean Verified { get; set; }
         public DateTime CreatedAt { get; set; }

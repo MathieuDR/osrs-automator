@@ -28,6 +28,10 @@ namespace WiseOldManConnector.Transformers {
 
                 //cfg.CreateMap<SearchResponse, Player>();
                 cfg.CreateMap<WOMGroup, Group>();
+                cfg.CreateMap<GroupCreateResponse, VerificationGroup>();
+                cfg.CreateMap<GroupEditResponse, Group>();
+                
+
                 cfg.CreateMap<WOMGroupDeltaMember, DeltaMember>().ConvertUsing<WOMGroupTopMemberToDeltaMemberConverter>();
 
                 cfg.CreateMap<AssertPlayerTypeResponse, PlayerType>()
@@ -93,15 +97,15 @@ namespace WiseOldManConnector.Transformers {
                     .ForMember(dest => dest.Members, opt => opt.MapFrom(src => src));
 
                 cfg.CreateMap<LeaderboardMember, HighscoreMember>()
-                    .ForMember(dest => dest.Player, opt => opt.MapFrom(src => src))
+                    .ForMember(dest => dest.Player, opt => opt.MapFrom(src => src.Player))
                     .ForMember(dest => dest.Metric, opt => opt.MapFrom(src => src));
 
                 cfg.CreateMap<IEnumerable<LeaderboardMember>, RecordLeaderboard>()
                     .ForMember(dest => dest.Members, opt => opt.MapFrom(src => src));
 
                 cfg.CreateMap<LeaderboardMember, Record>()
-                    .ForMember(dest => dest.Player, opt => opt.MapFrom(src => src))
-                    .ForMember(dest => dest.UpdateDateTime, opt => opt.MapFrom(src => src.UpdatedAt));
+                    .ForMember(dest => dest.Player, opt => opt.MapFrom(src => src.Player))
+                    .ForMember(dest => dest.UpdateDateTime, opt => opt.MapFrom(src => src.Player.UpdatedAt));
 
                 cfg.CreateMap<LeaderboardMember, Player>();
 
