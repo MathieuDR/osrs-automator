@@ -42,8 +42,8 @@ namespace DiscordBotFanatic.Modules {
         [Command("womgroup", RunMode = RunMode.Async)]
         [Summary("Set the wom group for guild")]
         [RequireContext(ContextType.Guild)]
-        public async Task SetWomGroup(int womGroup) {
-            var group = await _groupService.SetGroupForGuild(GetGuildUser(), womGroup);
+        public async Task SetWomGroup(int womGroup, string verificationCode) {
+            var group = await _groupService.SetGroupForGuild(GetGuildUser(), womGroup, verificationCode);
             var builder = Context.CreateCommonWiseOldManEmbedBuilder();
             builder.Title = $"Success.";
             builder.Description = $"Group set to {group.Name}";
