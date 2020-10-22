@@ -1,23 +1,25 @@
-﻿using Discord;
+﻿using System.Collections.Generic;
+using Discord;
 
 namespace DiscordBotFanatic.Models.Data {
-    public class Player : BaseModel {
+    public class Player : BaseGuildModel {
         public Player() { }
-        public Player(IUser user) : base(user) { }
 
-        public Player(ulong userId) : base(userId) {
-            DiscordId = userId;
+        public Player(ulong guildId, ulong discordId): base(guildId, discordId) {
+            
         }
 
-        public ulong DiscordId { get; set; }
+        public Player(IGuildUser user) : base(user) {
+            
+        }
+
+        public ulong DiscordId => CreatedByDiscordId;
         public int WiseOldManDefaultPlayerId { get; set; }
         public string DefaultPlayerUsername { get; set; }
 
-        public override void IsValid() {
-            if (DiscordId == 0) {
-                ValidationDictionary.Add(nameof(DiscordId),$"Discord Id is 0.");
-            }
+        public List<WiseOldManConnector.Models.Output.Player> CoupledOsrsAccounts { get; set; } = new List<WiseOldManConnector.Models.Output.Player>();
 
+        public override void IsValid() {
             if (string.IsNullOrEmpty(DefaultPlayerUsername)) {
                 ValidationDictionary.Add(nameof(DefaultPlayerUsername), $"No default username.");
             }

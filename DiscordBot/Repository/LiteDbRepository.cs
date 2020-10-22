@@ -1,17 +1,19 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using Discord;
 using DiscordBotFanatic.Models.Data;
 using LiteDB;
+using WiseOldManConnector.Models.Output;
+using Player = DiscordBotFanatic.Models.Data.Player;
 
 namespace DiscordBotFanatic.Repository {
     public class LiteDbRepository : IDiscordBotRepository {
         protected const string PlayerCollectionName = "players";
         protected const string GuildConfigurationCollectionName = "guildConfig";
         protected const string GuildEventCollectionName = "guildEvents";
-        protected const string GuildCompetitionCollectionName= "guildCompetitions";
+        protected const string GuildCompetitionCollectionName = "guildCompetitions";
         private readonly object _dbLock = new object();
+        private readonly Dictionary<ulong, object> _guildLocks = new Dictionary<ulong, object>();
 
         public LiteDbRepository(string fileName) {
             FileName = fileName;
@@ -20,233 +22,155 @@ namespace DiscordBotFanatic.Repository {
         protected LiteDatabase LiteDatabase { get; set; }
         protected string FileName { get; set; }
 
-        public List<Player> GetAllPlayers() {
-            lock (_dbLock) {
-                using (LiteDatabase = new LiteDatabase(FileName)) {
-                    var collection = LiteDatabase.GetCollection<Player>(PlayerCollectionName);
-                    return collection.Query().ToList();
+        public Player GetPlayerByOsrsAccount(ulong guildId, int womId) {
+            lock (GetGuildLock(guildId)) {
+                using (LiteDatabase = new LiteDatabase(GetGuildFileName(guildId))) {
+                    return GetPlayerQuery(LiteDatabase)
+                        .Where(p => p.CoupledOsrsAccounts.Select(wom => wom.Id).Any(id => id == womId))
+                        .FirstOrDefault();
                 }
             }
         }
 
-        public Player GetPlayerByDiscordId(ulong id) {
-            lock (_dbLock) {
-                using (LiteDatabase = new LiteDatabase(FileName)) {
-                    var collection = LiteDatabase.GetCollection<Player>(PlayerCollectionName);
-                    return collection.Query().Where(x => x.DiscordId == id).Limit(1).SingleOrDefault();
+        public Player GetPlayerByOsrsAccount(ulong guildId, string username) {
+            username = username.ToLowerInvariant();
+            lock (GetGuildLock(guildId)) {
+                using (LiteDatabase = new LiteDatabase(GetGuildFileName(guildId))) {
+                    return GetPlayerQuery(LiteDatabase).Where(p =>
+                            p.CoupledOsrsAccounts.Select(wom => wom.Username).Any(name => name == username))
+                        .FirstOrDefault();
                 }
             }
         }
 
-        public Player InsertPlayer(Player player) {
+        public Player CoupleOsrsPlayerToGuild(ulong guildId, ulong discordUserId,
+            WiseOldManConnector.Models.Output.Player womPlayer) {
+            var player = GetPlayerById(guildId, discordUserId);
+            if (player == null) {
+                player = new Player(guildId, discordUserId);
+                player.CoupledOsrsAccounts.Add(womPlayer);
+
+
+                return InsertPlayerForGuild(guildId, player);
+            }
+
+            player.CoupledOsrsAccounts.Add(womPlayer);
+            return UpdateOrInsertPlayerForGuild(guildId, player);
+        }
+
+        public Player InsertPlayerForGuild(ulong guildId, Player player) {
             player.IsValid();
 
-            lock (_dbLock) {
-                using (LiteDatabase = new LiteDatabase(FileName)) {
+            lock (GetGuildLock(guildId)) {
+                using (LiteDatabase = new LiteDatabase(GetGuildFileName(guildId))) {
                     var collection = LiteDatabase.GetCollection<Player>(PlayerCollectionName);
                     collection.Insert(player);
                 }
             }
 
-            return GetPlayerByDiscordId(player.DiscordId);
+            return GetPlayerById(guildId, player.DiscordId);
         }
 
-        public Player UpdatePlayer(Player player) {
-            player.IsValid();
+        public GroupConfig UpdateOrInsertGroupConfig(GroupConfig config) {
+            if (config._id == null) {
+                return InsertConfig(config);
+            }
 
-            lock (_dbLock) {
-                using (LiteDatabase = new LiteDatabase(FileName)) {
+            config.IsValid();
+            lock (GetGuildLock(config.GuildId)) {
+                using (LiteDatabase = new LiteDatabase(GetGuildFileName(config.GuildId))) {
+                    var collection = LiteDatabase.GetCollection<GroupConfig>(GuildConfigurationCollectionName);
+                    collection.Update(config);
+                }
+            }
+
+            return GetGroupConfig(config.GuildId);
+        }
+
+        public GroupConfig InsertConfig(GroupConfig config) {
+            config.IsValid();
+
+            lock (GetGuildLock(config.GuildId)) {
+                using (LiteDatabase = new LiteDatabase(GetGuildFileName(config.GuildId))) {
+                    var collection = LiteDatabase.GetCollection<GroupConfig>(GuildConfigurationCollectionName);
+                    collection.Insert(config);
+                }
+            }
+
+            return GetGroupConfig(config.GuildId);
+        }
+
+        public GroupConfig GetGroupConfig(ulong guildId) {
+            lock (GetGuildLock(guildId)) {
+                using (LiteDatabase = new LiteDatabase(GetGuildFileName(guildId))) {
+                    return GetGroupConfigQuery(LiteDatabase).Where(p => p.GuildId == guildId).FirstOrDefault();
+                }
+            }
+        }
+
+        public IEnumerable<Player> GetAllPlayersForGuild(in ulong guildId) {
+            lock (GetGuildLock(guildId)) {
+                using (LiteDatabase = new LiteDatabase(GetGuildFileName(guildId))) {
+                    return GetPlayerQuery(LiteDatabase).ToList();
+                }
+            }
+        }
+
+
+        public Player UpdateOrInsertPlayerForGuild(ulong guildId, Player player) {
+            if (player._id == null) {
+                return InsertPlayerForGuild(guildId, player);
+            }
+
+            player.IsValid();
+            lock (GetGuildLock(guildId)) {
+                using (LiteDatabase = new LiteDatabase(GetGuildFileName(guildId))) {
                     var collection = LiteDatabase.GetCollection<Player>(PlayerCollectionName);
                     collection.Update(player);
                 }
             }
 
-            return GetPlayerByDiscordId(player.DiscordId);
+            return GetPlayerById(guildId, player.DiscordId);
         }
 
-        public Player InsertOrUpdatePlayer(Player player) {
-            player.IsValid();
-
-            if (player._id != null) {
-                UpdatePlayer(player);
-            } else {
-                var fromDb = GetPlayerByDiscordId(player.DiscordId);
-                if (fromDb != null) {
-                    player._id = fromDb._id;
-                    UpdatePlayer(player);
-                } else {
-                    InsertPlayer(player);
-                }
-            }
-
-            return GetPlayerByDiscordId(player.DiscordId);
-        }
-
-        public bool HasActiveEvent(IGuild guild) {
-            return GetAllActiveGuildEvents(guild.Id).Any();
-        }
-
-        public GuildCustomEvent GetGuildEventById(ObjectId id) {
-            lock (_dbLock) {
-                using (LiteDatabase = new LiteDatabase(FileName)) {
-                    var collection = LiteDatabase.GetCollection<GuildCustomEvent>(GuildEventCollectionName);
-                    return collection.Query().Where(x => x._id == id).SingleOrDefault();
+        public Player GetPlayerById(ulong guildId, ulong id) {
+            lock (GetGuildLock(guildId)) {
+                using (LiteDatabase = new LiteDatabase(GetGuildFileName(guildId))) {
+                    return GetPlayerQuery(LiteDatabase).Where(p => p.DiscordId == id).FirstOrDefault();
                 }
             }
         }
 
-        public GuildCustomEvent InsertGuildEvent(GuildCustomEvent guildCustomEvent) {
-            lock (_dbLock) {
-                using (LiteDatabase = new LiteDatabase(FileName)) {
-                    var collection = LiteDatabase.GetCollection<GuildCustomEvent>(GuildEventCollectionName);
-                    collection.Insert(guildCustomEvent);
-                }
-            }
-
-            return GetGuildEventById(guildCustomEvent._id);
-        }
-
-        public GuildConfiguration GetGuildConfigurationById(ulong guildId) {
-            lock (_dbLock) {
-                using (LiteDatabase = new LiteDatabase(FileName)) {
-                    var collection = LiteDatabase.GetCollection<GuildConfiguration>(GuildConfigurationCollectionName);
-                    return collection.Query().Where(x => x.GuildId == guildId).SingleOrDefault();
+        public IEnumerable<Player> GetPlayersForGuild(ulong guildId) {
+            lock (GetGuildLock(guildId)) {
+                using (LiteDatabase = new LiteDatabase(GetGuildFileName(guildId))) {
+                    return GetPlayerQuery(LiteDatabase).ToList();
                 }
             }
         }
 
-        public GuildConfiguration UpdateOrInsertGuildConfiguration(GuildConfiguration guildConfiguration) {
-            if (guildConfiguration._id != null) {
-                UpdateGuildConfiguration(guildConfiguration);
-            } else {
-                var fromDb = GetGuildConfigurationById(guildConfiguration.GuildId);
-                if (fromDb != null) {
-                    guildConfiguration._id = fromDb._id;
-                    UpdateGuildConfiguration(guildConfiguration);
-                } else {
-                    InsertGuildConfiguration(guildConfiguration);
-                }
-            }
-
-            return GetGuildConfigurationById(guildConfiguration.GuildId);
+        private string GetGuildFileName(ulong guildId) {
+            return $"{guildId}_{FileName}";
         }
 
-        public GuildConfiguration InsertGuildConfiguration(GuildConfiguration guildConfiguration) {
-            //player.IsValid();
-
-            lock (_dbLock) {
-                using (LiteDatabase = new LiteDatabase(FileName)) {
-                    var collection = LiteDatabase.GetCollection<GuildConfiguration>(GuildConfigurationCollectionName);
-                    collection.Insert(guildConfiguration);
-                }
+        private Object GetGuildLock(ulong guildId) {
+            if (_guildLocks.ContainsKey(guildId)) {
+                return _guildLocks[guildId];
             }
 
-            return GetGuildConfigurationById(guildConfiguration.GuildId);
+            object lockObject = new object();
+            _guildLocks.Add(guildId, lockObject);
+            return lockObject;
         }
 
-        public List<GuildCustomEvent> GetAllGuildEvents(ulong guildId) {
-            lock (_dbLock) {
-                using (LiteDatabase = new LiteDatabase(FileName)) {
-                    var collection = LiteDatabase.GetCollection<GuildCustomEvent>(GuildEventCollectionName);
-                    return collection.Query().Where(x => x.GuildId == guildId).ToList();
-                }
-            }
+        private ILiteQueryable<Player> GetPlayerQuery(LiteDatabase db) {
+            var collection = LiteDatabase.GetCollection<Player>(PlayerCollectionName);
+            return collection.Query();
         }
 
-        public List<GuildCustomEvent> GetAllActiveGuildEvents(ulong guildId) {
-            var allEvents = GetAllGuildEvents(guildId).ToList();
-            var result = new List<GuildCustomEvent>();
-            foreach (GuildCustomEvent guildEvent in allEvents) {
-                if (guildEvent.EndTime == DateTime.MinValue) {
-                    result.Add(guildEvent);
-                }
-
-                if (guildEvent.EndTime >= DateTime.Now) {
-                    result.Add(guildEvent);
-                }
-            }
-
-            return result;
-        }
-
-        public GuildCustomEvent UpdateGuildEvent(GuildCustomEvent guildCustomEvent) {
-            lock (_dbLock) {
-                using (LiteDatabase = new LiteDatabase(FileName)) {
-                    var collection = LiteDatabase.GetCollection<GuildCustomEvent>(GuildEventCollectionName);
-                    collection.Update(guildCustomEvent);
-                }
-            }
-
-            return GetGuildEventById(guildCustomEvent._id);
-        }
-
-        public GuildCompetition InsertGuildCompetition(GuildCompetition guildCompetition) {
-            lock (_dbLock) {
-                using (LiteDatabase = new LiteDatabase(FileName)) {
-                    var collection = LiteDatabase.GetCollection<GuildCompetition>(GuildCompetitionCollectionName);
-                    collection.Insert(guildCompetition);
-                }
-            }
-
-            return GetGuildCompetitionById(guildCompetition._id);
-        }
-
-        public GuildCompetition GetGuildCompetitionById(ObjectId id) {
-            lock (_dbLock) {
-                using (LiteDatabase = new LiteDatabase(FileName)) {
-                    var collection = LiteDatabase.GetCollection<GuildCompetition>(GuildCompetitionCollectionName);
-                    return collection.Query().Where(x => x._id == id && x.EndTime >= DateTime.UtcNow).SingleOrDefault();
-                }
-            }
-        }
-
-        public GuildCompetition GetGuildCompetitionById(int id) {
-            lock (_dbLock) {
-                using (LiteDatabase = new LiteDatabase(FileName)) {
-                    var collection = LiteDatabase.GetCollection<GuildCompetition>(GuildCompetitionCollectionName);
-                    return collection.Query().Where(x => x.Id == id && x.EndTime >= DateTime.UtcNow).SingleOrDefault();
-                }
-            }
-        }
-
-        public List<GuildCompetition> GetAllGuildCompetitions(ulong guildId) {
-            lock (_dbLock) {
-                using (LiteDatabase = new LiteDatabase(FileName)) {
-                    var collection = LiteDatabase.GetCollection<GuildCompetition>(GuildCompetitionCollectionName);
-                    return collection.Query().Where(x => x.GuildId == guildId ).ToList();
-                }
-            }
-        }
-
-        public List<GuildCompetition> GetAllActiveGuildCompetitions(ulong guildId) {
-            lock (_dbLock) {
-                using (LiteDatabase = new LiteDatabase(FileName)) {
-                    var collection = LiteDatabase.GetCollection<GuildCompetition>(GuildCompetitionCollectionName);
-                    return collection.Query().Where(x => x.GuildId == guildId && x.EndTime >= DateTime.UtcNow).ToList();
-                }
-            }
-        }
-
-        public GuildCompetition UpdateGuildCompetition(GuildCompetition guildCompetition) {
-            lock (_dbLock) {
-                using (LiteDatabase = new LiteDatabase(FileName)) {
-                    var collection = LiteDatabase.GetCollection<GuildCompetition>(GuildCompetitionCollectionName);
-                    collection.Update(guildCompetition);
-                }
-            }
-
-            return GetGuildCompetitionById(guildCompetition._id);
-        }
-
-        public GuildConfiguration UpdateGuildConfiguration(GuildConfiguration guildConfiguration) {
-            lock (_dbLock) {
-                using (LiteDatabase = new LiteDatabase(FileName)) {
-                    var collection = LiteDatabase.GetCollection<GuildConfiguration>(GuildConfigurationCollectionName);
-                    collection.Update(guildConfiguration);
-                }
-            }
-
-            return GetGuildConfigurationById(guildConfiguration.GuildId);
+        private ILiteQueryable<GroupConfig> GetGroupConfigQuery(LiteDatabase db) {
+            var collection = LiteDatabase.GetCollection<GroupConfig>(GuildConfigurationCollectionName);
+            return collection.Query();
         }
     }
 }

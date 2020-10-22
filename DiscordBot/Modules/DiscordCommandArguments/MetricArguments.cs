@@ -1,4 +1,5 @@
 ﻿using DiscordBotFanatic.Models.Enums;
+using WiseOldManConnector.Models.WiseOldMan.Enums;
 
 namespace DiscordBotFanatic.Modules.DiscordCommandArguments {
 

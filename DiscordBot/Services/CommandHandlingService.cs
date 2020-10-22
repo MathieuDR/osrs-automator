@@ -14,6 +14,7 @@ using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
 using Discord.Net;
+using DiscordBotFanatic.Helpers;
 using DiscordBotFanatic.Models;
 using Serilog.Context;
 using Serilog.Events;
@@ -55,8 +56,10 @@ namespace DiscordBotFanatic.Services {
             _commands.AddTypeReader<BaseArguments>(new BaseArgumentsTypeReader());
 
             var t = _commands.AddModulesAsync(Assembly.GetEntryAssembly(), _provider);
-            await _commands.AddModuleAsync<PlayerStatsModule>(provider);
-            await _commands.AddModuleAsync<GroupStatsModule>(provider);
+            await _commands.AddModuleAsync<PlayerModule>(provider);
+            await _commands.AddModuleAsync<AdminModule>(provider);
+            //await _commands.AddModuleAsync<PlayerStatsModule>(provider);
+            //await _commands.AddModuleAsync<GroupStatsModule>(provider);
             await t;
         }
 
@@ -125,7 +128,7 @@ namespace DiscordBotFanatic.Services {
 
             // Setting logging information.
             using (LogContext.PushProperty("CommandContextDto", new SerilogCommandContextDto(context))) {
-                _logger.LogWithCommandInfoLine($"Command received.", LogEventLevel.Information, null);
+                var logTask = _logger.LogWithCommandInfoLine($"Command received.", LogEventLevel.Information, null);
 
                 // Execute the command with the command context we just
                 // created, along with the service provider for precondition checks.
@@ -133,16 +136,23 @@ namespace DiscordBotFanatic.Services {
                 // Keep in mind that result does not indicate a return value
                 // rather an object stating if the command executed successfully.
                 await _commands.ExecuteAsync(context: context, argPos: argPos, services: _provider);
+                await logTask;
             }
         }
 
         public async Task CreateErrorMessage(ICommandContext context, IResult result) {
-            var resultMessageTask = GetWaitMessage(context);
-
-            EmbedBuilder builder = new EmbedBuilder() {Title = $"Error!"};
-
             await _logger.Log(new LogMessage(LogSeverity.Error, "",
                 $"{result.Error} - {result.ErrorReason} ({context.Message.Content})"));
+
+            var builder = CreateErrorEmbedBuilder(context, result);
+
+
+            await context.Channel.SendMessageAsync(embed: builder.Build());
+        }
+
+        private EmbedBuilder CreateErrorEmbedBuilder(ICommandContext context, IResult result) {
+            EmbedBuilder builder = context.CreateCommonEmbedBuilder();
+            builder.Title = "Uh oh! Something went wrong.";
 
             Debug.Assert(result.Error != null, "result.Error != null");
             builder.AddField(result.Error.Value.ToString(), result.ErrorReason);
@@ -152,41 +162,7 @@ namespace DiscordBotFanatic.Services {
             }
 
             builder.AddField($"Get more help", $"Please use `{_configuration.CustomPrefix} help` for this bot's usage");
-
-            var resultMessage = await resultMessageTask;
-            if (resultMessage != null) {
-                await resultMessage.ModifyAsync(x => x.Embed = builder.Build());
-            } else {
-                await context.Channel.SendMessageAsync(embed: builder.Build());
-            }
-        }
-
-        private async Task<IUserMessage> GetWaitMessage(ICommandContext context) {
-            string toCompareId = context.Message.Id.ToString();
-            var channel = context.Message.Channel;
-            var messagesList = channel.GetMessagesAsync(context.Message, Direction.After);
-            IUserMessage resultMessage = null;
-            var foundMessage = new CancellationTokenSource();
-
-            await foreach (var messages in messagesList.WithCancellation(foundMessage.Token)) {
-                foreach (IMessage message in messages) {
-                    if (message.Embeds.Any()) {
-                        foreach (IEmbed messageEmbed in message.Embeds) {
-                            if (messageEmbed.Footer?.Text == toCompareId) {
-                                resultMessage = (IUserMessage) message;
-                                foundMessage.Cancel();
-                                break;
-                            }
-                        }
-                    }
-
-                    if (foundMessage.Token.IsCancellationRequested) {
-                        break;
-                    }
-                }
-            }
-
-            return resultMessage;
+            return builder;
         }
     }
 }

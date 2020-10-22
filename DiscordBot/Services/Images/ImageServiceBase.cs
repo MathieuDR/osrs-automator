@@ -5,19 +5,18 @@ using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
 using DiscordBotFanatic.Helpers;
-using DiscordBotFanatic.Models.Enums;
-using DiscordBotFanatic.Models.WiseOldMan.Cleaned;
 using DiscordBotFanatic.Services.interfaces;
 using SixLabors.Fonts;
 using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.Drawing.Processing;
 using SixLabors.ImageSharp.PixelFormats;
 using SixLabors.ImageSharp.Processing;
+using WiseOldManConnector.Models.WiseOldMan.Enums;
 using FontCollection = SixLabors.Fonts.FontCollection;
 using Image = SixLabors.ImageSharp.Image;
 
 namespace DiscordBotFanatic.Services.Images {
-    public abstract class ImageServiceBase<T> : IImageService<T> where T : IBaseInfo {
+    public abstract class ImageServiceBase<T> : IImageService<T> where T : class {
         protected readonly string BasePath;
         protected readonly string IconPath;
         protected readonly ILogService LogService;

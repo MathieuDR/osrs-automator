@@ -1,40 +1,70 @@
-﻿using System.Text;
+﻿using System;
+using System.Text;
 using System.Threading.Tasks;
+using AutoMapper;
 using Discord;
 using Discord.Commands;
+using DiscordBotFanatic.Helpers;
+using DiscordBotFanatic.Models.Configuration;
 using DiscordBotFanatic.Models.Enums;
 using DiscordBotFanatic.Services.interfaces;
 
 namespace DiscordBotFanatic.Modules {
 
     [Name("Administrator")]
-    [Group("admin")]
+    [Group("cfg")]
     [RequireUserPermission(GuildPermission.Administrator)]
-    public class AdminModule : ModuleBase<SocketCommandContext> {
-        private readonly IGuildService _guildService;
+    public class AdminModule : BaseWaitMessageEmbeddedResponseModule {
+        private readonly IAuthenticationService _authenticationService;
+        private readonly IGroupService _groupService;
 
-        public AdminModule(IGuildService guildService) {
-            _guildService = guildService;
+
+        public AdminModule(Mapper mapper, ILogService logger, MessageConfiguration messageConfiguration, IAuthenticationService authenticationService, IGroupService groupService) : base(mapper, logger, messageConfiguration) {
+            _authenticationService = authenticationService;
+            _groupService = groupService;
         }
 
-        [Name("Toggle Permission")]
-        [Command("permission")]
-        [Summary("Toggle a permission!")]
-        public Task TogglePermission(IRole role, Permissions permission) {
-            bool isAllowed = _guildService.ToggleRole(role, permission);
-            StringBuilder message = new StringBuilder();
-            message.Append($"Sucessfully toggled the role.");
-            if (isAllowed) {
-                message.Append($" {role.Name} are now granted the permission {permission}");
+        [Name("Toggle Permission on Role")]
+        [Command("right")]
+        [Summary("Toggle a permission for a role.")]
+        public Task ToggleRolePermission(IRole role, BotPermissions permission) {
+            throw new NotImplementedException();
+        }
+
+        [Name("Toggle Permission on User")]
+        [Command("right")]
+        [Summary("Toggle a permission for an user.")]
+        public Task ToggleUserPermission(IGuildUser user, BotPermissions permission) {
+            throw new NotImplementedException();
+        }
+
+        [Name("Set WOM group")]
+        [Command("womgroup", RunMode = RunMode.Async)]
+        [Summary("Set the wom group for guild")]
+        [RequireContext(ContextType.Guild)]
+        public async Task SetWomGroup(int womGroup) {
+            var group = await _groupService.SetGroupForGuild(GetGuildUser(), womGroup);
+            var builder = Context.CreateCommonWiseOldManEmbedBuilder();
+            builder.Title = $"Success.";
+            builder.Description = $"Group set to {group.Name}";
+            await ModifyWaitMessageAsync(builder.Build());
+        }
+
+        [Name("Auto add group")]
+        [Command("autoadd", RunMode = RunMode.Async)]
+        [Summary("Auto add group")]
+        [RequireContext(ContextType.Guild)]
+        public async Task SetAutoAdd(bool autoAdd) {
+            await _groupService.SetAutoAdd(GetGuildUser(), autoAdd);
+            var builder = Context.CreateCommonWiseOldManEmbedBuilder();
+            builder.Title = $"Success.";
+            if (autoAdd) {
+                builder.Description = $"New members will be automatically added.";
             } else {
-                message.Append($" {permission} revoked for {role.Name}");
+                builder.Description = $"New members will not be automatically added.";
             }
-
-            EmbedBuilder builder = new EmbedBuilder();
-            builder.Title = $"Success";
-            builder.Description = message.ToString();
-            return ReplyAsync(embed:builder.Build());
+            
+            await ModifyWaitMessageAsync(builder.Build());
         }
-
     }
 }

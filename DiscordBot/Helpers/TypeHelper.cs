@@ -5,6 +5,7 @@ using System.Text;
 using Discord;
 using DiscordBotFanatic.Models.Enums;
 using DiscordBotFanatic.Modules.DiscordCommandArguments;
+using WiseOldManConnector.Models.WiseOldMan.Enums;
 
 namespace DiscordBotFanatic.Helpers {
     public static class TypeHelper {

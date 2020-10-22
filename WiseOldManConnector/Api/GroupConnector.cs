@@ -16,14 +16,16 @@ namespace WiseOldManConnector.Api {
         public GroupConnector(IServiceProvider provider) : base(provider) {
             Area = "groups";
         }
+
         protected override string Area { get; }
+
         public async Task<ConnectorCollectionResponse<Group>> Search() {
             var request = GetNewRestRequest("");
 
             var result = await ExecuteCollectionRequest<WOMGroup>(request);
             return GetResponse<WOMGroup, Group>(result);
         }
-        
+
         public async Task<ConnectorCollectionResponse<Group>> Search(string name) {
             var request = GetNewRestRequest("");
 
@@ -87,7 +89,7 @@ namespace WiseOldManConnector.Api {
             request.AddParameter("period", period.GetEnumValueNameOrDefault());
 
             var requestResult = await ExecuteCollectionRequest<WOMGroupDeltaMember>(request);
-            var result =  GetResponse<DeltaLeaderboard>(requestResult);
+            var result = GetResponse<DeltaLeaderboard>(requestResult);
             result.Data.PageSize = 20;
             result.Data.Page = 0;
             result.Data.MetricType = metric;
@@ -95,7 +97,8 @@ namespace WiseOldManConnector.Api {
             return result;
         }
 
-        public async Task<ConnectorResponse<DeltaLeaderboard>> GainedLeaderboards(int id, MetricType metric, Period period, int limit, int offset) {
+        public async Task<ConnectorResponse<DeltaLeaderboard>> GainedLeaderboards(int id, MetricType metric, Period period,
+            int limit, int offset) {
             var request = GetNewRestRequest("{id}/gained");
 
             request.AddParameter("id", id, ParameterType.UrlSegment);
@@ -104,7 +107,7 @@ namespace WiseOldManConnector.Api {
             AddPaging(request, limit, offset);
 
             var requestResult = await ExecuteCollectionRequest<WOMGroupDeltaMember>(request);
-            var result =  GetResponse<DeltaLeaderboard>(requestResult);
+            var result = GetResponse<DeltaLeaderboard>(requestResult);
             result.Data.PageSize = limit;
             result.Data.Page = offset;
             result.Data.MetricType = metric;
@@ -169,7 +172,8 @@ namespace WiseOldManConnector.Api {
             return result;
         }
 
-        public async Task<ConnectorResponse<RecordLeaderboard>> RecordLeaderboards(int id, MetricType metric, Period period, int limit, int offset) {
+        public async Task<ConnectorResponse<RecordLeaderboard>> RecordLeaderboards(int id, MetricType metric, Period period,
+            int limit, int offset) {
             var request = GetNewRestRequest("{id}/records");
 
             request.AddParameter("id", id, ParameterType.UrlSegment);
@@ -245,19 +249,20 @@ namespace WiseOldManConnector.Api {
             return GetResponse<MessageResponse>(restResult);
         }
 
-        public async Task<ConnectorResponse<Group>> AddMembers(string verificationCode, IEnumerable<string> members) {
+        public async Task<ConnectorResponse<Group>> AddMembers(int id, string verificationCode, IEnumerable<string> members) {
             throw new NotImplementedException();
         }
 
-        public async Task<ConnectorResponse<Group>> RemoveMembers(string verificationCode, IEnumerable<string> members) {
+        public async Task<ConnectorResponse<Group>> RemoveMembers(int id, string verificationCode, IEnumerable<string> members) {
             throw new NotImplementedException();
         }
 
-        public async Task<ConnectorResponse<Player>> ChangeMemberRole(string verificationCode, string username, GroupRole role) {
+        public async Task<ConnectorResponse<Player>> ChangeMemberRole(int id, string verificationCode, string username,
+            GroupRole role) {
             throw new NotImplementedException();
         }
 
-        public async Task<ConnectorResponse<MessageResponse>> Update(string id) {
+        public async Task<ConnectorResponse<MessageResponse>> Update(int id) {
             throw new NotImplementedException();
         }
 

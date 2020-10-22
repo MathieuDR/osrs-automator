@@ -2,7 +2,7 @@
 
 namespace DiscordBotFanatic.Models.Enums {
     [Flags]
-    public enum Permissions {
+    public enum BotPermissions {
         None=0,
         EventManager,
         CompetitionManager
