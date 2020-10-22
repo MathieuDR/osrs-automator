@@ -249,8 +249,16 @@ namespace WiseOldManConnector.Api {
             return GetResponse<MessageResponse>(restResult);
         }
 
-        public async Task<ConnectorResponse<Group>> AddMembers(int id, string verificationCode, IEnumerable<string> members) {
-            throw new NotImplementedException();
+        public async Task<ConnectorResponse<Group>> AddMembers(int id, string verificationCode, IEnumerable<MemberRequest> members) {
+            var restRequest = GetNewRestRequest("{id}/add-members");
+            restRequest.AddParameter("id", id, ParameterType.UrlSegment);
+            restRequest.Method = Method.PUT;
+            restRequest.AddJsonBody(new {
+                verificationCode, members
+            });
+
+            var restResult = await ExecuteRequest<GroupEditResponse>(restRequest);
+            return GetResponse<Group>(restResult);
         }
 
         public async Task<ConnectorResponse<Group>> RemoveMembers(int id, string verificationCode, IEnumerable<string> members) {

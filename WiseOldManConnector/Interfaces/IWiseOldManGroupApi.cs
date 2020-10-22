@@ -31,7 +31,7 @@ namespace WiseOldManConnector.Interfaces {
         Task<ConnectorResponse<Group>> Edit(int id, EditGroupRequest request);
         Task<ConnectorResponse<MessageResponse>> Delete(int id, string verificationCode);
         //Task<ConnectorResponse<WOMGroup>> AddMembers(string verificationCode, IEnumerable<GroupMember> members);
-        Task<ConnectorResponse<Group>> AddMembers(int id, string verificationCode, IEnumerable<string> members);
+        Task<ConnectorResponse<Group>> AddMembers(int id, string verificationCode, IEnumerable<MemberRequest> members);
         Task<ConnectorResponse<Group>> RemoveMembers(int id, string verificationCode, IEnumerable<string> members);
         Task<ConnectorResponse<Player>> ChangeMemberRole(int id, string verificationCode, string username, GroupRole role);
         Task<ConnectorResponse<MessageResponse>> Update(int id);

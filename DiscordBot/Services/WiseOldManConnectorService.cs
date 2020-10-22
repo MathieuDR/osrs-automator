@@ -5,6 +5,8 @@ using System.Threading.Tasks;
 using DiscordBotFanatic.Services.interfaces;
 using WiseOldManConnector.Interfaces;
 using WiseOldManConnector.Models.Output;
+using WiseOldManConnector.Models.Requests;
+using WiseOldManConnector.Models.WiseOldMan.Enums;
 
 namespace DiscordBotFanatic.Services {
     public class WiseOldManConnectorService : IOsrsHighscoreService {
@@ -39,7 +41,7 @@ namespace DiscordBotFanatic.Services {
         }
 
         public Task AddOsrsAccountToToGroup(in int groupId, in string verificationCode, in IEnumerable<string> osrsAccounts) {
-            return _groupApi.AddMembers(groupId, verificationCode, osrsAccounts);
+            return _groupApi.AddMembers(groupId, verificationCode, osrsAccounts.Select(s=> new MemberRequest(){Name = s, Role = GroupRole.Member}));
         }
     }
 }
