@@ -88,6 +88,47 @@ namespace WiseOldManConnectorTests.Connectors {
         }
 
         [Fact]
+        public async Task AddingMembersHasNewMembersTask() {
+            var cname = GetClanName();
+            var cc = "MyClanChat";
+            var createRequest = new CreateGroupRequest(cname, cc, new List<MemberRequest>() {
+                new MemberRequest() {Name = "Den Badjas", Role = GroupRole.Leader}
+            });
+
+
+            var createResponse = await _groupApi.Create(createRequest);
+
+
+            var request = new List<MemberRequest>() {
+                new MemberRequest() {
+                    Name = "WouterPils", Role = GroupRole.Member
+                },
+                new MemberRequest() {
+                    Name = "ErkendRserke", Role = GroupRole.Leader
+                }
+            };
+            
+            try {
+                var response = await _groupApi.AddMembers(createResponse.Data.Id, createResponse.Data.VerificationCode, request);
+                Assert.NotNull(response.Data);
+                Assert.Equal(request.Count() + createRequest.Members.Count(), response.Data.Members.Count);
+
+                foreach (MemberRequest member in request) {
+                    Assert.Contains(response.Data.Members,
+                        player => player.DisplayName.Equals(member.Name, StringComparison.InvariantCultureIgnoreCase));
+
+                    Assert.Equal(member.Role,
+                        response.Data.Members
+                            .Where(x => x.DisplayName.Equals(member.Name, StringComparison.InvariantCultureIgnoreCase))
+                            .FirstOrDefault().Role);
+                }
+            }
+            finally {
+                await DeleteGroup(createResponse.Data.Id, createResponse.Data.VerificationCode);
+            }
+        }
+
+        [Fact]
         public async Task CompetitionsForValidGroupWithCompetitionsResultInCompetitions() {
             int id = TestConfiguration.ValidGroupId;
 
@@ -111,26 +152,6 @@ namespace WiseOldManConnectorTests.Connectors {
             Assert.True(compToTest.Participants > 0);
         }
 
-        [Fact]
-        public async Task CreateGroupResultsInGroupWithVerificationCode() {
-            var cname = GetClanName();
-            var cc = "MyClanChat";
-            var request = new CreateGroupRequest(cname, cc, new List<MemberRequest>() {
-                new MemberRequest() {Name = "ErkendRserke"},
-                new MemberRequest() {Name = "Den Badjas", Role = GroupRole.Leader}
-            });
-
-            var response = await _groupApi.Create(request);
-
-            try {
-                Assert.NotNull(response.Data);
-                Assert.NotEmpty(response.Data.VerificationCode);
-            }
-            finally {
-                await DeleteGroup(response.Data.Id, response.Data.VerificationCode);
-            }
-        }
-
 
         [Fact]
         public async Task CreateGroupResultsInGroupWithCorrectParams() {
@@ -152,10 +173,11 @@ namespace WiseOldManConnectorTests.Connectors {
                 foreach (MemberRequest member in request.Members) {
                     Assert.Contains(response.Data.Members,
                         player => player.DisplayName.Equals(member.Name, StringComparison.InvariantCultureIgnoreCase));
-                    Assert.Equal(member.Role, response.Data.Members.Where(x=>x.DisplayName.Equals(member.Name, StringComparison.InvariantCultureIgnoreCase)).FirstOrDefault().Role);
+                    Assert.Equal(member.Role,
+                        response.Data.Members
+                            .Where(x => x.DisplayName.Equals(member.Name, StringComparison.InvariantCultureIgnoreCase))
+                            .FirstOrDefault().Role);
                 }
-
-                
             }
             finally {
                 await DeleteGroup(response.Data.Id, response.Data.VerificationCode);
@@ -163,38 +185,22 @@ namespace WiseOldManConnectorTests.Connectors {
         }
 
         [Fact]
-        public async Task EditedGroupHasEditedParameters() {
+        public async Task CreateGroupResultsInGroupWithVerificationCode() {
             var cname = GetClanName();
             var cc = "MyClanChat";
-            var createRequest = new CreateGroupRequest(cname, cc, new List<MemberRequest>() {
+            var request = new CreateGroupRequest(cname, cc, new List<MemberRequest>() {
                 new MemberRequest() {Name = "ErkendRserke"},
                 new MemberRequest() {Name = "Den Badjas", Role = GroupRole.Leader}
             });
 
-
-            var createResponse = await _groupApi.Create(createRequest);
-
-
-            var request = new EditGroupRequest(createResponse.Data.VerificationCode, GetClanName(), "MySecondChat", new []{new MemberRequest(){Name = "WouterPils"}});
-
-            var response = await _groupApi.Edit(createResponse.Data.Id, request);
+            var response = await _groupApi.Create(request);
 
             try {
                 Assert.NotNull(response.Data);
-                Assert.Equal(request.Members.Count(), response.Data.Members.Count);
-                Assert.Equal(request.ClanChat, response.Data.ClanChat);
-                Assert.Equal(request.Name, response.Data.Name);
-
-                foreach (MemberRequest member in request.Members) {
-                    Assert.Contains(response.Data.Members,
-                        player => player.DisplayName.Equals(member.Name, StringComparison.InvariantCultureIgnoreCase));   
-                    Assert.Equal(member.Role, response.Data.Members.Where(x=>x.DisplayName.Equals(member.Name, StringComparison.InvariantCultureIgnoreCase)).FirstOrDefault().Role);
-                }
-
-                
+                Assert.NotEmpty(response.Data.VerificationCode);
             }
             finally {
-                await DeleteGroup(response.Data.Id, createResponse.Data.VerificationCode);
+                await DeleteGroup(response.Data.Id, response.Data.VerificationCode);
             }
         }
 
@@ -211,6 +217,44 @@ namespace WiseOldManConnectorTests.Connectors {
             Assert.NotNull(response.Data);
             Assert.Contains("Successfully", response.Data.Message);
             Assert.Contains(createdGroup.Data.Id.ToString(), response.Data.Message);
+        }
+
+        [Fact]
+        public async Task EditedGroupHasEditedParameters() {
+            var cname = GetClanName();
+            var cc = "MyClanChat";
+            var createRequest = new CreateGroupRequest(cname, cc, new List<MemberRequest>() {
+                new MemberRequest() {Name = "ErkendRserke"},
+                new MemberRequest() {Name = "Den Badjas", Role = GroupRole.Leader}
+            });
+
+
+            var createResponse = await _groupApi.Create(createRequest);
+
+
+            var request = new EditGroupRequest(createResponse.Data.VerificationCode, GetClanName(), "MySecondChat",
+                new[] {new MemberRequest() {Name = "WouterPils"}});
+
+            var response = await _groupApi.Edit(createResponse.Data.Id, request);
+
+            try {
+                Assert.NotNull(response.Data);
+                Assert.Equal(request.Members.Count(), response.Data.Members.Count);
+                Assert.Equal(request.ClanChat, response.Data.ClanChat);
+                Assert.Equal(request.Name, response.Data.Name);
+
+                foreach (MemberRequest member in request.Members) {
+                    Assert.Contains(response.Data.Members,
+                        player => player.DisplayName.Equals(member.Name, StringComparison.InvariantCultureIgnoreCase));
+                    Assert.Equal(member.Role,
+                        response.Data.Members
+                            .Where(x => x.DisplayName.Equals(member.Name, StringComparison.InvariantCultureIgnoreCase))
+                            .FirstOrDefault().Role);
+                }
+            }
+            finally {
+                await DeleteGroup(response.Data.Id, createResponse.Data.VerificationCode);
+            }
         }
 
         [Fact]

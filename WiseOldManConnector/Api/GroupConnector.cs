@@ -252,7 +252,7 @@ namespace WiseOldManConnector.Api {
         public async Task<ConnectorResponse<Group>> AddMembers(int id, string verificationCode, IEnumerable<MemberRequest> members) {
             var restRequest = GetNewRestRequest("{id}/add-members");
             restRequest.AddParameter("id", id, ParameterType.UrlSegment);
-            restRequest.Method = Method.PUT;
+            restRequest.Method = Method.POST;
             restRequest.AddJsonBody(new {
                 verificationCode, members
             });
