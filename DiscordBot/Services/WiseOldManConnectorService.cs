@@ -41,7 +41,7 @@ namespace DiscordBotFanatic.Services {
         }
 
         public Task AddOsrsAccountToToGroup(in int groupId, in string verificationCode, in IEnumerable<string> osrsAccounts) {
-            return _groupApi.AddMembers(groupId, verificationCode, osrsAccounts.Select(s=> new MemberRequest(){Name = s, Role = GroupRole.Member}));
+            return _groupApi.AddMembers(groupId, verificationCode, osrsAccounts.Distinct().Select(s=> new MemberRequest(){Name = s, Role = GroupRole.Member}));
         }
     }
 }

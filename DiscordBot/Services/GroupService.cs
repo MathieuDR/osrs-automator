@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
 using Discord;
@@ -7,6 +8,8 @@ using DiscordBotFanatic.Models.Data;
 using DiscordBotFanatic.Repository;
 using DiscordBotFanatic.Services.interfaces;
 using WiseOldManConnector.Models.Output;
+using WiseOldManConnector.Models.Requests;
+using WiseOldManConnector.Models.WiseOldMan.Enums;
 
 namespace DiscordBotFanatic.Services {
     public class GroupService : IGroupService {
@@ -54,16 +57,16 @@ namespace DiscordBotFanatic.Services {
 
         private Task AddAllPlayersToGroup(IGuildUser guildUser, GroupConfig config) {
             var players = _repository.GetAllPlayersForGuild(guildUser.GuildId).ToList();
-            
-            var tasks = new Task[players.Count()];
+            var usernames = new List<string>();
+
             for (var i = 0; i < players.Count; i++) {
                 var player = players[i];
-                var _ = _highscoreService.AddOsrsAccountToToGroup(config.WomGroupId, config.WomVerificationCode,
-                    player.CoupledOsrsAccounts.Select(osrs => osrs.Username).ToList());
-                tasks[i] = _;
+                var membersForPlayer = player.CoupledOsrsAccounts.Select(osrs => osrs.Username).ToList();
+                usernames.AddRange(membersForPlayer);
             }
 
-            Task.WaitAll(tasks, 180000);
+            _highscoreService.AddOsrsAccountToToGroup(config.WomGroupId, config.WomVerificationCode, usernames);
+
             return Task.CompletedTask;
         }
     }

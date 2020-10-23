@@ -62,8 +62,13 @@ namespace DiscordBotFanatic.Services {
                 player.DefaultPlayerUsername = osrsPlayer.Username;
                 player.WiseOldManDefaultPlayerId = osrsPlayer.Id;
             }
-
+            
             _repository.UpdateOrInsertPlayerForGuild(discordUser.GuildId, player);
+
+            var config = _repository.GetGroupConfig(discordUser.GuildId);
+            if (config.AutoAddNewAccounts) {
+                _osrsHighscoreService.AddOsrsAccountToToGroup(config.WomGroupId, config.WomVerificationCode, osrsPlayer.Username);
+            }
         }
 
         private void CheckIfPlayerIsAlreadyCoupled(IGuildUser discordUser, string proposedOsrsName, Models.Data.Player player) {
