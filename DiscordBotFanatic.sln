@@ -7,7 +7,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DiscordBotFanatic", "Discor
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WiseOldManConnector", "WiseOldManConnector\WiseOldManConnector.csproj", "{45E122BA-FF26-4CA1-A486-0888EBE3E1DF}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WiseOldManConnectorTests", "WiseOldManConnectorTests\WiseOldManConnectorTests.csproj", "{82AEFA8D-4B01-4335-9C2A-093C38D53060}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WiseOldManConnectorTests", "WiseOldManConnectorTests\WiseOldManConnectorTests.csproj", "{82AEFA8D-4B01-4335-9C2A-093C38D53060}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Discord.Addons.Interactive", "Discord.Addons.Interactive\Discord.Addons.Interactive.csproj", "{33B818B6-42EC-45D0-AEBF-C02F9CF0C21C}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -27,6 +29,10 @@ Global
 		{82AEFA8D-4B01-4335-9C2A-093C38D53060}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{82AEFA8D-4B01-4335-9C2A-093C38D53060}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{82AEFA8D-4B01-4335-9C2A-093C38D53060}.Release|Any CPU.Build.0 = Release|Any CPU
+		{33B818B6-42EC-45D0-AEBF-C02F9CF0C21C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{33B818B6-42EC-45D0-AEBF-C02F9CF0C21C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{33B818B6-42EC-45D0-AEBF-C02F9CF0C21C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{33B818B6-42EC-45D0-AEBF-C02F9CF0C21C}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
