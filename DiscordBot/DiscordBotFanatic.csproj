@@ -8,6 +8,12 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="ImageProcessor\**" />
+    <EmbeddedResource Remove="ImageProcessor\**" />
+    <None Remove="ImageProcessor\**" />
+  </ItemGroup>
+
+  <ItemGroup>
     <None Remove=".gitignore" />
   </ItemGroup>
 
@@ -34,10 +40,6 @@
     <None Update="appsettings*.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-  </ItemGroup>
-
-  <ItemGroup>
-    <Folder Include="ImageProcessor\" />
   </ItemGroup>
 
   <ItemGroup>

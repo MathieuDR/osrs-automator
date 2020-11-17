@@ -65,5 +65,18 @@ namespace DiscordBotFanatic.Modules {
             
             await ModifyWaitMessageAsync(builder.Build());
         }
+
+        [Name("Read config")]
+        [Command("view", RunMode = RunMode.Async)]
+        [Summary("Views the current configuration settings")]
+        [RequireContext(ContextType.Guild)]
+        public async Task ViewSettings() {
+            var settings = await _groupService.GetSettingsDictionary(GetGuildUser().Guild);
+
+            var builder = Context.CreateCommonEmbedBuilder();
+            builder.AddFieldsFromDictionary(settings);
+            
+            await ModifyWaitMessageAsync(builder.Build());
+        }
     }
 }
