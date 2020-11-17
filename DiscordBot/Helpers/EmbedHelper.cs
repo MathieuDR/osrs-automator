@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using Discord;
 using Discord.Commands;
 
@@ -87,6 +88,14 @@ namespace DiscordBotFanatic.Helpers {
         public static EmbedBuilder AddAuthorFromMessageAuthor(this EmbedBuilder builder, SocketCommandContext context,
             string url = null, string appendToFooter = null) {
             builder.Author = context.CreateAuthorFromMessageAuthor(url, appendToFooter);
+            return builder;
+        }
+
+        public static EmbedBuilder AddFieldsFromDictionary(this EmbedBuilder builder, Dictionary<string, string> dictionary) {
+            foreach (KeyValuePair<string, string> pair in dictionary) {
+                builder.AddField(pair.Key, pair.Value);
+            }
+
             return builder;
         }
     }
