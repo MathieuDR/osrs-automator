@@ -73,6 +73,7 @@ namespace DiscordBotFanatic {
                 .AddTransient<IDiscordBotRepository>(x => new LiteDbRepository(configuration.DatabaseFile))
                 .AddTransient<IPlayerService, PlayerService>()
                 .AddTransient<IGroupService, GroupService>()
+                .AddTransient<ICompetitionService, CompetitionService>()
                 .AddTransient<IAuthenticationService, AuthenticationService>()
                 .AddTransient<IOsrsHighscoreService, WiseOldManConnectorService>()
                 //.AddTransient<IOsrsHighscoreService, HighscoreService>()

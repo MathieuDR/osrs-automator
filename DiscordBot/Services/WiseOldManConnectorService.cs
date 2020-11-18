@@ -36,12 +36,25 @@ namespace DiscordBotFanatic.Services {
             return response.Data;
         }
 
-        public Task AddOsrsAccountToToGroup(in int groupId, in string verificationCode, in string osrsAccount) {
+        public Task AddOsrsAccountToToGroup(int groupId, string verificationCode, string osrsAccount) {
             return AddOsrsAccountToToGroup(groupId, verificationCode, new[] {osrsAccount});
         }
 
-        public Task AddOsrsAccountToToGroup(in int groupId, in string verificationCode, in IEnumerable<string> osrsAccounts) {
+        public Task AddOsrsAccountToToGroup(int groupId, string verificationCode, IEnumerable<string> osrsAccounts) {
             return _groupApi.AddMembers(groupId, verificationCode, osrsAccounts.Distinct().Select(s=> new MemberRequest(){Name = s, Role = GroupRole.Member}));
+        }
+
+        public Task<Competition> GetCompetition(int competitionId) {
+            throw new NotImplementedException();
+        }
+
+        public Task<Competition> GetCompetition(string competitionTitle) {
+            throw new NotImplementedException();
+        }
+
+        public async Task<IEnumerable<Competition>> GetAllCompetitionsForGroup(int groupId) {
+            var response = await _groupApi.Competitions(groupId);
+            return response.Data;
         }
     }
 }

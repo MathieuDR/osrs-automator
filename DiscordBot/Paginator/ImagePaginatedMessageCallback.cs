@@ -24,24 +24,36 @@ namespace DiscordBotFanatic.Paginator {
         public override async Task<bool> HandleCallbackAsync(SocketReaction reaction) {
             var emote = reaction.Emote;
 
-            if (Options is DeletePaginatedAppearanceOptions deleteOptions) {
-                if (emote.Equals(deleteOptions.Trash)) {
-                    await deleteOptions.Delete(Pager.Pages.ElementAt(Page - 1), Page-1);
-                    var tempList = Pager.Pages.ToList();
-                    tempList.RemoveAt(Page-1);
-                    Pager.Pages = tempList;
+            // Check if its custom options
+            if (!(Options is CustomActionsPaginatedAppearanceOptions customActionsOptions)) {
+                return await base.HandleCallbackAsync(reaction);
+            }
 
-                    if (Pager.Pages.Any()) {
-                        Page = Math.Max(Page - 1, 1);
-                        Pages = Pager.Pages.Count();
-                    } else {
-                        await Message.DeleteAsync().ConfigureAwait(false);
-                        return true;
-                    }
+            // Calculate index
+            var index = Page - 1;
 
+            if (emote.Equals(customActionsOptions.SelectEmoji)) {
+                await customActionsOptions.Select(Pager.Pages.ElementAt(index), index);
+                await Message.DeleteAsync().ConfigureAwait(false);
+                return true;
+            }
+
+            if (emote.Equals(customActionsOptions.DeleteEmoji)) {
+                await customActionsOptions.Delete(Pager.Pages.ElementAt(index), index);
+                var tempList = Pager.Pages.ToList();
+                tempList.RemoveAt(Page-1);
+                Pager.Pages = tempList;
+
+                if (Pager.Pages.Any()) {
+                    Page = Math.Max(Page - 1, 1);
+                    Pages = Pager.Pages.Count();
+                } else {
+                    await Message.DeleteAsync().ConfigureAwait(false);
+                    return true;
                 }
             }
 
+            // None of our custom options, go to base anyway.
             return await base.HandleCallbackAsync(reaction);
         }
 

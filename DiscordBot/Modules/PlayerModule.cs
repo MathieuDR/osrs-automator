@@ -62,9 +62,7 @@ namespace DiscordBotFanatic.Modules {
 
             var message = new CustomPaginatedMessage(Context.CreateCommonWiseOldManEmbedBuilder()) {
                 Pages = pages,
-                Options = new DeletePaginatedAppearanceOptions() {
-                    JumpDisplayOptions = JumpDisplayOptions.Never,
-                    DisplayInformationIcon = false,
+                Options = new CustomActionsPaginatedAppearanceOptions() {
                     Delete = async (toDelete, i) => await _playerService.DeleteCoupleOsrsAccountAtIndex(GetGuildUser(), i)
                 }
             };

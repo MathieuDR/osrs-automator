@@ -74,6 +74,7 @@ namespace DiscordBotFanatic.Modules {
             var settings = await _groupService.GetSettingsDictionary(GetGuildUser().Guild);
 
             var builder = Context.CreateCommonEmbedBuilder();
+            builder.WithTitle("Settings");
             builder.AddFieldsFromDictionary(settings);
             
             await ModifyWaitMessageAsync(builder.Build());
