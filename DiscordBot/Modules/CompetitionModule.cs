@@ -1,13 +1,11 @@
 ﻿using System.Threading.Tasks;
 using AutoMapper;
-using Discord;
 using Discord.Commands;
 using DiscordBotFanatic.Helpers;
 using DiscordBotFanatic.Models.Configuration;
 using DiscordBotFanatic.Models.ResponseModels;
 using DiscordBotFanatic.Paginator;
 using DiscordBotFanatic.Services.interfaces;
-using WiseOldManConnector.Models.Output;
 
 namespace DiscordBotFanatic.Modules {
 
@@ -33,13 +31,7 @@ namespace DiscordBotFanatic.Modules {
 
            var message = new CustomPaginatedMessage(builder) {
                Pages = competitions.ToPaginatedStringWithContexts(), 
-               Options = new CustomActionsPaginatedAppearanceOptions() {
-                   //Select = (selected, i) => {
-                   //     var context = selected as PaginatedStringWithContext<Competition>;
-                   //     _ = SetCompetition(GetGuildUser(), context.Reference);
-                   //     return Task.CompletedTask;
-                   //}
-               }
+               Options = new CustomActionsPaginatedAppearanceOptions()
            };
 
            await SendPaginatedMessageAsync(message);
