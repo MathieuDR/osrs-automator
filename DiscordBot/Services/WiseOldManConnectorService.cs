@@ -56,5 +56,9 @@ namespace DiscordBotFanatic.Services {
             var response = await _groupApi.Competitions(groupId);
             return response.Data;
         }
+
+        public async Task<DeltaLeaderboard> GetTopDeltasOfGroup(int groupId, MetricType metricType, Period period) {
+            return (await _groupApi.GainedLeaderboards(groupId, metricType, period)).Data;
+        }
     }
 }

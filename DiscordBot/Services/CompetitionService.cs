@@ -3,7 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Discord;
+using DiscordBotFanatic.Helpers;
 using DiscordBotFanatic.Models.Data;
+using DiscordBotFanatic.Models.Decorators;
 using DiscordBotFanatic.Repository;
 using DiscordBotFanatic.Services.interfaces;
 using WiseOldManConnector.Models.Output;
@@ -18,20 +20,20 @@ namespace DiscordBotFanatic.Services {
             _highscoreService = highscoreService;
         }
 
-        public async Task<IEnumerable<Competition>> ViewCompetitionsForGroup(IGuildUser guildUser) {
+        public async Task<IEnumerable<ItemDecorator<Competition>>> ViewCompetitionsForGroup(IGuildUser guildUser) {
             var allCompetitions = await ViewAllCompetitionsForGroup(guildUser);
 
             // Filter active ones
-            var result = allCompetitions.Where(x => x.EndDate > DateTimeOffset.Now);
+            var result = allCompetitions.Where(x => x.Item.EndDate > DateTimeOffset.Now);
 
             return result;
         }
 
-        public Task<IEnumerable<Competition>> ViewAllCompetitionsForGroup(IGuildUser guildUser) {
+        public async Task<IEnumerable<ItemDecorator<Competition>>> ViewAllCompetitionsForGroup(IGuildUser guildUser) {
             var config = GetGroupConfig(guildUser.GuildId);
 
-            var competitions = _highscoreService.GetAllCompetitionsForGroup(config.WomGroupId);
-            return competitions;
+            var competitions = await _highscoreService.GetAllCompetitionsForGroup(config.WomGroupId);
+            return competitions.Decorate();
         }
 
 
@@ -45,7 +47,7 @@ namespace DiscordBotFanatic.Services {
             return config;
         }
 
-        public async Task<Competition> SetCurrentCompetition(IGuildUser guildUser, int id) {
+        public async Task<ItemDecorator<Competition>> SetCurrentCompetition(IGuildUser guildUser, int id) {
             // Do we really need this?
             throw new NotImplementedException();
 
@@ -66,11 +68,11 @@ namespace DiscordBotFanatic.Services {
             //return competition;
         }
 
-        public async Task<Competition> SetCurrentCompetition(IGuildUser guildUser, string name) {
+        public async Task<ItemDecorator<Competition>> SetCurrentCompetition(IGuildUser guildUser, string name) {
             throw new System.NotImplementedException();
         }
 
-        public async Task<Competition> ViewCurrentCompetition(IGuild guild) {
+        public async Task<ItemDecorator<Competition>> ViewCurrentCompetition(IGuild guild) {
             throw new System.NotImplementedException();
         }
     }

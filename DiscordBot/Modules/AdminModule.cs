@@ -42,10 +42,10 @@ namespace DiscordBotFanatic.Modules {
         [Summary("Set the wom group for guild")]
         [RequireContext(ContextType.Guild)]
         public async Task SetWomGroup(int womGroup, string verificationCode) {
-            var group = await _groupService.SetGroupForGuild(GetGuildUser(), womGroup, verificationCode);
-            var builder = Context.CreateCommonWiseOldManEmbedBuilder();
+            var decoratedGroup = await _groupService.SetGroupForGuild(GetGuildUser(), womGroup, verificationCode);
+            var builder = Context.CreateCommonWiseOldManEmbedBuilder(decoratedGroup);
             builder.Title = $"Success.";
-            builder.Description = $"Group set to {group.Name}";
+            builder.Description = $"Group set to {decoratedGroup.Item.Name}";
             await ModifyWaitMessageAsync(builder.Build());
         }
 
@@ -55,7 +55,7 @@ namespace DiscordBotFanatic.Modules {
         [RequireContext(ContextType.Guild)]
         public async Task SetAutoAdd(bool autoAdd) {
             await _groupService.SetAutoAdd(GetGuildUser(), autoAdd);
-            var builder = Context.CreateCommonWiseOldManEmbedBuilder();
+            var builder = Context.CreateCommonEmbedBuilder();
             builder.Title = $"Success.";
             if (autoAdd) {
                 builder.Description = $"New members will be automatically added.";

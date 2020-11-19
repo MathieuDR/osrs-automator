@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
 using WiseOldManConnector.Models.Output;
+using WiseOldManConnector.Models.WiseOldMan.Enums;
 
 namespace DiscordBotFanatic.Services.interfaces {
     public interface IOsrsHighscoreService {
@@ -11,5 +12,6 @@ namespace DiscordBotFanatic.Services.interfaces {
         Task<Competition> GetCompetition(int competitionId);
         Task<Competition> GetCompetition(string competitionTitle);
         Task<IEnumerable<Competition>> GetAllCompetitionsForGroup(int groupId);
+        Task<DeltaLeaderboard> GetTopDeltasOfGroup(int groupId, MetricType metricType, Period period);
     }
 }

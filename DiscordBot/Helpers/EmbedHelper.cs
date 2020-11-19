@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using Discord;
 using Discord.Commands;
+using DiscordBotFanatic.Models.Decorators;
 
 namespace DiscordBotFanatic.Helpers {
     public static class EmbedHelper {
@@ -40,11 +42,15 @@ namespace DiscordBotFanatic.Helpers {
             };
         }
 
-        public static EmbedBuilder CreateCommonWiseOldManEmbedBuilder(this SocketCommandContext context,
-            string appendToFooter = null, string resourceUrl = null, string resource = null) {
+        public static EmbedBuilder CreateCommonWiseOldManEmbedBuilder<T>(this SocketCommandContext context, ItemDecorator<T> decorator, string appendToFooter = null) {
             var builder = CreateCommonEmbedBuilder(context);
-            builder.AddWiseOldManInfo(context, appendToFooter, resourceUrl, resource);
+            builder.AddWiseOldManInfo(context, appendToFooter, decorator.Link, decorator.Title);
             return builder;
+        }
+
+        public static EmbedBuilder CreateCommonWiseOldManEmbedBuilder<T>(this SocketCommandContext context, IEnumerable<ItemDecorator<T>> decorators, string appendToFooter = null) {
+            var decorator = decorators.FirstOrDefault();
+            return context.CreateCommonWiseOldManEmbedBuilder(decorator, appendToFooter);
         }
 
         public static EmbedBuilder CreateCommonEmbedBuilder(this SocketCommandContext context) {

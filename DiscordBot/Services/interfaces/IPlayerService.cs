@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
 using Discord;
+using DiscordBotFanatic.Models.Decorators;
 using WiseOldManConnector.Models.Output;
 
 namespace DiscordBotFanatic.Services.interfaces {
@@ -11,9 +12,9 @@ namespace DiscordBotFanatic.Services.interfaces {
         /// <param name="discordUser">Said discord user</param>
         /// <param name="proposedOsrsName">Proposed name</param>
         /// <returns></returns>
-        Task<Player> CoupleDiscordGuildUserToOsrsAccount(IGuildUser discordUser, string proposedOsrsName);
+        Task<ItemDecorator<Player>> CoupleDiscordGuildUserToOsrsAccount(IGuildUser discordUser, string proposedOsrsName);
 
-        Task<IEnumerable<Player>> GetAllOsrsAccounts(IGuildUser user);
+        Task<IEnumerable<ItemDecorator<Player>>> GetAllOsrsAccounts(IGuildUser user);
         Task DeleteCoupleOsrsAccountAtIndex(IGuildUser user, int index);
     }
 }

@@ -4,6 +4,8 @@ using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
 using Discord;
+using DiscordBotFanatic.Helpers;
+using DiscordBotFanatic.Models.Decorators;
 using DiscordBotFanatic.Repository;
 using DiscordBotFanatic.Services.interfaces;
 using WiseOldManConnector.Models.Output;
@@ -18,7 +20,7 @@ namespace DiscordBotFanatic.Services {
             _repository = repository;
         }
 
-        public async Task<Player> CoupleDiscordGuildUserToOsrsAccount(IGuildUser discordUser, string proposedOsrsName) {
+        public async Task<ItemDecorator<Player>> CoupleDiscordGuildUserToOsrsAccount(IGuildUser discordUser, string proposedOsrsName) {
             proposedOsrsName = proposedOsrsName.ToLowerInvariant();
             
             var player = _repository.GetPlayerById(discordUser.GuildId, discordUser.Id) ?? new Models.Data.Player(discordUser);
@@ -29,7 +31,7 @@ namespace DiscordBotFanatic.Services {
             if (player.CoupledOsrsAccounts.Any(p => p.Id == osrsPlayer.Id)) {
                 // Already coupled to this account
                 UpdateExistingPlayerOsrsAccount(discordUser.GuildId, player, osrsPlayer);
-                return osrsPlayer;
+                return osrsPlayer.Decorate();
             }
 
             var coupledUser = _repository.GetPlayerByOsrsAccount(discordUser.GuildId, osrsPlayer.Id);
@@ -40,12 +42,12 @@ namespace DiscordBotFanatic.Services {
             }
 
             AddNewOsrsAccount(discordUser, player, osrsPlayer);
-            return osrsPlayer;
+            return osrsPlayer.Decorate();
         }
 
-        public Task<IEnumerable<Player>> GetAllOsrsAccounts(IGuildUser user) {
+        public Task<IEnumerable<ItemDecorator<Player>>> GetAllOsrsAccounts(IGuildUser user) {
             var accounts = _repository.GetPlayerById(user.GuildId, user.Id).CoupledOsrsAccounts.AsEnumerable();
-            return Task.FromResult(accounts);
+            return Task.FromResult(accounts.Decorate());
         }
 
         public Task DeleteCoupleOsrsAccountAtIndex(IGuildUser user, int index) {

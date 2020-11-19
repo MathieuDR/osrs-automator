@@ -3,23 +3,26 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Discord;
+using DiscordBotFanatic.Helpers;
 using DiscordBotFanatic.Models.Data;
+using DiscordBotFanatic.Models.Decorators;
 using DiscordBotFanatic.Repository;
 using DiscordBotFanatic.Services.interfaces;
 using WiseOldManConnector.Models.Output;
+using WiseOldManConnector.Models.WiseOldMan.Enums;
 using Player = DiscordBotFanatic.Models.Data.Player;
 
 namespace DiscordBotFanatic.Services {
-    public class GroupService : IGroupService {
+    public class GroupService : BaseService, IGroupService {
         private readonly IOsrsHighscoreService _highscoreService;
         private readonly IDiscordBotRepository _repository;
-
-        public GroupService(IDiscordBotRepository repository, IOsrsHighscoreService highscoreService) {
+ 
+        public GroupService(ILogService logger, IDiscordBotRepository repository, IOsrsHighscoreService highscoreService) : base(logger) {
             _repository = repository;
             _highscoreService = highscoreService;
         }
 
-        public async Task<Group> SetGroupForGuild(IGuildUser guildUser, int womGroupId, string verificationCode) {
+        public async Task<ItemDecorator<Group>> SetGroupForGuild(IGuildUser guildUser, int womGroupId, string verificationCode) {
             Group group = await _highscoreService.GetGroupById(womGroupId);
             if (group == null) {
                 throw new Exception($"Group does not exist.");
@@ -32,7 +35,7 @@ namespace DiscordBotFanatic.Services {
             config.WomGroupId = group.Id;
 
             _repository.UpdateOrInsertGroupConfig(config);
-            return group;
+            return group.Decorate();
         }
 
         public async Task SetAutoAdd(IGuildUser guildUser, bool autoAdd) {
@@ -61,6 +64,26 @@ namespace DiscordBotFanatic.Services {
             }
 
             return Task.FromResult(settings.ToDictionary());
+        }
+
+        public Task<ItemDecorator<Leaderboard>> GetGroupLeaderboard(IGuildUser guildUser) {
+            return GetGroupLeaderboard(guildUser, MetricType.Overall, Period.Week);
+        }
+
+        public async Task<ItemDecorator<Leaderboard>> GetGroupLeaderboard(IGuildUser guildUser, MetricType metricType, Period period) {
+            var settings = _repository.GetGroupConfig(guildUser.GuildId);
+
+            // Check if competition is running
+            // Maybe go to competition service? Not sure
+            var competition = (await _highscoreService.GetAllCompetitionsForGroup(settings.WomGroupId)).FirstOrDefault(c => c.EndDate >= DateTimeOffset.Now);
+            
+            if (competition != null) {
+                return competition.DecorateLeaderboard();
+            }
+
+            // Check for delta gains, overall is standard
+           DeltaLeaderboard temp = await _highscoreService.GetTopDeltasOfGroup(settings.WomGroupId, metricType, period);
+           return temp.DecorateGeneric(settings.WomGroup);
         }
 
         private Task AddAllPlayersToGroup(IGuildUser guildUser, GroupConfig config) {

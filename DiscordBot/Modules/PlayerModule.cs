@@ -1,18 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+﻿using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
-using Discord.Addons.Interactive;
 using Discord.Commands;
 using DiscordBotFanatic.Helpers;
 using DiscordBotFanatic.Models.Configuration;
 using DiscordBotFanatic.Models.ResponseModels;
 using DiscordBotFanatic.Paginator;
 using DiscordBotFanatic.Services.interfaces;
-using WiseOldManConnector.Models.Output;
-using WiseOldManConnector.Models.WiseOldMan.Enums;
 
 namespace DiscordBotFanatic.Modules {
     [Name("Player module")]
@@ -39,9 +33,10 @@ namespace DiscordBotFanatic.Modules {
         [Summary("Add an OSRS name.")]
         [RequireContext(ContextType.Guild)]
         public async Task AddOsrsName(string name) {
-            var player = await _playerService.CoupleDiscordGuildUserToOsrsAccount(GetGuildUser(), name);
-            var builder = Context.CreateCommonWiseOldManEmbedBuilder();
-            builder.WithDescription($"Coupled {player.DisplayName} to your discord account in the server {Context.Guild.Name}");
+            var playerDecorater = await _playerService.CoupleDiscordGuildUserToOsrsAccount(GetGuildUser(), name);
+            var builder = Context.CreateCommonWiseOldManEmbedBuilder(playerDecorater);
+            builder.WithDescription(
+                $"Coupled {playerDecorater.Item.DisplayName} to your discord account in the server {Context.Guild.Name}");
             await ModifyWaitMessageAsync(builder.Build());
         }
 
@@ -50,17 +45,19 @@ namespace DiscordBotFanatic.Modules {
         [Summary("Cycle through accounts ")]
         [RequireContext(ContextType.Guild)]
         public async Task CycleThroughNames() {
-            var pages = (await _playerService.GetAllOsrsAccounts(GetGuildUser())).Select(x => x.ToPlayerInfoString());
+            var accountDecorators = await _playerService.GetAllOsrsAccounts(GetGuildUser());
+            var pages = accountDecorators.Select(x => x.Item.ToPlayerInfoString()).ToList();
 
             if (!pages.Any()) {
+                // we want to update actually.
                 var builder = Context.CreateCommonEmbedBuilder();
                 builder.WithDescription($"No accounts coupled");
                 builder.Title = "Uh oh :(";
-                ModifyWaitMessageAsync(builder.Build());
+                await ModifyWaitMessageAsync(builder.Build());
                 return;
             }
 
-            var message = new CustomPaginatedMessage(Context.CreateCommonWiseOldManEmbedBuilder()) {
+            var message = new CustomPaginatedMessage(Context.CreateCommonEmbedBuilder()) {
                 Pages = pages,
                 Options = new CustomActionsPaginatedAppearanceOptions() {
                     Delete = async (toDelete, i) => await _playerService.DeleteCoupleOsrsAccountAtIndex(GetGuildUser(), i)

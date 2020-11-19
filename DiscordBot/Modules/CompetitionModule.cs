@@ -1,4 +1,5 @@
-﻿using System.Threading.Tasks;
+﻿using System.Linq;
+using System.Threading.Tasks;
 using AutoMapper;
 using Discord.Commands;
 using DiscordBotFanatic.Helpers;
@@ -23,14 +24,14 @@ namespace DiscordBotFanatic.Modules {
         [RequireContext(ContextType.Guild)]
         public async Task BrowseCompetitions() {
             // Can perhaps 'select' to see more details of a competition?
-            var competitions = await _competitionService.ViewCompetitionsForGroup(GetGuildUser());
+            var competitionWrappers = (await _competitionService.ViewCompetitionsForGroup(GetGuildUser())).ToList();
             
-            var builder = Context.CreateCommonWiseOldManEmbedBuilder();
+            var builder = Context.CreateCommonWiseOldManEmbedBuilder(competitionWrappers);
             builder.Title = $"Current running competitions.";
             //builder.Description = $"Select a competition using the right emoji!";
 
            var message = new CustomPaginatedMessage(builder) {
-               Pages = competitions.ToPaginatedStringWithContexts(), 
+               Pages = competitionWrappers.Select(wrapper=>wrapper.Item).ToPaginatedStringWithContexts(), 
                Options = new CustomActionsPaginatedAppearanceOptions()
            };
 
@@ -52,11 +53,12 @@ namespace DiscordBotFanatic.Modules {
         [Summary("View the current competition")]
         [RequireContext(ContextType.Guild)]
         public async Task ViewCurrentCompetition() {
-            var competition = await _competitionService.ViewCurrentCompetition(GetGuildUser().Guild);
+            var competitionDecorator = await _competitionService.ViewCurrentCompetition(GetGuildUser().Guild);
+            var competition = competitionDecorator.Item;
             
-            var builder = Context.CreateCommonWiseOldManEmbedBuilder();
+            var builder = Context.CreateCommonWiseOldManEmbedBuilder(competitionDecorator);
             builder.Title = $"Current competition";
-            builder.Description = $"The servers current competition is set to: {competition.Title}";
+            builder.Description = $"The servers current competition is set to: {competitionDecorator.Title}";
 
             builder.AddField("Start date", competition.StartDate);
             builder.AddField("End date", competition.EndDate);
