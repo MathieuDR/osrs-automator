@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using AutoMapper;
 using WiseOldManConnector.Models.API.Responses;
 using WiseOldManConnector.Models.Output;
@@ -24,22 +23,43 @@ namespace WiseOldManConnector.Transformers {
                     .ForMember(dest => dest.EndDate, opt => opt.MapFrom(src => src.EndsAt))
                     .ForMember(dest => dest.CreateDate, opt => opt.MapFrom(src => src.CreatedAt))
                     .ForMember(dest => dest.UpdatedDate, opt => opt.MapFrom(src => src.UpdatedAt))
-                    .ForMember(dest => dest.ParticipantCount, opt => opt.MapFrom(src => src.ParticipantCount));
+                    .ForMember(dest => dest.ParticipantCount, opt => opt.MapFrom(src => src.ParticipantCount ?? src.Participants.Count))
+                    .ForMember(dest => dest.Participants, opt => opt.MapFrom(src => src));
+
+                //cfg.CreateMap<WOMCompetition, Competition>().ConvertUsing<WOMCompetitionToParticipantsCollectionConverter>();
+
+                cfg.CreateMap<WOMCompetition, IEnumerable<CompetitionParticipant>>()
+                    .ConvertUsing<WOMCompetitionToParticipantsCollectionConverter>();
+
+                cfg.CreateMap<Participant, CompetitionParticipant>()
+                    .ForMember(dest => dest.Player, opt => opt.MapFrom(src => src))
+                    .ForMember(dest => dest.CompetitionDelta, opt => opt.MapFrom(src => src.Progress))
+                    .ForMember(dest => dest.History, opt => opt.MapFrom(src => src.History));
+
+                cfg.CreateMap<CompetitionParticipantHistory, HistoryItem>()
+                    .ForMember(dest => dest.DateTime, opt => opt.MapFrom(src => src.Date));
+
+                cfg.CreateMap<CompetitionParticipantProgress, Delta>();
+
+
+                cfg.CreateMap<Participant, Player>();
+
+                cfg.CreateMap<string, MetricType>().ConvertUsing<StringToMetricTypeConverter>();
+                cfg.CreateMap<MetricType, DeltaType>().ConvertUsing<MetricTypeToDeltaTypeConverter>();
 
                 //cfg.CreateMap<SearchResponse, Player>();
                 cfg.CreateMap<WOMGroup, Group>();
                 cfg.CreateMap<GroupCreateResponse, VerificationGroup>();
                 cfg.CreateMap<GroupEditResponse, Group>();
-                
+
 
                 cfg.CreateMap<WOMGroupDeltaMember, DeltaMember>().ConvertUsing<WOMGroupTopMemberToDeltaMemberConverter>();
 
                 cfg.CreateMap<AssertPlayerTypeResponse, PlayerType>()
                     .ConvertUsing<AssertPlayerTypeResponseToPlayerTypeConverter>();
-                
+
 
                 cfg.CreateMap<AssertDisplayNameResponse, string>().ConvertUsing<AssertDisplayNameResponseToStringConverter>();
-                
 
 
                 cfg.CreateMap<WOMAchievement, Achievement>()
