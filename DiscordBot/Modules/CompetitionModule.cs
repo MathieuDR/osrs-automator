@@ -61,7 +61,7 @@ namespace DiscordBotFanatic.Modules {
             builder.AddField("Start date", competition.StartDate);
             builder.AddField("End date", competition.EndDate);
             builder.AddField("Duration", competition.Duration);
-            builder.AddField("Participants", competition.Participants);
+            builder.AddField("ParticipantCount", competition.ParticipantCount);
 
             await ModifyWaitMessageAsync(builder.Build());
         }
