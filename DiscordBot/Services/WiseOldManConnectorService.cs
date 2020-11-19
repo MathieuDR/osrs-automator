@@ -12,10 +12,12 @@ namespace DiscordBotFanatic.Services {
     public class WiseOldManConnectorService : IOsrsHighscoreService {
         private readonly IWiseOldManPlayerApi _playerApi;
         private readonly IWiseOldManGroupApi _groupApi;
+        private readonly IWiseOldManCompetitionApi _competitionApi;
 
-        public WiseOldManConnectorService(IWiseOldManPlayerApi playerApi, IWiseOldManGroupApi groupApi) {
+        public WiseOldManConnectorService(IWiseOldManPlayerApi playerApi, IWiseOldManGroupApi groupApi, IWiseOldManCompetitionApi competitionApi) {
             _playerApi = playerApi;
             _groupApi = groupApi;
+            _competitionApi = competitionApi;
         }
 
         public async Task<Player> GetPlayersForUsername(string username) {
@@ -44,8 +46,8 @@ namespace DiscordBotFanatic.Services {
             return _groupApi.AddMembers(groupId, verificationCode, osrsAccounts.Distinct().Select(s=> new MemberRequest(){Name = s, Role = GroupRole.Member}));
         }
 
-        public Task<Competition> GetCompetition(int competitionId) {
-            throw new NotImplementedException();
+        public async Task<Competition> GetCompetition(int competitionId) {
+            return (await _competitionApi.View(competitionId)).Data;
         }
 
         public Task<Competition> GetCompetition(string competitionTitle) {

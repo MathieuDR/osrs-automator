@@ -11,10 +11,12 @@ namespace WiseOldManConnector.Transformers.TypeConverters {
             var metric = context.Mapper.Map<MetricType>(source.Metric);
             var deltaType = context.Mapper.Map<DeltaType>(metric);
 
-            foreach (Participant sourceParticipant in source.Participants) {
-                var destinationParticipant = context.Mapper.Map<CompetitionParticipant>(sourceParticipant);
-                destinationParticipant.CompetitionDelta.DeltaType = deltaType;
-                result.Add(destinationParticipant);
+            if (source.Participants != null) {
+                foreach (Participant sourceParticipant in source.Participants) {
+                    var destinationParticipant = context.Mapper.Map<CompetitionParticipant>(sourceParticipant);
+                    destinationParticipant.CompetitionDelta.DeltaType = deltaType;
+                    result.Add(destinationParticipant);
+                }
             }
 
             return result;

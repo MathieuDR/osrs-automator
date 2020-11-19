@@ -11,7 +11,8 @@ namespace DiscordBotFanatic.Transformers {
             var config = new MapperConfiguration(cfg => {
                 cfg.CreateMap<string, Embed>().ConvertUsing<StringToEmbedConverter>();
                 cfg.CreateMap<EmbedResponse, Embed>().ConvertUsing<EmbedResponseToEmbedConverter>();
-                cfg.CreateMap<Leaderboard, Embed>().ConvertUsing<LeaderboardToEmbedConverter>();
+                //cfg.CreateMap<Leaderboard, Embed>().ConvertUsing<LeaderboardToEmbedConverter>();
+                cfg.CreateMap<CompetitionLeaderboard, EmbedBuilder>().ConvertUsing<CompetitionLeaderboardToEmbedBuilderConverter>();
             });
 
             return new Mapper(config);

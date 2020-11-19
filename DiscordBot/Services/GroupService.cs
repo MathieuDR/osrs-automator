@@ -75,9 +75,10 @@ namespace DiscordBotFanatic.Services {
 
             // Check if competition is running
             // Maybe go to competition service? Not sure
-            var competition = (await _highscoreService.GetAllCompetitionsForGroup(settings.WomGroupId)).FirstOrDefault(c => c.EndDate >= DateTimeOffset.Now);
+            var emptyCompetition = (await _highscoreService.GetAllCompetitionsForGroup(settings.WomGroupId)).FirstOrDefault(c => c.EndDate >= DateTimeOffset.Now);
             
-            if (competition != null) {
+            if (emptyCompetition != null) {
+                var competition = await _highscoreService.GetCompetition(emptyCompetition.Id);
                 return competition.DecorateLeaderboard();
             }
 

@@ -1,6 +1,7 @@
 ﻿using System.Threading.Tasks;
 using AutoMapper;
 using Discord.Commands;
+using DiscordBotFanatic.Helpers;
 using DiscordBotFanatic.Models.Configuration;
 using DiscordBotFanatic.Services.interfaces;
 
@@ -19,10 +20,14 @@ namespace DiscordBotFanatic.Modules {
         [RequireContext(ContextType.Guild)]
         public async Task TopGains() {
             // Get Leaderboard
-            var leaderboard = _groupService.GetGroupLeaderboard(GetGuildUser());
+            var leaderboardDecorator = await _groupService.GetGroupLeaderboard(GetGuildUser());
 
             // Print leaderboard out
+            var embedBuilder = Context.CreateCommonWiseOldManEmbedBuilder(leaderboardDecorator);
+            embedBuilder = Mapper.Map(leaderboardDecorator.Item, embedBuilder);
 
+            // send
+            await ModifyWaitMessageAsync(embedBuilder.Build());
         }
     }
 }

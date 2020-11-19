@@ -93,7 +93,7 @@ namespace DiscordBotFanatic.Helpers {
         public static ItemDecorator<DeltaLeaderboard> Decorate(this DeltaLeaderboard deltaLeaderboard, int groupId, string groupName) {
             Group group = new Group(){Id = groupId}; // oopsiedaisy. Should make it neat-o
             return new ItemDecorator<DeltaLeaderboard>(deltaLeaderboard, groupName, group.Url());
-        }
+        }   
 
         public static ItemDecorator<DeltaLeaderboard> Decorate(this DeltaLeaderboard deltaLeaderboard, Group group) {
             return deltaLeaderboard.Decorate(group.Id, group.Name);
