@@ -149,7 +149,7 @@ namespace WiseOldManConnectorTests.Connectors {
             Assert.NotEmpty(compToTest.Duration);
             Assert.Equal(id, compToTest.GroupId.Value);
             Assert.True(compToTest.EndDate > compToTest.StartDate);
-            Assert.True(compToTest.Participants > 0);
+            Assert.True(compToTest.ParticipantCount > 0);
         }
 
 

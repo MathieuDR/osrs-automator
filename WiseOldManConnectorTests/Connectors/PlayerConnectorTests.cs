@@ -146,7 +146,7 @@ namespace WiseOldManConnectorTests.Connectors {
             
             Assert.True(competition.StartDate < competition.EndDate);
             Assert.NotEmpty(competition.Duration);
-            Assert.True(competition.Participants > 1);
+            Assert.True(competition.ParticipantCount > 1);
         }
 
         [Fact]

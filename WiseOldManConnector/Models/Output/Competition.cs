@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using WiseOldManConnector.Models.WiseOldMan.Enums;
 
 namespace WiseOldManConnector.Models.Output {
@@ -13,6 +14,7 @@ namespace WiseOldManConnector.Models.Output {
         public DateTimeOffset CreateDate { get; set; }
         public DateTimeOffset? UpdatedDate { get; set; }
         public string Duration { get; set; }
-        public int Participants { get; set; }
+        public int ParticipantCount { get; set; }
+        public List<CompetitionParticipant> Participants { get; set; }
     }
 }

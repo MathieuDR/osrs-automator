@@ -24,7 +24,7 @@ namespace WiseOldManConnector.Transformers {
                     .ForMember(dest => dest.EndDate, opt => opt.MapFrom(src => src.EndsAt))
                     .ForMember(dest => dest.CreateDate, opt => opt.MapFrom(src => src.CreatedAt))
                     .ForMember(dest => dest.UpdatedDate, opt => opt.MapFrom(src => src.UpdatedAt))
-                    .ForMember(dest => dest.Participants, opt => opt.MapFrom(src => src.ParticipantCount));
+                    .ForMember(dest => dest.ParticipantCount, opt => opt.MapFrom(src => src.ParticipantCount));
 
                 //cfg.CreateMap<SearchResponse, Player>();
                 cfg.CreateMap<WOMGroup, Group>();

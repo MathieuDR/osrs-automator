@@ -9,7 +9,7 @@ namespace WiseOldManConnector.Configuration {
             services.AddTransient<IWiseOldManPlayerApi, PlayerConnector>();
             services.AddTransient<IWiseOldManRecordApi, RecordConnector>();
             services.AddTransient<IWiseOldManGroupApi, GroupConnector>();
-            //services.AddTransient<IWiseOldManCompetitionApi, CompetitionCon>();
+            services.AddTransient<IWiseOldManCompetitionApi, CompetitionConnector>();
             return services;
         }
     }

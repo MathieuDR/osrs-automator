@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using Newtonsoft.Json;
 
 namespace WiseOldManConnector.Models.API.Responses {
@@ -31,21 +32,14 @@ namespace WiseOldManConnector.Models.API.Responses {
             [JsonProperty("updatedAt")]
             public DateTime UpdatedAt { get; set; }
 
-            //[JsonProperty("group")]
-            //public WOMGroup WOMGroup { get; set; }
-
             [JsonProperty("duration")]
             public string Duration { get; set; }
 
             [JsonProperty("participantCount")]
             public int ParticipantCount { get; set; }
 
+            [JsonProperty("participants")]
+            public List<Participant> Participants { get; set; }
 
-            //[JsonProperty("totalGained")]
-            //public int TotalGained { get; set; }
-
-            //[JsonProperty("participants")]
-            //public List<Participant> Participants { get; set; }
-        
     }
 }
