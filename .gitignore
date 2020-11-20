@@ -437,3 +437,4 @@ $RECYCLE.BIN/
 !.vscode/extensions.json
 /appsettings.debug.json
 /appsettings.Development.json
+/.sonarqube
