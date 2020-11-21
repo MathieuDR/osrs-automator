@@ -28,7 +28,8 @@ namespace DiscordBotFanatic.Jobs {
                     var channel = guild.Channels.FirstOrDefault(c => c.Name.Contains("botssetup")) as ISocketMessageChannel;
 
                     if (channel != null) {
-                        await channel.SendMessageAsync("HELLO FROM JOB!");
+                        //await channel.SendMessageAsync("HELLO FROM JOB!");
+                        await _service.Log("Would send message but nah", LogEventLevel.Information, null);
                     } else {
                         await _service.Log("Cannot find channel", LogEventLevel.Information, null);
                     }

@@ -65,7 +65,8 @@ namespace WiseOldManConnector.Transformers {
                 cfg.CreateMap<WOMAchievement, Achievement>()
                     .ForMember(dest => dest.AchievedAt, opt => opt.MapFrom(src => src.CreatedAt))
                     .ForMember(dest => dest.Title, opt => opt.MapFrom(src => src.Type))
-                    .ForMember(dest => dest.IsMissing, opt => opt.MapFrom(src => src.Missing));
+                    .ForMember(dest => dest.IsMissing, opt => opt.MapFrom(src => src.Missing))
+                    .ForMember(dest => dest.Player, opt => opt.MapFrom(src => src.Player));
 
                 cfg.CreateMap<SnapshotsResponse, Snapshots>();
 

@@ -1,16 +1,17 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 using System.Threading.Tasks;
 using Discord;
 using DiscordBotFanatic.Helpers;
 using DiscordBotFanatic.Models.Data;
 using DiscordBotFanatic.Models.Decorators;
+using DiscordBotFanatic.Models.Enums;
 using DiscordBotFanatic.Repository;
 using DiscordBotFanatic.Services.interfaces;
 using WiseOldManConnector.Models.Output;
 using WiseOldManConnector.Models.WiseOldMan.Enums;
-using Player = DiscordBotFanatic.Models.Data.Player;
 
 namespace DiscordBotFanatic.Services {
     public class GroupService : BaseService, IGroupService {
@@ -39,9 +40,9 @@ namespace DiscordBotFanatic.Services {
         }
 
         public async Task SetAutoAdd(IGuildUser guildUser, bool autoAdd) {
-            GroupConfig config = _repository.GetGroupConfig(guildUser.GuildId);
-            if (config == null || config.WomGroupId <= 0) {
-                throw new Exception($"No group set for this server.");
+            GroupConfig config = GetGroupConfig(guildUser.GuildId);
+            if (config.WomGroupId <= 0) {
+                throw new Exception($"No Wise Old Man set for this server.");
             }
 
             config.AutoAddNewAccounts = autoAdd;
@@ -56,8 +57,53 @@ namespace DiscordBotFanatic.Services {
             await _;
         }
 
+        public async Task SetAutomationJobChannel(JobTypes jobType, IGuildUser user, IMessageChannel messageChannel) {
+            var config = GetGroupConfig(user.GuildId);
+            
+            //ChannelJobConfiguration setting;
+            if (config.AutomatedMessagesConfig.ChannelJobs.ContainsKey(jobType)) {
+                var setting = config.AutomatedMessagesConfig.ChannelJobs[jobType];
+                setting.ChannelId = messageChannel.Id;
+            } else {
+                var setting = new ChannelJobConfiguration(user.GuildId, messageChannel.Id);
+                config.AutomatedMessagesConfig.ChannelJobs.Add(jobType, setting);
+            }
+
+            _repository.UpdateOrInsertGroupConfig(config);
+        }
+
+        public Task<bool> ToggleAutomationJob(JobTypes jobType, IGuild guild) {
+            var config = GetGroupConfig(guild.Id);
+
+            //ChannelJobConfiguration setting;
+            if (!config.AutomatedMessagesConfig.ChannelJobs.ContainsKey(jobType)) {
+                throw new Exception($"No configuration for this jobtype set. Perhaps you need to set a channel.");
+            }
+
+            var setting = config.AutomatedMessagesConfig.ChannelJobs[jobType];
+            setting.Activated = !setting.Activated;
+            _repository.UpdateOrInsertGroupConfig(config);
+            return Task.FromResult(setting.Activated);
+        }
+
+        public async Task SetActivationAutomationJob(JobTypes jobType, bool activated) {
+            throw new NotImplementedException();
+        }
+
+        private GroupConfig GetGroupConfig(ulong guildId, bool validate = true) {
+            var result = _repository.GetGroupConfig(guildId);
+            if (validate) {
+                if (result == null) {
+                    throw new Exception($"Guild has no configuration. Please set the config");
+                }
+            }
+
+
+            return result;
+        }
+
         public Task<Dictionary<string, string>> GetSettingsDictionary(IGuild guild) {
-            var settings = _repository.GetGroupConfig(guild.Id);
+            var settings = GetGroupConfig(guild.Id, false);
 
             if (settings == null) {
                 return Task.FromResult(new Dictionary<string, string>());
@@ -71,7 +117,7 @@ namespace DiscordBotFanatic.Services {
         }
 
         public async Task<ItemDecorator<Leaderboard>> GetGroupLeaderboard(IGuildUser guildUser, MetricType metricType, Period period) {
-            var settings = _repository.GetGroupConfig(guildUser.GuildId);
+            var settings = GetGroupConfig(guildUser.GuildId);
 
             // Check if competition is running
             // Maybe go to competition service? Not sure

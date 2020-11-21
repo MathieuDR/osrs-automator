@@ -40,11 +40,18 @@ namespace DiscordBotFanatic.Configuration {
 
         private static IServiceCollectionQuartzConfigurator ConfigureHelloJob(
             this IServiceCollectionQuartzConfigurator quartzServices) {
-            quartzServices.ScheduleJob<HelloJob>(trigger => trigger
-                .WithIdentity("Combined configuration Trigger")
-                .StartAt(DateBuilder.EvenSecondDate(DateTimeOffset.UtcNow.AddSeconds(20)))
-                .WithDailyTimeIntervalSchedule(x => x.WithInterval(10, IntervalUnit.Second))
-                .WithDescription("my awesome trigger configured for a job with single call")
+            //quartzServices.ScheduleJob<HelloJob>(trigger => trigger
+            //    .WithIdentity("Combined configuration Trigger")
+            //    .StartAt(DateBuilder.EvenSecondDate(DateTimeOffset.UtcNow.AddSeconds(20)))
+            //    .WithDailyTimeIntervalSchedule(x => x.WithInterval(10, IntervalUnit.Second))
+            //    .WithDescription("my awesome trigger configured for a job with single call")
+            //);
+
+            quartzServices.ScheduleJob<AchievementsJob>(trigger => 
+                trigger.WithIdentity("Combined configuration Trigger")
+                .StartAt(DateBuilder.EvenSecondDate(DateTimeOffset.UtcNow.AddSeconds(30)))
+                .WithSimpleSchedule(x=>x.WithIntervalInHours(6).RepeatForever())
+                .WithDescription("Showing achievements for all the servers!")
             );
 
             return quartzServices;

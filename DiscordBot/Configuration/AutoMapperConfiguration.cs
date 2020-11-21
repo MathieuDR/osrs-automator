@@ -18,6 +18,9 @@ namespace DiscordBotFanatic.Configuration {
                 //cfg.CreateMap<Leaderboard, Embed>().ConvertUsing<LeaderboardToEmbedConverter>();
                 cfg.CreateMap<CompetitionLeaderboard, EmbedBuilder>()
                     .ConvertUsing<CompetitionLeaderboardToEmbedBuilderConverter>();
+
+                cfg.CreateMap<Achievement, EmbedBuilder>()
+                    .ConvertUsing<AchievementToEmbedBuilderConverter>();
             });
 
             return new Mapper(config);

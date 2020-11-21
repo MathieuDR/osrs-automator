@@ -3,6 +3,7 @@ using System.Threading.Tasks;
 using AutoMapper;
 using Discord;
 using Discord.Commands;
+using Discord.WebSocket;
 using DiscordBotFanatic.Helpers;
 using DiscordBotFanatic.Models.Configuration;
 using DiscordBotFanatic.Models.Enums;
@@ -64,6 +65,49 @@ namespace DiscordBotFanatic.Modules {
             }
             
             await ModifyWaitMessageAsync(builder.Build());
+        }
+
+        [Name("Set Automated message channel")]
+        [Command("set automated")]
+        [Summary("Set Automated message channel")]
+        [RequireContext(ContextType.Guild)]
+        public async Task SetAutoChannel(string job, IChannel channel) {
+            //var channel = Context.Channel;
+            var messageChannel = (ISocketMessageChannel) channel;
+
+            if (messageChannel == null) {
+                throw new Exception($"Channel wasn't a message channel. Try a different one.");
+            }
+
+            var jobType = Enum.Parse<JobTypes>(job, true);
+
+            await _groupService.SetAutomationJobChannel(jobType, GetGuildUser(), messageChannel);
+
+            var builder = Context.CreateCommonEmbedBuilder()
+                .WithTitle("Success!")
+                .WithDescription($"Channel {messageChannel.Name} set for job '{jobType}'");
+            
+            await ModifyWaitMessageAsync(builder.Build());
+        }
+
+        
+        [Name("Set Automated message channel")]
+        [Command("toggle automated")]
+        [Summary("Set Automated message channel")]
+        [RequireContext(ContextType.Guild)]
+        public async Task ToggleAutomatedJob(string job) {
+            var jobType = Enum.Parse<JobTypes>(job, true);
+            
+            bool activated = await _groupService.ToggleAutomationJob(jobType, GetGuildUser().Guild);
+
+            string verb = activated  ? "activated" : "deactivated";
+
+            var builder = Context.CreateCommonEmbedBuilder()
+                .WithTitle("Success!")
+                .WithDescription($"Job '{jobType}' {verb}");
+            
+            await ModifyWaitMessageAsync(builder.Build());
+
         }
 
         [Name("Read config")]

@@ -9,5 +9,6 @@ namespace WiseOldManConnector.Models.Output {
         public long Threshold { get; set; }
         public DateTime? AchievedAt { get; set; }
         public Boolean IsMissing { get; set; }
+        public Player Player { get; set; }
     }
 }
