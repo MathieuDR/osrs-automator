@@ -8,11 +8,6 @@ using WiseOldManConnector.Models.WiseOldMan.Enums;
 namespace DiscordBotFanatic.Transformers.TypeConverters {
     public class AchievementToEmbedBuilderConverter : ITypeConverter<Achievement, EmbedBuilder> {
 
-        private static int _idHash = 3;
-        private static int _idSpace = 5;
-        private static int _nameSpace = 15;
-        private static int _numberSpace = 6;
-
         public EmbedBuilder Convert(Achievement source, EmbedBuilder destination, ResolutionContext context) {
             destination ??= new EmbedBuilder();
 

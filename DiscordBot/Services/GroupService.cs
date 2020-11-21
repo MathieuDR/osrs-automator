@@ -57,7 +57,7 @@ namespace DiscordBotFanatic.Services {
             await _;
         }
 
-        public async Task SetAutomationJobChannel(JobTypes jobType, IGuildUser user, IMessageChannel messageChannel) {
+        public Task SetAutomationJobChannel(JobTypes jobType, IGuildUser user, IMessageChannel messageChannel) {
             var config = GetGroupConfig(user.GuildId);
             
             //ChannelJobConfiguration setting;
@@ -70,6 +70,7 @@ namespace DiscordBotFanatic.Services {
             }
 
             _repository.UpdateOrInsertGroupConfig(config);
+            return Task.CompletedTask;
         }
 
         public Task<bool> ToggleAutomationJob(JobTypes jobType, IGuild guild) {
@@ -86,7 +87,7 @@ namespace DiscordBotFanatic.Services {
             return Task.FromResult(setting.Activated);
         }
 
-        public async Task SetActivationAutomationJob(JobTypes jobType, bool activated) {
+        public Task SetActivationAutomationJob(JobTypes jobType, bool activated) {
             throw new NotImplementedException();
         }
 
