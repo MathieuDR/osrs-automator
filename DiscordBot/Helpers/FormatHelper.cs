@@ -1,11 +1,12 @@
 ﻿using System;
 using System.Globalization;
+using System.Linq;
 using WiseOldManConnector.Models.Output;
 using WiseOldManConnector.Models.WiseOldMan.Enums;
 
 namespace DiscordBotFanatic.Helpers {
     public static class FormatHelper {
-        public static readonly int[] Experiences = {
+        private static readonly int[] Experiences = {
             0, 0, 83, 174, 276, 388, 512, 650, 801, 969, 1154, 1358, 1584, 1833, 2107, 2411, 2746, 3115, 3523, 3973,
             4470, 5018, 5624, 6291, 7028, 7842, 8740, 9730, 10824, 12031, 13363, 14833, 16456, 18247, 20224, 22406,
             24815, 27473, 30408, 33648, 37224, 41171, 45529, 50339, 55649, 61512, 67983, 75127, 83014, 91721, 101333,
@@ -108,6 +109,17 @@ namespace DiscordBotFanatic.Helpers {
             }
 
             return index;
+        }
+
+        public static int ToExperience(this int level) {
+            var index = level;
+            
+            if (index >= Experiences.Length) {
+                return Experiences.Last();
+            }
+
+            return Experiences[index];
+
         }
     }
 }

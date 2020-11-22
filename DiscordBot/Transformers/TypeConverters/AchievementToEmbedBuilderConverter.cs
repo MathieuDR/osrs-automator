@@ -53,7 +53,7 @@ namespace DiscordBotFanatic.Transformers.TypeConverters {
                     }
                     break;
                 case DeltaType.Experience:
-                    if (source.Threshold >= FormatHelper.Experiences[99]) {
+                    if (source.Threshold > 99.ToExperience()) {
                         append = " experience";
                     } 
                     break;
