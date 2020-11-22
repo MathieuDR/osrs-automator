@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using DiscordBotFanatic.Models.Data;
 using LiteDB;
-using WiseOldManConnector.Models.Output;
 using Player = DiscordBotFanatic.Models.Data.Player;
 
 namespace DiscordBotFanatic.Repository {
@@ -12,6 +11,7 @@ namespace DiscordBotFanatic.Repository {
         protected const string GuildConfigurationCollectionName = "guildConfig";
         protected const string GuildEventCollectionName = "guildEvents";
         protected const string GuildCompetitionCollectionName = "guildCompetitions";
+        protected const string GuildJobStateCollectionName = "guildJobState";
         private readonly object _dbLock = new object();
         private readonly Dictionary<ulong, object> _guildLocks = new Dictionary<ulong, object>();
 
@@ -71,7 +71,7 @@ namespace DiscordBotFanatic.Repository {
             return GetPlayerById(guildId, player.DiscordId);
         }
 
-        public GroupConfig UpdateOrInsertGroupConfig(GroupConfig config) {
+        public GroupConfig CreateOrUpdateGroupConfig(GroupConfig config) {
             if (config._id == null) {
                 return InsertConfig(config);
             }
@@ -114,6 +114,46 @@ namespace DiscordBotFanatic.Repository {
                     return GetPlayerQuery(LiteDatabase).ToList();
                 }
             }
+        }
+
+        public AutomatedJobState GetAutomatedJobState(ulong guildId) {
+            lock (GetGuildLock(guildId)) {
+                using (LiteDatabase = new LiteDatabase(GetGuildFileName(guildId))) {
+                    var collection = LiteDatabase.GetCollection<AutomatedJobState>(GuildJobStateCollectionName);
+
+                    if (collection.Count() > 1) {
+                        throw new Exception($"Multiple job states!");
+                    }
+
+                    return collection.Query().Where(j=>j.GuildId == guildId).FirstOrDefault();
+                }
+            }
+        }
+
+        private AutomatedJobState InsertAutomatedJobState(AutomatedJobState jobState) {
+            lock (GetGuildLock(jobState.GuildId)) {
+                using (LiteDatabase = new LiteDatabase(GetGuildFileName(jobState.GuildId))) {
+                    var collection = LiteDatabase.GetCollection<AutomatedJobState>(GuildJobStateCollectionName);
+                    collection.Insert(jobState);
+                }
+            }
+
+            return GetAutomatedJobState(jobState.GuildId);
+        }
+
+        public AutomatedJobState CreateOrUpdateAutomatedJobState(ulong guildId, AutomatedJobState jobState) {
+            if (jobState._id == null) {
+                return InsertAutomatedJobState(jobState);
+            }
+            
+            lock (GetGuildLock(guildId)) {
+                using (LiteDatabase = new LiteDatabase(GetGuildFileName(guildId))) {
+                    var collection = LiteDatabase.GetCollection<AutomatedJobState>(GuildJobStateCollectionName);
+                    collection.Update(jobState);
+                }
+            }
+            
+            return GetAutomatedJobState(jobState.GuildId);
         }
 
 

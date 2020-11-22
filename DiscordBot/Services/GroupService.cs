@@ -35,7 +35,7 @@ namespace DiscordBotFanatic.Services {
             config.WomGroup = group;
             config.WomGroupId = group.Id;
 
-            _repository.UpdateOrInsertGroupConfig(config);
+            _repository.CreateOrUpdateGroupConfig(config);
             return group.Decorate();
         }
 
@@ -53,7 +53,7 @@ namespace DiscordBotFanatic.Services {
                 }
             });
 
-            _repository.UpdateOrInsertGroupConfig(config);
+            _repository.CreateOrUpdateGroupConfig(config);
             await _;
         }
 
@@ -69,7 +69,7 @@ namespace DiscordBotFanatic.Services {
                 config.AutomatedMessagesConfig.ChannelJobs.Add(jobType, setting);
             }
 
-            _repository.UpdateOrInsertGroupConfig(config);
+            _repository.CreateOrUpdateGroupConfig(config);
             return Task.CompletedTask;
         }
 
@@ -83,7 +83,7 @@ namespace DiscordBotFanatic.Services {
 
             var setting = config.AutomatedMessagesConfig.ChannelJobs[jobType];
             setting.Activated = !setting.Activated;
-            _repository.UpdateOrInsertGroupConfig(config);
+            _repository.CreateOrUpdateGroupConfig(config);
             return Task.FromResult(setting.Activated);
         }
 

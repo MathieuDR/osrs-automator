@@ -15,9 +15,13 @@ namespace DiscordBotFanatic.Repository {
 
         Player GetPlayerById(ulong guildId, ulong id);
         Player InsertPlayerForGuild(ulong guildId, Player player);
-        GroupConfig UpdateOrInsertGroupConfig(GroupConfig config);
+        GroupConfig CreateOrUpdateGroupConfig(GroupConfig config);
         GroupConfig InsertConfig(GroupConfig config);
         GroupConfig GetGroupConfig(ulong guildId);
         IEnumerable<Player> GetAllPlayersForGuild(in ulong guildId);
+
+        AutomatedJobState GetAutomatedJobState(ulong guildId);
+        AutomatedJobState CreateOrUpdateAutomatedJobState(ulong guildId, AutomatedJobState jobState);
+
     }
 }

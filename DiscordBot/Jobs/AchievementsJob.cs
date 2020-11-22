@@ -1,5 +1,4 @@
-﻿using System.Collections.Generic;
-using System.Linq;
+﻿using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
 using Discord;
@@ -16,11 +15,12 @@ namespace DiscordBotFanatic.Jobs {
     public class AchievementsJob : IJob {
         private readonly DiscordSocketClient _discord;
         private readonly ILogService _logService;
-        private readonly IDiscordBotRepository _repository;
-        private readonly IOsrsHighscoreService _osrsHighscoreService;
         private readonly Mapper _mapper;
+        private readonly IOsrsHighscoreService _osrsHighscoreService;
+        private readonly IDiscordBotRepository _repository;
 
-        public AchievementsJob(DiscordSocketClient discord, ILogService logService, IDiscordBotRepository repository, IOsrsHighscoreService osrsHighscoreService, Mapper mapper) {
+        public AchievementsJob(DiscordSocketClient discord, ILogService logService, IDiscordBotRepository repository,
+            IOsrsHighscoreService osrsHighscoreService, Mapper mapper) {
             _discord = discord;
             _logService = logService;
             _repository = repository;
@@ -37,7 +37,9 @@ namespace DiscordBotFanatic.Jobs {
 
                     var config = _repository.GetGroupConfig(discordGuild.Id);
 
-                    if (config == null || config.AutomatedMessagesConfig == null || config.AutomatedMessagesConfig.ChannelJobs == null || !config.AutomatedMessagesConfig.ChannelJobs.ContainsKey(JobTypes.Achievements)) {
+                    if (config == null || config.AutomatedMessagesConfig == null ||
+                        config.AutomatedMessagesConfig.ChannelJobs == null ||
+                        !config.AutomatedMessagesConfig.ChannelJobs.ContainsKey(JobTypes.Achievements)) {
                         // No config set. We don't care.
                         continue;
                     }
@@ -48,7 +50,7 @@ namespace DiscordBotFanatic.Jobs {
                         // Not activated
                         continue;
                     }
-                    
+
                     var channel = await GetChannel(discordGuild, settings);
                     if (channel == null) {
                         continue;
@@ -56,27 +58,59 @@ namespace DiscordBotFanatic.Jobs {
 
                     // Get achievements
                     _ = _logService.Log("Searching achievements", LogEventLevel.Information, null);
-                    var achievements = await _osrsHighscoreService.GetGroupAchievements(config.WomGroupId);
+                    var achievementsTask = _osrsHighscoreService.GetGroupAchievements(config.WomGroupId);
+                    var jobState = _repository.GetAutomatedJobState(config.GuildId);
+
+
+                    var achievements = (await achievementsTask).OrderBy(a => a.AchievedAt).ToList();
 
                     // Lookup when last time was printed!
-                    List<Achievement> toPrintAchievements = context.PreviousFireTimeUtc.HasValue ? achievements.Where(a => a.AchievedAt != null && a.AchievedAt.Value >= context.PreviousFireTimeUtc.Value).ToList() : achievements.ToList();
-                    _ = _logService.Log($"Printing {toPrintAchievements.Count} achievements", LogEventLevel.Information, null);
+                    int startIndex = 0; 
+                    if (jobState == null) {
+                        jobState = new AutomatedJobState() {
+                            GuildId = config.GuildId,
+                            LastPrintedAchievement = new Achievement()
+                        };
+                    } else {
+                        startIndex = achievements.FindIndex(a =>
+                            a.PlayerId == jobState.LastPrintedAchievement.PlayerId &&
+                            a.Title == jobState.LastPrintedAchievement.Title) + 1;
+                    }
 
-                    foreach (Achievement achievement in toPrintAchievements) {
+
+                    _ = _logService.Log($"Printing achievements", LogEventLevel.Information, null);
+
+                    int i;
+                    for (i = startIndex; i < achievements.Count; i++) {
+                        Achievement achievement = achievements[i];
+
                         var builder = new EmbedBuilder();
                         builder = _mapper.Map(achievement, builder);
-                        _ = channel.SendMessageAsync("", false, builder.Build());
+                        await channel.SendMessageAsync("", false, builder.Build());
+                    }
+
+                    _ = _logService.Log($"Printed {i - startIndex} achievements.", LogEventLevel.Information, null);
+
+                    if (startIndex != achievements.Count-1) {
+                        // Updating DB if we printed at least one!
+                        jobState.LastPrintedAchievement = achievements.LastOrDefault();
+                        _repository.CreateOrUpdateAutomatedJobState(config.GuildId, jobState);
                     }
                 }
             } else {
                 _ = _logService.Log("Not connected", LogEventLevel.Warning, null);
             }
 
-            
+            _ = _logService.Log("Ending achievements job execution", LogEventLevel.Information, null);
+        }
+
+        private bool IsAchievementEqual(Achievement achievement, Achievement toCompare) {
+            return achievement.PlayerId == toCompare.PlayerId && achievement.Title == toCompare.Title;
         }
 
         private Task<ISocketMessageChannel> GetChannel(SocketGuild discordGuild, ChannelJobConfiguration settings) {
-            ISocketMessageChannel channel = (ISocketMessageChannel) discordGuild.Channels.FirstOrDefault(c => c.Id == settings.ChannelId);
+            ISocketMessageChannel channel =
+                (ISocketMessageChannel) discordGuild.Channels.FirstOrDefault(c => c.Id == settings.ChannelId);
 
             if (channel == null) {
                 _ = _logService.Log("Cannot find channel", LogEventLevel.Warning, null);

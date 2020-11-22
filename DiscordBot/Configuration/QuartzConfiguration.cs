@@ -49,8 +49,8 @@ namespace DiscordBotFanatic.Configuration {
 
             quartzServices.ScheduleJob<AchievementsJob>(trigger => 
                 trigger.WithIdentity("Combined configuration Trigger")
-                .StartAt(DateBuilder.EvenSecondDate(DateTimeOffset.UtcNow.AddSeconds(30)))
-                .WithSimpleSchedule(x=>x.WithIntervalInHours(6).RepeatForever())
+                .StartAt(DateBuilder.EvenSecondDate(DateTimeOffset.UtcNow.AddSeconds(5)))
+                .WithSimpleSchedule(x=>x.WithIntervalInMinutes(30).RepeatForever())
                 .WithDescription("Showing achievements for all the servers!")
             );
 
