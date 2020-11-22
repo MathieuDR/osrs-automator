@@ -16,11 +16,11 @@ namespace DiscordBotFanatic.Jobs {
         protected ILogService LogService { get; }
         protected IDiscordBotRepository Repository { get; }
         protected Mapper Mapper { get; }
-        protected JobTypes JobType { get; }
+        protected JobType JobType { get; }
         protected GroupConfig Configuration { get; private set; }
 
 
-        protected BaseGuildJob(DiscordSocketClient discord, ILogService logService, IDiscordBotRepository repository, Mapper mapper, JobTypes jobType) {
+        protected BaseGuildJob(DiscordSocketClient discord, ILogService logService, IDiscordBotRepository repository, Mapper mapper, JobType jobType) {
             Discord = discord;
             LogService = logService;
             Repository = repository;
@@ -34,17 +34,17 @@ namespace DiscordBotFanatic.Jobs {
 
             if (Discord.ConnectionState == ConnectionState.Connected) {
                 foreach (SocketGuild discordGuild in Discord.Guilds) {
-                    _ = LogService.Log($"Guild: {discordGuild.Name}, done", LogEventLevel.Information, null);
+                    _ = LogService.Log($"Guild: {discordGuild.Name}, starting", LogEventLevel.Information, null);
                     Configuration = Repository.GetGroupConfig(discordGuild.Id);
 
                     if (Configuration == null || Configuration.AutomatedMessagesConfig == null ||
                         Configuration.AutomatedMessagesConfig.ChannelJobs == null ||
-                        !Configuration.AutomatedMessagesConfig.ChannelJobs.ContainsKey(JobTypes.Achievements)) {
+                        !Configuration.AutomatedMessagesConfig.ChannelJobs.ContainsKey(JobType)) {
                         // No config set. We don't care.
                         continue;
                     }
 
-                    var settings = Configuration.AutomatedMessagesConfig.ChannelJobs[JobTypes.Achievements];
+                    var settings = Configuration.AutomatedMessagesConfig.ChannelJobs[JobType];
 
                     if (!settings.Activated) {
                         // Not activated
@@ -59,7 +59,7 @@ namespace DiscordBotFanatic.Jobs {
                     // Do task for guild
                     await ForGuild(discordGuild, channel);
 
-                    _ = LogService.Log($"Guild: {discordGuild.Name}, starting", LogEventLevel.Information, null);
+                    _ = LogService.Log($"Guild: {discordGuild.Name}, done", LogEventLevel.Information, null);
                 }
             } else {
                 _ = LogService.Log("Not connected", LogEventLevel.Warning, null);
@@ -76,7 +76,7 @@ namespace DiscordBotFanatic.Jobs {
 
             if (channel == null) {
                 _ = LogService.Log("Cannot find channel", LogEventLevel.Warning, null);
-                _ = guild.DefaultChannel.SendMessageAsync($"Channel not found for automated job: {JobTypes.Achievements}");
+                _ = guild.DefaultChannel.SendMessageAsync($"Channel not found for automated job: {JobType.Achievements}");
             }
 
             return Task.FromResult(channel);

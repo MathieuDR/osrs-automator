@@ -7,7 +7,6 @@ using DiscordBotFanatic.Models.Data;
 using DiscordBotFanatic.Models.Enums;
 using DiscordBotFanatic.Repository;
 using DiscordBotFanatic.Services.interfaces;
-using Quartz;
 using Serilog.Events;
 using WiseOldManConnector.Models.Output;
 
@@ -16,7 +15,7 @@ namespace DiscordBotFanatic.Jobs {
         private readonly IOsrsHighscoreService _osrsHighscoreService;
 
 
-        public AchievementsJob(DiscordSocketClient discord, ILogService logService, IDiscordBotRepository repository,Mapper mapper,IOsrsHighscoreService osrsHighscoreService) : base(discord, logService, repository, mapper, JobTypes.Achievements) {
+        public AchievementsJob(DiscordSocketClient discord, ILogService logService, IDiscordBotRepository repository,Mapper mapper,IOsrsHighscoreService osrsHighscoreService) : base(discord, logService, repository, mapper, JobType.Achievements) {
             _osrsHighscoreService = osrsHighscoreService;
         }
 
@@ -60,10 +59,6 @@ namespace DiscordBotFanatic.Jobs {
                         jobState.LastPrintedAchievement = achievements.LastOrDefault();
                         Repository.CreateOrUpdateAutomatedJobState(Configuration.GuildId, jobState);
                     }
-        }
-        
-        private bool IsAchievementEqual(Achievement achievement, Achievement toCompare) {
-            return achievement.PlayerId == toCompare.PlayerId && achievement.Title == toCompare.Title;
         }
     }
 }

@@ -77,7 +77,7 @@ namespace DiscordBotFanatic.Modules {
                 throw new Exception($"Channel wasn't a message channel. Try a different one.");
             }
 
-            var jobType = Enum.Parse<JobTypes>(job, true);
+            var jobType = Enum.Parse<JobType>(job, true);
 
             await _groupService.SetAutomationJobChannel(jobType, GetGuildUser(), messageChannel);
 
@@ -96,7 +96,7 @@ namespace DiscordBotFanatic.Modules {
         [Summary("Set Automated message channel")]
         [RequireContext(ContextType.Guild)]
         public async Task ToggleAutomatedJob(string job) {
-            var jobType = Enum.Parse<JobTypes>(job, true);
+            var jobType = Enum.Parse<JobType>(job, true);
             
             bool activated = await _groupService.ToggleAutomationJob(jobType, GetGuildUser().Guild);
 

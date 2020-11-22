@@ -270,8 +270,13 @@ namespace WiseOldManConnector.Api {
             throw new NotImplementedException();
         }
 
-        public Task<ConnectorResponse<MessageResponse>> Update(int id) {
-            throw new NotImplementedException();
+        public async Task<ConnectorResponse<MessageResponse>> Update(int id) {
+            var restRequest = GetNewRestRequest("{id}/update-all");
+            restRequest.AddParameter("id", id, ParameterType.UrlSegment);
+            restRequest.Method = Method.POST;
+
+            var restResult = await ExecuteRequest<WOMMessageResponse>(restRequest);
+            return GetResponse<MessageResponse>(restResult);
         }
 
         private void AddPaging(RestRequest request, int limit, int offset) {

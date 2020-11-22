@@ -66,5 +66,10 @@ namespace DiscordBotFanatic.Services {
         public async Task<IEnumerable<Achievement>> GetGroupAchievements(int groupId) {
             return (await _groupApi.RecentAchievements(groupId)).Data;
         }
+
+        public async Task<MessageResponse> UpdateGroup(int groupId) {
+            return (await _groupApi.Update(groupId)).Data;
+
+        }
     }
 }

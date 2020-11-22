@@ -5,7 +5,7 @@ namespace DiscordBotFanatic.Models.Data {
     public class AutomatedMessagesConfig {
         public AutomatedMessagesConfig() { }
 
-        public Dictionary<JobTypes, ChannelJobConfiguration> ChannelJobs { get; set; } = new Dictionary<JobTypes, ChannelJobConfiguration>();
+        public Dictionary<JobType, ChannelJobConfiguration> ChannelJobs { get; set; } = new Dictionary<JobType, ChannelJobConfiguration>();
 
     }
 

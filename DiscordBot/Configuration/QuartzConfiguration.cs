@@ -1,5 +1,6 @@
 ﻿using System;
 using DiscordBotFanatic.Jobs;
+using DiscordBotFanatic.Models.Enums;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Quartz;
@@ -40,17 +41,17 @@ namespace DiscordBotFanatic.Configuration {
 
         private static IServiceCollectionQuartzConfigurator ConfigureJobs(
             this IServiceCollectionQuartzConfigurator quartzServices) {
-            //quartzServices.ScheduleJob<HelloJob>(trigger => trigger
-            //    .WithIdentity("Combined configuration Trigger")
-            //    .StartAt(DateBuilder.EvenSecondDate(DateTimeOffset.UtcNow.AddSeconds(20)))
-            //    .WithDailyTimeIntervalSchedule(x => x.WithInterval(10, IntervalUnit.Second))
-            //    .WithDescription("my awesome trigger configured for a job with single call")
-            //);
+            quartzServices.ScheduleJob<AutoUpdateGroupJob>(trigger => 
+                trigger.WithIdentity(JobType.GroupUpdate.ToString(), "wom")
+                    .StartAt(DateBuilder.EvenSecondDate(DateTimeOffset.UtcNow.AddSeconds(5)))
+                    .WithSimpleSchedule(x=>x.WithIntervalInHours(2).RepeatForever())
+                    .WithDescription("Showing achievements for all the servers!")
+            );
 
             quartzServices.ScheduleJob<AchievementsJob>(trigger => 
-                trigger.WithIdentity("Combined configuration Trigger")
-                .StartAt(DateBuilder.EvenSecondDate(DateTimeOffset.UtcNow.AddSeconds(5)))
-                .WithSimpleSchedule(x=>x.WithIntervalInMinutes(30).RepeatForever())
+                trigger.WithIdentity(JobType.Achievements.ToString(), "wom")
+                .StartAt(DateBuilder.EvenSecondDate(DateTimeOffset.UtcNow.AddMinutes(1)))
+                .WithSimpleSchedule(x=>x.WithIntervalInHours(1).RepeatForever())
                 .WithDescription("Showing achievements for all the servers!")
             );
 
