@@ -21,9 +21,12 @@ namespace DiscordBotFanatic.Configuration {
 
                 cfg.CreateMap<string, Embed>().ConvertUsing<StringToEmbedConverter>();
                 cfg.CreateMap<EmbedResponse, Embed>().ConvertUsing<EmbedResponseToEmbedConverter>();
-                //cfg.CreateMap<Leaderboard, Embed>().ConvertUsing<LeaderboardToEmbedConverter>();
+                
                 cfg.CreateMap<CompetitionLeaderboard, EmbedBuilder>()
                     .ConvertUsing<CompetitionLeaderboardToEmbedBuilderConverter>();
+
+                cfg.CreateMap<DeltaLeaderboard, EmbedBuilder>()
+                    .ConvertUsing<DeltaLeaderboardToEmbedBuilderConverter>();
 
                 cfg.CreateMap<Achievement, EmbedBuilder>()
                     .ConvertUsing<AchievementToEmbedBuilderConverter>();
