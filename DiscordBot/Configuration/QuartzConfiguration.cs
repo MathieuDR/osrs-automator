@@ -15,7 +15,7 @@ namespace DiscordBotFanatic.Configuration {
                     // handy when part of cluster or you want to otherwise identify multiple schedulers
                     q.SchedulerId = "Scheduler-Core";
 
-                    q.ConfigureHelloJob();
+                    q.ConfigureJobs();
                     // we take this from appsettings.json, just show it's possible
                     // q.SchedulerName = "Quartz ASP.NET Core Sample Scheduler";
 
@@ -38,7 +38,7 @@ namespace DiscordBotFanatic.Configuration {
                 });
         }
 
-        private static IServiceCollectionQuartzConfigurator ConfigureHelloJob(
+        private static IServiceCollectionQuartzConfigurator ConfigureJobs(
             this IServiceCollectionQuartzConfigurator quartzServices) {
             //quartzServices.ScheduleJob<HelloJob>(trigger => trigger
             //    .WithIdentity("Combined configuration Trigger")
