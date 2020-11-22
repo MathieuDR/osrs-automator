@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using DiscordBotFanatic.Models.Decorators;
 using DiscordBotFanatic.Paginator;
+using RestSharp.Extensions;
 using WiseOldManConnector.Models.Output;
 using WiseOldManConnector.Models.WiseOldMan.Enums;
 
@@ -66,9 +67,9 @@ namespace DiscordBotFanatic.Helpers {
 
         public static string Url(this Player player) {
             var builder = GetWomBuilder();
-            builder.Path = $"players/{player.Id}";
+            builder.Path = $"players/{player.DisplayName}";
 
-            return builder.Uri.ToString();
+            return builder.Uri.AbsoluteUri;
         }
 
         public static string Url(this DeltaLeaderboard deltaLeaderboard, int groupId) {
