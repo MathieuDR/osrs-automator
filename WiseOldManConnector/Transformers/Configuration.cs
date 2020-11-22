@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using AutoMapper;
+using WiseOldManConnector.Configuration;
 using WiseOldManConnector.Models.API.Responses;
 using WiseOldManConnector.Models.Output;
 using WiseOldManConnector.Models.WiseOldMan.Enums;
@@ -12,6 +13,11 @@ namespace WiseOldManConnector.Transformers {
     internal static class Configuration {
         public static Mapper GetMapper() {
             var config = new MapperConfiguration(cfg => {
+                // Adding profiles
+                cfg.AddProfile<MetricMappingProfile>();
+
+                // Adding specific maps
+
                 //cfg.CreateMap<string, MetricType>().ConvertUsing<StringToMetricTypeConverter>();
                 cfg.CreateMap<PlayerResponse, Player>();
                 cfg.CreateMap<Models.API.Responses.Metric, Metric>();
@@ -23,7 +29,8 @@ namespace WiseOldManConnector.Transformers {
                     .ForMember(dest => dest.EndDate, opt => opt.MapFrom(src => src.EndsAt))
                     .ForMember(dest => dest.CreateDate, opt => opt.MapFrom(src => src.CreatedAt))
                     .ForMember(dest => dest.UpdatedDate, opt => opt.MapFrom(src => src.UpdatedAt))
-                    .ForMember(dest => dest.ParticipantCount, opt => opt.MapFrom(src => src.ParticipantCount ?? src.Participants.Count))
+                    .ForMember(dest => dest.ParticipantCount,
+                        opt => opt.MapFrom(src => src.ParticipantCount ?? src.Participants.Count))
                     .ForMember(dest => dest.Participants, opt => opt.MapFrom(src => src));
 
                 //cfg.CreateMap<WOMCompetition, Competition>().ConvertUsing<WOMCompetitionToParticipantsCollectionConverter>();
@@ -43,9 +50,6 @@ namespace WiseOldManConnector.Transformers {
 
 
                 cfg.CreateMap<Participant, Player>();
-
-                cfg.CreateMap<string, MetricType>().ConvertUsing<StringToMetricTypeConverter>();
-                cfg.CreateMap<MetricType, DeltaType>().ConvertUsing<MetricTypeToDeltaTypeConverter>();
 
                 //cfg.CreateMap<SearchResponse, Player>();
                 cfg.CreateMap<WOMGroup, Group>();

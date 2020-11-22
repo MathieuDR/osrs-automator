@@ -3,6 +3,7 @@ using Discord;
 using DiscordBotFanatic.Models.ResponseModels;
 using DiscordBotFanatic.Transformers.TypeConverters;
 using Microsoft.Extensions.DependencyInjection;
+using WiseOldManConnector.Configuration;
 using WiseOldManConnector.Models.Output;
 
 namespace DiscordBotFanatic.Configuration {
@@ -13,6 +14,11 @@ namespace DiscordBotFanatic.Configuration {
 
         private static Mapper GetMapper() {
             var config = new MapperConfiguration(cfg => {
+                // adding profiles
+                cfg.AddProfile<MetricMappingProfile>();
+
+                // Adding maps
+
                 cfg.CreateMap<string, Embed>().ConvertUsing<StringToEmbedConverter>();
                 cfg.CreateMap<EmbedResponse, Embed>().ConvertUsing<EmbedResponseToEmbedConverter>();
                 //cfg.CreateMap<Leaderboard, Embed>().ConvertUsing<LeaderboardToEmbedConverter>();

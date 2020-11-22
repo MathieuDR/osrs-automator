@@ -6,7 +6,7 @@ using WiseOldManConnector.Models.WiseOldMan.Enums;
 
 namespace WiseOldManConnector.Helpers {
     public static class EnumHelper {
-        internal static string GetEnumValueNameOrDefault<T>(this T enumVal) {
+        public static string GetEnumValueNameOrDefault<T>(this T enumVal) {
             var enumType = typeof(T);
             var memInfo = enumType.GetMember(enumVal.ToString());
             var attr = memInfo.FirstOrDefault()?.GetCustomAttributes(false).OfType<EnumMemberAttribute>().FirstOrDefault();
