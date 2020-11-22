@@ -7,20 +7,21 @@ using Discord.WebSocket;
 using DiscordBotFanatic.Helpers;
 using DiscordBotFanatic.Models.Configuration;
 using DiscordBotFanatic.Models.Enums;
+using DiscordBotFanatic.Preconditions;
 using DiscordBotFanatic.Services.interfaces;
 
 namespace DiscordBotFanatic.Modules {
-
     [Name("Administrator")]
     [Group("cfg")]
-    [RequireUserPermission(GuildPermission.Administrator)]
+    [RequireUserPermission(GuildPermission.Administrator, Group = "Permission")]
+    [RequireRole("Fanatics Developer", Group = "Permission")]
     public class AdminModule : BaseWaitMessageEmbeddedResponseModule {
-        private readonly IAuthenticationService _authenticationService;
         private readonly IGroupService _groupService;
 
 
-        public AdminModule(Mapper mapper, ILogService logger, MessageConfiguration messageConfiguration, IAuthenticationService authenticationService, IGroupService groupService) : base(mapper, logger, messageConfiguration) {
-            _authenticationService = authenticationService;
+        public AdminModule(Mapper mapper, ILogService logger, MessageConfiguration messageConfiguration,
+            IGroupService groupService) :
+            base(mapper, logger, messageConfiguration) {
             _groupService = groupService;
         }
 
@@ -45,7 +46,7 @@ namespace DiscordBotFanatic.Modules {
         public async Task SetWomGroup(int womGroup, string verificationCode) {
             var decoratedGroup = await _groupService.SetGroupForGuild(GetGuildUser(), womGroup, verificationCode);
             var builder = new EmbedBuilder().AddWiseOldMan(decoratedGroup);
-                
+
             builder.Title = $"Success.";
             builder.Description = $"Group set to {decoratedGroup.Item.Name}";
             await ModifyWaitMessageAsync(builder.Build());
@@ -58,10 +59,11 @@ namespace DiscordBotFanatic.Modules {
         public async Task SetAutoAdd(bool autoAdd) {
             await _groupService.SetAutoAdd(GetGuildUser(), autoAdd);
             var builder = new EmbedBuilder().AddCommonProperties().AddFooterFromMessageAuthor(Context);
-            
+
             builder.Title = $"Success.";
-            builder.Description = autoAdd ? $"New members will be automatically added." : $"New members will not be automatically added.";
-            
+            builder.Description =
+                autoAdd ? $"New members will be automatically added." : $"New members will not be automatically added.";
+
             await ModifyWaitMessageAsync(builder.Build());
         }
 
@@ -86,30 +88,29 @@ namespace DiscordBotFanatic.Modules {
                 .AddFooterFromMessageAuthor(Context)
                 .WithTitle("Success!")
                 .WithDescription($"Channel {messageChannel.Name} set for job '{jobType}'");
-            
+
             await ModifyWaitMessageAsync(builder.Build());
         }
 
-        
+
         [Name("Set Automated message channel")]
         [Command("toggle automated")]
         [Summary("Set Automated message channel")]
         [RequireContext(ContextType.Guild)]
         public async Task ToggleAutomatedJob(string job) {
             var jobType = Enum.Parse<JobType>(job, true);
-            
+
             bool activated = await _groupService.ToggleAutomationJob(jobType, GetGuildUser().Guild);
 
-            string verb = activated  ? "activated" : "deactivated";
+            string verb = activated ? "activated" : "deactivated";
 
-            var builder =new EmbedBuilder()
+            var builder = new EmbedBuilder()
                 .AddCommonProperties()
                 .AddFooterFromMessageAuthor(Context)
                 .WithTitle("Success!")
                 .WithDescription($"Job '{jobType}' {verb}");
-            
-            await ModifyWaitMessageAsync(builder.Build());
 
+            await ModifyWaitMessageAsync(builder.Build());
         }
 
         [Name("Read config")]
@@ -124,7 +125,7 @@ namespace DiscordBotFanatic.Modules {
                 .AddFooterFromMessageAuthor(Context)
                 .WithTitle("Settings")
                 .AddFieldsFromDictionary(settings);
-            
+
             await ModifyWaitMessageAsync(builder.Build());
         }
     }
