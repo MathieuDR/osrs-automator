@@ -47,7 +47,7 @@ namespace DiscordBotFanatic.Services {
             return config;
         }
 
-        public async Task<ItemDecorator<Competition>> SetCurrentCompetition(IGuildUser guildUser, int id) {
+        public Task<ItemDecorator<Competition>> SetCurrentCompetition(IGuildUser guildUser, int id) {
             // Do we really need this?
             throw new NotImplementedException();
 
@@ -68,11 +68,11 @@ namespace DiscordBotFanatic.Services {
             //return competition;
         }
 
-        public async Task<ItemDecorator<Competition>> SetCurrentCompetition(IGuildUser guildUser, string name) {
+        public Task<ItemDecorator<Competition>> SetCurrentCompetition(IGuildUser guildUser, string name) {
             throw new System.NotImplementedException();
         }
 
-        public async Task<ItemDecorator<Competition>> ViewCurrentCompetition(IGuild guild) {
+        public Task<ItemDecorator<Competition>> ViewCurrentCompetition(IGuild guild) {
             throw new System.NotImplementedException();
         }
     }

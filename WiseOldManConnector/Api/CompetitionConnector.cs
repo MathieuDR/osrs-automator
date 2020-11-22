@@ -15,39 +15,39 @@ namespace WiseOldManConnector.Api {
             Area = "competitions";
         }
         protected override string Area { get; }
-        public async Task<ConnectorCollectionResponse<Competition>> SearchCompetition(CompetitionRequest request) {
+        public Task<ConnectorCollectionResponse<Competition>> SearchCompetition(CompetitionRequest request) {
             throw new NotImplementedException();
         }
 
-        public async Task<ConnectorCollectionResponse<Competition>> Search(string title) {
+        public Task<ConnectorCollectionResponse<Competition>> Search(string title) {
             throw new NotImplementedException();
         }
 
-        public async Task<ConnectorCollectionResponse<Competition>> Search(string title, int limit, int offset) {
+        public Task<ConnectorCollectionResponse<Competition>> Search(string title, int limit, int offset) {
             throw new NotImplementedException();
         }
 
-        public async Task<ConnectorCollectionResponse<Competition>> Search(string title, MetricType metric) {
+        public Task<ConnectorCollectionResponse<Competition>> Search(string title, MetricType metric) {
             throw new NotImplementedException();
         }
 
-        public async Task<ConnectorCollectionResponse<Competition>> Search(string title, MetricType metric, int limit, int offset) {
+        public Task<ConnectorCollectionResponse<Competition>> Search(string title, MetricType metric, int limit, int offset) {
             throw new NotImplementedException();
         }
 
-        public async Task<ConnectorCollectionResponse<Competition>> Search(string title, MetricType metric, CompetitionStatus status) {
+        public Task<ConnectorCollectionResponse<Competition>> Search(string title, MetricType metric, CompetitionStatus status) {
             throw new NotImplementedException();
         }
 
-        public async Task<ConnectorCollectionResponse<Competition>> Search(string title, MetricType metric, CompetitionStatus status, int limit, int offset) {
+        public Task<ConnectorCollectionResponse<Competition>> Search(string title, MetricType metric, CompetitionStatus status, int limit, int offset) {
             throw new NotImplementedException();
         }
 
-        public async Task<ConnectorCollectionResponse<Competition>> Search(string title, CompetitionStatus status) {
+        public Task<ConnectorCollectionResponse<Competition>> Search(string title, CompetitionStatus status) {
             throw new NotImplementedException();
         }
 
-        public async Task<ConnectorCollectionResponse<Competition>> Search(string title, CompetitionStatus status, int limit, int offset) {
+        public Task<ConnectorCollectionResponse<Competition>> Search(string title, CompetitionStatus status, int limit, int offset) {
             throw new NotImplementedException();
         }
 
@@ -59,32 +59,32 @@ namespace WiseOldManConnector.Api {
             return GetResponse<Competition>(result);
         }
 
-        public async Task<ConnectorResponse<Competition>> Create(string title, MetricType metric, DateTimeOffset startsAt, DateTimeOffset endsAt, IEnumerable<string> participants) {
+        public Task<ConnectorResponse<Competition>> Create(string title, MetricType metric, DateTimeOffset startsAt, DateTimeOffset endsAt, IEnumerable<string> participants) {
             throw new NotImplementedException();
         }
 
-        public async Task<ConnectorResponse<Competition>> Create(string title, MetricType metric, DateTimeOffset startsAt, DateTimeOffset endsAt, int groupId,
+        public Task<ConnectorResponse<Competition>> Create(string title, MetricType metric, DateTimeOffset startsAt, DateTimeOffset endsAt, int groupId,
             string groupVerificationCode) {
             throw new NotImplementedException();
         }
 
-        public async Task<ConnectorResponse<Competition>> Edit(int id, string verificationCode, CompetitionRequest request) {
+        public Task<ConnectorResponse<Competition>> Edit(int id, string verificationCode, CompetitionRequest request) {
             throw new NotImplementedException();
         }
 
-        public async Task<ConnectorResponse<MessageResponse>> AddParticipants(int id, string verificationCode, IEnumerable<string> participants) {
+        public Task<ConnectorResponse<MessageResponse>> AddParticipants(int id, string verificationCode, IEnumerable<string> participants) {
             throw new NotImplementedException();
         }
 
-        public async Task<ConnectorResponse<MessageResponse>> RemoveParticipants(int id, string verificationCode, IEnumerable<string> participants) {
+        public Task<ConnectorResponse<MessageResponse>> RemoveParticipants(int id, string verificationCode, IEnumerable<string> participants) {
             throw new NotImplementedException();
         }
 
-        public async Task<ConnectorResponse<MessageResponse>> Delete(int id, string verificationCode) {
+        public Task<ConnectorResponse<MessageResponse>> Delete(int id, string verificationCode) {
             throw new NotImplementedException();
         }
 
-        public async Task<ConnectorResponse<MessageResponse>> Update(int id) {
+        public Task<ConnectorResponse<MessageResponse>> Update(int id) {
             throw new NotImplementedException();
         }
     }

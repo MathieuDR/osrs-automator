@@ -261,16 +261,16 @@ namespace WiseOldManConnector.Api {
             return GetResponse<Group>(restResult);
         }
 
-        public async Task<ConnectorResponse<Group>> RemoveMembers(int id, string verificationCode, IEnumerable<string> members) {
+        public Task<ConnectorResponse<Group>> RemoveMembers(int id, string verificationCode, IEnumerable<string> members) {
             throw new NotImplementedException();
         }
 
-        public async Task<ConnectorResponse<Player>> ChangeMemberRole(int id, string verificationCode, string username,
+        public Task<ConnectorResponse<Player>> ChangeMemberRole(int id, string verificationCode, string username,
             GroupRole role) {
             throw new NotImplementedException();
         }
 
-        public async Task<ConnectorResponse<MessageResponse>> Update(int id) {
+        public Task<ConnectorResponse<MessageResponse>> Update(int id) {
             throw new NotImplementedException();
         }
 

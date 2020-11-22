@@ -25,7 +25,7 @@ namespace DiscordBotFanatic.Services {
         private readonly DiscordSocketClient _discord;
         private readonly ILogService _logger;
         private readonly MetricSynonymsConfiguration _metricSynonymsConfiguration;
-        private BotConfiguration _configuration;
+        private readonly BotConfiguration _configuration;
         private IServiceProvider _provider;
 
         public CommandHandlingService(IServiceProvider provider, DiscordSocketClient discord, CommandService commands,
@@ -83,8 +83,9 @@ namespace DiscordBotFanatic.Services {
 
         private async Task HandleCommandAsync(SocketMessage messageParam) {
             // Don't process the command if it was a system message
-            var message = messageParam as SocketUserMessage;
-            if (message == null) return;
+            if (!(messageParam is SocketUserMessage message)) {
+                return;
+            }
 
             // Create a number to track where the prefix ends and the command begins
             int argPos = 0;
@@ -92,7 +93,8 @@ namespace DiscordBotFanatic.Services {
             // Determine if the message is a command based on the prefix and make sure no bots trigger commands
             if (message.Content.Trim() == _configuration.CustomPrefix.Trim() ||
                 message.Content.Trim() == _discord.CurrentUser.Mention) {
-                var commands = _commands.Search("help").Commands;
+                var commands = _commands.Search("help").Commands.ToList();
+
                 await commands.FirstOrDefault().ExecuteAsync(new SocketCommandContext(_discord, message),
                     new List<object>() {null}, new List<object>() {null}, _provider);
 
@@ -133,7 +135,8 @@ namespace DiscordBotFanatic.Services {
         }
 
         private EmbedBuilder CreateErrorEmbedBuilder(ICommandContext context, IResult result) {
-            EmbedBuilder builder = context.CreateCommonEmbedBuilder();
+            EmbedBuilder builder = new EmbedBuilder().AddCommonProperties().AddFooterFromMessageAuthor(context);
+                
             builder.Title = "Uh oh! Something went wrong.";
 
             Debug.Assert(result.Error != null, "result.Error != null");

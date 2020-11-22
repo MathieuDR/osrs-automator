@@ -452,68 +452,83 @@ namespace WiseOldManConnectorTests.Connectors {
         }
 
         [Fact]
-        public async Task TypeAssertionForHardcoreIronmanIsCorrect() {
+        public Task TypeAssertionForHardcoreIronmanIsCorrect() {
             var username = TestConfiguration.ValidHardcoreIronMan;
 
             var response = _playerApi.AssertPlayerType(username);
             Assert.Equal(PlayerType.HardcoreIronMan, response.Result.Data);
+
+            return Task.CompletedTask;
         }
 
         [Fact]
-        public async Task TypeAssertionForHardcoreIronmanIsWrong() {
+        public Task TypeAssertionForHardcoreIronmanIsWrong() {
             var username = TestConfiguration.ValidRegularPlayer;
 
             var response = _playerApi.AssertPlayerType(username);
             Assert.NotEqual(PlayerType.HardcoreIronMan, response.Result.Data);
 
+            return Task.CompletedTask;
         }
 
         [Fact]
-        public async Task TypeAssertionForIronmanIsCorrect() {
+        public Task TypeAssertionForIronmanIsCorrect() {
             var username = TestConfiguration.ValidIronMan;
 
             var response = _playerApi.AssertPlayerType(username);
             Assert.Equal(PlayerType.IronMan, response.Result.Data);
+       
+            return Task.CompletedTask;
         }
 
         [Fact]
-        public async Task TypeAssertionForIronmanIsWrong() {
+        public Task TypeAssertionForIronmanIsWrong() {
             var username = TestConfiguration.ValidRegularPlayer;
 
             var response = _playerApi.AssertPlayerType(username);
             Assert.NotEqual(PlayerType.IronMan, response.Result.Data);
+        
+            return Task.CompletedTask;
         }
 
         [Fact]
-        public async Task TypeAssertionForRegularPlayerIsCorrect() {
+        public Task TypeAssertionForRegularPlayerIsCorrect() {
             var username = TestConfiguration.ValidRegularPlayer;
 
             var response = _playerApi.AssertPlayerType(username);
             Assert.Equal(PlayerType.Regular, response.Result.Data);
+        
+            return Task.CompletedTask;
         }
 
         [Fact]
-        public async Task TypeAssertionForRegularPlayerIsWrong() {
+        public Task TypeAssertionForRegularPlayerIsWrong() {
             var username = TestConfiguration.ValidHardcoreIronMan;
 
             var response = _playerApi.AssertPlayerType(username);
             Assert.NotEqual(PlayerType.Regular, response.Result.Data);
+        
+            return Task.CompletedTask;
         }
 
         [Fact]
-        public async Task TypeAssertionForUltimateIronManIsCorrect() {
+        public Task TypeAssertionForUltimateIronManIsCorrect() {
             var username = TestConfiguration.ValidUltimateIronMan;
 
             var response = _playerApi.AssertPlayerType(username);
             Assert.Equal(PlayerType.UltimateIronMan, response.Result.Data);
+        
+            return Task.CompletedTask;
         }
 
         [Fact]
-        public async Task TypeAssertionForUltimateIronManIsWrong() {
+        public Task TypeAssertionForUltimateIronManIsWrong() {
             var username = TestConfiguration.ValidRegularPlayer;
 
             var response = _playerApi.AssertPlayerType(username);
             Assert.NotEqual(PlayerType.UltimateIronMan, response.Result.Data);
+        
+            return Task.CompletedTask;
         }
 
         [Fact]
