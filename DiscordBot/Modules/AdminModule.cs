@@ -44,7 +44,8 @@ namespace DiscordBotFanatic.Modules {
         [RequireContext(ContextType.Guild)]
         public async Task SetWomGroup(int womGroup, string verificationCode) {
             var decoratedGroup = await _groupService.SetGroupForGuild(GetGuildUser(), womGroup, verificationCode);
-            var builder = Context.CreateCommonWiseOldManEmbedBuilder(decoratedGroup);
+            var builder = new EmbedBuilder().AddWiseOldMan(decoratedGroup);
+                
             builder.Title = $"Success.";
             builder.Description = $"Group set to {decoratedGroup.Item.Name}";
             await ModifyWaitMessageAsync(builder.Build());
@@ -56,13 +57,10 @@ namespace DiscordBotFanatic.Modules {
         [RequireContext(ContextType.Guild)]
         public async Task SetAutoAdd(bool autoAdd) {
             await _groupService.SetAutoAdd(GetGuildUser(), autoAdd);
-            var builder = Context.CreateCommonEmbedBuilder();
+            var builder = new EmbedBuilder().AddCommonProperties().AddFooterFromMessageAuthor(Context);
+            
             builder.Title = $"Success.";
-            if (autoAdd) {
-                builder.Description = $"New members will be automatically added.";
-            } else {
-                builder.Description = $"New members will not be automatically added.";
-            }
+            builder.Description = autoAdd ? $"New members will be automatically added." : $"New members will not be automatically added.";
             
             await ModifyWaitMessageAsync(builder.Build());
         }
@@ -83,7 +81,9 @@ namespace DiscordBotFanatic.Modules {
 
             await _groupService.SetAutomationJobChannel(jobType, GetGuildUser(), messageChannel);
 
-            var builder = Context.CreateCommonEmbedBuilder()
+            var builder = new EmbedBuilder()
+                .AddCommonProperties()
+                .AddFooterFromMessageAuthor(Context)
                 .WithTitle("Success!")
                 .WithDescription($"Channel {messageChannel.Name} set for job '{jobType}'");
             
@@ -102,7 +102,9 @@ namespace DiscordBotFanatic.Modules {
 
             string verb = activated  ? "activated" : "deactivated";
 
-            var builder = Context.CreateCommonEmbedBuilder()
+            var builder =new EmbedBuilder()
+                .AddCommonProperties()
+                .AddFooterFromMessageAuthor(Context)
                 .WithTitle("Success!")
                 .WithDescription($"Job '{jobType}' {verb}");
             
@@ -117,9 +119,11 @@ namespace DiscordBotFanatic.Modules {
         public async Task ViewSettings() {
             var settings = await _groupService.GetSettingsDictionary(GetGuildUser().Guild);
 
-            var builder = Context.CreateCommonEmbedBuilder();
-            builder.WithTitle("Settings");
-            builder.AddFieldsFromDictionary(settings);
+            var builder = new EmbedBuilder()
+                .AddCommonProperties()
+                .AddFooterFromMessageAuthor(Context)
+                .WithTitle("Settings")
+                .AddFieldsFromDictionary(settings);
             
             await ModifyWaitMessageAsync(builder.Build());
         }

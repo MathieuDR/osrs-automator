@@ -1,5 +1,6 @@
 ﻿using System.Threading.Tasks;
 using AutoMapper;
+using Discord;
 using Discord.Commands;
 using DiscordBotFanatic.Helpers;
 using DiscordBotFanatic.Models.Configuration;
@@ -23,7 +24,10 @@ namespace DiscordBotFanatic.Modules {
             var leaderboardDecorator = await _groupService.GetGroupLeaderboard(GetGuildUser());
 
             // Print leaderboard out
-            var embedBuilder = Context.CreateCommonWiseOldManEmbedBuilder(leaderboardDecorator);
+            var embedBuilder = new EmbedBuilder()
+                .AddWiseOldMan(leaderboardDecorator)
+                .AddFooterFromMessageAuthor(Context);
+
             embedBuilder = Mapper.Map(leaderboardDecorator.Item, embedBuilder);
 
             // send

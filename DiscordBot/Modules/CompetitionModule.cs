@@ -1,6 +1,7 @@
 ﻿using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
+using Discord;
 using Discord.Commands;
 using DiscordBotFanatic.Helpers;
 using DiscordBotFanatic.Models.Configuration;
@@ -9,11 +10,11 @@ using DiscordBotFanatic.Paginator;
 using DiscordBotFanatic.Services.interfaces;
 
 namespace DiscordBotFanatic.Modules {
-
     public class CompetitionModule : BaseWaitMessageEmbeddedResponseModule {
         private readonly ICompetitionService _competitionService;
 
-        public CompetitionModule(Mapper mapper, ILogService logger, MessageConfiguration messageConfiguration, ICompetitionService competitionService) : base(mapper, logger, messageConfiguration) {
+        public CompetitionModule(Mapper mapper, ILogService logger, MessageConfiguration messageConfiguration,
+            ICompetitionService competitionService) : base(mapper, logger, messageConfiguration) {
             _competitionService = competitionService;
         }
 
@@ -25,17 +26,19 @@ namespace DiscordBotFanatic.Modules {
         public async Task BrowseCompetitions() {
             // Can perhaps 'select' to see more details of a competition?
             var competitionWrappers = (await _competitionService.ViewCompetitionsForGroup(GetGuildUser())).ToList();
-            
-            var builder = Context.CreateCommonWiseOldManEmbedBuilder(competitionWrappers);
-            builder.Title = $"Current running competitions.";
-            //builder.Description = $"Select a competition using the right emoji!";
 
-           var message = new CustomPaginatedMessage(builder) {
-               Pages = competitionWrappers.Select(wrapper=>wrapper.Item).ToPaginatedStringWithContexts(), 
-               Options = new CustomActionsPaginatedAppearanceOptions()
-           };
+            var builder = new EmbedBuilder()
+                .AddWiseOldMan(competitionWrappers.FirstOrDefault())
+                .WithTitle($"Current running competitions.")
+                .AddFooterFromMessageAuthor(Context);
+            ;
 
-           await SendPaginatedMessageAsync(message);
+            var message = new CustomPaginatedMessage(builder) {
+                Pages = competitionWrappers.Select(wrapper => wrapper.Item).ToPaginatedStringWithContexts(),
+                Options = new CustomActionsPaginatedAppearanceOptions()
+            };
+
+            await SendPaginatedMessageAsync(message);
         }
 
         //private async Task SetCompetition(IGuildUser user, Competition competition) {
@@ -55,10 +58,13 @@ namespace DiscordBotFanatic.Modules {
         public async Task ViewCurrentCompetition() {
             var competitionDecorator = await _competitionService.ViewCurrentCompetition(GetGuildUser().Guild);
             var competition = competitionDecorator.Item;
-            
-            var builder = Context.CreateCommonWiseOldManEmbedBuilder(competitionDecorator);
-            builder.Title = $"Current competition";
-            builder.Description = $"The servers current competition is set to: {competitionDecorator.Title}";
+
+            var builder = new EmbedBuilder()
+                .AddWiseOldMan(competitionDecorator)
+                .WithTitle("Current competition")
+                .WithDescription($"The servers current competition is set to: {competitionDecorator.Title}")
+                .AddFooterFromMessageAuthor(Context);
+
 
             builder.AddField("Start date", competition.StartDate);
             builder.AddField("End date", competition.EndDate);
@@ -67,6 +73,5 @@ namespace DiscordBotFanatic.Modules {
 
             await ModifyWaitMessageAsync(builder.Build());
         }
-
     }
 }

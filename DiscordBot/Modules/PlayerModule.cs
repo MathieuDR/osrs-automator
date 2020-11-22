@@ -1,6 +1,8 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
+using Discord;
 using Discord.Commands;
 using DiscordBotFanatic.Helpers;
 using DiscordBotFanatic.Models.Configuration;
@@ -21,7 +23,8 @@ namespace DiscordBotFanatic.Modules {
         [Name("Set Default OSRS username")]
         [Command("setosrs", RunMode = RunMode.Async)]
         [Summary("Set your default OSRS name for commands, and competitions")]
-        public async Task SetOsrsName(string name) {
+        public Task SetOsrsName(string name) {
+            throw new NotImplementedException();
             //var player = await _playerService.CoupleDiscordGuildUserToOsrsAccount(GetGuildUser(), name);
             //var b = Context.CreateCommonWiseOldManEmbedBuilder();
             //b.Description = $"Successfully set the default player to {player.DisplayName}";
@@ -34,9 +37,13 @@ namespace DiscordBotFanatic.Modules {
         [RequireContext(ContextType.Guild)]
         public async Task AddOsrsName(string name) {
             var playerDecorater = await _playerService.CoupleDiscordGuildUserToOsrsAccount(GetGuildUser(), name);
-            var builder = Context.CreateCommonWiseOldManEmbedBuilder(playerDecorater);
-            builder.WithDescription(
-                $"Coupled {playerDecorater.Item.DisplayName} to your discord account in the server {Context.Guild.Name}");
+            
+            
+            var builder = new EmbedBuilder()
+                .AddWiseOldMan(playerDecorater)
+                .AddFooterFromMessageAuthor(Context)
+                .WithDescription($"Coupled {playerDecorater.Item.DisplayName} to your discord account in the server {Context.Guild.Name}");
+
             await ModifyWaitMessageAsync(builder.Build());
         }
 
@@ -50,14 +57,18 @@ namespace DiscordBotFanatic.Modules {
 
             if (!pages.Any()) {
                 // we want to update actually.
-                var builder = Context.CreateCommonEmbedBuilder();
-                builder.WithDescription($"No accounts coupled");
-                builder.Title = "Uh oh :(";
+
+                var builder = new EmbedBuilder()
+                    .AddCommonProperties()
+                    .AddFooterFromMessageAuthor(Context)
+                    .WithDescription($"No accounts coupled")
+                    .WithTitle("Uh oh :(");
+
                 await ModifyWaitMessageAsync(builder.Build());
                 return;
             }
 
-            var message = new CustomPaginatedMessage(Context.CreateCommonEmbedBuilder()) {
+            var message = new CustomPaginatedMessage(new EmbedBuilder().AddCommonProperties().AddFooterFromMessageAuthor(Context)) {
                 Pages = pages,
                 Options = new CustomActionsPaginatedAppearanceOptions() {
                     Delete = async (toDelete, i) => await _playerService.DeleteCoupleOsrsAccountAtIndex(GetGuildUser(), i)
