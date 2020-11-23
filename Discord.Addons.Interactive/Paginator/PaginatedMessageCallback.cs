@@ -118,21 +118,25 @@ namespace Discord.Addons.Interactive.Paginator
             return false;
         }
         
-        protected virtual Embed BuildEmbed()
-        {
+        protected virtual Embed BuildEmbed() {
+            var pageIndex = Page - 1;
+
             var builder = new EmbedBuilder()
                 .WithAuthor(Pager.Author)
                 .WithColor(Pager.Color)
-                .WithFooter(f => f.Text = string.Format(Options.FooterFormat, Page, Pages))
                 .WithTitle(Pager.Title);
+
             if (Pager.Pages is IEnumerable<EmbedFieldBuilder> efb)
             {
-                builder.Fields = efb.Skip((Page - 1) * Options.FieldsPerPage).Take(Options.FieldsPerPage).ToList();
+                builder.Fields = efb.Skip(pageIndex * Options.FieldsPerPage).Take(Options.FieldsPerPage).ToList();
                 builder.Description = Pager.AlternateDescription;
-            } 
-            else
-            {
-                builder.Description = Pager.Pages.ElementAt(Page - 1).ToString();
+            } else {
+                var item = Pager.Pages.ElementAt(pageIndex);
+                if (item is EmbedBuilder customBuilder) {
+                    builder = customBuilder.WithFooter(f => f.Text = string.Format(Options.FooterFormat, Page, Pages));
+                } else {
+                    builder.Description = Pager.Pages.ElementAt(Page - 1).ToString();
+                }
             }
             
             return builder.Build();

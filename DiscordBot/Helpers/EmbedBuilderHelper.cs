@@ -51,7 +51,7 @@ namespace DiscordBotFanatic.Helpers {
             return builder;
         }
 
-        public static EmbedBuilder AddFooterFromMessageAuthor(this EmbedBuilder builder, ICommandContext context,
+        public static EmbedBuilder WithMessageAuthorFooter(this EmbedBuilder builder, ICommandContext context,
             string appendToFooter = "") {
             string footerText = $"Requested by {context.User.Username}.";
             if (!string.IsNullOrWhiteSpace(appendToFooter)) {

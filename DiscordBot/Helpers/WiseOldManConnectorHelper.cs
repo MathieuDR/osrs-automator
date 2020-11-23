@@ -80,57 +80,57 @@ namespace DiscordBotFanatic.Helpers {
 
             return builder.Uri.ToString();
         }
+        
+        public static IEnumerable<ItemDecorator<T>> Decorate<T>(this IEnumerable<T> items) where T : IBaseConnectorOutput {
+            if (items == null) {
+                return new List<ItemDecorator<T>>();
+            }
 
-        public static ItemDecorator<Group> Decorate(this Group group) {
-            return new ItemDecorator<Group>(group, group.Name, group.Url());
+            var list = items.ToList();
+
+            return list.Select(i => i.Decorate());
         }
 
-        public static ItemDecorator<Competition> Decorate(this Competition competition) {
-            return new ItemDecorator<Competition>(competition, competition.Title, competition.Url());
+        public static ItemDecorator<Group> Decorate(this Group group)
+        {
+            return group == null ? null : new ItemDecorator<Group>(group, group.Name, group.Url());
         }
 
-        public static ItemDecorator<Leaderboard> DecorateLeaderboard(this Competition competition) {
-            return new ItemDecorator<Leaderboard>(competition.Leaderboard, competition.Title, competition.Url());
+        public static ItemDecorator<Competition> Decorate(this Competition competition)
+        {
+            return competition == null ? null : new ItemDecorator<Competition>(competition, competition.Title, competition.Url());
+        }
+        
+        public static ItemDecorator<Player> Decorate(this Player player)
+        {
+            return player == null ? null : new ItemDecorator<Player>(player, player.DisplayName, player.Url());
         }
 
-        public static ItemDecorator<DeltaLeaderboard> Decorate(this DeltaLeaderboard deltaLeaderboard, int groupId,
-            string groupName) {
-            Group group = new Group() {Id = groupId}; // oopsiedaisy. Should make it neat-o
-            return new ItemDecorator<DeltaLeaderboard>(deltaLeaderboard, groupName, group.Url());
+        public static ItemDecorator<T> Decorate<T>(this T item) where T : IBaseConnectorOutput {
+            switch (item) {
+                case Player player:
+                    return player.Decorate() as ItemDecorator<T>;
+                case Group group:
+                    return group.Decorate() as ItemDecorator<T>;
+                case Competition competition:
+                    return competition.Decorate() as ItemDecorator<T>;
+                default:
+                    throw new ArgumentOutOfRangeException(nameof(item));
+            }
         }
 
-        public static ItemDecorator<DeltaLeaderboard> Decorate(this DeltaLeaderboard deltaLeaderboard, Group group) {
-            return deltaLeaderboard.Decorate(group.Id, group.Name);
-        }
+        public static ItemDecorator<Leaderboard> Decorate(this DeltaLeaderboard deltaLeaderboard, int groupId, string groupName) {
+            if (deltaLeaderboard == null)
+            {
+                return null;
+            }
 
-        public static ItemDecorator<Leaderboard> DecorateGeneric(this DeltaLeaderboard deltaLeaderboard, int groupId,
-            string groupName) {
-            Group group = new Group() {Id = groupId}; // oopsiedaisy. Should make it neat-o
+            Group group = new Group() { Id = groupId };
             return new ItemDecorator<Leaderboard>(deltaLeaderboard, groupName, group.Url());
         }
 
-        public static ItemDecorator<Leaderboard> DecorateGeneric(this DeltaLeaderboard deltaLeaderboard, Group group) {
-            return deltaLeaderboard.DecorateGeneric(group.Id, group.Name);
-        }
-
-        public static IEnumerable<ItemDecorator<Group>> Decorate(this IEnumerable<Group> groups) {
-            return groups.Select(g => g.Decorate());
-        }
-
-        public static IEnumerable<ItemDecorator<Competition>> Decorate(this IEnumerable<Competition> competitions) {
-            return competitions.Select(c => c.Decorate());
-        }
-
-        public static IEnumerable<ItemDecorator<Leaderboard>> DecorateLeaderboard(this IEnumerable<Competition> competitions) {
-            return competitions.Select(c => c.DecorateLeaderboard());
-        }
-
-        public static ItemDecorator<Player> Decorate(this Player player) {
-            return new ItemDecorator<Player>(player, player.DisplayName, player.Url());
-        }
-
-        public static IEnumerable<ItemDecorator<Player>> Decorate(this IEnumerable<Player> players) {
-            return players.Select(p => p.Decorate());
+        public static ItemDecorator<Leaderboard> DecorateLeaderboard(this Competition competition) {
+            return competition == null ? null : new ItemDecorator<Leaderboard>(competition.Leaderboard, competition.Title, competition.Url());
         }
 
 

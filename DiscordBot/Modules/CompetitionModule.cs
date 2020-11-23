@@ -27,10 +27,15 @@ namespace DiscordBotFanatic.Modules {
             // Can perhaps 'select' to see more details of a competition?
             var competitionWrappers = (await _competitionService.ViewCompetitionsForGroup(GetGuildUser())).ToList();
 
+            if (competitionWrappers.Count == 0) {
+                _ = SendNoResultMessage();
+                return;
+            }
+
             var builder = new EmbedBuilder()
                 .AddWiseOldMan(competitionWrappers.FirstOrDefault())
                 .WithTitle($"Current running competitions.")
-                .AddFooterFromMessageAuthor(Context);
+                .WithMessageAuthorFooter(Context);
             
             var message = new CustomPaginatedMessage(builder) {
                 Pages = competitionWrappers.Select(wrapper => wrapper.Item).ToPaginatedStringWithContexts(),
@@ -50,27 +55,27 @@ namespace DiscordBotFanatic.Modules {
         //    await ReplyAsync(null,  false, builder.Build());
         //}
 
-        [Name("View the metadata of the current competition")]
-        [Command("comp view", RunMode = RunMode.Async)]
-        [Summary("View the current competition")]
-        [RequireContext(ContextType.Guild)]
-        public async Task ViewCurrentCompetition() {
-            var competitionDecorator = await _competitionService.ViewCurrentCompetition(GetGuildUser().Guild);
-            var competition = competitionDecorator.Item;
+        //[Name("View the metadata of the current competition")]
+        //[Command("comp view", RunMode = RunMode.Async)]
+        //[Summary("View the current competition")]
+        //[RequireContext(ContextType.Guild)]
+        //public async Task ViewCurrentCompetition() {
+        //    var competitionDecorator = await _competitionService.ViewCurrentCompetition(GetGuildUser().Guild);
+        //    var competition = competitionDecorator.Item;
 
-            var builder = new EmbedBuilder()
-                .AddWiseOldMan(competitionDecorator)
-                .WithTitle("Current competition")
-                .WithDescription($"The servers current competition is set to: {competitionDecorator.Title}")
-                .AddFooterFromMessageAuthor(Context);
+        //    var builder = new EmbedBuilder()
+        //        .AddWiseOldMan(competitionDecorator)
+        //        .WithTitle("Current competition")
+        //        .WithDescription($"The servers current competition is set to: {competitionDecorator.Title}")
+        //        .WithMessageAuthorFooter(Context);
 
 
-            builder.AddField("Start date", competition.StartDate);
-            builder.AddField("End date", competition.EndDate);
-            builder.AddField("Duration", competition.Duration);
-            builder.AddField("ParticipantCount", competition.ParticipantCount);
+        //    builder.AddField("Start date", competition.StartDate);
+        //    builder.AddField("End date", competition.EndDate);
+        //    builder.AddField("Duration", competition.Duration);
+        //    builder.AddField("ParticipantCount", competition.ParticipantCount);
 
-            await ModifyWaitMessageAsync(builder.Build());
-        }
+        //    await ModifyWaitMessageAsync(builder.Build());
+        //}
     }
 }

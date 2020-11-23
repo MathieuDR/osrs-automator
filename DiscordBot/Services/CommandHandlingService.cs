@@ -133,7 +133,7 @@ namespace DiscordBotFanatic.Services {
         }
 
         private EmbedBuilder CreateErrorEmbedBuilder(ICommandContext context, IResult result) {
-            EmbedBuilder builder = new EmbedBuilder().AddCommonProperties().AddFooterFromMessageAuthor(context);
+            EmbedBuilder builder = new EmbedBuilder().AddCommonProperties().WithMessageAuthorFooter(context);
 
             builder.Title = "Uh oh! Something went wrong.";
 

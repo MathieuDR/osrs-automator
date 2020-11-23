@@ -47,7 +47,7 @@ namespace DiscordBotFanatic.Services {
         }
 
         public Task<IEnumerable<ItemDecorator<Player>>> GetAllOsrsAccounts(IGuildUser user) {
-            var accounts = _repository.GetPlayerById(user.GuildId, user.Id).CoupledOsrsAccounts.AsEnumerable();
+            var accounts = _repository.GetPlayerById(user.GuildId, user.Id)?.CoupledOsrsAccounts.AsEnumerable();
             return Task.FromResult(accounts.Decorate());
         }
 

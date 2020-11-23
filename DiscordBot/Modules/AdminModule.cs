@@ -58,7 +58,7 @@ namespace DiscordBotFanatic.Modules {
         [RequireContext(ContextType.Guild)]
         public async Task SetAutoAdd(bool autoAdd) {
             await _groupService.SetAutoAdd(GetGuildUser(), autoAdd);
-            var builder = new EmbedBuilder().AddCommonProperties().AddFooterFromMessageAuthor(Context);
+            var builder = new EmbedBuilder().AddCommonProperties().WithMessageAuthorFooter(Context);
 
             builder.Title = $"Success.";
             builder.Description =
@@ -85,7 +85,7 @@ namespace DiscordBotFanatic.Modules {
 
             var builder = new EmbedBuilder()
                 .AddCommonProperties()
-                .AddFooterFromMessageAuthor(Context)
+                .WithMessageAuthorFooter(Context)
                 .WithTitle("Success!")
                 .WithDescription($"Channel {messageChannel.Name} set for job '{jobType}'");
 
@@ -106,7 +106,7 @@ namespace DiscordBotFanatic.Modules {
 
             var builder = new EmbedBuilder()
                 .AddCommonProperties()
-                .AddFooterFromMessageAuthor(Context)
+                .WithMessageAuthorFooter(Context)
                 .WithTitle("Success!")
                 .WithDescription($"Job '{jobType}' {verb}");
 
@@ -122,7 +122,7 @@ namespace DiscordBotFanatic.Modules {
 
             var builder = new EmbedBuilder()
                 .AddCommonProperties()
-                .AddFooterFromMessageAuthor(Context)
+                .WithMessageAuthorFooter(Context)
                 .WithTitle("Settings")
                 .AddFieldsFromDictionary(settings);
 

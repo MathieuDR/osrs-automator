@@ -122,7 +122,7 @@ namespace DiscordBotFanatic.Services {
 
             // Check for delta gains, overall is standard
             DeltaLeaderboard temp = await _highscoreService.GetTopDeltasOfGroup(settings.WomGroupId, metricType, period);
-            return temp.DecorateGeneric(settings.WomGroup);
+            return temp.Decorate(settings.WomGroup.Id, settings.WomGroup.Name);
         }
 
         private GroupConfig GetGroupConfig(ulong guildId, bool validate = true) {

@@ -54,7 +54,16 @@ namespace DiscordBotFanatic.Modules {
             base.BeforeExecute(command);
         }
 
-        public Task ModifyWaitMessageAsync(Embed embed) {
+        private Embed PleaseWaitEmbed() {
+            var builder = new EmbedBuilder() {
+                Title = $"Please hang tight {MessageUserDisplay}, we're executing your command {new Emoji("\u2699")}",
+                Description = $"{MessageHelper.GetRandomDescription(MessageConfiguration)}"
+            };
+            builder.WithFooter(Context.Message.Id.ToString());
+            return builder.Build();
+        }
+
+        protected Task ModifyWaitMessageAsync(Embed embed) {
             _waitMessageHandled = true;
             return _waitMessageTask.ContinueWith((waitMessageTask) => {
                 Logger.Log(
@@ -64,11 +73,11 @@ namespace DiscordBotFanatic.Modules {
             });
         }
 
-        public Task DeleteWaitMessageAsync() {
+        protected Task DeleteWaitMessageAsync() {
             return DeleteWaitMessageAsync(new TimeSpan(0, 0, 0));
         }
 
-        public Task DeleteWaitMessageAsync(TimeSpan timeout) {
+        protected Task DeleteWaitMessageAsync(TimeSpan timeout) {
             _waitMessageHandled = true;
             return _waitMessageTask.ContinueWith((waitMessageTask) => {
                 Logger.Log(
@@ -84,13 +93,14 @@ namespace DiscordBotFanatic.Modules {
             });
         }
 
-        private Embed PleaseWaitEmbed() {
-            var builder = new EmbedBuilder() {
-                Title = $"Please hang tight {MessageUserDisplay}, we're executing your command {new Emoji("\u2699")}",
-                Description = $"{MessageHelper.GetRandomDescription(MessageConfiguration)}"
-            };
-            builder.WithFooter(Context.Message.Id.ToString());
-            return builder.Build();
+        protected Task SendNoResultMessage(string title = "No Results!", string description = "Seems there is nothing there") {
+            var builder = new EmbedBuilder()
+                .AddCommonProperties()
+                .WithMessageAuthorFooter(Context)
+                .WithTitle(title)
+                .WithDescription(description);
+
+            return ModifyWaitMessageAsync(builder.Build());
         }
     }
 }

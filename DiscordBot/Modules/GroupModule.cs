@@ -27,7 +27,7 @@ namespace DiscordBotFanatic.Modules {
             // Print leaderboard out
             var embedBuilder = new EmbedBuilder()
                 .AddWiseOldMan(leaderboardDecorator)
-                .AddFooterFromMessageAuthor(Context);
+                .WithMessageAuthorFooter(Context);
 
             embedBuilder = Mapper.Map(leaderboardDecorator.Item, embedBuilder);
 
