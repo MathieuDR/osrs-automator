@@ -10,25 +10,26 @@ namespace DiscordBotFanatic.Paginator {
 
     public class CustomActionsPaginatedAppearanceOptions : PaginatedAppearanceOptions {
         public IEmote DeleteEmoji = new Emoji("🗑️");
-        public PerformAction Delete { get; set; }
 
         public IEmote SelectEmoji = new Emoji("👍");
-        public PerformAction Select { get; set; }
 
         public CustomActionsPaginatedAppearanceOptions() {
             JumpDisplayOptions = JumpDisplayOptions.Never;
             DisplayInformationIcon = false;
         }
-  
+
+        public PerformAction Delete { get; set; }
+        public PerformAction Select { get; set; }
+
 
         public override async Task AddReactions(RestUserMessage message, SocketCommandContext context, int pages) {
             await base.AddReactions(message, context, pages);
-            
-            if(Delete != null) {
+
+            if (Delete != null) {
                 await message.AddReactionAsync(DeleteEmoji);
             }
 
-            if(Select != null) {
+            if (Select != null) {
                 await message.AddReactionAsync(SelectEmoji);
             }
         }

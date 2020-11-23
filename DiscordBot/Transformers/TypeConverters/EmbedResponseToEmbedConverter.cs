@@ -6,7 +6,7 @@ using DiscordBotFanatic.Models.ResponseModels;
 namespace DiscordBotFanatic.Transformers.TypeConverters {
     public class EmbedResponseToEmbedConverter : ITypeConverter<EmbedResponse, Embed> {
         public Embed Convert(EmbedResponse source, Embed destination, ResolutionContext context) {
-            var builder =  new EmbedBuilder();
+            var builder = new EmbedBuilder();
 
             if (string.IsNullOrWhiteSpace(source.Title) && string.IsNullOrWhiteSpace(source.Description)) {
                 throw new ResponseException($"Response object must have a title or description.", null);
@@ -16,11 +16,11 @@ namespace DiscordBotFanatic.Transformers.TypeConverters {
                 builder.Author = new EmbedAuthorBuilder();
                 builder.Author.Name = source.AuthorName;
             }
-            
+
             if (!string.IsNullOrWhiteSpace(source.Title)) {
                 builder.Title = source.Title;
             }
-            
+
             if (!string.IsNullOrWhiteSpace(source.Description)) {
                 builder.Description = source.Description;
             }
@@ -29,8 +29,8 @@ namespace DiscordBotFanatic.Transformers.TypeConverters {
                 builder.Footer = new EmbedFooterBuilder();
                 builder.Footer.Text = source.Footer;
             }
-           
-           
+
+
             return builder.Build();
         }
     }

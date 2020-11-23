@@ -9,8 +9,7 @@ using Discord.WebSocket;
 using DiscordBotFanatic.Models.ResponseModels;
 
 namespace DiscordBotFanatic.Paginator {
-    public class ImagePaginatedMessageCallback :PaginatedMessageCallback {
-
+    public class ImagePaginatedMessageCallback : PaginatedMessageCallback {
         private string _footerBuilderTemplate;
 
         public ImagePaginatedMessageCallback(InteractiveService interactive, SocketCommandContext sourceContext,
@@ -41,7 +40,7 @@ namespace DiscordBotFanatic.Paginator {
             if (emote.Equals(customActionsOptions.DeleteEmoji)) {
                 await customActionsOptions.Delete(Pager.Pages.ElementAt(index), index);
                 var tempList = Pager.Pages.ToList();
-                tempList.RemoveAt(Page-1);
+                tempList.RemoveAt(Page - 1);
                 Pager.Pages = tempList;
 
                 if (Pager.Pages.Any()) {
@@ -61,15 +60,13 @@ namespace DiscordBotFanatic.Paginator {
             if (Pager is CustomPaginatedMessage customPaginated) {
                 customPaginated.EmbedWrapper.Footer.Text = string.Format(_footerBuilderTemplate, Page, Pages);
 
-                if (Pager.Pages is IEnumerable<EmbedFieldBuilder> efb)
-                {
-                    customPaginated.EmbedWrapper.Fields = efb.Skip((Page - 1) * Options.FieldsPerPage).Take(Options.FieldsPerPage).ToList();
+                if (Pager.Pages is IEnumerable<EmbedFieldBuilder> efb) {
+                    customPaginated.EmbedWrapper.Fields =
+                        efb.Skip((Page - 1) * Options.FieldsPerPage).Take(Options.FieldsPerPage).ToList();
                     customPaginated.EmbedWrapper.Description = Pager.AlternateDescription;
-                } 
-                else
-                {
+                } else {
                     customPaginated.EmbedWrapper.Description = Pager.Pages.ElementAt(Page - 1).ToString();
-                } 
+                }
 
                 return customPaginated.EmbedWrapper.Build();
             } else {

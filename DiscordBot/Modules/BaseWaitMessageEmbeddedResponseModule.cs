@@ -13,12 +13,12 @@ using Serilog.Events;
 namespace DiscordBotFanatic.Modules {
     [DontAutoLoad]
     public abstract class BaseWaitMessageEmbeddedResponseModule : BaseEmbeddedResponseModule {
-        private Task<IUserMessage> _waitMessageTask;
         private bool _waitMessageHandled = false;
+        private Task<IUserMessage> _waitMessageTask;
 
 
-
-        protected BaseWaitMessageEmbeddedResponseModule(Mapper mapper, ILogService logger, MessageConfiguration messageConfiguration) : base(mapper, logger) {
+        protected BaseWaitMessageEmbeddedResponseModule(Mapper mapper, ILogService logger,
+            MessageConfiguration messageConfiguration) : base(mapper, logger) {
             MessageConfiguration = messageConfiguration;
         }
 
@@ -49,16 +49,18 @@ namespace DiscordBotFanatic.Modules {
             if (user != null) {
                 MessageUserDisplay = user.Nickname;
             }
-            
+
             _waitMessageTask = ReplyAsync(embed: PleaseWaitEmbed());
             base.BeforeExecute(command);
         }
-        
+
         public Task ModifyWaitMessageAsync(Embed embed) {
             _waitMessageHandled = true;
             return _waitMessageTask.ContinueWith((waitMessageTask) => {
-                Logger.Log($"{nameof(BaseWaitMessageEmbeddedResponseModule)}, {nameof(ModifyWaitMessageAsync)}, continue at of waitmessage", LogEventLevel.Debug, null);
-                waitMessageTask.Result.ModifyAsync(x=> x.Embed = new Optional<Embed>(embed));
+                Logger.Log(
+                    $"{nameof(BaseWaitMessageEmbeddedResponseModule)}, {nameof(ModifyWaitMessageAsync)}, continue at of waitmessage",
+                    LogEventLevel.Debug, null);
+                waitMessageTask.Result.ModifyAsync(x => x.Embed = new Optional<Embed>(embed));
             });
         }
 

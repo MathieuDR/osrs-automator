@@ -13,7 +13,8 @@ namespace DiscordBotFanatic.Jobs {
         private readonly IOsrsHighscoreService _osrsHighscoreService;
 
         public AutoUpdateGroupJob(DiscordSocketClient discord, ILogService logService, IDiscordBotRepository repository,
-            Mapper mapper, IOsrsHighscoreService osrsHighscoreService) : base(discord, logService, repository, mapper, JobType.GroupUpdate) {
+            Mapper mapper, IOsrsHighscoreService osrsHighscoreService) : base(discord, logService, repository, mapper,
+            JobType.GroupUpdate) {
             _osrsHighscoreService = osrsHighscoreService;
         }
 
@@ -21,7 +22,7 @@ namespace DiscordBotFanatic.Jobs {
             var task = _osrsHighscoreService.UpdateGroup(Configuration.WomGroupId);
 
             var decorator = Configuration.WomGroup.Decorate();
-            
+
             var builder = new EmbedBuilder()
                 .AddWiseOldMan(decorator)
                 .WithTimestamp(DateTimeOffset.Now);

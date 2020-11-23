@@ -8,9 +8,9 @@ using DiscordBotFanatic.Modules.DiscordCommandArguments;
 
 namespace DiscordBotFanatic.TypeReaders {
     public class BaseArgumentsTypeReader : TypeReader {
-        
         public override Task<TypeReaderResult> ReadAsync(ICommandContext context, string input, IServiceProvider services) {
-            List<string> parameters = Regex.Matches(input, @"[\""].+?[\""]|[^ ]+").Select(m => m.Value.Replace("\"", "")).ToList();
+            List<string> parameters =
+                Regex.Matches(input, @"[\""].+?[\""]|[^ ]+").Select(m => m.Value.Replace("\"", "")).ToList();
 
             if (!parameters.Any()) {
                 return Task.FromResult(TypeReaderResult.FromSuccess(null));

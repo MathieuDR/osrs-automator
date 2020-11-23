@@ -7,8 +7,7 @@ namespace DiscordBotFanatic.Models.Data {
 
         public GroupConfig(IGuildUser user) : this(user.GuildId, user.Id) { }
 
-        public GroupConfig(ulong guildId, ulong discordId) : base(guildId, discordId) {
-        }
+        public GroupConfig(ulong guildId, ulong discordId) : base(guildId, discordId) { }
 
         public int WomGroupId { get; set; }
 

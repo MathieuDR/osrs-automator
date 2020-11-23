@@ -6,10 +6,7 @@ using WiseOldManConnector.Models.Output;
 
 namespace DiscordBotFanatic.Services.Images {
     public class MetricImageService : ScrollImageServiceBase<DeltaMetric> {
-
-        public MetricImageService(ILogService logService) : base(logService) {
-
-        }
+        public MetricImageService(ILogService logService) : base(logService) { }
 
         protected override Image CreateImage(DeltaMetric info) {
             throw new NotImplementedException();

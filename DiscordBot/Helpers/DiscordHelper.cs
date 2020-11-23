@@ -1,9 +1,6 @@
-﻿using System;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 using Discord;
-using Discord.Commands;
 using DiscordBotFanatic.Models.ResponseModels;
-using Microsoft.Extensions.Configuration;
 
 namespace DiscordBotFanatic.Helpers {
     public static class DiscordHelper {
@@ -26,6 +23,7 @@ namespace DiscordBotFanatic.Helpers {
             if (string.IsNullOrWhiteSpace(message.EmbedWrapper.Footer.Text)) {
                 whitespace = "";
             }
+
             message.EmbedWrapper.Footer.Text += $"{whitespace}{{0}}/{{1}} Pages.";
             return message;
         }

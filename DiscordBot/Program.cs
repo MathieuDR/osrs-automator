@@ -24,8 +24,6 @@ using WiseOldManConnector.Configuration;
 
 namespace DiscordBotFanatic {
     class Program {
-        static void Main() => new Program().EntryPointAsync().GetAwaiter().GetResult();
-
         public async Task EntryPointAsync() {
             IConfiguration config = BuildConfig();
             IServiceProvider services = ConfigureServices(config); // No using statement?
@@ -41,13 +39,15 @@ namespace DiscordBotFanatic {
 
                 await discordTask;
                 await schedulerTask;
-                
+
                 await Task.Delay(-1);
             } catch (Exception e) {
                 Log.Fatal(e, $"FATAL ERROR: ");
                 //await (await schedulerTask).Shutdown();
             }
         }
+
+        static void Main() => new Program().EntryPointAsync().GetAwaiter().GetResult();
 
         private async Task ConfigureScheduler(IServiceProvider services) {
             var factory = services.GetRequiredService<ISchedulerFactory>();
@@ -70,7 +70,7 @@ namespace DiscordBotFanatic {
         //    // Grab the Scheduler instance from the Factory
         //    StdSchedulerFactory factory = new StdSchedulerFactory();
         //    IScheduler scheduler = await factory.GetScheduler();
-            
+
 
         //    return scheduler;
         //}
@@ -140,8 +140,6 @@ namespace DiscordBotFanatic {
                 .ConfigureQuartz(config)
                 .ConfigureAutoMapper()
                 .BuildServiceProvider();
-
-
         }
 
         private IConfiguration BuildConfig() {

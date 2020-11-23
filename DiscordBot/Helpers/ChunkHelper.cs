@@ -14,18 +14,18 @@ namespace DiscordBotFanatic.Helpers {
             this.start = start;
         }
 
-        public IEnumerator<T> GetEnumerator() {
-            return new ChildEnumerator(this);
-        }
-
         System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator() {
             return GetEnumerator();
         }
 
+        public IEnumerator<T> GetEnumerator() {
+            return new ChildEnumerator(this);
+        }
+
         class ChildEnumerator : IEnumerator<T> {
+            readonly ChunkedEnumerable<T> _parent;
             T _current;
             bool _done;
-            readonly ChunkedEnumerable<T> _parent;
             int _position;
 
 
@@ -33,16 +33,6 @@ namespace DiscordBotFanatic.Helpers {
                 _parent = parent;
                 _position = -1;
                 parent.wrapper.AddRef();
-            }
-
-            public T Current {
-                get {
-                    if (_position == -1 || _done) {
-                        throw new InvalidOperationException();
-                    }
-
-                    return _current;
-                }
             }
 
             public void Dispose() {
@@ -73,6 +63,16 @@ namespace DiscordBotFanatic.Helpers {
             public void Reset() {
                 // per http://msdn.microsoft.com/en-us/library/system.collections.ienumerator.reset.aspx
                 throw new NotSupportedException();
+            }
+
+            public T Current {
+                get {
+                    if (_position == -1 || _done) {
+                        throw new InvalidOperationException();
+                    }
+
+                    return _current;
+                }
             }
         }
     }

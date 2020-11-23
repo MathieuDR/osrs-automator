@@ -4,7 +4,7 @@ using DiscordBotFanatic.Helpers;
 
 namespace DiscordBotFanatic.Models.ResponseModels {
     public class CustomPaginatedMessage : PaginatedMessage {
-        public CustomPaginatedMessage() : base(){
+        public CustomPaginatedMessage() : base() {
             Options = new PaginatedAppearanceOptions {
                 DisplayInformationIcon = false, JumpDisplayOptions = JumpDisplayOptions.Never
             };

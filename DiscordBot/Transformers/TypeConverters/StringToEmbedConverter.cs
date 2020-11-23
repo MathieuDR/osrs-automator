@@ -5,7 +5,7 @@ using Discord;
 namespace DiscordBotFanatic.Transformers.TypeConverters {
     public class StringToEmbedConverter : ITypeConverter<string, Embed> {
         public Embed Convert(string source, Embed destination, ResolutionContext context) {
-            var builder =  new EmbedBuilder();
+            var builder = new EmbedBuilder();
             builder.Title = $"Success";
             builder.Description = source;
             builder.Color = Color.DarkPurple;

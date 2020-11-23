@@ -41,7 +41,8 @@ namespace DiscordBotFanatic.TypeReaders {
                 } else if (string.IsNullOrEmpty(result.Name)) {
                     result.Name = parameter.Replace("\"", "");
                 } else {
-                    return Task.FromResult(TypeReaderResult.FromError(CommandError.BadArgCount, $"Wrong errors, Cannot parse all parameters. Ambigious username ({result.Name} & {parameter})"));
+                    return Task.FromResult(TypeReaderResult.FromError(CommandError.BadArgCount,
+                        $"Wrong errors, Cannot parse all parameters. Ambigious username ({result.Name} & {parameter})"));
                 }
             }
 

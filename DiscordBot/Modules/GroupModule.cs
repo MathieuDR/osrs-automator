@@ -10,7 +10,8 @@ namespace DiscordBotFanatic.Modules {
     public class GroupModule : BaseWaitMessageEmbeddedResponseModule {
         private readonly IGroupService _groupService;
 
-        public GroupModule(Mapper mapper, ILogService logger, MessageConfiguration messageConfiguration, IGroupService groupService) : base(mapper, logger,
+        public GroupModule(Mapper mapper, ILogService logger, MessageConfiguration messageConfiguration,
+            IGroupService groupService) : base(mapper, logger,
             messageConfiguration) {
             _groupService = groupService;
         }

@@ -29,7 +29,6 @@ namespace DiscordBotFanatic.Preconditions {
             // Since it wasn't, fail
             return Task.FromResult(
                 PreconditionResult.FromError($"You must have a role named {_name} to run this command."));
-
         }
     }
 }

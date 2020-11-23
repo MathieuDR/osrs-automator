@@ -10,8 +10,8 @@ using WiseOldManConnector.Models.WiseOldMan.Enums;
 
 namespace DiscordBotFanatic.Helpers {
     public static class WiseOldManConnectorHelper {
-
         private static string _wiseOldManHost = "wiseoldman.net";
+
         public static string ToPlayerInfoString(this Player player) {
             StringBuilder builder = new StringBuilder();
             builder.Append($"{player.DisplayName} - Combat ");
@@ -35,18 +35,21 @@ namespace DiscordBotFanatic.Helpers {
         }
 
         public static PaginatedStringWithContext<Player> ToPaginatedStringWithContext(this Player player) {
-            return new PaginatedStringWithContext<Player>(){Reference = player, StringValue = player.ToPlayerInfoString()};
+            return new PaginatedStringWithContext<Player>() {Reference = player, StringValue = player.ToPlayerInfoString()};
         }
 
-        public static IEnumerable<PaginatedStringWithContext<Player>> ToPaginatedStringWithContexts(this IEnumerable<Player> players) {
+        public static IEnumerable<PaginatedStringWithContext<Player>> ToPaginatedStringWithContexts(
+            this IEnumerable<Player> players) {
             return players.Select(p => p.ToPaginatedStringWithContext());
         }
 
         public static PaginatedStringWithContext<Competition> ToPaginatedStringWithContext(this Competition competition) {
-            return new PaginatedStringWithContext<Competition>(){Reference = competition, StringValue = competition.ToCompetitionInfoString()};
+            return new PaginatedStringWithContext<Competition>()
+                {Reference = competition, StringValue = competition.ToCompetitionInfoString()};
         }
 
-        public static IEnumerable<PaginatedStringWithContext<Competition>> ToPaginatedStringWithContexts(this IEnumerable<Competition> competitions) {
+        public static IEnumerable<PaginatedStringWithContext<Competition>> ToPaginatedStringWithContexts(
+            this IEnumerable<Competition> competitions) {
             return competitions.Select(c => c.ToPaginatedStringWithContext());
         }
 
@@ -91,17 +94,19 @@ namespace DiscordBotFanatic.Helpers {
             return new ItemDecorator<Leaderboard>(competition.Leaderboard, competition.Title, competition.Url());
         }
 
-        public static ItemDecorator<DeltaLeaderboard> Decorate(this DeltaLeaderboard deltaLeaderboard, int groupId, string groupName) {
-            Group group = new Group(){Id = groupId}; // oopsiedaisy. Should make it neat-o
+        public static ItemDecorator<DeltaLeaderboard> Decorate(this DeltaLeaderboard deltaLeaderboard, int groupId,
+            string groupName) {
+            Group group = new Group() {Id = groupId}; // oopsiedaisy. Should make it neat-o
             return new ItemDecorator<DeltaLeaderboard>(deltaLeaderboard, groupName, group.Url());
-        }   
+        }
 
         public static ItemDecorator<DeltaLeaderboard> Decorate(this DeltaLeaderboard deltaLeaderboard, Group group) {
             return deltaLeaderboard.Decorate(group.Id, group.Name);
         }
 
-        public static ItemDecorator<Leaderboard> DecorateGeneric(this DeltaLeaderboard deltaLeaderboard, int groupId, string groupName) {
-            Group group = new Group(){Id = groupId}; // oopsiedaisy. Should make it neat-o
+        public static ItemDecorator<Leaderboard> DecorateGeneric(this DeltaLeaderboard deltaLeaderboard, int groupId,
+            string groupName) {
+            Group group = new Group() {Id = groupId}; // oopsiedaisy. Should make it neat-o
             return new ItemDecorator<Leaderboard>(deltaLeaderboard, groupName, group.Url());
         }
 
@@ -131,7 +136,7 @@ namespace DiscordBotFanatic.Helpers {
 
 
         private static UriBuilder GetWomBuilder() {
-            return new UriBuilder("https",_wiseOldManHost);
+            return new UriBuilder("https", _wiseOldManHost);
         }
     }
 }

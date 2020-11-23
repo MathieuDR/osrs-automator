@@ -12,6 +12,15 @@ using Serilog.Events;
 
 namespace DiscordBotFanatic.Jobs {
     public abstract class BaseGuildJob : IJob {
+        protected BaseGuildJob(DiscordSocketClient discord, ILogService logService, IDiscordBotRepository repository,
+            Mapper mapper, JobType jobType) {
+            Discord = discord;
+            LogService = logService;
+            Repository = repository;
+            Mapper = mapper;
+            JobType = jobType;
+        }
+
         protected DiscordSocketClient Discord { get; }
         protected ILogService LogService { get; }
         protected IDiscordBotRepository Repository { get; }
@@ -20,17 +29,8 @@ namespace DiscordBotFanatic.Jobs {
         protected GroupConfig Configuration { get; private set; }
 
 
-        protected BaseGuildJob(DiscordSocketClient discord, ILogService logService, IDiscordBotRepository repository, Mapper mapper, JobType jobType) {
-            Discord = discord;
-            LogService = logService;
-            Repository = repository;
-            Mapper = mapper;
-            JobType = jobType;
-        }
-
-
         public virtual async Task Execute(IJobExecutionContext context) {
-             _ = LogService.Log($"Starting {JobType} job execution", LogEventLevel.Information, null);
+            _ = LogService.Log($"Starting {JobType} job execution", LogEventLevel.Information, null);
 
             if (Discord.ConnectionState == ConnectionState.Connected) {
                 foreach (SocketGuild discordGuild in Discord.Guilds) {

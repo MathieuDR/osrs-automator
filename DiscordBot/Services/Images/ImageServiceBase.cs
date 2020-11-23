@@ -17,36 +17,35 @@ using Image = SixLabors.ImageSharp.Image;
 
 namespace DiscordBotFanatic.Services.Images {
     public abstract class ImageServiceBase<T> : IImageService<T> where T : class {
-        protected readonly string BasePath;
-        protected readonly string IconPath;
-        protected readonly ILogService LogService;
-        protected readonly string BgPath;
-        protected readonly Point ShadowOffset;
+        protected const string ResourcePath = "Images";
 
         private readonly FontCollection _collection;
-        protected readonly Font InfoFont;
-        protected readonly Font HeaderFont;
-        protected readonly Color FontColor;
-        protected readonly Color ShadowColor;
+        protected readonly string BasePath;
+        protected readonly string BgPath;
         protected readonly TextGraphicsOptions CenterFontOptions;
+        protected readonly Color FontColor;
+        protected readonly Font HeaderFont;
+        protected readonly string IconPath;
+        protected readonly Font InfoFont;
         protected readonly TextGraphicsOptions LeftAlignFontOptions;
-        protected const string ResourcePath = "Images";
-        
+        protected readonly ILogService LogService;
+        protected readonly Color ShadowColor;
+        protected readonly Point ShadowOffset;
 
 
         public ImageServiceBase(ILogService logService) {
             LogService = logService;
             BasePath = Directory.GetCurrentDirectory();
-            
+
             IconPath = Path.Join(BasePath, ResourcePath, "icons");
             BgPath = Path.Join(BasePath, ResourcePath, "backgrounds");
-            ShadowOffset = new Point(2,3);
+            ShadowOffset = new Point(2, 3);
 
             // Fonts
             _collection = new FontCollection();
             InfoFont = GetRunescapeChatFont(64, FontStyle.Regular);
             HeaderFont = GetRunescapeChatFont(70, FontStyle.Bold);
-           
+
             FontColor = Color.Black;
             ShadowColor = Color.DimGrey;
 
@@ -65,7 +64,7 @@ namespace DiscordBotFanatic.Services.Images {
 
         public Discord.Image GetImage(T info) {
             BeforeGetImage(info);
-                
+
             Stopwatch t = new Stopwatch();
             t.Start();
             Image image = CreateImage(info);

@@ -5,14 +5,12 @@ namespace DiscordBotFanatic.Models.Data {
     public class AutomatedMessagesConfig {
         public AutomatedMessagesConfig() { }
 
-        public Dictionary<JobType, ChannelJobConfiguration> ChannelJobs { get; set; } = new Dictionary<JobType, ChannelJobConfiguration>();
-
+        public Dictionary<JobType, ChannelJobConfiguration> ChannelJobs { get; set; } =
+            new Dictionary<JobType, ChannelJobConfiguration>();
     }
 
     public class ChannelJobConfiguration {
-        public ChannelJobConfiguration() {
-            
-        }
+        public ChannelJobConfiguration() { }
 
         public ChannelJobConfiguration(ulong guildId) : this(guildId, ulong.MinValue) { }
 

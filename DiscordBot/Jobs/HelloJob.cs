@@ -19,7 +19,7 @@ namespace DiscordBotFanatic.Jobs {
 
         public async Task Execute(IJobExecutionContext context) {
             await _service.Log("Greetings from HelloJob!", LogEventLevel.Information, null);
-            
+
             if (_discord.ConnectionState == ConnectionState.Connected) {
                 await _service.Log("Connected", LogEventLevel.Information, null);
                 var guild = _discord.Guilds.FirstOrDefault(g => g.Name.Contains("Saskora"));

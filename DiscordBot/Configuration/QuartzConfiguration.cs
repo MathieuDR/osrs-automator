@@ -29,7 +29,7 @@ namespace DiscordBotFanatic.Configuration {
                         // to configure via default constructor
                         options.AllowDefaultConstructor = true;
                     });
-                    
+
                     // or for scoped service support like EF Core DbContext
                     // q.UseMicrosoftDependencyInjectionScopedJobFactory();
 
@@ -41,18 +41,18 @@ namespace DiscordBotFanatic.Configuration {
 
         private static IServiceCollectionQuartzConfigurator ConfigureJobs(
             this IServiceCollectionQuartzConfigurator quartzServices) {
-            quartzServices.ScheduleJob<AutoUpdateGroupJob>(trigger => 
+            quartzServices.ScheduleJob<AutoUpdateGroupJob>(trigger =>
                 trigger.WithIdentity(JobType.GroupUpdate.ToString(), "wom")
                     .StartAt(DateBuilder.EvenSecondDate(DateTimeOffset.UtcNow.AddMinutes(5)))
-                    .WithSimpleSchedule(x=>x.WithIntervalInHours(3).RepeatForever())
+                    .WithSimpleSchedule(x => x.WithIntervalInHours(3).RepeatForever())
                     .WithDescription("Showing achievements for all the servers!")
             );
 
             quartzServices.ScheduleJob<AchievementsJob>(trigger =>
                 trigger.WithIdentity(JobType.Achievements.ToString(), "wom")
-                .StartAt(DateBuilder.EvenSecondDate(DateTimeOffset.UtcNow.AddMinutes(1)))
-                .WithSimpleSchedule(x => x.WithIntervalInHours(1).RepeatForever())
-                .WithDescription("Showing achievements for all the servers!")
+                    .StartAt(DateBuilder.EvenSecondDate(DateTimeOffset.UtcNow.AddMinutes(1)))
+                    .WithSimpleSchedule(x => x.WithIntervalInHours(1).RepeatForever())
+                    .WithDescription("Showing achievements for all the servers!")
             );
 
             return quartzServices;

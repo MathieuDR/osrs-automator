@@ -125,34 +125,23 @@ namespace DiscordBotFanatic.Repository {
                         throw new Exception($"Multiple job states!");
                     }
 
-                    return collection.Query().Where(j=>j.GuildId == guildId).FirstOrDefault();
+                    return collection.Query().Where(j => j.GuildId == guildId).FirstOrDefault();
                 }
             }
-        }
-
-        private AutomatedJobState InsertAutomatedJobState(AutomatedJobState jobState) {
-            lock (GetGuildLock(jobState.GuildId)) {
-                using (LiteDatabase = new LiteDatabase(GetGuildFileName(jobState.GuildId))) {
-                    var collection = LiteDatabase.GetCollection<AutomatedJobState>(GuildJobStateCollectionName);
-                    collection.Insert(jobState);
-                }
-            }
-
-            return GetAutomatedJobState(jobState.GuildId);
         }
 
         public AutomatedJobState CreateOrUpdateAutomatedJobState(ulong guildId, AutomatedJobState jobState) {
             if (jobState._id == null) {
                 return InsertAutomatedJobState(jobState);
             }
-            
+
             lock (GetGuildLock(guildId)) {
                 using (LiteDatabase = new LiteDatabase(GetGuildFileName(guildId))) {
                     var collection = LiteDatabase.GetCollection<AutomatedJobState>(GuildJobStateCollectionName);
                     collection.Update(jobState);
                 }
             }
-            
+
             return GetAutomatedJobState(jobState.GuildId);
         }
 
@@ -187,6 +176,17 @@ namespace DiscordBotFanatic.Repository {
                     return GetPlayerQuery(LiteDatabase).ToList();
                 }
             }
+        }
+
+        private AutomatedJobState InsertAutomatedJobState(AutomatedJobState jobState) {
+            lock (GetGuildLock(jobState.GuildId)) {
+                using (LiteDatabase = new LiteDatabase(GetGuildFileName(jobState.GuildId))) {
+                    var collection = LiteDatabase.GetCollection<AutomatedJobState>(GuildJobStateCollectionName);
+                    collection.Insert(jobState);
+                }
+            }
+
+            return GetAutomatedJobState(jobState.GuildId);
         }
 
         private string GetGuildFileName(ulong guildId) {

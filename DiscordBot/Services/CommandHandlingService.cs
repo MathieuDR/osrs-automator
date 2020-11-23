@@ -22,10 +22,10 @@ using Serilog.Events;
 namespace DiscordBotFanatic.Services {
     public class CommandHandlingService {
         private readonly CommandService _commands;
+        private readonly BotConfiguration _configuration;
         private readonly DiscordSocketClient _discord;
         private readonly ILogService _logger;
         private readonly MetricSynonymsConfiguration _metricSynonymsConfiguration;
-        private readonly BotConfiguration _configuration;
         private IServiceProvider _provider;
 
         public CommandHandlingService(IServiceProvider provider, DiscordSocketClient discord, CommandService commands,
@@ -40,11 +40,6 @@ namespace DiscordBotFanatic.Services {
             _discord.MessageReceived += HandleCommandAsync;
             _discord.UserJoined += HandleJoinAsync;
             _commands.CommandExecuted += OnCommandExecutedAsync;
-        }
-
-        private Task HandleJoinAsync(SocketGuildUser arg) {
-            //throw new NotImplementedException();
-            return Task.CompletedTask;
         }
 
         public async Task InitializeAsync(IServiceProvider provider) {
@@ -78,6 +73,21 @@ namespace DiscordBotFanatic.Services {
             // ...or even log the result (the method used should fit into
             // your existing log handler)
             await _logger.LogWithCommandInfoLine($"Command executed.", LogEventLevel.Information, null);
+        }
+
+        public async Task CreateErrorMessage(ICommandContext context, IResult result) {
+            await _logger.Log(new LogMessage(LogSeverity.Error, "",
+                $"{result.Error} - {result.ErrorReason} ({context.Message.Content})"));
+
+            var builder = CreateErrorEmbedBuilder(context, result);
+
+
+            await context.Channel.SendMessageAsync(embed: builder.Build());
+        }
+
+        private Task HandleJoinAsync(SocketGuildUser arg) {
+            //throw new NotImplementedException();
+            return Task.CompletedTask;
         }
 
 
@@ -124,19 +134,9 @@ namespace DiscordBotFanatic.Services {
             }
         }
 
-        public async Task CreateErrorMessage(ICommandContext context, IResult result) {
-            await _logger.Log(new LogMessage(LogSeverity.Error, "",
-                $"{result.Error} - {result.ErrorReason} ({context.Message.Content})"));
-
-            var builder = CreateErrorEmbedBuilder(context, result);
-
-
-            await context.Channel.SendMessageAsync(embed: builder.Build());
-        }
-
         private EmbedBuilder CreateErrorEmbedBuilder(ICommandContext context, IResult result) {
             EmbedBuilder builder = new EmbedBuilder().AddCommonProperties().AddFooterFromMessageAuthor(context);
-                
+
             builder.Title = "Uh oh! Something went wrong.";
 
             Debug.Assert(result.Error != null, "result.Error != null");

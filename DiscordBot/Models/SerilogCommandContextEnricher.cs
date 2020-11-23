@@ -12,7 +12,7 @@ namespace DiscordBotFanatic.Models {
                 Channel = context.Channel.Name;
             }
         }
-       
+
 
         public string Message { get; set; }
         public string User => $"{UserName}#{Discriminator}";
@@ -23,9 +23,7 @@ namespace DiscordBotFanatic.Models {
         public bool IsPrivate { get; set; }
 
         public string MessageLocation {
-            get {
-                return IsPrivate ? "Direct Message" : $"{Channel} ({Guild})";
-            }
+            get { return IsPrivate ? "Direct Message" : $"{Channel} ({Guild})"; }
         }
 
         public override string ToString() {

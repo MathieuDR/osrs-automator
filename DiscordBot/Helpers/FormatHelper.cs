@@ -113,13 +113,12 @@ namespace DiscordBotFanatic.Helpers {
 
         public static int ToExperience(this int level) {
             var index = level;
-            
+
             if (index >= Experiences.Length) {
                 return Experiences.Last();
             }
 
             return Experiences[index];
-
         }
     }
 }

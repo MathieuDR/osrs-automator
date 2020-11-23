@@ -37,12 +37,13 @@ namespace DiscordBotFanatic.Modules {
         [RequireContext(ContextType.Guild)]
         public async Task AddOsrsName(string name) {
             var playerDecorater = await _playerService.CoupleDiscordGuildUserToOsrsAccount(GetGuildUser(), name);
-            
-            
+
+
             var builder = new EmbedBuilder()
                 .AddWiseOldMan(playerDecorater)
                 .AddFooterFromMessageAuthor(Context)
-                .WithDescription($"Coupled {playerDecorater.Item.DisplayName} to your discord account in the server {Context.Guild.Name}");
+                .WithDescription(
+                    $"Coupled {playerDecorater.Item.DisplayName} to your discord account in the server {Context.Guild.Name}");
 
             await ModifyWaitMessageAsync(builder.Build());
         }

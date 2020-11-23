@@ -31,7 +31,7 @@ namespace DiscordBotFanatic.Helpers {
             type = type.GetGenericInfo(builder);
 
             if (type == typeof(IUser) || type == typeof(IGuildUser)) {
-                builder.Append( "Mention a(n) user(s) in the channel");
+                builder.Append("Mention a(n) user(s) in the channel");
                 identified = true;
             }
 
@@ -40,29 +40,11 @@ namespace DiscordBotFanatic.Helpers {
                 identified = true;
             }
 
-            if(!identified) {
+            if (!identified) {
                 builder.Append("Unknown/Complex");
             }
 
             return builder.ToString();
-        }
-
-        private static Type GetGenericInfo(this Type type, StringBuilder builder = null) {
-            builder ??= new StringBuilder();
-
-            if (type.IsGenericType && type.GetGenericTypeDefinition() == typeof(Nullable<>))
-            {
-                builder.Append("Optional: ");
-                return Nullable.GetUnderlyingType(type);
-            }
-
-            if (type.IsGenericType && type.GetGenericTypeDefinition() == typeof(IEnumerable<>))
-            {
-                builder.Append("List: ");
-                return type.GetGenericArguments()[0];
-            }
-
-            return type;
         }
 
         public static string ToFriendlyName(this Type type, bool isSpecific = false) {
@@ -134,11 +116,27 @@ namespace DiscordBotFanatic.Helpers {
                 identified = true;
             }
 
-            if(!identified) {
+            if (!identified) {
                 builder.Append("Unknown/Complex");
             }
 
             return builder.ToString();
+        }
+
+        private static Type GetGenericInfo(this Type type, StringBuilder builder = null) {
+            builder ??= new StringBuilder();
+
+            if (type.IsGenericType && type.GetGenericTypeDefinition() == typeof(Nullable<>)) {
+                builder.Append("Optional: ");
+                return Nullable.GetUnderlyingType(type);
+            }
+
+            if (type.IsGenericType && type.GetGenericTypeDefinition() == typeof(IEnumerable<>)) {
+                builder.Append("List: ");
+                return type.GetGenericArguments()[0];
+            }
+
+            return type;
         }
     }
 }

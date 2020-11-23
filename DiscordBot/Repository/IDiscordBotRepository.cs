@@ -22,6 +22,5 @@ namespace DiscordBotFanatic.Repository {
 
         AutomatedJobState GetAutomatedJobState(ulong guildId);
         AutomatedJobState CreateOrUpdateAutomatedJobState(ulong guildId, AutomatedJobState jobState);
-
     }
 }

@@ -11,9 +11,9 @@ using DiscordBotFanatic.Services.interfaces;
 using WiseOldManConnector.Models.Output;
 
 namespace DiscordBotFanatic.Services {
-    public class CompetitionService : ICompetitionService{
-        private readonly IDiscordBotRepository _repository;
+    public class CompetitionService : ICompetitionService {
         private readonly IOsrsHighscoreService _highscoreService;
+        private readonly IDiscordBotRepository _repository;
 
         public CompetitionService(IDiscordBotRepository repository, IOsrsHighscoreService highscoreService) {
             _repository = repository;
@@ -34,17 +34,6 @@ namespace DiscordBotFanatic.Services {
 
             var competitions = await _highscoreService.GetAllCompetitionsForGroup(config.WomGroupId);
             return competitions.Decorate();
-        }
-
-
-        private GroupConfig GetGroupConfig(ulong guildId) {
-            var config = _repository.GetGroupConfig(guildId);
-
-            if (config == null) {
-                throw new Exception("No group set for server.");
-            }
-
-            return config;
         }
 
         public Task<ItemDecorator<Competition>> SetCurrentCompetition(IGuildUser guildUser, int id) {
@@ -74,6 +63,17 @@ namespace DiscordBotFanatic.Services {
 
         public Task<ItemDecorator<Competition>> ViewCurrentCompetition(IGuild guild) {
             throw new System.NotImplementedException();
+        }
+
+
+        private GroupConfig GetGroupConfig(ulong guildId) {
+            var config = _repository.GetGroupConfig(guildId);
+
+            if (config == null) {
+                throw new Exception("No group set for server.");
+            }
+
+            return config;
         }
     }
 }

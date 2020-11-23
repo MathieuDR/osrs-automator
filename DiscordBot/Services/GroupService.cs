@@ -17,8 +17,9 @@ namespace DiscordBotFanatic.Services {
     public class GroupService : BaseService, IGroupService {
         private readonly IOsrsHighscoreService _highscoreService;
         private readonly IDiscordBotRepository _repository;
- 
-        public GroupService(ILogService logger, IDiscordBotRepository repository, IOsrsHighscoreService highscoreService) : base(logger) {
+
+        public GroupService(ILogService logger, IDiscordBotRepository repository, IOsrsHighscoreService highscoreService) :
+            base(logger) {
             _repository = repository;
             _highscoreService = highscoreService;
         }
@@ -59,7 +60,7 @@ namespace DiscordBotFanatic.Services {
 
         public Task SetAutomationJobChannel(JobType jobType, IGuildUser user, IMessageChannel messageChannel) {
             var config = GetGroupConfig(user.GuildId);
-            
+
             //ChannelJobConfiguration setting;
             if (config.AutomatedMessagesConfig.ChannelJobs.ContainsKey(jobType)) {
                 var setting = config.AutomatedMessagesConfig.ChannelJobs[jobType];
@@ -91,18 +92,6 @@ namespace DiscordBotFanatic.Services {
             throw new NotImplementedException();
         }
 
-        private GroupConfig GetGroupConfig(ulong guildId, bool validate = true) {
-            var result = _repository.GetGroupConfig(guildId);
-            if (validate) {
-                if (result == null) {
-                    throw new Exception($"Guild has no configuration. Please set the config");
-                }
-            }
-
-
-            return result;
-        }
-
         public Task<Dictionary<string, string>> GetSettingsDictionary(IGuild guild) {
             var settings = GetGroupConfig(guild.Id, false);
 
@@ -117,21 +106,36 @@ namespace DiscordBotFanatic.Services {
             return GetGroupLeaderboard(guildUser, MetricType.Overall, Period.Week);
         }
 
-        public async Task<ItemDecorator<Leaderboard>> GetGroupLeaderboard(IGuildUser guildUser, MetricType metricType, Period period) {
+        public async Task<ItemDecorator<Leaderboard>> GetGroupLeaderboard(IGuildUser guildUser, MetricType metricType,
+            Period period) {
             var settings = GetGroupConfig(guildUser.GuildId);
 
             // Check if competition is running
             // Maybe go to competition service? Not sure
-            var emptyCompetition = (await _highscoreService.GetAllCompetitionsForGroup(settings.WomGroupId)).FirstOrDefault(c => c.EndDate >= DateTimeOffset.Now);
-            
+            var emptyCompetition =
+                (await _highscoreService.GetAllCompetitionsForGroup(settings.WomGroupId)).FirstOrDefault(c =>
+                    c.EndDate >= DateTimeOffset.Now);
+
             if (emptyCompetition != null) {
                 var competition = await _highscoreService.GetCompetition(emptyCompetition.Id);
                 return competition.DecorateLeaderboard();
             }
 
             // Check for delta gains, overall is standard
-           DeltaLeaderboard temp = await _highscoreService.GetTopDeltasOfGroup(settings.WomGroupId, metricType, period);
-           return temp.DecorateGeneric(settings.WomGroup);
+            DeltaLeaderboard temp = await _highscoreService.GetTopDeltasOfGroup(settings.WomGroupId, metricType, period);
+            return temp.DecorateGeneric(settings.WomGroup);
+        }
+
+        private GroupConfig GetGroupConfig(ulong guildId, bool validate = true) {
+            var result = _repository.GetGroupConfig(guildId);
+            if (validate) {
+                if (result == null) {
+                    throw new Exception($"Guild has no configuration. Please set the config");
+                }
+            }
+
+
+            return result;
         }
 
         private Task AddAllPlayersToGroup(IGuildUser guildUser, GroupConfig config) {

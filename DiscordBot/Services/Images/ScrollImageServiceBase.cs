@@ -13,23 +13,23 @@ using SixLabors.ImageSharp.Processing;
 namespace DiscordBotFanatic.Services.Images {
     public abstract class ScrollImageServiceBase<T> : ImageServiceBase<T> where T : class {
         private readonly string _scrollBase;
-        private int _maxScrolls;
-        private int _headerSections;
+        protected readonly Size HeaderTextOffset;
 
         protected readonly int SectionHeight = 80;
-        protected readonly Size HeaderTextOffset;
+        private int _headerSections;
+        private int _maxScrolls;
+
+        protected int CurrentSectionYOffset;
+        protected int MiddleOfCurrentSectionForTextYOffset;
+        protected int MiddleOfCurrentSectionYOffset;
 
         protected Size ScrollGutter;
         protected Size ScrollMargin;
 
-        protected int CurrentSectionYOffset;
-        protected int MiddleOfCurrentSectionYOffset;
-        protected int MiddleOfCurrentSectionForTextYOffset;
-
         protected ScrollImageServiceBase(ILogService logService) : base(logService) {
             _maxScrolls = 1;
             _scrollBase = Path.Join(BgPath, "scroll");
-            HeaderTextOffset = new Size(0,130);
+            HeaderTextOffset = new Size(0, 130);
             ScrollGutter = new Size(300, 50);
             ScrollMargin = new Size(150, 0);
         }
@@ -40,12 +40,9 @@ namespace DiscordBotFanatic.Services.Images {
         }
 
         public int HeaderSections {
-            get { return _headerSections;}
+            get { return _headerSections; }
             set { _headerSections = value; }
         }
-
-        protected abstract void MutateScrollWithInfo(IImageProcessingContext context, T info);
-        protected abstract void MutateScrollWithHeaders(IImageProcessingContext context);
 
 
         protected override Image CreateImageForMultipleInfos(IEnumerable<T> infos) {
@@ -81,15 +78,17 @@ namespace DiscordBotFanatic.Services.Images {
             return resultImage;
         }
 
-       [SuppressMessage("ReSharper", "AccessToDisposedClosure")]
-       protected Image CreateScrollImageForMultipleInfos(IEnumerable<T> infos) {
+        protected abstract void MutateScrollWithInfo(IImageProcessingContext context, T info);
+        protected abstract void MutateScrollWithHeaders(IImageProcessingContext context);
+
+        [SuppressMessage("ReSharper", "AccessToDisposedClosure")]
+        protected Image CreateScrollImageForMultipleInfos(IEnumerable<T> infos) {
             var infoList = infos.ToList();
             int infoHeightSection = 80;
-            
+
             Image resultImage;
             Random random = new Random();
 
-            
 
             // Load start and end of the scroll
             using Image topImage = Image.Load(Path.Join(_scrollBase, "scroll_start.png"));
@@ -101,14 +100,15 @@ namespace DiscordBotFanatic.Services.Images {
 
             // Create image
             int offsetHeight = topImage.Height + HeaderSections * infoHeightSection;
-            int totalHeight = offsetHeight + bottomImage.Height + (infoList.Count  * infoHeightSection);
+            int totalHeight = offsetHeight + bottomImage.Height + (infoList.Count * infoHeightSection);
             resultImage = new Image<Rgba32>(topImage.Width, totalHeight);
-            
-            
+
+
             // Append scrolls
             resultImage.Mutate(x => {
                 x.DrawImage(topImage, new Point(0, 0), PixelColorBlendingMode.Normal, PixelAlphaCompositionMode.Src, 1);
-                x.DrawImage(bottomImage, new Point(0, totalHeight - bottomImage.Height), PixelColorBlendingMode.Normal, PixelAlphaCompositionMode.Src, 1);
+                x.DrawImage(bottomImage, new Point(0, totalHeight - bottomImage.Height), PixelColorBlendingMode.Normal,
+                    PixelAlphaCompositionMode.Src, 1);
 
                 for (int i = 0; i < HeaderSections; i++) {
                     Image bg = randomBg[random.Next(0, randomBg.Length)];

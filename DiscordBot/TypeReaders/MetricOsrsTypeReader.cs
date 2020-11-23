@@ -19,7 +19,8 @@ namespace DiscordBotFanatic.TypeReaders {
         }
 
         public override Task<TypeReaderResult> ReadAsync(ICommandContext context, string input, IServiceProvider services) {
-            List<string> parameters = Regex.Matches(input, @"[\""].+?[\""]|[^ ]+").Select(m => m.Value.Replace("\"", "")).ToList();
+            List<string> parameters =
+                Regex.Matches(input, @"[\""].+?[\""]|[^ ]+").Select(m => m.Value.Replace("\"", "")).ToList();
 
             if (!parameters.Any()) {
                 return Task.FromResult(TypeReaderResult.FromSuccess(null));
@@ -38,7 +39,8 @@ namespace DiscordBotFanatic.TypeReaders {
                 } else if (string.IsNullOrEmpty(result.Name)) {
                     result.Name = parameter.Replace("\"", "");
                 } else {
-                    return Task.FromResult(TypeReaderResult.FromError(CommandError.BadArgCount, $"Wrong errors, Cannot parse all parameters. Ambigious username ({result.Name} & {parameter})"));
+                    return Task.FromResult(TypeReaderResult.FromError(CommandError.BadArgCount,
+                        $"Wrong errors, Cannot parse all parameters. Ambigious username ({result.Name} & {parameter})"));
                 }
             }
 

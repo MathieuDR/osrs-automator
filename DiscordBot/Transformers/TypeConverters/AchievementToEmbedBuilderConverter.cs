@@ -9,7 +9,6 @@ using WiseOldManConnector.Models.WiseOldMan.Enums;
 
 namespace DiscordBotFanatic.Transformers.TypeConverters {
     public class AchievementToEmbedBuilderConverter : ITypeConverter<Achievement, EmbedBuilder> {
-
         public EmbedBuilder Convert(Achievement source, EmbedBuilder destination, ResolutionContext context) {
             destination ??= new EmbedBuilder();
 
@@ -33,14 +32,13 @@ namespace DiscordBotFanatic.Transformers.TypeConverters {
 
             string append = "";
             switch (typeOfMetric) {
-               
                 case DeltaType.Score:
                     switch (source.Metric) {
                         case MetricType.BountyHunterHunter:
                         case MetricType.BountyHunterRogue:
                         case MetricType.LastManStanding:
                             append = " rank";
-                           break;
+                            break;
                         case MetricType.ClueScrollsAll:
                         case MetricType.ClueScrollsBeginner:
                         case MetricType.ClueScrollsEasy:
@@ -51,11 +49,13 @@ namespace DiscordBotFanatic.Transformers.TypeConverters {
                             append = " completed";
                             break;
                     }
+
                     break;
                 case DeltaType.Experience:
                     if (source.Threshold > 99.ToExperience()) {
                         append = " experience";
-                    } 
+                    }
+
                     break;
             }
 

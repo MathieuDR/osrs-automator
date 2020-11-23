@@ -10,11 +10,12 @@ using WiseOldManConnector.Models.WiseOldMan.Enums;
 
 namespace DiscordBotFanatic.Services {
     public class WiseOldManConnectorService : IOsrsHighscoreService {
-        private readonly IWiseOldManPlayerApi _playerApi;
-        private readonly IWiseOldManGroupApi _groupApi;
         private readonly IWiseOldManCompetitionApi _competitionApi;
+        private readonly IWiseOldManGroupApi _groupApi;
+        private readonly IWiseOldManPlayerApi _playerApi;
 
-        public WiseOldManConnectorService(IWiseOldManPlayerApi playerApi, IWiseOldManGroupApi groupApi, IWiseOldManCompetitionApi competitionApi) {
+        public WiseOldManConnectorService(IWiseOldManPlayerApi playerApi, IWiseOldManGroupApi groupApi,
+            IWiseOldManCompetitionApi competitionApi) {
             _playerApi = playerApi;
             _groupApi = groupApi;
             _competitionApi = competitionApi;
@@ -24,7 +25,7 @@ namespace DiscordBotFanatic.Services {
             var response = await _playerApi.Search(username);
             if (response.Data.Count() == 1) {
                 return response.Data.FirstOrDefault();
-            }else if (response.Data.Count() > 1) {
+            } else if (response.Data.Count() > 1) {
                 throw new Exception($"Too many result with the search parameter {username}");
             }
 
@@ -43,7 +44,8 @@ namespace DiscordBotFanatic.Services {
         }
 
         public Task AddOsrsAccountToToGroup(int groupId, string verificationCode, IEnumerable<string> osrsAccounts) {
-            return _groupApi.AddMembers(groupId, verificationCode, osrsAccounts.Distinct().Select(s=> new MemberRequest(){Name = s, Role = GroupRole.Member}));
+            return _groupApi.AddMembers(groupId, verificationCode,
+                osrsAccounts.Distinct().Select(s => new MemberRequest() {Name = s, Role = GroupRole.Member}));
         }
 
         public async Task<Competition> GetCompetition(int competitionId) {
@@ -69,7 +71,6 @@ namespace DiscordBotFanatic.Services {
 
         public async Task<MessageResponse> UpdateGroup(int groupId) {
             return (await _groupApi.Update(groupId)).Data;
-
         }
     }
 }

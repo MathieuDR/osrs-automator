@@ -11,18 +11,20 @@ using DiscordBotFanatic.Services.interfaces;
 using WiseOldManConnector.Models.Output;
 
 namespace DiscordBotFanatic.Services {
-    public class PlayerService :BaseService, IPlayerService {
+    public class PlayerService : BaseService, IPlayerService {
         private readonly IOsrsHighscoreService _osrsHighscoreService;
         private readonly IDiscordBotRepository _repository;
 
-        public PlayerService(ILogService logger, IOsrsHighscoreService osrsHighscoreService, IDiscordBotRepository repository) : base(logger) {
+        public PlayerService(ILogService logger, IOsrsHighscoreService osrsHighscoreService, IDiscordBotRepository repository) :
+            base(logger) {
             _osrsHighscoreService = osrsHighscoreService;
             _repository = repository;
         }
 
-        public async Task<ItemDecorator<Player>> CoupleDiscordGuildUserToOsrsAccount(IGuildUser discordUser, string proposedOsrsName) {
+        public async Task<ItemDecorator<Player>> CoupleDiscordGuildUserToOsrsAccount(IGuildUser discordUser,
+            string proposedOsrsName) {
             proposedOsrsName = proposedOsrsName.ToLowerInvariant();
-            
+
             var player = _repository.GetPlayerById(discordUser.GuildId, discordUser.Id) ?? new Models.Data.Player(discordUser);
             CheckIfPlayerIsAlreadyCoupled(discordUser, proposedOsrsName, player);
 
@@ -64,7 +66,7 @@ namespace DiscordBotFanatic.Services {
                 player.DefaultPlayerUsername = osrsPlayer.Username;
                 player.WiseOldManDefaultPlayerId = osrsPlayer.Id;
             }
-            
+
             _repository.UpdateOrInsertPlayerForGuild(discordUser.GuildId, player);
 
             var config = _repository.GetGroupConfig(discordUser.GuildId);

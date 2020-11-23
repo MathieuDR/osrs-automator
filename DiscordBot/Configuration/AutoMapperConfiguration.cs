@@ -18,10 +18,9 @@ namespace DiscordBotFanatic.Configuration {
                 cfg.AddProfile<MetricMappingProfile>();
 
                 // Adding maps
-
                 cfg.CreateMap<string, Embed>().ConvertUsing<StringToEmbedConverter>();
                 cfg.CreateMap<EmbedResponse, Embed>().ConvertUsing<EmbedResponseToEmbedConverter>();
-                
+
                 cfg.CreateMap<CompetitionLeaderboard, EmbedBuilder>()
                     .ConvertUsing<CompetitionLeaderboardToEmbedBuilderConverter>();
 

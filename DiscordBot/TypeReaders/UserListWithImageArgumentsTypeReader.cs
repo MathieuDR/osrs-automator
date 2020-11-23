@@ -21,21 +21,23 @@ namespace DiscordBotFanatic.TypeReaders {
             if (context.Message.Attachments.Count == 1) {
                 result.ImageUrl = context.Message.Attachments.FirstOrDefault()?.Url;
             } else if (context.Message.Attachments.Any()) {
-                return await Task.FromResult(TypeReaderResult.FromError(CommandError.BadArgCount, $"Maximum one attachment ({context.Message.Attachments.Count})"));
+                return await Task.FromResult(TypeReaderResult.FromError(CommandError.BadArgCount,
+                    $"Maximum one attachment ({context.Message.Attachments.Count})"));
             }
 
             if (usersCollection == null) {
-                return await Task.FromResult(TypeReaderResult.FromError(CommandError.ParseFailed, $"No users in channel. Cannot parse user mentions"));
+                return await Task.FromResult(TypeReaderResult.FromError(CommandError.ParseFailed,
+                    $"No users in channel. Cannot parse user mentions"));
             }
 
             if (parameters.Count != parameters.Distinct().Count()) {
-                return await Task.FromResult(TypeReaderResult.FromError(CommandError.ParseFailed, $"Repeating values in arguments."));
+                return await Task.FromResult(TypeReaderResult.FromError(CommandError.ParseFailed,
+                    $"Repeating values in arguments."));
             }
 
             foreach (string parameter in parameters) {
                 var cts = new CancellationTokenSource();
                 if (MentionUtils.TryParseUser(parameter, out var userId)) {
-                    
                     // ReSharper disable once PossibleMultipleEnumeration
                     await foreach (var users in usersCollection.WithCancellation(cts.Token)) {
                         foreach (var user in users) {
@@ -44,7 +46,8 @@ namespace DiscordBotFanatic.TypeReaders {
                             }
 
                             if (user.IsBot) {
-                                return await Task.FromResult(TypeReaderResult.FromError(CommandError.ParseFailed, $"User is a bot ({parameter})"));
+                                return await Task.FromResult(TypeReaderResult.FromError(CommandError.ParseFailed,
+                                    $"User is a bot ({parameter})"));
                             }
 
                             userResultList.Add(user);
@@ -55,21 +58,25 @@ namespace DiscordBotFanatic.TypeReaders {
                     if (parameter.IsValidUrl()) {
                         result.ImageUrl = parameter;
                     } else {
-                        return await Task.FromResult(TypeReaderResult.FromError(CommandError.ParseFailed, $"Cannot parse arguments. Not correct url format ({parameter})"));
+                        return await Task.FromResult(TypeReaderResult.FromError(CommandError.ParseFailed,
+                            $"Cannot parse arguments. Not correct url format ({parameter})"));
                     }
                 } else {
-                    return await Task.FromResult(TypeReaderResult.FromError(CommandError.BadArgCount, $"Cannot parse arguments. Ambiguous imageUrl ({result.ImageUrl} & {parameter})"));
+                    return await Task.FromResult(TypeReaderResult.FromError(CommandError.BadArgCount,
+                        $"Cannot parse arguments. Ambiguous imageUrl ({result.ImageUrl} & {parameter})"));
                 }
             }
 
             result.Users = userResultList;
 
             if (!result.Users.Any()) {
-                return await Task.FromResult(TypeReaderResult.FromError(CommandError.BadArgCount, $"Need at least one user mentioned"));
+                return await Task.FromResult(TypeReaderResult.FromError(CommandError.BadArgCount,
+                    $"Need at least one user mentioned"));
             }
 
             if (string.IsNullOrEmpty(result.ImageUrl)) {
-                return await Task.FromResult(TypeReaderResult.FromError(CommandError.BadArgCount, $"Need an image url or attachment."));
+                return await Task.FromResult(TypeReaderResult.FromError(CommandError.BadArgCount,
+                    $"Need an image url or attachment."));
             }
 
             return await Task.FromResult(TypeReaderResult.FromSuccess(result));

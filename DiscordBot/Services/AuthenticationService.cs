@@ -4,7 +4,7 @@ using DiscordBotFanatic.Models.Enums;
 using DiscordBotFanatic.Services.interfaces;
 
 namespace DiscordBotFanatic.Services {
-    public class AuthenticationService :IAuthenticationService {
+    public class AuthenticationService : IAuthenticationService {
         public Task<bool> IsAllowed(IUserGuild guildUser, BotPermissions permissions) {
             throw new System.NotImplementedException();
         }

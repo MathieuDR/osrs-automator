@@ -8,7 +8,8 @@ using WiseOldManConnector.Models.WiseOldMan.Enums;
 
 namespace DiscordBotFanatic.Helpers {
     public static class MetricTypeHelper {
-        public static bool TryParseToMetricType(this string metricType, MetricSynonymsConfiguration configuration, out object value) {
+        public static bool TryParseToMetricType(this string metricType, MetricSynonymsConfiguration configuration,
+            out object value) {
             if (Enum.TryParse(typeof(MetricType), metricType, true, out value)) {
                 return true;
             }

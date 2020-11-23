@@ -12,9 +12,8 @@ namespace DiscordBotFanatic.Helpers {
             int i = rand.Next(messages.WaitMessages.Count);
             string result = messages.WaitMessages[i];
 
-            string output = emojiRegex.Replace(result, delegate(Match match) {
-                return new Emoji(match.Groups[1].Value).ToString();
-            });
+            string output = emojiRegex.Replace(result,
+                delegate(Match match) { return new Emoji(match.Groups[1].Value).ToString(); });
 
             return output;
         }

@@ -12,21 +12,21 @@ using DiscordBotFanatic.Models.Configuration;
 namespace DiscordBotFanatic.Modules {
     [Name("Help")]
     public class HelpModule : ModuleBase<SocketCommandContext> {
+        private const string HelpSummary = "Help function";
+        private const string HelpCommand = "help";
+
+        private readonly CommandService _commandService;
+        private readonly BotConfiguration _configuration;
+        private readonly IServiceProvider _serviceProvider;
+
+        private Dictionary<string, Type> _parametersToOutput;
+
         public HelpModule(CommandService commandService, IServiceProvider serviceProvider, BotConfiguration configuration) {
             _commandService = commandService;
             _serviceProvider = serviceProvider;
             _configuration = configuration;
             _parametersToOutput = new Dictionary<string, Type>();
         }
-
-        private const string HelpSummary = "Help function";
-        private const string HelpCommand = "help";
-
-        private Dictionary<string, Type> _parametersToOutput;
-
-        private readonly CommandService _commandService;
-        private readonly IServiceProvider _serviceProvider;
-        private readonly BotConfiguration _configuration;
 
         [Command(HelpCommand)]
         [Summary(HelpSummary)]
@@ -35,14 +35,13 @@ namespace DiscordBotFanatic.Modules {
             EmbedBuilder output = new EmbedBuilder();
             if (string.IsNullOrEmpty(module)) {
                 output.Title = "Help";
-                output.AddField("**Module help**", $"Use `{_configuration.CustomPrefix} help <module>` to get help with a module.{Environment.NewLine}For example: `{_configuration.CustomPrefix} help \"player stats\"`");
+                output.AddField("**Module help**",
+                    $"Use `{_configuration.CustomPrefix} help <module>` to get help with a module.{Environment.NewLine}For example: `{_configuration.CustomPrefix} help \"player stats\"`");
                 foreach (var mod in _commandService.Modules.Where(m => m.Parent == null)) {
                     AddHelp(mod, ref output);
                 }
 
                 AddPrefixHelp(output);
-
-                
             } else {
                 var mod = _commandService.Modules.FirstOrDefault(m => m.Name.ToLower() == module.ToLower());
                 if (mod == null) {
@@ -51,7 +50,12 @@ namespace DiscordBotFanatic.Modules {
                 }
 
                 output.Title = mod.Name.Replace("Module", "");
-                output.Description = $"{mod.Summary}\n" + (!string.IsNullOrEmpty(mod.Remarks) ? $"({mod.Remarks})\n" : "") + (mod.Aliases.Any(x => !string.IsNullOrEmpty(x)) ? $"Prefix(es): {string.Join(",", mod.Aliases)}\n" : "") + (mod.Submodules.Any() ? $"Submodules: {mod.Submodules.Select(m => m.Name)}\n" : "") + " ";
+                output.Description = $"{mod.Summary}\n" + (!string.IsNullOrEmpty(mod.Remarks) ? $"({mod.Remarks})\n" : "") +
+                                     (mod.Aliases.Any(x => !string.IsNullOrEmpty(x))
+                                         ? $"Prefix(es): {string.Join(",", mod.Aliases)}\n"
+                                         : "") + (mod.Submodules.Any()
+                                         ? $"Submodules: {mod.Submodules.Select(m => m.Name)}\n"
+                                         : "") + " ";
                 AddCommands(mod, ref output);
                 if (_parametersToOutput.Count > 0) {
                     AddParameterInfo(ref output);
@@ -63,13 +67,91 @@ namespace DiscordBotFanatic.Modules {
             await ReplyAsync("", embed: output.Build());
         }
 
-        private void AddPrefixHelp(EmbedBuilder output) {
-            output.AddField($"Prefixes", $"`{_configuration.CustomPrefix}` or a mention towards me!{Environment.NewLine}For example `{_configuration.CustomPrefix} help`");
-            //output.AddField($"Parameters", $"`{_configuration.CustomPrefix}` or a mention towards me!{Environment.NewLine}For example `{_configuration.CustomPrefix} help`");
+        public static void AddStandardParameterInfo(EmbedBuilder output, string prefix) {
+            output.AddField($"Parameter parsing",
+                $"When you have a text parameter with a space, you need to encase the parameter with quotes.{Environment.NewLine}Example: `{prefix} get \"iron man\"`");
         }
 
-        public static void AddStandardParameterInfo(EmbedBuilder output, string prefix) {
-            output.AddField($"Parameter parsing", $"When you have a text parameter with a space, you need to encase the parameter with quotes.{Environment.NewLine}Example: `{prefix} get \"iron man\"`");
+        //[Command(HelpCommand)]
+        //[Summary(HelpSummary)]
+        //[Alias(HelpAlias)]
+        //public async Task Help(string command) {
+        //    Task.CompletedTask;
+        //}
+
+        public void AddHelp(ModuleInfo module, ref EmbedBuilder builder) {
+            foreach (var sub in module.Submodules) AddHelp(sub, ref builder);
+            builder.AddField(f => {
+                f.Name = $"Module: **{module.Name}**";
+                f.Value = $"Commands: {string.Join(", ", module.Commands.Select(x => $"`{x.Name}`"))}";
+            });
+        }
+
+        public void AddCommands(ModuleInfo module, ref EmbedBuilder builder) {
+            foreach (var command in module.Commands) {
+                command.CheckPreconditionsAsync(Context, _serviceProvider).GetAwaiter().GetResult();
+                AddCommand(command, ref builder);
+            }
+        }
+
+        public void AddCommand(CommandInfo command, ref EmbedBuilder builder) {
+            builder.AddField(f => {
+                f.Name = $"**{command.Name}**";
+                f.Value = $"{command.Summary}\n" + (!string.IsNullOrEmpty(command.Remarks) ? $"({command.Remarks})\n" : "") +
+                          (command.Aliases.Any()
+                              ? $"Chat commands: {string.Join(", ", command.Aliases.Distinct().Select(x => $"`{x}`"))}\n"
+                              : "") +
+                          $"Usage: `{_configuration.CustomPrefix} {GetPrefix(command).Trim()} {GetParameters(command)}`";
+            });
+        }
+
+        public string GetParameters(CommandInfo command) {
+            StringBuilder output = new StringBuilder();
+            if (!command.Parameters.Any()) return output.ToString();
+            foreach (var param in command.Parameters) {
+                if (!_parametersToOutput.ContainsKey(param.Type.FullName ?? string.Empty)) {
+                    _parametersToOutput.Add(param.Type.FullName ?? string.Empty, param.Type);
+                }
+
+                if (param.IsOptional) {
+                    output.Append($"[{param.Name}:{param.Type.ToFriendlyName()}");
+                    if (param.DefaultValue != null &&
+                        (param.Type == typeof(string) && !string.IsNullOrEmpty(param.DefaultValue.ToString()))) {
+                        output.Append($" = {param.DefaultValue}");
+                    }
+
+                    output.Append($"] ");
+                } else if (param.IsMultiple) {
+                    output.Append($"|{param.Name}:{param.Type.ToFriendlyName()}| ");
+                } else if (param.IsRemainder) {
+                    output.Append($"...{param.Name}:{param.Type.ToFriendlyName()} ");
+                } else {
+                    output.Append($"<{param.Name}:{param.Type.ToFriendlyName()}> ");
+                }
+            }
+
+            return output.ToString();
+        }
+
+
+        public string GetPrefix(CommandInfo command) {
+            //var output = GetPrefix(command.Module);
+            //output += $"{command.Aliases.FirstOrDefault()} ";
+            return $"{command.Aliases.FirstOrDefault()} ";
+        }
+
+        public string GetPrefix(ModuleInfo module) {
+            string output = "";
+            if (module.Parent != null) output = $"{GetPrefix(module.Parent)}{output}";
+            if (module.Aliases.Any())
+                output += string.Concat(module.Aliases.FirstOrDefault(), " ");
+            return output;
+        }
+
+        private void AddPrefixHelp(EmbedBuilder output) {
+            output.AddField($"Prefixes",
+                $"`{_configuration.CustomPrefix}` or a mention towards me!{Environment.NewLine}For example `{_configuration.CustomPrefix} help`");
+            //output.AddField($"Parameters", $"`{_configuration.CustomPrefix}` or a mention towards me!{Environment.NewLine}For example `{_configuration.CustomPrefix} help`");
         }
 
         private void AddParameterInfo(ref EmbedBuilder output) {
@@ -159,7 +241,9 @@ namespace DiscordBotFanatic.Modules {
                     builder.Append(string.Join(", ", properties.Select(x => $"**{x.Name}** {x.PropertyType.ToFriendlyName()}")));
 
 
-                    var list = properties.Where(x => !types.ContainsKey(x.PropertyType.FullName ?? string.Empty) && !extraTypes.ContainsKey(x.PropertyType.FullName ?? string.Empty)).ToList();
+                    var list = properties.Where(x =>
+                        !types.ContainsKey(x.PropertyType.FullName ?? string.Empty) &&
+                        !extraTypes.ContainsKey(x.PropertyType.FullName ?? string.Empty)).ToList();
                     Dictionary<string, Type> dictionary = new Dictionary<string, Type>();
                     foreach (var item in list) {
                         if (!dictionary.ContainsKey(item.PropertyType.FullName ?? string.Empty)) {
@@ -182,77 +266,6 @@ namespace DiscordBotFanatic.Modules {
             }
 
             return result;
-        }
-
-        //[Command(HelpCommand)]
-        //[Summary(HelpSummary)]
-        //[Alias(HelpAlias)]
-        //public async Task Help(string command) {
-        //    Task.CompletedTask;
-        //}
-
-        public void AddHelp(ModuleInfo module, ref EmbedBuilder builder) {
-            foreach (var sub in module.Submodules) AddHelp(sub, ref builder);
-            builder.AddField(f => {
-                f.Name = $"Module: **{module.Name}**";
-                f.Value = $"Commands: {string.Join(", ", module.Commands.Select(x => $"`{x.Name}`"))}";
-            });
-        }
-
-        public void AddCommands(ModuleInfo module, ref EmbedBuilder builder) {
-            foreach (var command in module.Commands) {
-                command.CheckPreconditionsAsync(Context, _serviceProvider).GetAwaiter().GetResult();
-                AddCommand(command, ref builder);
-            }
-        }
-
-        public void AddCommand(CommandInfo command, ref EmbedBuilder builder) {
-            builder.AddField(f => {
-                f.Name = $"**{command.Name}**";
-                f.Value = $"{command.Summary}\n" + (!string.IsNullOrEmpty(command.Remarks) ? $"({command.Remarks})\n" : "") + (command.Aliases.Any() ? $"Chat commands: {string.Join(", ", command.Aliases.Distinct().Select(x => $"`{x}`"))}\n" : "") + $"Usage: `{_configuration.CustomPrefix} {GetPrefix(command).Trim()} {GetParameters(command)}`";
-            });
-        }
-
-        public string GetParameters(CommandInfo command) {
-            StringBuilder output = new StringBuilder();
-            if (!command.Parameters.Any()) return output.ToString();
-            foreach (var param in command.Parameters) {
-                if (!_parametersToOutput.ContainsKey(param.Type.FullName ?? string.Empty)) {
-                    _parametersToOutput.Add(param.Type.FullName ?? string.Empty, param.Type);
-                }
-
-                if (param.IsOptional) {
-                    output.Append($"[{param.Name}:{param.Type.ToFriendlyName()}");
-                    if (param.DefaultValue != null && (param.Type == typeof(string) && !string.IsNullOrEmpty(param.DefaultValue.ToString()))) {
-                        output.Append($" = {param.DefaultValue}");
-                    }
-
-                    output.Append($"] ");
-                } else if (param.IsMultiple) {
-                    output.Append($"|{param.Name}:{param.Type.ToFriendlyName()}| ");
-                } else if (param.IsRemainder) {
-                    output.Append($"...{param.Name}:{param.Type.ToFriendlyName()} ");
-                } else {
-                    output.Append($"<{param.Name}:{param.Type.ToFriendlyName()}> ");
-                }
-            }
-
-            return output.ToString();
-        }
-
-
-        public string GetPrefix(CommandInfo command) {
-            //var output = GetPrefix(command.Module);
-            //output += $"{command.Aliases.FirstOrDefault()} ";
-            return $"{command.Aliases.FirstOrDefault()} ";
-        }
-
-        public string GetPrefix(ModuleInfo module) {
-            string output = "";
-            if (module.Parent != null) output = $"{GetPrefix(module.Parent)}{output}";
-            if (module.Aliases.Any())
-                output += string.Concat(module.Aliases.FirstOrDefault(), " ");
-            return output;
         }
 
 
