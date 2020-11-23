@@ -54,9 +54,10 @@ namespace DiscordBotFanatic.Jobs {
                 await channel.SendMessageAsync("", false, builder.Build());
             }
 
-            _ = LogService.Log($"Printed {i - startIndex} achievements.", LogEventLevel.Information, null);
+            var totalPrinted = i - startIndex;
+            _ = LogService.Log($"Printed {totalPrinted} achievements.", LogEventLevel.Information, null);
 
-            if (startIndex != achievements.Count - 1) {
+            if (totalPrinted > 0) {
                 // Updating DB if we printed at least one!
                 jobState.LastPrintedAchievement = achievements.LastOrDefault();
                 Repository.CreateOrUpdateAutomatedJobState(Configuration.GuildId, jobState);
