@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using WiseOldManConnector.Models.WiseOldMan.Enums;
 
 namespace WiseOldManConnector.Models.Output {
-    public class Competition {
+    public class Competition : IBaseConnectorOutput{
         public int Id { get; set; }
         public string Title { get; set; }
         public MetricType Metric { get; set; }

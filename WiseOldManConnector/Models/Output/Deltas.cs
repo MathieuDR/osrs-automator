@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using WiseOldManConnector.Models.WiseOldMan.Enums;
 
 namespace WiseOldManConnector.Models.Output {
-    public class Deltas {
+    public class Deltas : IBaseConnectorOutput{
         public Period Period { get; set; }
         public DateTimeOffset StartDateTime { get; set; }
         public DateTimeOffset EndDateTime { get; set; }

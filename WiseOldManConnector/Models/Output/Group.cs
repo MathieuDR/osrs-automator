@@ -4,7 +4,7 @@ using WiseOldManConnector.Interfaces;
 using WiseOldManConnector.Models.Requests;
 
 namespace WiseOldManConnector.Models.Output {
-    public class Group {
+    public class Group : IBaseConnectorOutput{
         public int Id { get; set; }
         public string Name { get; set; }
         public int Score { get; set; }

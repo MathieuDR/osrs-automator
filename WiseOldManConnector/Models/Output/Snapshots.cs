@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 
 namespace WiseOldManConnector.Models.Output {
-    public class Snapshots{
+    public class Snapshots : IBaseConnectorOutput{
         public List<Snapshot> Day { get; set; }
         public List<Snapshot> Week { get; set; }
         public List<Snapshot> Month { get; set; }

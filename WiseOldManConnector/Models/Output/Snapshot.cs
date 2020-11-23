@@ -4,7 +4,7 @@ using WiseOldManConnector.Helpers;
 using WiseOldManConnector.Models.WiseOldMan.Enums;
 
 namespace WiseOldManConnector.Models.Output {
-    public class Snapshot {
+    public class Snapshot : IBaseConnectorOutput{
         public Dictionary<MetricType, Metric> AllMetrics { get; set; } = new Dictionary<MetricType, Metric>();
 
         public Metric GetMetricForType(MetricType metric) {

@@ -2,7 +2,7 @@
 using WiseOldManConnector.Models.WiseOldMan.Enums;
 
 namespace WiseOldManConnector.Models.Output {
-    public class Player {
+    public class Player : IBaseConnectorOutput{
         public int Id { get; set; }
         public string Username { get; set; }
         public string DisplayName { get; set; }

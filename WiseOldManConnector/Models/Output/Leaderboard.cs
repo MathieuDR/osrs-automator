@@ -2,7 +2,7 @@
 using WiseOldManConnector.Models.WiseOldMan.Enums;
 
 namespace WiseOldManConnector.Models.Output {
-    public abstract class Leaderboard{
+    public abstract class Leaderboard: IBaseConnectorOutput{
         
         /// <summary>
         /// Offset
