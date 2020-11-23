@@ -6,7 +6,6 @@ using System.Threading.Tasks;
 using Discord.Commands;
 using DiscordBotFanatic.Helpers;
 using DiscordBotFanatic.Models.Configuration;
-using DiscordBotFanatic.Models.Enums;
 using DiscordBotFanatic.Modules.DiscordCommandArguments;
 using WiseOldManConnector.Models.WiseOldMan.Enums;
 

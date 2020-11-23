@@ -7,10 +7,10 @@ using WiseOldManConnector.Models.Output;
 
 namespace DiscordBotFanatic.Transformers.TypeConverters {
     public class DeltaLeaderboardToEmbedBuilderConverter : ITypeConverter<DeltaLeaderboard, EmbedBuilder> {
-        private static int _idHash = 3;
-        private static int _idSpace = 5;
-        private static int _nameSpace = 15;
-        private static int _numberSpace = 6;
+        private static readonly int IdHash = 3;
+        private static readonly int IdSpace = 5;
+        private static readonly int NameSpace = 15;
+        private static readonly int NumberSpace = 6;
 
         public EmbedBuilder Convert(DeltaLeaderboard source, EmbedBuilder destination, ResolutionContext context) {
             destination ??= new EmbedBuilder();
@@ -20,8 +20,8 @@ namespace DiscordBotFanatic.Transformers.TypeConverters {
             }
 
             StringBuilder description = new StringBuilder();
-            description.Append("#".PadLeft(_idHash).PadRight(_idSpace));
-            description.Append("Name".PadRight(_nameSpace));
+            description.Append("#".PadLeft(IdHash).PadRight(IdSpace));
+            description.Append("Name".PadRight(NameSpace));
             description.Append("Experience");
             description.Append(Environment.NewLine);
 
@@ -31,9 +31,9 @@ namespace DiscordBotFanatic.Transformers.TypeConverters {
             for (int i = 0; i < bound; i++) {
                 var member = source.Members[i];
 
-                description.Append($"{i + 1}, ".PadLeft(_idSpace));
-                description.Append(member.Player.DisplayName.PadRight(_nameSpace));
-                description.Append(member.Delta.Gained.FormatNumber().PadLeft(_numberSpace) + Environment.NewLine);
+                description.Append($"{i + 1}, ".PadLeft(IdSpace));
+                description.Append(member.Player.DisplayName.PadRight(NameSpace));
+                description.Append(member.Delta.Gained.FormatNumber().PadLeft(NumberSpace) + Environment.NewLine);
             }
 
             destination.Description = $"```{description}```";

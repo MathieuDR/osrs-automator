@@ -3,11 +3,11 @@ using WiseOldManConnectorTests.Fixtures;
 using Xunit;
 
 namespace WiseOldManConnectorTests.Connectors {
-    public class ConnectorTests : IClassFixture<APIFixture> {
+    public class ConnectorTests : IClassFixture<ApiFixture> {
         
         public ServiceProvider ServiceProvider;
 
-        public ConnectorTests(APIFixture fixture) {
+        public ConnectorTests(ApiFixture fixture) {
             ServiceProvider = fixture.ServiceProvider;
         }
     }

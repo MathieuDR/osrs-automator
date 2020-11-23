@@ -6,7 +6,6 @@ using Discord;
 using Discord.Addons.Interactive;
 using Discord.Commands;
 using Discord.WebSocket;
-using DiscordBotFanatic.Models.Exceptions;
 using DiscordBotFanatic.Models.ResponseModels;
 using DiscordBotFanatic.Paginator;
 using DiscordBotFanatic.Services.interfaces;

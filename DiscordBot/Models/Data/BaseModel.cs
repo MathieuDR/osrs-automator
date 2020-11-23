@@ -39,7 +39,7 @@ namespace DiscordBotFanatic.Models.Data {
         }
 
         public virtual Dictionary<string, string> ToDictionary() {
-            var t = this.GetType();
+            var t = GetType();
             PropertyInfo[] props = t.GetProperties();
             var dict = new Dictionary<string, string>();
 

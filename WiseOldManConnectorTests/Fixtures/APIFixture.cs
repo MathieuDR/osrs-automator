@@ -2,8 +2,8 @@
 using WiseOldManConnector.Configuration;
 
 namespace WiseOldManConnectorTests.Fixtures {
-    public class APIFixture {
-        public APIFixture() {
+    public class ApiFixture {
+        public ApiFixture() {
             var serviceCollection = new ServiceCollection();
             serviceCollection.AddWiseOldManApi();
             ServiceProvider = serviceCollection.BuildServiceProvider();

@@ -33,7 +33,7 @@ namespace DiscordBotFanatic.Helpers {
             return builder.AddWiseldManAuthor(decorator.Title, decorator.Link);
         }
 
-        public static EmbedBuilder AddWiseldManAuthor<T>(this EmbedBuilder builder, string title = null,
+        public static EmbedBuilder AddWiseOldManAuthor(this EmbedBuilder builder, string title = null,
             string resourceUrl = null) {
             builder.Author = new EmbedAuthorBuilder() {
                 Name = string.IsNullOrWhiteSpace(title) ? "Wiseoldman.net" : title,
@@ -62,7 +62,7 @@ namespace DiscordBotFanatic.Helpers {
                 IconUrl = context.User.GetAvatarUrl(),
                 Text = footerText
             };
-            ;
+            
             return builder;
         }
 

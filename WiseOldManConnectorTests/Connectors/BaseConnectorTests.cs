@@ -7,7 +7,7 @@ using Xunit;
 
 namespace WiseOldManConnectorTests.Connectors {
     public class BaseConnectorTests : ConnectorTests {
-        public BaseConnectorTests(APIFixture fixture) : base(fixture) {
+        public BaseConnectorTests(ApiFixture fixture) : base(fixture) {
             _playerApi = fixture.ServiceProvider.GetService<IWiseOldManPlayerApi>();
         }
 
@@ -17,9 +17,9 @@ namespace WiseOldManConnectorTests.Connectors {
         public async Task ViewPlayerByInvalidId() {
             int id = -1;
 
-            Task act() => _playerApi.View(id);
+            Task Act() => _playerApi.View(id);
 
-            var exception = await Assert.ThrowsAsync<BadRequestException>(act);
+            var exception = await Assert.ThrowsAsync<BadRequestException>(Act);
 
             Assert.NotNull(exception);
             Assert.NotEmpty(exception.Parameters);

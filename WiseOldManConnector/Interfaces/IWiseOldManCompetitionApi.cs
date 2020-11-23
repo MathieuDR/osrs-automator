@@ -9,7 +9,7 @@ using WiseOldManConnector.Models.WiseOldMan.Enums;
 namespace WiseOldManConnector.Interfaces {
     public interface IWiseOldManCompetitionApi {
 
-        Task<ConnectorCollectionResponse<Competition>> SearchCompetition(Models.Requests.CompetitionRequest request);
+        Task<ConnectorCollectionResponse<Competition>> SearchCompetition(CompetitionRequest request);
         Task<ConnectorCollectionResponse<Competition>> Search(string title);
         Task<ConnectorCollectionResponse<Competition>> Search(string title, int limit, int offset);
         Task<ConnectorCollectionResponse<Competition>> Search(string title, MetricType metric);

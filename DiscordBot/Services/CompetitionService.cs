@@ -58,11 +58,11 @@ namespace DiscordBotFanatic.Services {
         }
 
         public Task<ItemDecorator<Competition>> SetCurrentCompetition(IGuildUser guildUser, string name) {
-            throw new System.NotImplementedException();
+            throw new NotImplementedException();
         }
 
         public Task<ItemDecorator<Competition>> ViewCurrentCompetition(IGuild guild) {
-            throw new System.NotImplementedException();
+            throw new NotImplementedException();
         }
 
 

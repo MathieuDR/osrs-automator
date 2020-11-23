@@ -3,7 +3,6 @@ using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
 using WiseOldManConnector.Interfaces;
 using WiseOldManConnector.Models;
-using WiseOldManConnector.Models.Output.Exceptions;
 using WiseOldManConnector.Models.WiseOldMan.Enums;
 using WiseOldManConnectorTests.Fixtures;
 using Xunit;
@@ -11,7 +10,7 @@ using Record = WiseOldManConnector.Models.Output.Record;
 
 namespace WiseOldManConnectorTests.Connectors {
     public class RecordConnectorTests : ConnectorTests {
-        public RecordConnectorTests(APIFixture fixture) : base(fixture) {
+        public RecordConnectorTests(ApiFixture fixture) : base(fixture) {
             _recordApi = fixture.ServiceProvider.GetService<IWiseOldManRecordApi>();
         }
 

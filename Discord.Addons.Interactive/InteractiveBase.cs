@@ -21,8 +21,8 @@ namespace Discord.Addons.Interactive
         public Task<SocketMessage> NextMessageAsync(bool fromSourceUser = true, bool inSourceChannel = true, TimeSpan? timeout = null, CancellationToken token = default(CancellationToken)) 
             => Interactive.NextMessageAsync(Context, fromSourceUser, inSourceChannel, timeout, token);
 
-        public Task<IUserMessage> ReplyAndDeleteAsync(string content, bool isTTS = false, Embed embed = null, TimeSpan? timeout = null, RequestOptions options = null)
-            => Interactive.ReplyAndDeleteAsync(Context, content, isTTS, embed, timeout, options);
+        public Task<IUserMessage> ReplyAndDeleteAsync(string content, bool isTts = false, Embed embed = null, TimeSpan? timeout = null, RequestOptions options = null)
+            => Interactive.ReplyAndDeleteAsync(Context, content, isTts, embed, timeout, options);
 
         public Task<IUserMessage> PagedReplyAsync(IEnumerable<object> pages, bool fromSourceUser = true)
         {

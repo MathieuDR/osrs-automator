@@ -1,8 +1,5 @@
 ﻿using System.Collections.Generic;
-using Discord;
 using DiscordBotFanatic.Models.Data;
-using LiteDB;
-using WiseOldManConnector.Models.Output;
 using OsrsPlayer = WiseOldManConnector.Models.Output.Player;
 using Player = DiscordBotFanatic.Models.Data.Player;
 

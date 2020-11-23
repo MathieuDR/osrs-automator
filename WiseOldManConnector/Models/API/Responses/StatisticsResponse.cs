@@ -9,7 +9,7 @@ namespace WiseOldManConnector.Models.API.Responses {
         public int MaxedTotalCount { get; set; }
 
         [JsonProperty("maxed200msCount")]
-        public int Maxed200msCount { get; set; }
+        public int Maxed200MsCount { get; set; }
 
         [JsonProperty("averageStats")]
         public WOMSnapshot AverageStats { get; set; }

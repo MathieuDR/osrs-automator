@@ -81,13 +81,13 @@ namespace Discord.Addons.Interactive
         }
 
         public async Task<IUserMessage> ReplyAndDeleteAsync(SocketCommandContext context, 
-            string content, bool isTTS = false, 
+            string content, bool isTts = false, 
             Embed embed = null, 
             TimeSpan? timeout = null, 
             RequestOptions options = null)
         {
             timeout = timeout ?? _defaultTimeout;
-            var message = await context.Channel.SendMessageAsync(content, isTTS, embed, options).ConfigureAwait(false);
+            var message = await context.Channel.SendMessageAsync(content, isTts, embed, options).ConfigureAwait(false);
             _ = Task.Delay(timeout.Value)
                 .ContinueWith(_ => message.DeleteAsync().ConfigureAwait(false))
                 .ConfigureAwait(false);

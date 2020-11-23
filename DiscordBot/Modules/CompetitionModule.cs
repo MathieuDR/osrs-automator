@@ -31,8 +31,7 @@ namespace DiscordBotFanatic.Modules {
                 .AddWiseOldMan(competitionWrappers.FirstOrDefault())
                 .WithTitle($"Current running competitions.")
                 .AddFooterFromMessageAuthor(Context);
-            ;
-
+            
             var message = new CustomPaginatedMessage(builder) {
                 Pages = competitionWrappers.Select(wrapper => wrapper.Item).ToPaginatedStringWithContexts(),
                 Options = new CustomActionsPaginatedAppearanceOptions()

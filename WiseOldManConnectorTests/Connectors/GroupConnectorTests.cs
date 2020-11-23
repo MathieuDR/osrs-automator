@@ -6,7 +6,6 @@ using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
 using WiseOldManConnector.Helpers;
 using WiseOldManConnector.Interfaces;
-using WiseOldManConnector.Models;
 using WiseOldManConnector.Models.Output;
 using WiseOldManConnector.Models.Output.Exceptions;
 using WiseOldManConnector.Models.Requests;
@@ -18,7 +17,7 @@ using Record = WiseOldManConnector.Models.Output.Record;
 
 namespace WiseOldManConnectorTests.Connectors {
     public class GroupConnectorTests : ConnectorTests {
-        public GroupConnectorTests(APIFixture fixture) : base(fixture) {
+        public GroupConnectorTests(ApiFixture fixture) : base(fixture) {
             _groupApi = fixture.ServiceProvider.GetService<IWiseOldManGroupApi>();
         }
 

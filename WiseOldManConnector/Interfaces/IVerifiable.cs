@@ -1,6 +1,4 @@
-﻿using Newtonsoft.Json;
-
-namespace WiseOldManConnector.Models.Requests {
+﻿namespace WiseOldManConnector.Models.Requests {
     internal interface IVerifiable {
         public string VerificationCode { get; set; }
     }

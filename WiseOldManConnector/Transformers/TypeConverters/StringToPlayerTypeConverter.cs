@@ -1,6 +1,5 @@
 ﻿using System;
 using AutoMapper;
-using WiseOldManConnector.Models.Output;
 using WiseOldManConnector.Models.WiseOldMan.Enums;
 
 namespace WiseOldManConnector.Transformers.TypeConverters {

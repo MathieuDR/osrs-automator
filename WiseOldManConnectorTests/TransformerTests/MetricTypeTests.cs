@@ -1,5 +1,4 @@
-﻿using AutoMapper;
-using WiseOldManConnector.Models.WiseOldMan.Enums;
+﻿using WiseOldManConnector.Models.WiseOldMan.Enums;
 using WiseOldManConnectorTests.Fixtures;
 using Xunit;
 

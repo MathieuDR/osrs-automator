@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using WiseOldManConnector.Models.Output;
 
 namespace WiseOldManConnector.Models {
     public class ConnectorCollectionResponse<T> : ConnectorResponseBase {

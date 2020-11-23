@@ -3,8 +3,6 @@ using DiscordBotFanatic.Models.Enums;
 
 namespace DiscordBotFanatic.Models.Data {
     public class AutomatedMessagesConfig {
-        public AutomatedMessagesConfig() { }
-
         public Dictionary<JobType, ChannelJobConfiguration> ChannelJobs { get; set; } =
             new Dictionary<JobType, ChannelJobConfiguration>();
     }

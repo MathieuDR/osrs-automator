@@ -19,7 +19,7 @@ namespace DiscordBotFanatic.Modules {
         private readonly BotConfiguration _configuration;
         private readonly IServiceProvider _serviceProvider;
 
-        private Dictionary<string, Type> _parametersToOutput;
+        private readonly Dictionary<string, Type> _parametersToOutput;
 
         public HelpModule(CommandService commandService, IServiceProvider serviceProvider, BotConfiguration configuration) {
             _commandService = commandService;

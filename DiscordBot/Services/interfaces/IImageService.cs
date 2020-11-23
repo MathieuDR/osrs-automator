@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using Image = Discord.Image;
 
 namespace DiscordBotFanatic.Services.interfaces {

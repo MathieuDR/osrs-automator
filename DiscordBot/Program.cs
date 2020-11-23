@@ -1,29 +1,25 @@
 ﻿using System;
 using System.IO;
 using System.Threading.Tasks;
-using AutoMapper;
 using Discord;
 using Discord.Addons.Interactive;
 using Discord.Commands;
 using Discord.WebSocket;
 using DiscordBotFanatic.Configuration;
-using DiscordBotFanatic.Jobs;
 using DiscordBotFanatic.Models.Configuration;
 using DiscordBotFanatic.Repository;
 using DiscordBotFanatic.Services;
 using DiscordBotFanatic.Services.interfaces;
-using DiscordBotFanatic.Transformers;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Quartz;
-using Quartz.Impl;
 using Serilog;
 using Serilog.Events;
 using Serilog.Formatting.Json;
 using WiseOldManConnector.Configuration;
 
 namespace DiscordBotFanatic {
-    class Program {
+    internal class Program {
         public async Task EntryPointAsync() {
             IConfiguration config = BuildConfig();
             IServiceProvider services = ConfigureServices(config); // No using statement?
@@ -47,7 +43,7 @@ namespace DiscordBotFanatic {
             }
         }
 
-        static void Main() => new Program().EntryPointAsync().GetAwaiter().GetResult();
+        private static void Main() => new Program().EntryPointAsync().GetAwaiter().GetResult();
 
         private async Task ConfigureScheduler(IServiceProvider services) {
             var factory = services.GetRequiredService<ISchedulerFactory>();

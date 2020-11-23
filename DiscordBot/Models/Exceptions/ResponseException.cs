@@ -3,6 +3,11 @@ using Discord.WebSocket;
 
 namespace DiscordBotFanatic.Models.Exceptions {
     public class ResponseException : Exception {
-        public ResponseException(string message, SocketMessage discordMessage) : base(message) { }
+        // ReSharper disable once NotAccessedField.Local
+        private readonly SocketMessage _discordMessage;
+
+        public ResponseException(string message, SocketMessage discordMessage) : base(message) {
+            _discordMessage = discordMessage;
+        }
     }
 }

@@ -4,13 +4,12 @@ using System.Linq;
 using System.Text;
 using DiscordBotFanatic.Models.Decorators;
 using DiscordBotFanatic.Paginator;
-using RestSharp.Extensions;
 using WiseOldManConnector.Models.Output;
 using WiseOldManConnector.Models.WiseOldMan.Enums;
 
 namespace DiscordBotFanatic.Helpers {
     public static class WiseOldManConnectorHelper {
-        private static string _wiseOldManHost = "wiseoldman.net";
+        private static readonly string WiseOldManHost = "wiseoldman.net";
 
         public static string ToPlayerInfoString(this Player player) {
             StringBuilder builder = new StringBuilder();
@@ -136,7 +135,7 @@ namespace DiscordBotFanatic.Helpers {
 
 
         private static UriBuilder GetWomBuilder() {
-            return new UriBuilder("https", _wiseOldManHost);
+            return new UriBuilder("https", WiseOldManHost);
         }
     }
 }

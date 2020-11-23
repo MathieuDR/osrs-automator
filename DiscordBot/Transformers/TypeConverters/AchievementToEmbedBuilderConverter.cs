@@ -1,6 +1,4 @@
-﻿using System;
-using System.Text;
-using AutoMapper;
+﻿using AutoMapper;
 using Discord;
 using DiscordBotFanatic.Helpers;
 using WiseOldManConnector.Helpers;

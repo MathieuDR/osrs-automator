@@ -11,7 +11,7 @@ using Xunit;
 
 namespace WiseOldManConnectorTests.Connectors {
     public class CompetitionConnectorTests : ConnectorTests{
-        public CompetitionConnectorTests(APIFixture fixture) : base(fixture) {
+        public CompetitionConnectorTests(ApiFixture fixture) : base(fixture) {
             _competitionApi = fixture.ServiceProvider.GetRequiredService<IWiseOldManCompetitionApi>();
         }
 

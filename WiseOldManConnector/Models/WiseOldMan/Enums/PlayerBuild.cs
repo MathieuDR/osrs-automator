@@ -4,6 +4,6 @@
         Def1,
         Lvl3,
         Hp10,
-        F2p
+        F2P
     }
 }

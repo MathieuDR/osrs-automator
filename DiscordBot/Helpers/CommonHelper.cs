@@ -8,10 +8,9 @@ namespace DiscordBotFanatic.Helpers {
             var wrapper = new EnumeratorWrapper<T>(source);
             int currentPos = 0;
 
-            T ignore;
             try {
                 wrapper.AddRef();
-                while (wrapper.Get(currentPos, out ignore)) {
+                while (wrapper.Get(currentPos, out _)) {
                     yield return new ChunkedEnumerable<T>(wrapper, chunksize, currentPos);
                     currentPos += chunksize;
                 }

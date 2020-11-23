@@ -13,7 +13,7 @@ using Serilog.Events;
 namespace DiscordBotFanatic.Modules {
     [DontAutoLoad]
     public abstract class BaseWaitMessageEmbeddedResponseModule : BaseEmbeddedResponseModule {
-        private bool _waitMessageHandled = false;
+        private bool _waitMessageHandled;
         private Task<IUserMessage> _waitMessageTask;
 
 

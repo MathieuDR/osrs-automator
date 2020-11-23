@@ -4,7 +4,6 @@ using System.Linq;
 using AutoMapper;
 using WiseOldManConnector.Models.API.Responses;
 using WiseOldManConnector.Models.Output;
-using WiseOldManConnector.Models.WiseOldMan.Enums;
 
 namespace WiseOldManConnector.Transformers.TypeConverters {
     internal class DeltaFullResponseToDeltasConverter : ITypeConverter<DeltaFullResponse, Deltas> {

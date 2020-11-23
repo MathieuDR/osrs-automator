@@ -21,7 +21,7 @@ namespace WiseOldManConnector.Transformers.TypeConverters {
                     "1def" => PlayerBuild.Def1,
                     "lvl3" => PlayerBuild.Lvl3,
                     "10hp" => PlayerBuild.Hp10,
-                    "f2p" => PlayerBuild.F2p,
+                    "f2p" => PlayerBuild.F2P,
                     _ => throw new ArgumentOutOfRangeException(nameof(source), source, null)
                 };
             }

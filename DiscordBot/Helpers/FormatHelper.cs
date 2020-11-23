@@ -1,8 +1,6 @@
-﻿using System;
-using System.Globalization;
+﻿using System.Globalization;
 using System.Linq;
 using WiseOldManConnector.Models.Output;
-using WiseOldManConnector.Models.WiseOldMan.Enums;
 
 namespace DiscordBotFanatic.Helpers {
     public static class FormatHelper {
@@ -33,16 +31,16 @@ namespace DiscordBotFanatic.Helpers {
             return metric.Rank.FormatNumber();
         }
 
-        public static string FormatNumber(this int number, bool ZeroAsStripe = false) {
-            return FormatNumber((long) number, ZeroAsStripe);
+        public static string FormatNumber(this int number, bool zeroAsStripe = false) {
+            return FormatNumber((long) number, zeroAsStripe);
         }
 
-        public static string FormatConditionally(this int number, bool ZeroAsStripe = false) {
+        public static string FormatConditionally(this int number, bool zeroAsStripe = false) {
             return FormatConditionally((long) number);
         }
 
-        public static string FormatNumber(this long number, bool ZeroAsStripe = false) {
-            if (ZeroAsStripe && number == 0) {
+        public static string FormatNumber(this long number, bool zeroAsStripe = false) {
+            if (zeroAsStripe && number == 0) {
                 return "-";
             }
 

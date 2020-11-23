@@ -95,8 +95,8 @@ namespace DiscordBotFanatic.Services.Images {
 
         #region image manipulation helpers
 
-        protected Image ConcatImages(List<Image> images, int maxHorizontal, Size gutter, Size Margin) {
-            return ConcatImages(images, maxHorizontal, gutter.Width, gutter.Height, Margin.Width, Margin.Height);
+        protected Image ConcatImages(List<Image> images, int maxHorizontal, Size gutter, Size margin) {
+            return ConcatImages(images, maxHorizontal, gutter.Width, gutter.Height, margin.Width, margin.Height);
         }
 
         protected Image ConcatImages(List<Image> images, int maxHorizontal, int xGutter, int yGutter, int xMargin, int yMargin) {

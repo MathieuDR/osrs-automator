@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Discord.Commands;
-using Discord.Rest;
 using Discord.WebSocket;
 
 namespace Discord.Addons.Interactive
@@ -47,7 +46,7 @@ namespace Discord.Addons.Interactive
             Message = message;
             Interactive.AddReactionCallback(message, this);
             // Reactions take a while to add, don't wait for them
-            var t_ = Options.AddReactions(message, Context, Pages);
+            var t = Options.AddReactions(message, Context, Pages);
 
             // TODO: (Next major version) timeouts need to be handled at the service-level!
             if (Timeout.HasValue && Timeout.Value != null)

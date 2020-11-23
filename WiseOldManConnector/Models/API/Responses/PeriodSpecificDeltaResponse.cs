@@ -1,6 +1,5 @@
 ﻿using System;
 using Newtonsoft.Json;
-using WiseOldManConnector.Models.WiseOldMan.Enums;
 
 namespace WiseOldManConnector.Models.API.Responses {
     internal class DeltaFullResponse : BaseResponse { // TODO Rename

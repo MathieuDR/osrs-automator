@@ -2,16 +2,16 @@
 using System.Collections.Generic;
 
 namespace DiscordBotFanatic.Helpers {
-    class ChunkedEnumerable<T> : IEnumerable<T> {
-        int chunkSize;
-        int start;
+    internal class ChunkedEnumerable<T> : IEnumerable<T> {
+        private readonly int _chunkSize;
+        private readonly int _start;
 
-        EnumeratorWrapper<T> wrapper;
+        private readonly EnumeratorWrapper<T> _wrapper;
 
         public ChunkedEnumerable(EnumeratorWrapper<T> wrapper, int chunkSize, int start) {
-            this.wrapper = wrapper;
-            this.chunkSize = chunkSize;
-            this.start = start;
+            _wrapper = wrapper;
+            _chunkSize = chunkSize;
+            _start = start;
         }
 
         System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator() {
@@ -22,23 +22,23 @@ namespace DiscordBotFanatic.Helpers {
             return new ChildEnumerator(this);
         }
 
-        class ChildEnumerator : IEnumerator<T> {
-            readonly ChunkedEnumerable<T> _parent;
-            T _current;
-            bool _done;
-            int _position;
+        private class ChildEnumerator : IEnumerator<T> {
+            private readonly ChunkedEnumerable<T> _parent;
+            private T _current;
+            private bool _done;
+            private int _position;
 
 
             public ChildEnumerator(ChunkedEnumerable<T> parent) {
                 _parent = parent;
                 _position = -1;
-                parent.wrapper.AddRef();
+                parent._wrapper.AddRef();
             }
 
             public void Dispose() {
                 if (!_done) {
                     _done = true;
-                    _parent.wrapper.RemoveRef();
+                    _parent._wrapper.RemoveRef();
                 }
             }
 
@@ -49,12 +49,12 @@ namespace DiscordBotFanatic.Helpers {
             public bool MoveNext() {
                 _position++;
 
-                if (_position + 1 > _parent.chunkSize) {
+                if (_position + 1 > _parent._chunkSize) {
                     _done = true;
                 }
 
                 if (!_done) {
-                    _done = !_parent.wrapper.Get(_position + _parent.start, out _current);
+                    _done = !_parent._wrapper.Get(_position + _parent._start, out _current);
                 }
 
                 return !_done;
@@ -77,16 +77,16 @@ namespace DiscordBotFanatic.Helpers {
         }
     }
 
-    class EnumeratorWrapper<T> {
-        Enumeration _currentEnumeration;
+    internal class EnumeratorWrapper<T> {
+        private Enumeration _currentEnumeration;
 
-        int _refs;
+        private int _refs;
 
         public EnumeratorWrapper(IEnumerable<T> source) {
             SourceEumerable = source;
         }
 
-        IEnumerable<T> SourceEumerable { get; set; }
+        private IEnumerable<T> SourceEumerable { get; set; }
 
         public bool Get(int pos, out T item) {
             if (_currentEnumeration != null && _currentEnumeration.Position > pos) {
@@ -131,7 +131,7 @@ namespace DiscordBotFanatic.Helpers {
             }
         }
 
-        class Enumeration {
+        private class Enumeration {
             public IEnumerator<T> Source { get; set; }
             public int Position { get; set; }
             public bool AtEnd { get; set; }

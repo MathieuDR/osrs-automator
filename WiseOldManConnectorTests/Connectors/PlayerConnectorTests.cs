@@ -1,5 +1,4 @@
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
@@ -18,7 +17,7 @@ using Record = WiseOldManConnector.Models.Output.Record;
 
 namespace WiseOldManConnectorTests.Connectors {
     public class PlayerConnectorTests : ConnectorTests {
-        public PlayerConnectorTests(APIFixture fixture) : base(fixture) {
+        public PlayerConnectorTests(ApiFixture fixture) : base(fixture) {
             _playerApi = fixture.ServiceProvider.GetService<IWiseOldManPlayerApi>();
         }
 
@@ -225,7 +224,7 @@ namespace WiseOldManConnectorTests.Connectors {
         public async Task SearchPlayerWithInvalidUsernameResultsEmptyCollection() {
             string username = "sghsdfgwe";
 
-            ConnectorCollectionResponse<WiseOldManConnector.Models.Output.Player> response = await _playerApi.Search(username);
+            ConnectorCollectionResponse<Player> response = await _playerApi.Search(username);
 
             Assert.NotNull(response);
             Assert.NotNull(response.Data);
@@ -243,7 +242,7 @@ namespace WiseOldManConnectorTests.Connectors {
         public async Task SearchPlayerWithSpecificUsernameResultsIntoCollectionWithOnePlayer() {
             string username = TestConfiguration.ValidPlayerUsernameWithValidCapatilization;
 
-            ConnectorCollectionResponse<WiseOldManConnector.Models.Output.Player> response = await _playerApi.Search(username);
+            ConnectorCollectionResponse<Player> response = await _playerApi.Search(username);
 
             Assert.NotNull(response);
             Assert.NotNull(response.Data);
@@ -275,7 +274,7 @@ namespace WiseOldManConnectorTests.Connectors {
         public async Task SearchPlayerWithUnspecificUserNameResultsInCollectionWithMultiplePlayers() {
             string username = "iron";
 
-            ConnectorCollectionResponse<WiseOldManConnector.Models.Output.Player> response = await _playerApi.Search(username);
+            ConnectorCollectionResponse<Player> response = await _playerApi.Search(username);
 
             Assert.NotNull(response);
             Assert.NotNull(response.Data);
@@ -287,7 +286,7 @@ namespace WiseOldManConnectorTests.Connectors {
         public async Task SearchPlayerWithUsernameResultsIntoCollectionWithPlayer() {
             string username = TestConfiguration.ValidPlayerUsernameWithValidCapatilization;
 
-            ConnectorCollectionResponse<WiseOldManConnector.Models.Output.Player> response = await _playerApi.Search(username);
+            ConnectorCollectionResponse<Player> response = await _playerApi.Search(username);
 
             Assert.NotNull(response);
             Assert.NotNull(response.Data);
@@ -425,7 +424,7 @@ namespace WiseOldManConnectorTests.Connectors {
         [Fact]
         public async Task TrackingMultipleTimesInShortPeriodResultsInException() {
             string username = TestConfiguration.SecondaryValidPlayerUserName;
-            ConnectorResponse<WiseOldManConnector.Models.Output.Player> response = await _playerApi.Track(username);
+            ConnectorResponse<Player> response = await _playerApi.Track(username);
             Assert.NotNull(response);
             Assert.NotNull(response.Data);
             Assert.Equal(username, response.Data.Username, StringComparer.InvariantCultureIgnoreCase);
@@ -438,7 +437,7 @@ namespace WiseOldManConnectorTests.Connectors {
         [Fact]
         public async Task TrackingPlayerByUsernameResultsInPlayer() {
             string username = TestConfiguration.ValidPlayerUsernameWithValidCapatilization;
-            ConnectorResponse<WiseOldManConnector.Models.Output.Player> response = await _playerApi.Track(username);
+            ConnectorResponse<Player> response = await _playerApi.Track(username);
             Assert.NotNull(response);
             Assert.NotNull(response.Data);
             Assert.Equal(username, response.Data.Username, StringComparer.InvariantCultureIgnoreCase);
@@ -573,7 +572,7 @@ namespace WiseOldManConnectorTests.Connectors {
         public async Task ViewPlayerByUsernameResultsIntoPlayerWithSameUsername() {
             string username = TestConfiguration.ValidPlayerUsernameWithValidCapatilization;
 
-            ConnectorResponse<WiseOldManConnector.Models.Output.Player> response = await _playerApi.View(username);
+            ConnectorResponse<Player> response = await _playerApi.View(username);
 
             Assert.NotNull(response);
             Assert.NotNull(response.Data);
@@ -584,7 +583,7 @@ namespace WiseOldManConnectorTests.Connectors {
         public async Task ViewPlayerSnapshotHasAllMetrics() {
             int id = TestConfiguration.ValidPlayerId;
 
-            ConnectorResponse<WiseOldManConnector.Models.Output.Player> response = await _playerApi.View(id);
+            ConnectorResponse<Player> response = await _playerApi.View(id);
 
 
             var types = EnumHelper.GetMetricTypes(MetricTypeCategory.All);

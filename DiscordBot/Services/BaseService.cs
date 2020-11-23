@@ -1,5 +1,4 @@
-﻿using DiscordBotFanatic.Models.Decorators;
-using DiscordBotFanatic.Services.interfaces;
+﻿using DiscordBotFanatic.Services.interfaces;
 
 namespace DiscordBotFanatic.Services {
     public abstract class BaseService {

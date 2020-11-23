@@ -5,7 +5,6 @@ using Discord;
 using Discord.Commands;
 using Discord.WebSocket;
 using DiscordBotFanatic.Services.interfaces;
-using Serilog;
 using Serilog.Events;
 
 namespace DiscordBotFanatic.Services {

@@ -10,7 +10,7 @@ using DiscordBotFanatic.Models.ResponseModels;
 
 namespace DiscordBotFanatic.Paginator {
     public class ImagePaginatedMessageCallback : PaginatedMessageCallback {
-        private string _footerBuilderTemplate;
+        private readonly string _footerBuilderTemplate;
 
         public ImagePaginatedMessageCallback(InteractiveService interactive, SocketCommandContext sourceContext,
             PaginatedMessage pager, ICriterion<SocketReaction> criterion = null) : base(interactive, sourceContext, pager,
