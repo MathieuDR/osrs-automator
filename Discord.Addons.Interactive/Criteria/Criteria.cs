@@ -2,7 +2,7 @@
 using System.Threading.Tasks;
 using Discord.Commands;
 
-namespace Discord.Addons.Interactive
+namespace Discord.Addons.Interactive.Criteria
 {
     public class Criteria<T> : ICriterion<T>
     {

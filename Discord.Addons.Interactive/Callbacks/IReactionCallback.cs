@@ -1,9 +1,10 @@
 ﻿using System;
 using System.Threading.Tasks;
+using Discord.Addons.Interactive.Criteria;
 using Discord.Commands;
 using Discord.WebSocket;
 
-namespace Discord.Addons.Interactive
+namespace Discord.Addons.Interactive.Callbacks
 {
     public interface IReactionCallback
     {

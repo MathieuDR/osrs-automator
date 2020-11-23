@@ -2,6 +2,9 @@
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
+using Discord.Addons.Interactive.Callbacks;
+using Discord.Addons.Interactive.Criteria;
+using Discord.Addons.Interactive.Paginator;
 using Discord.Commands;
 using Discord.WebSocket;
 

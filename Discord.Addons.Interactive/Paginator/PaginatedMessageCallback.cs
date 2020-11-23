@@ -2,10 +2,12 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Discord.Addons.Interactive.Callbacks;
+using Discord.Addons.Interactive.Criteria;
 using Discord.Commands;
 using Discord.WebSocket;
 
-namespace Discord.Addons.Interactive
+namespace Discord.Addons.Interactive.Paginator
 {
     public class PaginatedMessageCallback : IReactionCallback
     {
@@ -46,15 +48,15 @@ namespace Discord.Addons.Interactive
             Message = message;
             Interactive.AddReactionCallback(message, this);
             // Reactions take a while to add, don't wait for them
-            var t = Options.AddReactions(message, Context, Pages);
+            _ = Options.AddReactions(message, Context, Pages);
 
             // TODO: (Next major version) timeouts need to be handled at the service-level!
-            if (Timeout.HasValue && Timeout.Value != null)
+            if (Timeout != null)
             {
                 _ = Task.Delay(Timeout.Value).ContinueWith(_ =>
                 {
                     Interactive.RemoveReactionCallback(message);
-                    _ = Message.DeleteAsync();
+                    Message.DeleteAsync();
                 });
             }
         }

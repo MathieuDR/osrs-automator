@@ -4,6 +4,8 @@ using System.Threading.Tasks;
 using AutoMapper;
 using Discord;
 using Discord.Addons.Interactive;
+using Discord.Addons.Interactive.Criteria;
+using Discord.Addons.Interactive.Paginator;
 using Discord.Commands;
 using Discord.WebSocket;
 using DiscordBotFanatic.Models.ResponseModels;

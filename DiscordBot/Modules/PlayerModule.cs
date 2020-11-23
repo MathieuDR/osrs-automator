@@ -54,7 +54,7 @@ namespace DiscordBotFanatic.Modules {
         [RequireContext(ContextType.Guild)]
         public async Task CycleThroughNames() {
             var accountDecorators = await _playerService.GetAllOsrsAccounts(GetGuildUser());
-            var pages = accountDecorators.Select(x => x.Item.ToPlayerInfoString()).ToList();
+            var pages = accountDecorators.Select(x => x.Item.DisplayName).ToList();
 
             if (!pages.Any()) {
                 // we want to update actually.

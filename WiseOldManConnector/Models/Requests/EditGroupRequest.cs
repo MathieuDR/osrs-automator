@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using Newtonsoft.Json;
+using WiseOldManConnector.Interfaces;
 
 namespace WiseOldManConnector.Models.Requests {
     public class EditGroupRequest : CreateGroupRequest, IVerifiable {

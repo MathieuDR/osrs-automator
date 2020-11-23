@@ -3,7 +3,7 @@ using System.Threading.Tasks;
 using Discord.Commands;
 using Discord.Rest;
 
-namespace Discord.Addons.Interactive
+namespace Discord.Addons.Interactive.Paginator
 {
     public class PaginatedAppearanceOptions
     {
@@ -35,9 +35,7 @@ namespace Discord.Addons.Interactive
                 await message.AddReactionAsync(Next);
                 await message.AddReactionAsync(Last);
 
-                var manageMessages = (context.Channel is IGuildChannel guildChannel)
-                    ? (context.User as IGuildUser).GetPermissions(guildChannel).ManageMessages
-                    : false;
+                var manageMessages = (context.Channel is IGuildChannel guildChannel) && ((IGuildUser) context.User).GetPermissions(guildChannel).ManageMessages;
 
                 if (JumpDisplayOptions == JumpDisplayOptions.Always
                     || (JumpDisplayOptions == JumpDisplayOptions.WithManageMessages && manageMessages))

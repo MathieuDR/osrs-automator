@@ -8,15 +8,6 @@ namespace DiscordBotFanatic.Helpers {
             builder.AddField("\u200B", "\u200B", inline);
         }
 
-        public static async Task AddPagingEmojis(this IMessage message, bool trash = false) {
-            var leftEmoji = Emote.Parse("\u2190");
-            var rightEmoji = Emote.Parse("\u2192");
-            var trashEmoji = Emote.Parse("\U0001F5D1");
-            await message.AddReactionAsync(leftEmoji, RequestOptions.Default);
-            await message.AddReactionAsync(trashEmoji, RequestOptions.Default);
-            await message.AddReactionAsync(rightEmoji, RequestOptions.Default);
-        }
-
         public static CustomPaginatedMessage AddPagingToFooter(this CustomPaginatedMessage message) {
             message.EmbedWrapper.Footer ??= new EmbedFooterBuilder();
             string whitespace = " ";

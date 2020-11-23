@@ -2,7 +2,7 @@
 using Discord.Commands;
 using Discord.WebSocket;
 
-namespace Discord.Addons.Interactive
+namespace Discord.Addons.Interactive.Criteria
 {
     public class EnsureIsIntegerCriterion : ICriterion<SocketMessage>
     {

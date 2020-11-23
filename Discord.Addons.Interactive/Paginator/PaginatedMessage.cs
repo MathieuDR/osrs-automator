@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace Discord.Addons.Interactive
+namespace Discord.Addons.Interactive.Paginator
 {
     public class PaginatedMessage
     {

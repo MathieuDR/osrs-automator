@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using WiseOldManConnector.Interfaces;
 using WiseOldManConnector.Models.Requests;
 
 namespace WiseOldManConnector.Models.Output {

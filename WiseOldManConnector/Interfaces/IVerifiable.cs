@@ -1,4 +1,4 @@
-﻿namespace WiseOldManConnector.Models.Requests {
+﻿namespace WiseOldManConnector.Interfaces {
     internal interface IVerifiable {
         public string VerificationCode { get; set; }
     }

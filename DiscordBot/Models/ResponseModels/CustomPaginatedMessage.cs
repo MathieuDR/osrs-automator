@@ -1,5 +1,6 @@
 ﻿using Discord;
 using Discord.Addons.Interactive;
+using Discord.Addons.Interactive.Paginator;
 using DiscordBotFanatic.Helpers;
 
 namespace DiscordBotFanatic.Models.ResponseModels {
