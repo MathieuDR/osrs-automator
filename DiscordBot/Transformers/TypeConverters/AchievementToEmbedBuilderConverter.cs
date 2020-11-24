@@ -22,9 +22,7 @@ namespace DiscordBotFanatic.Transformers.TypeConverters {
                 .WithImageUrl($"https://wiseoldman.net/img/runescape/backgrounds/{metricWomBackground}.png");
 
 
-            if (string.IsNullOrEmpty(destination.Title)) {
-                destination.Title = $"New achievement for {source.Player.DisplayName}!";
-            }
+            
 
             DeltaType typeOfMetric = context.Mapper.Map<DeltaType>(source.Metric);
 
@@ -57,8 +55,9 @@ namespace DiscordBotFanatic.Transformers.TypeConverters {
                     break;
             }
 
-            destination.Description = $"{source.Player.DisplayName} just got {source.Title.ToLowerInvariant()}{append}.";
 
+            destination.Description = "";
+            destination.Title = $"{source.Player.DisplayName} just got {source.Title.ToLowerInvariant()}{append}.";
             destination.AddField("Achieved at", source.AchievedAt.Value.ToString("dddd, dd/MM/yyyy"), true);
             destination.AddField("Metric", source.Metric, true);
 
