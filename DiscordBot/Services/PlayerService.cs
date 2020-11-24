@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Threading.Tasks;
@@ -38,7 +39,7 @@ namespace DiscordBotFanatic.Services {
             var coupledUser = _repository.GetPlayerByOsrsAccount(discordUser.GuildId, osrsPlayer.Id);
 
             if (coupledUser != null) {
-                UpdateExistingPlayerOsrsAccount(discordUser.GuildId, coupledUser, osrsPlayer);
+                //UpdateExistingPlayerOsrsAccount(discordUser.GuildId, coupledUser, osrsPlayer);
                 throw new ValidationException($"User {proposedOsrsName} is already registered on this server.");
             }
 
@@ -47,7 +48,40 @@ namespace DiscordBotFanatic.Services {
         }
 
         public Task<IEnumerable<ItemDecorator<Player>>> GetAllOsrsAccounts(IGuildUser user) {
-            var accounts = _repository.GetPlayerById(user.GuildId, user.Id)?.CoupledOsrsAccounts.AsEnumerable();
+            var player = _repository.GetPlayerById(user.GuildId, user.Id);
+
+            if (player == null) {
+                return Task.FromResult(new List<ItemDecorator<Player>>().AsEnumerable());
+            }
+
+            var accounts = player.CoupledOsrsAccounts;
+            var tasks = new List<Task>();
+
+            for (var i = 0; i < accounts.Count; i++) {
+                var index = i;
+                var account = accounts[i];
+
+                //if (account.UpdatedAt.AddDays(7) > DateTimeOffset.Now && account.LatestSnapshot != null) {
+                //    continue;
+                //}
+
+                // Account is 7 days old, or doesn't have a snapshot.
+                var task = _osrsHighscoreService.GetPlayerById(account.Id).ContinueWith(antecedent => {
+                    var p = antecedent.Result;
+                    accounts[index] = p;
+                    Console.WriteLine($"i: {index}");
+                });
+
+                tasks.Add(task);
+            }
+
+            if (tasks.Any()) {
+                Task.WaitAll(tasks.ToArray());
+
+                player.CoupledOsrsAccounts = accounts.ToList();
+                _repository.UpdateOrInsertPlayerForGuild(user.GuildId, player);
+            }
+
             return Task.FromResult(accounts.Decorate());
         }
 

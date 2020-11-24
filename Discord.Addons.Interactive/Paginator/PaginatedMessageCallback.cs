@@ -19,6 +19,8 @@ namespace Discord.Addons.Interactive.Paginator
         public ICriterion<SocketReaction> Criterion => _criterion;
         public TimeSpan? Timeout => Options.Timeout;
 
+        public DateTimeOffset LastInteraction { get; set; } = DateTimeOffset.Now;
+
         private readonly ICriterion<SocketReaction> _criterion;
         protected readonly PaginatedMessage Pager;
 
@@ -53,16 +55,29 @@ namespace Discord.Addons.Interactive.Paginator
             // TODO: (Next major version) timeouts need to be handled at the service-level!
             if (Timeout != null)
             {
-                _ = Task.Delay(Timeout.Value).ContinueWith(_ =>
-                {
-                    Interactive.RemoveReactionCallback(message);
-                    Message.DeleteAsync();
-                });
+                _ = Task.Delay(Timeout.Value).ContinueWith(_ => TimeOutHandler());
             }
+        }
+
+        public virtual Task TimeOutHandler() {
+            if (!Timeout.HasValue) {
+                return Task.CompletedTask;
+            }
+
+            if (LastInteraction.Add(Timeout.Value) > DateTimeOffset.Now) {
+                _ = Task.Delay(Timeout.Value).ContinueWith(_ => TimeOutHandler());
+                return Task.CompletedTask;
+            }
+
+            Interactive.RemoveReactionCallback(Message);
+            _ = Message.RemoveAllReactionsAsync().ConfigureAwait(false);
+            return Task.CompletedTask;
         }
 
         public virtual async Task<bool> HandleCallbackAsync(SocketReaction reaction)
         {
+            LastInteraction = DateTimeOffset.Now;
+            
             var emote = reaction.Emote;
             _ = Message.RemoveReactionAsync(reaction.Emote, reaction.User.Value);
 
@@ -82,9 +97,9 @@ namespace Discord.Addons.Interactive.Paginator
             }
             else if (emote.Equals(Options.Last))
                 Page = Pages;
-            else if (emote.Equals(Options.Stop))
-            {
-                await Message.DeleteAsync().ConfigureAwait(false);
+            else if (emote.Equals(Options.Stop)) {
+                Interactive.RemoveReactionCallback(Message);
+                await Message.RemoveAllReactionsAsync().ConfigureAwait(false);
                 return true;
             }
             else if (emote.Equals(Options.Jump))

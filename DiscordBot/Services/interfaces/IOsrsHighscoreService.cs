@@ -15,5 +15,6 @@ namespace DiscordBotFanatic.Services.interfaces {
         Task<DeltaLeaderboard> GetTopDeltasOfGroup(int groupId, MetricType metricType, Period period);
         Task<IEnumerable<Achievement>> GetGroupAchievements(int groupId);
         Task<MessageResponse> UpdateGroup(int groupId);
+        Task<Player> GetPlayerById(int playerId);
     }
 }

@@ -23,10 +23,15 @@ namespace DiscordBotFanatic.Services {
 
         public async Task<Player> GetPlayersForUsername(string username) {
             var response = await _playerApi.Search(username);
-            if (response.Data.Count() == 1) {
-                return response.Data.FirstOrDefault();
-            } else if (response.Data.Count() > 1) {
-                throw new Exception($"Too many result with the search parameter {username}");
+
+            var queried = response.Data.Where(x => x.Username.ToLowerInvariant() == username.ToLowerInvariant()).ToList();
+            
+            if (queried.Count() == 1) {
+                return queried.FirstOrDefault();
+            }
+
+            if (response.Data.Count() > 1) {
+                throw new Exception($"Too many result with the search parameter {username}, but none specific.");
             }
 
             var trackingResponse = await _playerApi.Track(username);
@@ -71,6 +76,10 @@ namespace DiscordBotFanatic.Services {
 
         public async Task<MessageResponse> UpdateGroup(int groupId) {
             return (await _groupApi.Update(groupId)).Data;
+        }
+
+        public async Task<Player> GetPlayerById(int playerId) {
+            return (await _playerApi.View(playerId)).Data;
         }
     }
 }

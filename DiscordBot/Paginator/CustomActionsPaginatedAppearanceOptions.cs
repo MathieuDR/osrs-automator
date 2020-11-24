@@ -1,6 +1,6 @@
-﻿using System.Threading.Tasks;
+﻿using System;
+using System.Threading.Tasks;
 using Discord;
-using Discord.Addons.Interactive;
 using Discord.Addons.Interactive.Paginator;
 using Discord.Commands;
 using Discord.Rest;
@@ -17,6 +17,7 @@ namespace DiscordBotFanatic.Paginator {
         public CustomActionsPaginatedAppearanceOptions() {
             JumpDisplayOptions = JumpDisplayOptions.Never;
             DisplayInformationIcon = false;
+            Timeout = TimeSpan.FromMinutes(1);
         }
 
         public PerformAction Delete { get; set; }

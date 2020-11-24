@@ -336,7 +336,7 @@ namespace WiseOldManConnectorTests.Connectors {
             Assert.Equal(metric, highscore.MetricType);
             Assert.True(highscore.Metric.Level > 1 && highscore.Metric.Level < 100);
             Assert.True(highscore.Metric.Rank > 0);
-            Assert.True(highscore.Metric.Experience > 1);
+            Assert.True(highscore.Metric.Value > 1);
         }
 
         [Fact]

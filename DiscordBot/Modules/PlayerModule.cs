@@ -9,6 +9,7 @@ using DiscordBotFanatic.Models.Configuration;
 using DiscordBotFanatic.Models.ResponseModels;
 using DiscordBotFanatic.Paginator;
 using DiscordBotFanatic.Services.interfaces;
+using WiseOldManConnector.Models.WiseOldMan.Enums;
 
 namespace DiscordBotFanatic.Modules {
     [Name("Player module")]
@@ -61,7 +62,15 @@ namespace DiscordBotFanatic.Modules {
                 return;
             }
 
-            var pages = accountDecorators.Select(x => x.Item.DisplayName).ToList();
+            var pages = accountDecorators.Select(x => new EmbedBuilder()
+                .AddWiseOldMan(x)
+                .WithMessageAuthorFooter(Context)
+                //.WithDescription($"Oldschool runescape username: {x.Item.DisplayName}.")
+                .WithThumbnailUrl(x.Item.Type.WiseOldManIconUrl())
+                .AddField("Combat", x.Item.CombatLevel, true)
+                //.AddField("Overall", x.Item.LatestSnapshot.GetMetricForType(MetricType.Overall).Level, true)
+                .AddField("Mode", x.Item.Type, true)
+                .AddField("Build", x.Item.Build, true)).ToList();
 
             var message = new CustomPaginatedMessage(new EmbedBuilder().AddCommonProperties().WithMessageAuthorFooter(Context)) {
                 Pages = pages,

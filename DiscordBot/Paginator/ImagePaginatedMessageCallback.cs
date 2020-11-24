@@ -58,27 +58,27 @@ namespace DiscordBotFanatic.Paginator {
             return await base.HandleCallbackAsync(reaction);
         }
 
-        protected override Embed BuildEmbed() {
-            if (Pager is CustomPaginatedMessage customPaginated) {
-                customPaginated.EmbedWrapper.Footer.Text = string.Format(_footerBuilderTemplate, Page, Pages);
+        //protected override Embed BuildEmbed() {
+        //    if (Pager is CustomPaginatedMessage customPaginated) {
+        //        customPaginated.EmbedWrapper.Footer.Text = string.Format(_footerBuilderTemplate, Page, Pages);
 
-                if (Pager.Pages is IEnumerable<EmbedFieldBuilder> efb) {
-                    customPaginated.EmbedWrapper.Fields =
-                        efb.Skip((Page - 1) * Options.FieldsPerPage).Take(Options.FieldsPerPage).ToList();
-                    customPaginated.EmbedWrapper.Description = Pager.AlternateDescription;
-                } else {
-                    customPaginated.EmbedWrapper.Description = Pager.Pages.ElementAt(Page - 1).ToString();
-                }
+        //        if (Pager.Pages is IEnumerable<EmbedFieldBuilder> efb) {
+        //            customPaginated.EmbedWrapper.Fields =
+        //                efb.Skip((Page - 1) * Options.FieldsPerPage).Take(Options.FieldsPerPage).ToList();
+        //            customPaginated.EmbedWrapper.Description = Pager.AlternateDescription;
+        //        } else {
+        //            customPaginated.EmbedWrapper.Description = Pager.Pages.ElementAt(Page - 1).ToString();
+        //        }
 
-                return customPaginated.EmbedWrapper.Build();
-            } else {
-                return base.BuildEmbed();
-            }
+        //        return customPaginated.EmbedWrapper.Build();
+        //    } else {
+        //        return base.BuildEmbed();
+        //    }
 
-            //var embed = base.BuildEmbed();
-            //var builder = embed.ToEmbedBuilder();
-            //builder.Description += "_CUSTOM";
-            //return builder.Build();
-        }
+        //    //var embed = base.BuildEmbed();
+        //    //var builder = embed.ToEmbedBuilder();
+        //    //builder.Description += "_CUSTOM";
+        //    //return builder.Build();
+        //}
     }
 }

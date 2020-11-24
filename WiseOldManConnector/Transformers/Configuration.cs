@@ -23,6 +23,13 @@ namespace WiseOldManConnector.Transformers {
                 cfg.CreateMap<Models.API.Responses.Metric, Metric>();
                 cfg.CreateMap<WOMSnapshot, Snapshot>()
                     .ForMember(dest => dest.AllMetrics, opt => opt.MapFrom<MetricToDictionaryResolver>());
+                
+                cfg.CreateMap<Models.API.Responses.Metric, Metric>()
+                    .ForMember(dest => dest.EffectiveHours,
+                        opt => opt.MapFrom(src => src.EffectiveHoursBossing ?? src.EffectiveHoursPlaying))
+                    .ForMember(dest => dest.Value,
+                        opt => opt.MapFrom(src => src.Score ?? src.Kills ?? src.Experience));
+                    
 
                 cfg.CreateMap<WOMCompetition, Competition>()
                     .ForMember(dest => dest.StartDate, opt => opt.MapFrom(src => src.StartsAt))

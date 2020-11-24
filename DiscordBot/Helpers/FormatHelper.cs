@@ -20,11 +20,11 @@ namespace DiscordBotFanatic.Helpers {
         };
 
         public static string ToLevel(this Metric metric) {
-            return metric.Experience.ToLevel().ToString();
+            return metric.Value.ToLevel().ToString();
         }
 
         public static string FormattedExperience(this Metric metric) {
-            return metric.Experience.FormatNumber();
+            return metric.Value.FormatNumber();
         }
 
         public static string FormattedRank(this Metric metric) {
