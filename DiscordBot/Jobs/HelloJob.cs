@@ -17,7 +17,7 @@ namespace DiscordBotFanatic.Jobs {
         }
 
         public async Task Execute(IJobExecutionContext context) {
-            await _service.Log("Greetings from HelloJob!", LogEventLevel.Information, null);
+            await _service.Log("Automated Hello from Hello BleuJob!", LogEventLevel.Information, null);
 
             if (_discord.ConnectionState == ConnectionState.Connected) {
                 await _service.Log("Connected", LogEventLevel.Information, null);
@@ -27,7 +27,7 @@ namespace DiscordBotFanatic.Jobs {
                     var channel = guild.Channels.FirstOrDefault(c => c.Name.Contains("botssetup")) as ISocketMessageChannel;
 
                     if (channel != null) {
-                        //await channel.SendMessageAsync("HELLO FROM JOB!");
+                        //await channel.SendMessageAsync("HELLO FROM JARIGE BLOJOB!");
                         await _service.Log("Would send message but nah", LogEventLevel.Information, null);
                     } else {
                         await _service.Log("Cannot find channel", LogEventLevel.Information, null);
