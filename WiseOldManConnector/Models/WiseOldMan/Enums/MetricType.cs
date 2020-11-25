@@ -221,5 +221,11 @@ namespace WiseOldManConnector.Models.WiseOldMan.Enums {
 
         [EnumMember(Value = "combat")]
         Combat,
+
+        [EnumMember(Value = "ehp")]
+        EffectiveHoursPlaying,
+
+        [EnumMember(Value = "ehb")]
+        EffectiveHoursBossing,
     }
 }

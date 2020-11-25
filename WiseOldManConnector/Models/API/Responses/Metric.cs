@@ -15,9 +15,9 @@ namespace WiseOldManConnector.Models.API.Responses {
         public int? Experience { get; set; }
 
         [JsonProperty("ehp")]
-        public int? EffectiveHoursPlaying { get; set; }
+        public double? EffectiveHoursPlaying { get; set; }
 
         [JsonProperty("ehb")]
-        public int? EffectiveHoursBossing { get; set; }
+        public double? EffectiveHoursBossing { get; set; }
     }
 }

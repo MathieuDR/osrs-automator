@@ -68,8 +68,9 @@ namespace DiscordBotFanatic.Services {
                 // Account is 7 days old, or doesn't have a snapshot.
                 var task = _osrsHighscoreService.GetPlayerById(account.Id).ContinueWith(antecedent => {
                     var p = antecedent.Result;
-                    accounts[index] = p;
-                    Console.WriteLine($"i: {index}");
+                    if (p != null) {
+                        accounts[index] = p;
+                    }
                 });
 
                 tasks.Add(task);

@@ -21,6 +21,7 @@ namespace WiseOldManConnector.Transformers {
                 //cfg.CreateMap<string, MetricType>().ConvertUsing<StringToMetricTypeConverter>();
                 cfg.CreateMap<PlayerResponse, Player>();
                 cfg.CreateMap<Models.API.Responses.Metric, Metric>();
+
                 cfg.CreateMap<WOMSnapshot, Snapshot>()
                     .ForMember(dest => dest.AllMetrics, opt => opt.MapFrom<MetricToDictionaryResolver>());
                 

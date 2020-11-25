@@ -79,7 +79,8 @@ namespace DiscordBotFanatic.Services {
         }
 
         public async Task<Player> GetPlayerById(int playerId) {
-            return (await _playerApi.View(playerId)).Data;
+            var response = (await _playerApi.View(playerId));
+            return response.Data;
         }
     }
 }

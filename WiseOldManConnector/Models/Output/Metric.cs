@@ -3,6 +3,6 @@
         public int Rank { get; set; }
         public int Value { get; set; }
         public int Level { get; set; }
-        public int EffectiveHours { get; set; }
+        public double EffectiveHours { get; set; }
     }
 }

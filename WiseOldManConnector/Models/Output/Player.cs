@@ -16,6 +16,10 @@ namespace WiseOldManConnector.Models.Output {
         public Snapshot LatestSnapshot { get; set; }
         public int OverallExperience { get; set; }
         public GroupRole? Role{ get; set; }
+        public double EffectiveHoursPlayer { get; set; }
+        public double EffectiveHoursBossed { get; set; }
+        public double TimeToMax { get; set; }
+        public double TimeTo200m { get; set; }
 
     }
 }
