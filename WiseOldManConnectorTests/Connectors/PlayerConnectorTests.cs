@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using AutoMapper;
 using Microsoft.Extensions.DependencyInjection;
 using WiseOldManConnector.Helpers;
 using WiseOldManConnector.Interfaces;
@@ -584,13 +585,25 @@ namespace WiseOldManConnectorTests.Connectors {
             int id = TestConfiguration.ValidPlayerId;
 
             ConnectorResponse<Player> response = await _playerApi.View(id);
-
-
+            
             var types = EnumHelper.GetMetricTypes(MetricTypeCategory.All);
             foreach (var type in types) {
                 Assert.Contains(type, (IDictionary<MetricType, Metric>) response.Data.LatestSnapshot.AllMetrics);
+
+                var metric = response.Data.LatestSnapshot.AllMetrics[type];
+
+                if (metric.Rank != -1) {
+                    Assert.True(metric.Rank > 0);
+                    Assert.True(metric.Value > 0);
+
+                    if (type == MetricType.Construction || type == MetricType.TheCorruptedGauntlet) {
+                        Assert.True(metric.EffectiveHours > 0 );
+                    }
+                }
             }
         }
+
+
 
         [Fact]
         public async Task GainedByUserIdResultsInCollection() {
