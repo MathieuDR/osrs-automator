@@ -543,6 +543,33 @@ namespace WiseOldManConnectorTests.Connectors {
         }
 
         [Fact]
+        public async Task ViewRegularPlayerResultsInCorrectType() {
+            int id = TestConfiguration.ValidPlayerId;
+
+            ConnectorResponse<Player> response = await _playerApi.View(id);
+
+            Assert.Equal(PlayerType.Regular, response.Data.Type);
+        }
+
+        [Fact]
+        public async Task ViewIronManPlayerResultsInCorrectType() {
+            int id = TestConfiguration.ValidIronManId;
+
+            ConnectorResponse<Player> response = await _playerApi.View(id);
+
+            Assert.Equal(PlayerType.IronMan, response.Data.Type);
+        }
+
+        [Fact]
+        public async Task ViewMainPlayerResultsInCorrectMode() {
+            int id = TestConfiguration.ValidPlayerId;
+
+            ConnectorResponse<Player> response = await _playerApi.View(id);
+
+            Assert.Equal(PlayerBuild.Main, response.Data.Build);
+        }
+
+        [Fact]
         public async Task ViewPlayerByIdResultsInValidPlayer() {
             int id = TestConfiguration.ValidPlayerId;
 

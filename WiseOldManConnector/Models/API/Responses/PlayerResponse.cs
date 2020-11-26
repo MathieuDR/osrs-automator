@@ -16,6 +16,9 @@ namespace WiseOldManConnector.Models.API.Responses {
         [JsonProperty("build")]
         public string Build { get; set; }
 
+        [JsonProperty("type")]
+        public string Type { get; set; }
+
         [JsonProperty("flagged")]
         public bool Flagged { get; set; }
 

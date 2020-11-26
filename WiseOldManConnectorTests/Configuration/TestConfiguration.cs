@@ -14,5 +14,6 @@
         public static string UnspecificGroupName = "OS";
         public static int ValidGroupId = 51;
         public static int InvalidGroupId = -1;
+        public static int ValidIronManId = 64498;
     }
 }
