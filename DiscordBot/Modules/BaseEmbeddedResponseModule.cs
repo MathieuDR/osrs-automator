@@ -38,7 +38,7 @@ namespace DiscordBotFanatic.Modules {
 
         public async Task<IUserMessage> SendPaginatedMessageAsync(PaginatedMessage pager,
             ICriterion<SocketReaction> criterion = null) {
-            var callback = new ImagePaginatedMessageCallback(Interactive, Context, pager, criterion);
+            var callback = new CustomPaginatedMessageCallback(Interactive, Context, pager, criterion);
             await callback.DisplayAsync().ConfigureAwait(false);
             return callback.Message;
         }

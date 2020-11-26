@@ -6,9 +6,11 @@ using Discord;
 using Discord.Commands;
 using DiscordBotFanatic.Helpers;
 using DiscordBotFanatic.Models.Configuration;
+using DiscordBotFanatic.Models.Decorators;
 using DiscordBotFanatic.Models.ResponseModels;
 using DiscordBotFanatic.Paginator;
 using DiscordBotFanatic.Services.interfaces;
+using WiseOldManConnector.Models.Output;
 using WiseOldManConnector.Models.WiseOldMan.Enums;
 
 namespace DiscordBotFanatic.Modules {
@@ -53,12 +55,14 @@ namespace DiscordBotFanatic.Modules {
         [Summary("Cycle through accounts ")]
         [RequireContext(ContextType.Guild)]
         public async Task CycleThroughNames() {
+            var defaultAccountTask = _playerService.GetDefaultAccountUserName(GetGuildUser());
             var accountDecorators = (await _playerService.GetAllOsrsAccounts(GetGuildUser())).ToList();
-            
+            var defaultAccount = await defaultAccountTask;
+
 
             if (!accountDecorators.Any()) {
                 // we want to update actually.
-                _ = SendNoResultMessage(description:"No accounts coupled");
+                _ = SendNoResultMessage(description: "No accounts coupled");
                 return;
             }
 
@@ -69,13 +73,35 @@ namespace DiscordBotFanatic.Modules {
                 .WithThumbnailUrl(x.Item.Type.WiseOldManIconUrl())
                 .AddField("Combat", x.Item.CombatLevel, true)
                 //.AddField("Overall", x.Item.LatestSnapshot.GetMetricForType(MetricType.Overall).Level, true)
-                .AddField("Mode", x.Item.Type, true)
+                .AddField("Account Mode", x.Item.Type, true)
                 .AddField("Build", x.Item.Build, true)).ToList();
 
+            var formatString = "Thumbs up to set as main!\r\nCurrent main: {0}";
+
+            var infoMessageTask = ReplyAsync(string.Format(formatString, defaultAccount));
             var message = new CustomPaginatedMessage(new EmbedBuilder().AddCommonProperties().WithMessageAuthorFooter(Context)) {
                 Pages = pages,
                 Options = new CustomActionsPaginatedAppearanceOptions() {
-                    Delete = async (toDelete, i) => await _playerService.DeleteCoupleOsrsAccountAtIndex(GetGuildUser(), i)
+                    Delete = async (toDelete, i) => {
+                        // Delete from original decorator, so our select keeps working #BAD
+                        var decorator = accountDecorators[i];
+                        await _playerService.DeleteCoupledOsrsAccount(GetGuildUser(), decorator.Item.Id);
+
+                        var newDefault = await _playerService.GetDefaultAccountUserName(GetGuildUser());
+                        _ = infoMessageTask.Result.ModifyAsync(props => props.Content = string.Format(formatString, newDefault));
+                        accountDecorators.RemoveAt(i);
+                    },
+                    Select = async (selected, i) => {
+                        // Bug with delete?!
+                        var playerDecorator = accountDecorators[i];
+                        var newDefault = await _playerService.SetDefaultAccount(GetGuildUser(), playerDecorator.Item);
+
+                        // Does this work?!
+                        if (infoMessageTask.Result != null) {
+                            _ =  infoMessageTask.Result.ModifyAsync(props =>
+                                props.Content = string.Format(formatString, newDefault));
+                        }
+                    }
                 }
             };
             await SendPaginatedMessageAsync(message);

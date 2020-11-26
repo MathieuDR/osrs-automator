@@ -86,19 +86,63 @@ namespace DiscordBotFanatic.Services {
             return Task.FromResult(accounts.Decorate());
         }
 
-        public Task DeleteCoupleOsrsAccountAtIndex(IGuildUser user, int index) {
+        public Task DeleteCoupledOsrsAccount(IGuildUser user, int id) {
             var player = _repository.GetPlayerById(user.GuildId, user.Id);
+
+            if (player == null) {
+                throw new Exception($"No configuration for player.");
+            }
+
+            if (player.CoupledOsrsAccounts.Count == 1) {
+                throw new Exception($"Cannot delete last coupled account. Please add a new one first.");
+            }
+
+            var index = player.CoupledOsrsAccounts.FindIndex(x => x.Id == id);
             player.CoupledOsrsAccounts.RemoveAt(index);
+
+            if (player.WiseOldManDefaultPlayerId == id) {
+                SetDefaultAccount(user, player.CoupledOsrsAccounts.FirstOrDefault(), player);
+            }
+
             _repository.UpdateOrInsertPlayerForGuild(user.GuildId, player);
             return Task.CompletedTask;
+        }
+
+        public Task<string> SetDefaultAccount(IGuildUser user, Player player) {
+            return SetDefaultAccount(user, player, null);
+        }
+
+        public Task<string> GetDefaultAccountUserName(IGuildUser user) {
+            var player = _repository.GetPlayerById(user.GuildId, user.Id);
+            return Task.FromResult(player.DefaultPlayerUsername);
+        }
+
+        public Task<string> SetDefaultAccount(IGuildUser discordUser, Player osrsPlayer, Models.Data.Player player) {
+            if (player == null) {
+                player = _repository.GetPlayerById(discordUser.GuildId, discordUser.Id);
+            }
+
+            if (player == null) {
+                throw new Exception($"No configuration found for player!");
+            }
+
+            if (!player.CoupledOsrsAccounts.Any(x => x.Id == osrsPlayer.Id)) {
+                AddNewOsrsAccount(discordUser, player, osrsPlayer);
+            }
+
+            player.DefaultPlayerUsername = osrsPlayer.DisplayName;
+            player.WiseOldManDefaultPlayerId = osrsPlayer.Id;
+            _repository.UpdateOrInsertPlayerForGuild(discordUser.GuildId, player);
+            return Task.FromResult(player.DefaultPlayerUsername);
         }
 
         private void AddNewOsrsAccount(IGuildUser discordUser, Models.Data.Player player, Player osrsPlayer) {
             // New account
             player.CoupledOsrsAccounts.Add(osrsPlayer);
+
             if (player.CoupledOsrsAccounts.Count == 1) {
-                player.DefaultPlayerUsername = osrsPlayer.Username;
-                player.WiseOldManDefaultPlayerId = osrsPlayer.Id;
+                // RISKY LOOP!
+                SetDefaultAccount(discordUser, osrsPlayer, player);
             }
 
             _repository.UpdateOrInsertPlayerForGuild(discordUser.GuildId, player);

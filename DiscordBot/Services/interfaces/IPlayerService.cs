@@ -15,6 +15,8 @@ namespace DiscordBotFanatic.Services.interfaces {
         Task<ItemDecorator<Player>> CoupleDiscordGuildUserToOsrsAccount(IGuildUser discordUser, string proposedOsrsName);
 
         Task<IEnumerable<ItemDecorator<Player>>> GetAllOsrsAccounts(IGuildUser user);
-        Task DeleteCoupleOsrsAccountAtIndex(IGuildUser user, int index);
+        Task DeleteCoupledOsrsAccount(IGuildUser user, int id);
+        Task<string> SetDefaultAccount(IGuildUser user, Player player);
+        Task<string> GetDefaultAccountUserName(IGuildUser user);
     }
 }
