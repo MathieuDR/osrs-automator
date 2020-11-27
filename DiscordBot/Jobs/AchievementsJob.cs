@@ -22,7 +22,7 @@ namespace DiscordBotFanatic.Jobs {
         }
 
         public override async Task ForGuild(SocketGuild guild, IMessageChannel channel) {
-            _ = LogService.Log("Searching achievements", LogEventLevel.Information, null);
+            _ = LogService.Log("Searching achievements", LogEventLevel.Information);
             var achievementsTask = _osrsHighscoreService.GetGroupAchievements(Configuration.WomGroupId);
             var jobState = Repository.GetAutomatedJobState(Configuration.GuildId);
 
@@ -43,7 +43,7 @@ namespace DiscordBotFanatic.Jobs {
             }
 
 
-            _ = LogService.Log($"Printing achievements", LogEventLevel.Information, null);
+            _ = LogService.Log($"Printing achievements", LogEventLevel.Information);
 
             int i;
             for (i = startIndex; i < achievements.Count; i++) {
@@ -55,7 +55,7 @@ namespace DiscordBotFanatic.Jobs {
             }
 
             var totalPrinted = i - startIndex;
-            _ = LogService.Log($"Printed {totalPrinted} achievements.", LogEventLevel.Information, null);
+            _ = LogService.Log($"Printed {totalPrinted} achievements.", LogEventLevel.Information);
 
             if (totalPrinted > 0) {
                 // Updating DB if we printed at least one!

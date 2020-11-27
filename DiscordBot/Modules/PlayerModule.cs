@@ -1,15 +1,20 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
 using Discord;
+using Discord.Addons.Interactive.Criteria;
 using Discord.Commands;
+using Discord.WebSocket;
 using DiscordBotFanatic.Helpers;
 using DiscordBotFanatic.Models.Configuration;
 using DiscordBotFanatic.Models.Decorators;
 using DiscordBotFanatic.Models.ResponseModels;
 using DiscordBotFanatic.Paginator;
 using DiscordBotFanatic.Services.interfaces;
+using Microsoft.Extensions.Options;
+using Serilog.Events;
 using WiseOldManConnector.Models.Output;
 using WiseOldManConnector.Models.WiseOldMan.Enums;
 
@@ -86,6 +91,7 @@ namespace DiscordBotFanatic.Modules {
             var formatString = "Thumbs up to set as main!\r\nCurrent main: {0}";
 
             var infoMessageTask = ReplyAsync(string.Format(formatString, defaultAccount));
+            // This needs to be refactored! ASAP
             var message = new CustomPaginatedMessage(new EmbedBuilder().AddCommonProperties().WithMessageAuthorFooter(Context)) {
                 Pages = pages,
                 Options = new CustomActionsPaginatedAppearanceOptions() {
@@ -108,7 +114,25 @@ namespace DiscordBotFanatic.Modules {
                             _ =  infoMessageTask.Result.ModifyAsync(props =>
                                 props.Content = string.Format(formatString, newDefault));
                         }
+                    },EmojiActions = new Dictionary<IEmote, PerformAction>() {
+                        {
+                            new Emoji("✏️"),
+                            async (selected, i) => {
+                                _ = Task.Run(async () =>
+                                {
+                                    var criteria = new Criteria<SocketMessage>()
+                                        .AddCriterion(new EnsureSourceChannelCriterion())
+                                        .AddCriterion(new EnsureFromUserCriterion(GetGuildUser()));
+
+                                    var response = await Interactive.NextMessageAsync(Context, criteria, TimeSpan.FromSeconds(15));
+                                    var newUserName = response.Content;
+                                    _ = Logger.Log(newUserName, LogEventLevel.Information);
+                                });
+                            }
+                        } 
                     }
+                    
+                    
                 }
             };
             await SendPaginatedMessageAsync(message);

@@ -34,6 +34,10 @@ namespace DiscordBotFanatic.Services {
             return Task.CompletedTask;
         }
 
+        public Task Log(string message, LogEventLevel level, params object[] arguments) {
+            return Log(message, level, null, arguments);
+        }
+
         public Task Log(string message, LogEventLevel level, Exception exception, params object[] arguments) {
             Serilog.Log.Write(level, exception, message, arguments);
             return Task.CompletedTask;

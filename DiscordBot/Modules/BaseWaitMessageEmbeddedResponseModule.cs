@@ -68,7 +68,7 @@ namespace DiscordBotFanatic.Modules {
             return _waitMessageTask.ContinueWith((waitMessageTask) => {
                 Logger.Log(
                     $"{nameof(BaseWaitMessageEmbeddedResponseModule)}, {nameof(ModifyWaitMessageAsync)}, continue at of waitmessage",
-                    LogEventLevel.Debug, null);
+                    LogEventLevel.Debug);
                 waitMessageTask.Result.ModifyAsync(x => x.Embed = new Optional<Embed>(embed));
             });
         }
@@ -82,7 +82,7 @@ namespace DiscordBotFanatic.Modules {
             return _waitMessageTask.ContinueWith((waitMessageTask) => {
                 Logger.Log(
                     $"{nameof(BaseWaitMessageEmbeddedResponseModule)}, {nameof(ModifyWaitMessageAsync)}, continue at of waitmessage",
-                    LogEventLevel.Debug, null);
+                    LogEventLevel.Debug);
                 if (timeout.TotalSeconds > 1) {
                     Task.Delay(timeout)
                         .ContinueWith(_ => _waitMessageTask.Result.DeleteAsync().ConfigureAwait(false))

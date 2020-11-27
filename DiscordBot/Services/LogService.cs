@@ -59,8 +59,16 @@ namespace DiscordBotFanatic.Services {
         }
 
         public Task Log(string message, LogEventLevel level, Exception exception, params object[] arguments) {
-            throw new NotImplementedException();
+            _debugLogger.Log(LogLevelFromLogEventLevel(level), exception, message, arguments);
+            return Task.CompletedTask;
         }
+
+        
+        public Task Log(string message, LogEventLevel level,  params object[] arguments) {
+            _debugLogger.Log(LogLevelFromLogEventLevel(level), message, arguments);
+            return Task.CompletedTask;
+        }
+
 
         public Task LogWithCommandInfoLine(string message, LogEventLevel level, Exception exception, params object[] arguments) {
             throw new NotImplementedException();
@@ -68,5 +76,8 @@ namespace DiscordBotFanatic.Services {
 
         private static LogLevel LogLevelFromSeverity(LogSeverity severity)
             => (LogLevel) (Math.Abs((int) severity - 5));
+
+        private static LogLevel LogLevelFromLogEventLevel(LogEventLevel LogEventLevel)
+            => (LogLevel) LogEventLevel;
     }
 }

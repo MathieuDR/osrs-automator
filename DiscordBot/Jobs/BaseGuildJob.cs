@@ -30,11 +30,11 @@ namespace DiscordBotFanatic.Jobs {
 
 
         public virtual async Task Execute(IJobExecutionContext context) {
-            _ = LogService.Log($"Starting {JobType} job execution", LogEventLevel.Information, null);
+            _ = LogService.Log($"Starting {JobType} job execution", LogEventLevel.Information);
 
             if (Discord.ConnectionState == ConnectionState.Connected) {
                 foreach (SocketGuild discordGuild in Discord.Guilds) {
-                    _ = LogService.Log($"Guild: {discordGuild.Name}, starting", LogEventLevel.Information, null);
+                    _ = LogService.Log($"Guild: {discordGuild.Name}, starting", LogEventLevel.Information);
                     Configuration = Repository.GetGroupConfig(discordGuild.Id);
 
                     if (Configuration == null || Configuration.AutomatedMessagesConfig == null ||
@@ -59,13 +59,13 @@ namespace DiscordBotFanatic.Jobs {
                     // Do task for guild
                     await ForGuild(discordGuild, channel);
 
-                    _ = LogService.Log($"Guild: {discordGuild.Name}, done", LogEventLevel.Information, null);
+                    _ = LogService.Log($"Guild: {discordGuild.Name}, done", LogEventLevel.Information);
                 }
             } else {
-                _ = LogService.Log("Not connected", LogEventLevel.Warning, null);
+                _ = LogService.Log("Not connected", LogEventLevel.Warning);
             }
 
-            _ = LogService.Log($"Ending {JobType} job execution", LogEventLevel.Information, null);
+            _ = LogService.Log($"Ending {JobType} job execution", LogEventLevel.Information);
         }
 
         public abstract Task ForGuild(SocketGuild guild, IMessageChannel channel);
@@ -75,7 +75,7 @@ namespace DiscordBotFanatic.Jobs {
                 (ISocketMessageChannel) guild.Channels.FirstOrDefault(c => c.Id == config.ChannelId);
 
             if (channel == null) {
-                _ = LogService.Log("Cannot find channel", LogEventLevel.Warning, null);
+                _ = LogService.Log("Cannot find channel", LogEventLevel.Warning);
                 _ = guild.DefaultChannel.SendMessageAsync($"Channel not found for automated job: {JobType.Achievements}");
             }
 

@@ -17,10 +17,10 @@ namespace DiscordBotFanatic.Jobs {
         }
 
         public async Task Execute(IJobExecutionContext context) {
-            await _service.Log("Automated Hello from Hello BleuJob!", LogEventLevel.Information, null);
+            await _service.Log("Automated Hello from Hello BleuJob!", LogEventLevel.Information);
 
             if (_discord.ConnectionState == ConnectionState.Connected) {
-                await _service.Log("Connected", LogEventLevel.Information, null);
+                await _service.Log("Connected", LogEventLevel.Information);
                 var guild = _discord.Guilds.FirstOrDefault(g => g.Name.Contains("Saskora"));
 
                 if (guild != null) {
@@ -28,12 +28,12 @@ namespace DiscordBotFanatic.Jobs {
 
                     if (channel != null) {
                         //await channel.SendMessageAsync("HELLO FROM JARIGE BLOJOB!");
-                        await _service.Log("Would send message but nah", LogEventLevel.Information, null);
+                        await _service.Log("Would send message but nah", LogEventLevel.Information);
                     } else {
-                        await _service.Log("Cannot find channel", LogEventLevel.Information, null);
+                        await _service.Log("Cannot find channel", LogEventLevel.Information);
                     }
                 } else {
-                    await _service.Log("Cannot find guild", LogEventLevel.Information, null);
+                    await _service.Log("Cannot find guild", LogEventLevel.Information);
                 }
             }
 

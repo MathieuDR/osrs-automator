@@ -12,6 +12,7 @@ namespace DiscordBotFanatic.Services.interfaces {
         Task LogStopWatch(string area, Stopwatch stopwatch);
 
 
+        Task Log(string message, LogEventLevel level, params object[] arguments);
         Task Log(string message, LogEventLevel level, Exception exception, params object[] arguments);
         Task LogWithCommandInfoLine(string message, LogEventLevel level, Exception exception, params object[] arguments);
     }
