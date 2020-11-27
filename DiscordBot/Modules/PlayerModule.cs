@@ -50,12 +50,19 @@ namespace DiscordBotFanatic.Modules {
             await ModifyWaitMessageAsync(builder.Build());
         }
 
+        [Name("Set Name")]
+        [Command("name")]
+        [Summary("Set your desired name")]
+        public async Task SetName() {
+
+        }
+
         [Name("Account cycle")]
         [Command("accounts", RunMode = RunMode.Async)]
         [Summary("Cycle through accounts ")]
         [RequireContext(ContextType.Guild)]
-        public async Task CycleThroughNames() {
-            var defaultAccountTask = _playerService.GetDefaultAccountUserName(GetGuildUser());
+        public async Task CycleThroughAccounts() {
+            var defaultAccountTask = _playerService.GetDefaultOsrsDisplayName(GetGuildUser());
             var accountDecorators = (await _playerService.GetAllOsrsAccounts(GetGuildUser())).ToList();
             var defaultAccount = await defaultAccountTask;
 
@@ -87,7 +94,7 @@ namespace DiscordBotFanatic.Modules {
                         var decorator = accountDecorators[i];
                         await _playerService.DeleteCoupledOsrsAccount(GetGuildUser(), decorator.Item.Id);
 
-                        var newDefault = await _playerService.GetDefaultAccountUserName(GetGuildUser());
+                        var newDefault = await _playerService.GetDefaultOsrsDisplayName(GetGuildUser());
                         _ = infoMessageTask.Result.ModifyAsync(props => props.Content = string.Format(formatString, newDefault));
                         accountDecorators.RemoveAt(i);
                     },

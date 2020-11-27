@@ -87,11 +87,7 @@ namespace DiscordBotFanatic.Services {
         }
 
         public Task DeleteCoupledOsrsAccount(IGuildUser user, int id) {
-            var player = _repository.GetPlayerById(user.GuildId, user.Id);
-
-            if (player == null) {
-                throw new Exception($"No configuration for player.");
-            }
+            var player = GetPlayerConfigurationOrThrowException(user);
 
             if (player.CoupledOsrsAccounts.Count == 1) {
                 throw new Exception($"Cannot delete last coupled account. Please add a new one first.");
@@ -112,28 +108,65 @@ namespace DiscordBotFanatic.Services {
             return SetDefaultAccount(user, player, null);
         }
 
-        public Task<string> GetDefaultAccountUserName(IGuildUser user) {
+        public Task<string> GetDefaultOsrsDisplayName(IGuildUser user) {
             var player = _repository.GetPlayerById(user.GuildId, user.Id);
             return Task.FromResult(player.DefaultPlayerUsername);
         }
 
-        public Task<string> SetDefaultAccount(IGuildUser discordUser, Player osrsPlayer, Models.Data.Player player) {
-            if (player == null) {
-                player = _repository.GetPlayerById(discordUser.GuildId, discordUser.Id);
+        public Task<string> GetUserNickname(IGuildUser user, out bool isOsrsAccount) {
+            var player = GetPlayerConfigurationOrThrowException(user);
+            isOsrsAccount = string.IsNullOrEmpty(player.Nickname);
+            return isOsrsAccount ? Task.FromResult(player.DefaultPlayerUsername) : Task.FromResult(player.Nickname);
+        }
+
+        public async Task<string> SetUserName(IGuildUser user, string name) {
+            if (string.IsNullOrWhiteSpace(name)) {
+                throw new Exception($"Name must not be empty!");
             }
 
+            var player = GetPlayerConfigurationOrThrowException(user);
+            player.Nickname = name;
+
+            await EnforceUsername(user, player);
+
+            _repository.UpdateOrInsertPlayerForGuild(user.GuildId, player);
+            return player.Nickname;
+        }
+
+        public async Task<string> SetDefaultAccount(IGuildUser discordUser, Player osrsPlayer, Models.Data.Player player) {
             if (player == null) {
-                throw new Exception($"No configuration found for player!");
+                player = GetPlayerConfigurationOrThrowException(discordUser);
             }
 
-            if (!player.CoupledOsrsAccounts.Any(x => x.Id == osrsPlayer.Id)) {
+            if (player.CoupledOsrsAccounts.All(x => x.Id != osrsPlayer.Id)) {
+                // Should never really happen though..
                 AddNewOsrsAccount(discordUser, player, osrsPlayer);
             }
 
             player.DefaultPlayerUsername = osrsPlayer.DisplayName;
             player.WiseOldManDefaultPlayerId = osrsPlayer.Id;
+
+            await EnforceUsername(discordUser, player);
+
             _repository.UpdateOrInsertPlayerForGuild(discordUser.GuildId, player);
-            return Task.FromResult(player.DefaultPlayerUsername);
+            return player.DefaultPlayerUsername;
+        }
+
+        private async Task EnforceUsername(IGuildUser user, Models.Data.Player playerConfig) {
+            if (playerConfig.EnforceNameTemplate && !string.IsNullOrWhiteSpace(playerConfig.DefaultPlayerUsername) &&
+                !string.IsNullOrWhiteSpace(playerConfig.Nickname)) {
+                await user.ModifyAsync(u => u.Nickname = $"{playerConfig.DefaultPlayerUsername} ({playerConfig.Nickname})");
+            }
+        }
+
+        private Models.Data.Player GetPlayerConfigurationOrThrowException(IGuildUser user) {
+            var config = _repository.GetPlayerById(user.GuildId, user.Id);
+
+            if (config == null) {
+                throw new Exception($"No configuration found for player!");
+            }
+
+            return config;
         }
 
         private void AddNewOsrsAccount(IGuildUser discordUser, Models.Data.Player player, Player osrsPlayer) {

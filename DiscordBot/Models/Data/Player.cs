@@ -12,9 +12,12 @@ namespace DiscordBotFanatic.Models.Data {
         public ulong DiscordId => CreatedByDiscordId;
         public int WiseOldManDefaultPlayerId { get; set; }
         public string DefaultPlayerUsername { get; set; }
+        public string Nickname { get; set; }
 
         public List<WiseOldManConnector.Models.Output.Player> CoupledOsrsAccounts { get; set; } =
             new List<WiseOldManConnector.Models.Output.Player>();
+
+        public bool EnforceNameTemplate { get; set; }
 
         public override void IsValid() {
             if (string.IsNullOrEmpty(DefaultPlayerUsername)) {
