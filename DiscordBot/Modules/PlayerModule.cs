@@ -58,9 +58,7 @@ namespace DiscordBotFanatic.Modules {
         [Name("Set Name")]
         [Command("name")]
         [Summary("Set your desired name")]
-        public async Task SetName() {
-
-        }
+        public async Task SetName() { }
 
         [Name("Account cycle")]
         [Command("accounts", RunMode = RunMode.Async)]
@@ -88,12 +86,16 @@ namespace DiscordBotFanatic.Modules {
                 .AddField("Account Mode", x.Item.Type, true)
                 .AddField("Build", x.Item.Build, true)).ToList();
 
-            var formatString = "Thumbs up to set as main!\r\nCurrent main: {0}";
+            var formatString = "Pencil for a name change!\r\nThumbs up to set as main!\r\nCurrent main: {0}";
 
-            var infoMessageTask = ReplyAsync(string.Format(formatString, defaultAccount));
+            _ = DeleteWaitMessageAsync();
+
+            //var infoMessage = await ReplyAsync();
+            IUserMessage pagedMessage = null;
             // This needs to be refactored! ASAP
             var message = new CustomPaginatedMessage(new EmbedBuilder().AddCommonProperties().WithMessageAuthorFooter(Context)) {
                 Pages = pages,
+                Content = string.Format(formatString, defaultAccount),
                 Options = new CustomActionsPaginatedAppearanceOptions() {
                     Delete = async (toDelete, i) => {
                         // Delete from original decorator, so our select keeps working #BAD
@@ -101,7 +103,7 @@ namespace DiscordBotFanatic.Modules {
                         await _playerService.DeleteCoupledOsrsAccount(GetGuildUser(), decorator.Item.Id);
 
                         var newDefault = await _playerService.GetDefaultOsrsDisplayName(GetGuildUser());
-                        _ = infoMessageTask.Result.ModifyAsync(props => props.Content = string.Format(formatString, newDefault));
+                        _ = pagedMessage?.ModifyAsync(props => props.Content = string.Format(formatString, newDefault));
                         accountDecorators.RemoveAt(i);
                     },
                     Select = async (selected, i) => {
@@ -109,33 +111,35 @@ namespace DiscordBotFanatic.Modules {
                         var playerDecorator = accountDecorators[i];
                         var newDefault = await _playerService.SetDefaultAccount(GetGuildUser(), playerDecorator.Item);
 
-                        // Does this work?!
-                        if (infoMessageTask.Result != null) {
-                            _ =  infoMessageTask.Result.ModifyAsync(props =>
-                                props.Content = string.Format(formatString, newDefault));
-                        }
-                    },EmojiActions = new Dictionary<IEmote, PerformAction>() {
+                        _ = pagedMessage?.ModifyAsync(props =>
+                            props.Content = string.Format(formatString, newDefault));
+                    },
+                    EmojiActions = new Dictionary<IEmote, PerformAction>() {
                         {
                             new Emoji("✏️"),
                             async (selected, i) => {
-                                _ = Task.Run(async () =>
-                                {
+                                _ = Task.Run(async () => {
+                                    var playerDecorator = accountDecorators[i];
+
                                     var criteria = new Criteria<SocketMessage>()
                                         .AddCriterion(new EnsureSourceChannelCriterion())
                                         .AddCriterion(new EnsureFromUserCriterion(GetGuildUser()));
-
-                                    var response = await Interactive.NextMessageAsync(Context, criteria, TimeSpan.FromSeconds(15));
+                                    var timeout = TimeSpan.FromSeconds(15);
+                                    var infoReply = await Interactive.ReplyAndDeleteAsync(Context,
+                                        $"Please type in the new name for {playerDecorator.Item.DisplayName}", false, null,
+                                        timeout);
+                                    var response = await Interactive.NextMessageAsync(Context, criteria, timeout);
+                                    _ = infoReply.DeleteAsync();
                                     var newUserName = response.Content;
+                                    _ = response.DeleteAsync();
                                     _ = Logger.Log(newUserName, LogEventLevel.Information);
                                 });
                             }
-                        } 
+                        }
                     }
-                    
-                    
                 }
             };
-            await SendPaginatedMessageAsync(message);
+            pagedMessage = await SendPaginatedMessageAsync(message);
         }
     }
 }
