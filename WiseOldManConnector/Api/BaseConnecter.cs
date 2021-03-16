@@ -92,6 +92,10 @@ namespace WiseOldManConnector.Api {
                 throw new NullReferenceException($"We did not receive a response. Please try again later or contact the administration.");
             }
 
+            if (response.ErrorException != null) {
+                throw new BadRequestException(response.ErrorException.Message, response);
+            }
+
             switch (response.StatusCode) {
                 case HttpStatusCode.Accepted:
                 case HttpStatusCode.NoContent:
