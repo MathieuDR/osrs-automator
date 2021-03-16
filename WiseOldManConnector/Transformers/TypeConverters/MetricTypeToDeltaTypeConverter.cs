@@ -44,8 +44,13 @@ namespace WiseOldManConnector.Transformers.TypeConverters {
                 case MetricType.ClueScrollsMaster:
                 case MetricType.LastManStanding:
                 case MetricType.Combat:
+                case MetricType.SoulWarsZeal:
                     return DeltaType.Score;
-
+                
+                case MetricType.EffectiveHoursBossing:
+                case MetricType.EffectiveHoursPlaying:
+                    return DeltaType.Hours;
+                
                 case MetricType.AbyssalSire:
                 case MetricType.AlchemicalHydra:
                 case MetricType.BarrowsChests:

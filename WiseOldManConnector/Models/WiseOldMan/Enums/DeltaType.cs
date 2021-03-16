@@ -4,6 +4,7 @@
         Rank,
         Score,
         Experience,
-        Kills
+        Kills,
+        Hours
     }
 }
