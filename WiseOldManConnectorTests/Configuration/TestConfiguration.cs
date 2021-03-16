@@ -6,9 +6,9 @@
         public static int ValidAccomplishedPlayerId = 5613;
         public static int ValidPlayerId = 4029;
         public static string ValidRegularPlayer = ValidPlayerUsernameWithValidCapatilization;
-        public static string ValidIronMan = "Elite HIT";
-        public static string ValidHardcoreIronMan = "Zxhc";
-        public static string ValidUltimateIronMan = "Hold My Item";
+        public static string ValidIronMan = "Wagen";
+        public static string ValidHardcoreIronMan = "BoefWoof";
+        public static string ValidUltimateIronMan = "blixk";
         public static string InvalidUser = "kljhsdvgfjlhgdsfjhkldgsfhjklfsdgjlhksgdfjkhlgfdsjhkfgd";
         public static string SpecificGroupName = "Fanatics";
         public static string UnspecificGroupName = "OS";
