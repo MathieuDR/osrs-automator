@@ -52,6 +52,7 @@ namespace WiseOldManConnector.Transformers.TypeConverters {
                     "clue_scrolls_elite" => MetricType.ClueScrollsElite,
                     "clue_scrolls_master" => MetricType.ClueScrollsMaster,
                     "last_man_standing" => MetricType.LastManStanding,
+                    "soul_wars_zeal" => MetricType.SoulWarsZeal,
                     "abyssal_sire" => MetricType.AbyssalSire,
                     "alchemical_hydra" => MetricType.AlchemicalHydra,
                     "barrows_chests" => MetricType.BarrowsChests,
@@ -97,6 +98,8 @@ namespace WiseOldManConnector.Transformers.TypeConverters {
                     "zalcano" => MetricType.Zalcano,
                     "zulrah" => MetricType.Zulrah,
                     "combat" => MetricType.Combat,
+                    "ehb" => MetricType.EffectiveHoursBossing,
+                    "ehp" => MetricType.EffectiveHoursPlaying,
                     _ => throw new ArgumentOutOfRangeException(nameof(source), source, null)
                 };
             }

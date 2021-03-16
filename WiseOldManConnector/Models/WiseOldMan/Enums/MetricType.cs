@@ -86,6 +86,8 @@ namespace WiseOldManConnector.Models.WiseOldMan.Enums {
 
         [EnumMember(Value = "last_man_standing")]
         LastManStanding,
+        [EnumMember(Value = "soul_wars_zeal")]
+        SoulWarsZeal,
 
         [EnumMember(Value = "abyssal_sire")]
         AbyssalSire,
