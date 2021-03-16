@@ -9,7 +9,7 @@ namespace WiseOldManConnector.Models.API.Responses {
         [JsonProperty("playerId")]
         public int PlayerId { get; set; }
 
-        [JsonProperty("type")]
+        [JsonProperty("name")]
         public string Type { get; set; }
 
         [JsonProperty("metric")]
