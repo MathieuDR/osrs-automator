@@ -5,7 +5,7 @@ namespace WiseOldManConnector.Models.API.Responses {
     internal class WOMRecord : BaseResponse {
 
         [JsonProperty("value")]
-        public int Value { get; set; }
+        public double Value { get; set; }
         [JsonProperty("period")]
         public string Period { get; set; }
 
