@@ -53,6 +53,6 @@ namespace WiseOldManConnector.Models.API.Responses {
         public string Role { get; set; }
 
         [JsonProperty("exp")]
-        public int OverallExperience { get; set; }
+        public long OverallExperience { get; set; }
     }
 }
