@@ -250,7 +250,7 @@ namespace WiseOldManConnectorTests.Connectors {
             Assert.True(player.Id > 0);
             Assert.Null(player.LatestSnapshot);
             Assert.Null(player.Role);
-            Assert.Equal(0, player.OverallExperience);
+            Assert.NotEqual(0, player.OverallExperience);
             Assert.True(player.UpdatedAt < DateTimeOffset.Now);
             Assert.True(player.RegisteredAt < DateTimeOffset.Now);
         }
