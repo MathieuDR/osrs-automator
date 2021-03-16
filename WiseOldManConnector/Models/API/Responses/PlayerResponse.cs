@@ -41,7 +41,7 @@ namespace WiseOldManConnector.Models.API.Responses {
         public DateTime? RegisteredAt { get; set; }
 
         [JsonProperty("updatedAt")]
-        public DateTime UpdatedAt { get; set; }
+        public DateTime? UpdatedAt { get; set; }
 
         [JsonProperty("latestSnapshot")]
         public WOMSnapshot LatestSnapshot { get; set; }
