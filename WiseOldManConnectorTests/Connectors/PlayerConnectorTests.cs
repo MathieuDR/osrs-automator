@@ -74,7 +74,7 @@ namespace WiseOldManConnectorTests.Connectors {
 
             Assert.NotNull(response);
             Assert.NotEmpty(response.Data);
-            Assert.True(Enum.GetValues(typeof(MetricType)).Length <= response.Data.Count());
+            Assert.True(Enum.GetValues(typeof(MetricType)).Length >= response.Data.Count());
         }
 
         [Fact]
