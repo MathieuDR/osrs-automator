@@ -104,22 +104,6 @@ namespace WiseOldManConnectorTests.Connectors {
 
 
         [Fact]
-        public async Task AchievementsWithMissingsResultsInCollectionWithAllMetricsAndCombat() {
-            var username = TestConfiguration.ValidPlayerUsernameWithValidCapatilization;
-
-            var response = await _playerApi.Achievements(username, true);
-            var enumValues = EnumHelper.GetMetricTypes(MetricTypeCategory.All).ToList();
-            var achievementMetrics = response.Data.Select(x => x.Metric).Distinct().ToList();
-            enumValues.Add(MetricType.Combat);
-
-            // Distinct
-            Assert.True(achievementMetrics.Count == enumValues.Count);
-            foreach (var type in enumValues) {
-                Assert.Contains(type, achievementMetrics);
-            }
-        }
-
-        [Fact]
         public async Task CompetitionByIdResultsInCollection() {
             var id = TestConfiguration.ValidPlayerId;
 
