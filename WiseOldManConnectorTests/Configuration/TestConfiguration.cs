@@ -10,7 +10,7 @@
         public static string ValidHardcoreIronMan = "BoefWoof";
         public static string ValidUltimateIronMan = "blixk";
         public static string InvalidUser = "kljhsdvgfjlhgdsfjhkldgsfhjklfsdgjlhksgdfjkhlgfdsjhkfgd";
-        public static string SpecificGroupName = "Fanatics";
+        public static string SpecificGroupName = "Eternals";
         public static string UnspecificGroupName = "OS";
         public static int ValidGroupId = 51;
         public static int InvalidGroupId = -1;
