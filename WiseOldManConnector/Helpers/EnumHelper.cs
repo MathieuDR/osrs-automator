@@ -18,25 +18,60 @@ namespace WiseOldManConnector.Helpers {
             return enumVal.ToString();
         }
 
+        public static string FriendlyName(this MetricType metricType, bool capitalize = false) {
+            var valName = metricType.GetEnumValueNameOrDefault();
+            valName = valName.Replace('_', ' ');
+
+            if (capitalize) {
+                valName = $"{char.ToUpper(valName.First())}{valName.Substring(1)}";
+            }
+
+            return valName;
+        }
+
+        public static MetricTypeCategory Category(this MetricType metricType) {
+            if (GetMetricTypes(MetricTypeCategory.Bosses).Contains(metricType)) {
+                return MetricTypeCategory.Bosses;
+            }
+
+            if (GetMetricTypes(MetricTypeCategory.Skills).Contains(metricType)) {
+                return MetricTypeCategory.Skills;
+            }
+            
+            if (GetMetricTypes(MetricTypeCategory.Activities).Contains(metricType)) {
+                return MetricTypeCategory.Activities;
+            }
+
+            if (GetMetricTypes(MetricTypeCategory.Time).Contains(metricType)) {
+                return MetricTypeCategory.Time;
+            }
+
+            throw new ArgumentOutOfRangeException($"Cannot find category of {metricType}");
+        }
+
         public static List<MetricType> GetMetricTypes(this MetricTypeCategory category) {
             switch (category) {
                 case MetricTypeCategory.All:
                     var skills = GetMetricTypes(MetricTypeCategory.Skills);
                     var activities = GetMetricTypes(MetricTypeCategory.Activities);
                     var bosses = GetMetricTypes(MetricTypeCategory.Bosses);
+                    var time = GetMetricTypes(MetricTypeCategory.Time);
 
                     var result =  new List<MetricType>();
                     result.AddRange(skills);
                     result.AddRange(activities);
                     result.AddRange(bosses);
-
+                    result.AddRange(time);
                     return result;
+                
                 case MetricTypeCategory.Skills:
                     return SkillMetrics();
-                case MetricTypeCategory.Bosses:
-                    return BossMetrics();
                 case MetricTypeCategory.Activities:
                     return ActivityMetrics();
+                case MetricTypeCategory.Bosses:
+                    return BossMetrics();
+                case MetricTypeCategory.Time:
+                    return TimeMetrics();
                 case MetricTypeCategory.Others:
                 default:
                     throw new ArgumentOutOfRangeException(nameof(category), category, null);
@@ -77,6 +112,7 @@ namespace WiseOldManConnector.Helpers {
                 MetricType.Sarachnis,
                 MetricType.Scorpia,
                 MetricType.Skotizo,
+                MetricType.Tempoross,
                 MetricType.TheGauntlet,
                 MetricType.TheCorruptedGauntlet,
                 MetricType.TheatreOfBlood,
@@ -107,6 +143,15 @@ namespace WiseOldManConnector.Helpers {
                 MetricType.LastManStanding,
             };
         }
+        
+        public static List<MetricType> TimeMetrics() {
+            return new List<MetricType>() {
+                MetricType.EffectiveHoursBossing,
+                MetricType.EffectiveHoursPlaying
+            };
+        }
+        
+        
 
         public static List<MetricType> SkillMetrics() {
             return new List<MetricType>() {

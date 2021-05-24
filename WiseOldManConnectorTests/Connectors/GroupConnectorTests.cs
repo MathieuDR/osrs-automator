@@ -274,7 +274,7 @@ namespace WiseOldManConnectorTests.Connectors {
         [Fact]
         public async Task GainedLeaderBoardHasValidDelta() {
             int id = TestConfiguration.ValidGroupId;
-            var metric = MetricType.Slayer;
+            var metric = MetricType.EffectiveHoursPlaying;
             var period = Period.Month;
 
             var response = await _groupApi.GainedLeaderboards(id, metric, period);
@@ -336,7 +336,7 @@ namespace WiseOldManConnectorTests.Connectors {
             Assert.Equal(metric, highscore.MetricType);
             Assert.True(highscore.Metric.Level > 1 && highscore.Metric.Level < 100);
             Assert.True(highscore.Metric.Rank > 0);
-            Assert.True(highscore.Metric.Value > 1);
+            Assert.Equal(0,highscore.Metric.Value);
         }
 
         [Fact]
@@ -352,6 +352,19 @@ namespace WiseOldManConnectorTests.Connectors {
             Assert.True(player.Id > 0);
             Assert.True(player.UpdatedAt < DateTimeOffset.Now);
             Assert.True(player.RegisteredAt < DateTimeOffset.Now);
+        }
+        
+        [Fact]
+        public async Task HighscoresHasValidCategory() {
+            int id = TestConfiguration.ValidGroupId;
+            var metric = MetricType.Slayer;
+
+            var response = await _groupApi.Highscores(id, metric);
+            var member = response.Data.Members.FirstOrDefault();
+
+            
+            Assert.Equal(metric,member.MetricType);
+            Assert.Equal(metric,response.Data.MetricType);
         }
 
         [Fact]

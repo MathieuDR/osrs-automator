@@ -1,4 +1,5 @@
-﻿using System.Globalization;
+﻿using System;
+using System.Globalization;
 using System.Linq;
 using WiseOldManConnector.Models.Output;
 
@@ -28,16 +29,28 @@ namespace DiscordBotFanatic.Helpers {
         }
 
         public static string FormattedRank(this Metric metric) {
-            return metric.Rank.FormatNumber();
+            return FormatNumber((double)metric.Rank);
         }
 
-        public static string FormatNumber(this int number, bool zeroAsStripe = false) {
-            return FormatNumber((long) number, zeroAsStripe);
-        }
+        // public static string FormatNumber(this double number, bool zeroAsStripe = false) {
+        //     return FormatNumber((long) number, zeroAsStripe);
+        // }
+        
+        public static string FormatNumber(this double number, bool zeroAsStripe = false) {
+            if (number>=1) {
+                return FormatNumber((long) number);
+            }
 
-        public static string FormatConditionally(this int number, bool zeroAsStripe = false) {
-            return FormatConditionally((long) number);
+            return number.ToString("N");
         }
+        
+        public static string FormatHours(this double number) {
+            return $"{number- (number - (int) number)}:{TimeSpan.FromHours(number-(int)number).ToString(@"mm")}";
+        }
+        
+        // public static string FormatConditionally(this int number, bool zeroAsStripe = false) {
+        //     return FormatConditionally((long) number);
+        // }
 
         public static string FormatNumber(this long number, bool zeroAsStripe = false) {
             if (zeroAsStripe && number == 0) {
@@ -89,11 +102,11 @@ namespace DiscordBotFanatic.Helpers {
             return number.ToString("+#;-#;0", nfi);
         }
 
-        public static int ToLevel(this long experience) {
+        public static int ToLevel(this double experience) {
             return ToLevel((int) experience);
         }
 
-        public static int ToLevel(this int experience) {
+        public static int ToLevel(this long experience) {
             int index;
 
             for (index = 0; index < Experiences.Length; index++) {
@@ -109,6 +122,11 @@ namespace DiscordBotFanatic.Helpers {
             return index;
         }
 
+        public static int ToExperience(this double level) {
+            return ToExperience((int) level);
+        }
+        
+        
         public static int ToExperience(this int level) {
             var index = level;
 

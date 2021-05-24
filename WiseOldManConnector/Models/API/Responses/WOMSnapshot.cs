@@ -245,5 +245,14 @@ namespace WiseOldManConnector.Models.API.Responses {
 
         [JsonProperty("zulrah")]
         public Metric Zulrah { get; set; }
+        
+        [JsonProperty("tempoross")]
+        public Metric Tempoross { get; set; }
+        
+        [JsonProperty("ehb")]
+        public Metric EffectiveHoursBossing { get; set; }
+        
+        [JsonProperty("ehp")]
+        public Metric EffectiveHoursPlaying { get; set; }
     }
 }

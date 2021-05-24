@@ -76,6 +76,7 @@ namespace WiseOldManConnector.Transformers.Resolvers {
                 {MetricType.Sarachnis, context.Mapper.Map<Metric>(source.Sarachnis)},
                 {MetricType.Scorpia, context.Mapper.Map<Metric>(source.Scorpia)},
                 {MetricType.Skotizo, context.Mapper.Map<Metric>(source.Skotizo)},
+                {MetricType.Tempoross, context.Mapper.Map<Metric>(source.Tempoross)},
                 {MetricType.TheGauntlet, context.Mapper.Map<Metric>(source.TheGauntlet)},
                 {MetricType.TheCorruptedGauntlet, context.Mapper.Map<Metric>(source.TheCorruptedGauntlet)},
                 {MetricType.TheatreOfBlood, context.Mapper.Map<Metric>(source.TheatreOfBlood)},
@@ -87,7 +88,9 @@ namespace WiseOldManConnector.Transformers.Resolvers {
                 {MetricType.Vorkath, context.Mapper.Map<Metric>(source.Vorkath)},
                 {MetricType.Wintertodt, context.Mapper.Map<Metric>(source.Wintertodt)},
                 {MetricType.Zalcano, context.Mapper.Map<Metric>(source.Zalcano)},
-                {MetricType.Zulrah, context.Mapper.Map<Metric>(source.Zulrah)}
+                {MetricType.Zulrah, context.Mapper.Map<Metric>(source.Zulrah)},
+                {MetricType.EffectiveHoursBossing, context.Mapper.Map<Metric>(source.EffectiveHoursBossing)},
+                {MetricType.EffectiveHoursPlaying, context.Mapper.Map<Metric>(source.EffectiveHoursPlaying)}
             };
 
             return result;

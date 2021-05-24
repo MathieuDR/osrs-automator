@@ -19,5 +19,8 @@ namespace WiseOldManConnector.Models.API.Responses {
 
         [JsonProperty("ehb")]
         public double? EffectiveHoursBossing { get; set; }
+
+        [JsonProperty("Value")]
+        public double? Value { get; set; }
     }
 }

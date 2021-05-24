@@ -21,4 +21,21 @@ namespace WiseOldManConnector.Transformers.TypeConverters {
             return destination;
         }
     }
+    
+    // internal class LeaderboardMemberToHighscoreMember : ITypeConverter<LeaderboardMember, HighscoreMember> {
+    //     public HighscoreMember Convert(LeaderboardMember source, HighscoreMember destination, ResolutionContext context) {
+    //         destination = new HighscoreMember();
+    //
+    //         destination.Player = context.Mapper.Map<PlayerResponse, Player>(source.Player);
+    //         destination.Delta = new Delta() {
+    //             DeltaType = DeltaType.Experience,
+    //             Gained = source.Gained
+    //         };
+    //
+    //         destination.EndTime = source.EndDate;
+    //         destination.StartTime= source.StartDate;
+    //
+    //         return destination;
+    //     }
+    // }
 }

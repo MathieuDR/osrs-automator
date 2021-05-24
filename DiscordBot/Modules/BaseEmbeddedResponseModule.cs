@@ -15,10 +15,7 @@ using DiscordBotFanatic.Services.interfaces;
 namespace DiscordBotFanatic.Modules {
     [DontAutoLoad]
     public abstract class BaseEmbeddedResponseModule : InteractiveBase<SocketCommandContext> {
-        //protected object ResponseObject;
-        //protected TimeSpan DeleteTimeOut = new TimeSpan(0,1,0);
-
-
+        
         protected BaseEmbeddedResponseModule(Mapper mapper, ILogService logger) {
             Mapper = mapper;
             Logger = logger;

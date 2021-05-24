@@ -50,8 +50,6 @@
     <ProjectReference Include="..\WiseOldManConnector\WiseOldManConnector.csproj" />
   </ItemGroup>
 
-  <Target Name="PostBuild" AfterTargets="PostBuildEvent">
-    <Exec Command="XCOPY &quot;$(SolutionDir)DiscordBot\Images&quot; &quot;$(TargetDir)\Images\&quot; /S /Y" />
-  </Target>
+
 
 </Project>

@@ -25,19 +25,19 @@ namespace DiscordBotFanatic.Modules {
             _groupService = groupService;
         }
 
-        [Name("Toggle Permission on Role")]
-        [Command("right")]
-        [Summary("Toggle a permission for a role.")]
-        public Task ToggleRolePermission(IRole role, BotPermissions permission) {
-            throw new NotImplementedException();
-        }
-
-        [Name("Toggle Permission on User")]
-        [Command("right")]
-        [Summary("Toggle a permission for an user.")]
-        public Task ToggleUserPermission(IGuildUser user, BotPermissions permission) {
-            throw new NotImplementedException();
-        }
+        // [Name("Toggle Permission on Role")]
+        // [Command("right")]
+        // [Summary("Toggle a permission for a role.")]
+        // public Task ToggleRolePermission(IRole role, BotPermissions permission) {
+        //     throw new NotImplementedException();
+        // }
+        //
+        // [Name("Toggle Permission on User")]
+        // [Command("right")]
+        // [Summary("Toggle a permission for an user.")]
+        // public Task ToggleUserPermission(IGuildUser user, BotPermissions permission) {
+        //     throw new NotImplementedException();
+        // }
 
         [Name("Set WOM group")]
         [Command("womgroup", RunMode = RunMode.Async)]
@@ -51,21 +51,21 @@ namespace DiscordBotFanatic.Modules {
             builder.Description = $"Group set to {decoratedGroup.Item.Name}";
             await ModifyWaitMessageAsync(builder.Build());
         }
-
-        [Name("Auto add group")]
-        [Command("autoadd", RunMode = RunMode.Async)]
-        [Summary("Auto add group")]
-        [RequireContext(ContextType.Guild)]
-        public async Task SetAutoAdd(bool autoAdd) {
-            await _groupService.SetAutoAdd(GetGuildUser(), autoAdd);
-            var builder = new EmbedBuilder().AddCommonProperties().WithMessageAuthorFooter(Context);
-
-            builder.Title = $"Success.";
-            builder.Description =
-                autoAdd ? $"New members will be automatically added." : $"New members will not be automatically added.";
-
-            await ModifyWaitMessageAsync(builder.Build());
-        }
+        
+        // [Name("Auto add group")]
+        // [Command("autoadd", RunMode = RunMode.Async)]
+        // [Summary("Auto add group")]
+        // [RequireContext(ContextType.Guild)]
+        // public async Task SetAutoAdd(bool autoAdd) {
+        //     await _groupService.SetAutoAdd(GetGuildUser(), autoAdd);
+        //     var builder = new EmbedBuilder().AddCommonProperties().WithMessageAuthorFooter(Context);
+        //
+        //     builder.Title = $"Success.";
+        //     builder.Description =
+        //         autoAdd ? $"New members will be automatically added." : $"New members will not be automatically added.";
+        //
+        //     await ModifyWaitMessageAsync(builder.Build());
+        // }
 
         [Name("Set Automated message channel")]
         [Command("set automated")]
@@ -93,9 +93,9 @@ namespace DiscordBotFanatic.Modules {
         }
 
 
-        [Name("Set Automated message channel")]
+        [Name("Toggle job")]
         [Command("toggle automated")]
-        [Summary("Set Automated message channel")]
+        [Summary("Toggle job")]
         [RequireContext(ContextType.Guild)]
         public async Task ToggleAutomatedJob(string job) {
             var jobType = Enum.Parse<JobType>(job, true);

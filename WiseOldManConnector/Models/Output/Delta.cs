@@ -5,7 +5,7 @@ namespace WiseOldManConnector.Models.Output {
         public DeltaType DeltaType { get; set; }
         public long Start { get; set; }
         public long End { get; set; }
-        public long Gained { get; set; }
+        public double Gained { get; set; }
 
     }
 }

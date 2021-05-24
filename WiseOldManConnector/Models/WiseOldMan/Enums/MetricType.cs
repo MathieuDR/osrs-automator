@@ -229,5 +229,8 @@ namespace WiseOldManConnector.Models.WiseOldMan.Enums {
 
         [EnumMember(Value = "ehb")]
         EffectiveHoursBossing,
+        
+        [EnumMember(Value = "tempoross")]
+        Tempoross
     }
 }

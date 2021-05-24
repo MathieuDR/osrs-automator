@@ -125,7 +125,8 @@ namespace WiseOldManConnector.Api {
 
             result.Data.Page = 0;
             result.Data.PageSize = 20;
-
+            result.Data.MetricType = metric;
+            
             foreach (HighscoreMember member in result.Data.Members) {
                 member.MetricType = metric;
             }
@@ -269,10 +270,15 @@ namespace WiseOldManConnector.Api {
             throw new NotImplementedException();
         }
 
-        public async Task<ConnectorResponse<MessageResponse>> Update(int id) {
+        public async Task<ConnectorResponse<MessageResponse>> Update(int id, string verificationCode) {
             var restRequest = GetNewRestRequest("{id}/update-all");
             restRequest.AddParameter("id", id, ParameterType.UrlSegment);
             restRequest.Method = Method.POST;
+           
+            restRequest.AddJsonBody(new {
+                verificationCode
+            });
+
 
             var restResult = await ExecuteRequest<WOMMessageResponse>(restRequest);
             return GetResponse<MessageResponse>(restResult);

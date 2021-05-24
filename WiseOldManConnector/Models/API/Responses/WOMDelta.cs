@@ -6,6 +6,6 @@ namespace WiseOldManConnector.Models.API.Responses {
         public int End { get; set; }
 
         [JsonProperty("gained")]
-        public int Gained { get; set; }
+        public double Gained { get; set; }
     }
 }

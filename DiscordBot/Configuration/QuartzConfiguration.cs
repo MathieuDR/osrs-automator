@@ -43,17 +43,29 @@ namespace DiscordBotFanatic.Configuration {
             this IServiceCollectionQuartzConfigurator quartzServices) {
             quartzServices.ScheduleJob<AutoUpdateGroupJob>(trigger =>
                 trigger.WithIdentity(JobType.GroupUpdate.ToString(), "wom")
-                    .StartAt(DateBuilder.EvenSecondDate(DateTimeOffset.UtcNow.AddMinutes(5)))
-                    .WithSimpleSchedule(x => x.WithIntervalInHours(3).RepeatForever())
+                    .WithSchedule(CronScheduleBuilder.DailyAtHourAndMinute(14, 30)
+                        .InTimeZone(TimeZoneInfo.FindSystemTimeZoneById("Europe/Berlin"))
+                        .WithMisfireHandlingInstructionFireAndProceed())
                     .WithDescription("Showing achievements for all the servers!")
             );
+            
+            quartzServices.ScheduleJob<TopLeaderBoardJob>(trigger =>
+                trigger.WithIdentity(JobType.DailyTop.ToString(), "wom")
+                    // .WithSchedule(CronScheduleBuilder.DailyAtHourAndMinute(14, 30)
+                    //     .InTimeZone(TimeZoneInfo.FindSystemTimeZoneById("Europe/Berlin"))
+                    //     .WithMisfireHandlingInstructionFireAndProceed())
+                    .StartAt(DateBuilder.EvenSecondDate(DateTimeOffset.UtcNow.AddSeconds(10)))
+                    .WithDescription("Showing top gains for all the servers!")
+            );
+            
+           
 
-            quartzServices.ScheduleJob<AchievementsJob>(trigger =>
-                trigger.WithIdentity(JobType.Achievements.ToString(), "wom")
-                    .StartAt(DateBuilder.EvenSecondDate(DateTimeOffset.UtcNow.AddMinutes(1)))
-                    .WithSimpleSchedule(x => x.WithIntervalInHours(1).RepeatForever())
-                    .WithDescription("Showing achievements for all the servers!")
-            );
+            // quartzServices.ScheduleJob<AchievementsJob>(trigger =>
+            //     trigger.WithIdentity(JobType.Achievements.ToString(), "wom")
+            //         .StartAt(DateBuilder.EvenSecondDate(DateTimeOffset.UtcNow.AddMinutes(1)))
+            //         .WithSimpleSchedule(x => x.WithIntervalInHours(1).RepeatForever())
+            //         .WithDescription("Showing achievements for all the servers!")
+            // );
 
             return quartzServices;
         }
