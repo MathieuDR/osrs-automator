@@ -34,7 +34,7 @@ namespace DiscordBotFanatic.Jobs {
 
        
 
-        protected async Task CreateRecovery(int minutes = 5) {
+        protected async Task CreateRecovery(int minutes = 25) {
             Console.WriteLine($"Stopping execution");
                 
             var Trigger = TriggerBuilder.Create()

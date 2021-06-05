@@ -24,7 +24,7 @@ namespace DiscordBotFanatic.Jobs {
 
         public MonthlyTopDeltasJob(DiscordSocketClient discord, ILogService logService, IDiscordBotRepository repository,
             Mapper mapper, IOsrsHighscoreService osrsHighscoreService) : base(discord,
-            logService, repository, mapper, JobType.DailyTop) {
+            logService, repository, mapper, JobType.MonthlyTopGains) {
             _osrsHighscoreService = osrsHighscoreService;
             
             _period = Period.Month;
@@ -35,18 +35,14 @@ namespace DiscordBotFanatic.Jobs {
 
             var metrics = MetricTypeCategory.All.GetMetricTypes();
 
-            List<DeltaLeaderboard> tops = null;
+            List<DeltaLeaderboard> tops = new List<DeltaLeaderboard>();
             
             try {
-                var tasks = new List<Task<DeltaLeaderboard>>();
                 foreach (var metric in metrics) {   
                     _ = LogService.Log($"Calling for {metric}", LogEventLevel.Information);
-                    var task = _osrsHighscoreService.GetTopDeltasOfGroup(Configuration.WomGroupId, metric, _period);
-                    tasks.Add(task);
+                    var top = await _osrsHighscoreService.GetTopDeltasOfGroup(Configuration.WomGroupId, metric, _period);
+                    tops.Add(top);
                 }
-                
-                await Task.WhenAll(tasks);
-                tops = tasks.Select(x => x.Result).ToList();
             } catch (Exception e) {
                 Console.WriteLine(e);
                 await CreateRecovery();
