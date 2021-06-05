@@ -62,36 +62,6 @@ namespace DiscordBotFanatic {
             await client.LoginAsync(TokenType.Bot, botConfig.Token);
             await client.StartAsync();
         }
-
-
-        //private async Task<IScheduler> CreateQuartzScheduler(IConfiguration config) {
-        //    // Grab the Scheduler instance from the Factory
-        //    StdSchedulerFactory factory = new StdSchedulerFactory();
-        //    IScheduler scheduler = await factory.GetScheduler();
-
-
-        //    return scheduler;
-        //}
-
-        //private async Task ScheduleTasks(IScheduler scheduler) {
-        //    // define the job and tie it to our HelloJob class
-        //    IJobDetail job = JobBuilder.Create<HelloJob>()
-        //        .WithIdentity("job1", "group1")
-        //        .Build();
-
-        //    // Trigger the job to run now, and then repeat every 10 seconds
-        //    ITrigger trigger = TriggerBuilder.Create()
-        //        .WithIdentity("trigger1", "group1")
-        //        .StartNow()
-        //        .WithSimpleSchedule(x => x
-        //            .WithIntervalInSeconds(10)
-        //            .RepeatForever())
-        //        .Build();
-
-        //    // Tell quartz to schedule the job using our trigger
-        //    await scheduler.ScheduleJob(job, trigger);
-        //}
-
         private IServiceProvider ConfigureServices(IConfiguration config) {
             StartupConfiguration configuration = config.GetSection("Startup").Get<StartupConfiguration>();
             BotConfiguration botConfiguration = config.GetSection("Bot").Get<BotConfiguration>();

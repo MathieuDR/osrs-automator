@@ -92,6 +92,22 @@ namespace DiscordBotFanatic.Modules {
             await ModifyWaitMessageAsync(builder.Build());
         }
 
+        [Name("Queue job")]
+        [Command("queue")]
+        [Summary("Queue automated job")]
+        [RequireContext(ContextType.Guild)]
+        public async Task QueueAutomated(string job) {
+            var jobType = Enum.Parse<JobType>(job, true);
+            _ = _groupService.QueueJob(jobType);
+                
+            var builder = new EmbedBuilder()
+                .AddCommonProperties()
+                .WithMessageAuthorFooter(Context)
+                .WithTitle("Success!")
+                .WithDescription($"Job '{jobType}' queued");
+
+            await ModifyWaitMessageAsync(builder.Build());
+        }
 
         [Name("Toggle job")]
         [Command("toggle automated")]
@@ -99,7 +115,6 @@ namespace DiscordBotFanatic.Modules {
         [RequireContext(ContextType.Guild)]
         public async Task ToggleAutomatedJob(string job) {
             var jobType = Enum.Parse<JobType>(job, true);
-
             bool activated = await _groupService.ToggleAutomationJob(jobType, GetGuildUser().Guild);
 
             string verb = activated ? "activated" : "deactivated";

@@ -16,5 +16,6 @@ namespace DiscordBotFanatic.Services.interfaces {
         Task<Dictionary<string, string>> GetSettingsDictionary(IGuild guild);
         Task<ItemDecorator<Leaderboard>> GetGroupLeaderboard(IGuildUser guildUser);
         Task<ItemDecorator<Leaderboard>> GetGroupLeaderboard(IGuildUser guildUser, MetricType metric, Period period);
+        Task QueueJob(JobType jobType);
     }
 }
