@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using DiscordBotFanatic.Models;
 using DiscordBotFanatic.Models.Data;
 using LiteDB;
 using Player = DiscordBotFanatic.Models.Data.Player;
@@ -12,6 +13,7 @@ namespace DiscordBotFanatic.Repository {
         protected const string GuildEventCollectionName = "guildEvents";
         protected const string GuildCompetitionCollectionName = "guildCompetitions";
         protected const string GuildJobStateCollectionName = "guildJobState";
+        protected const string GuildUserCountsCollectionName = "guildUserCounts";
         private readonly object _dbLock = new object();
         private readonly Dictionary<ulong, object> _guildLocks = new Dictionary<ulong, object>();
 
@@ -145,6 +147,49 @@ namespace DiscordBotFanatic.Repository {
             return GetAutomatedJobState(jobState.GuildId);
         }
 
+        public UserCountInfo GetCountInfoByUserId(ulong guildId, ulong userId) {
+            lock (GetGuildLock(guildId)) {
+                using (LiteDatabase = new LiteDatabase(GetGuildFileName(guildId))) {
+                    return GetCountQuery(LiteDatabase).Where(c => c.DiscordId == userId).FirstOrDefault();
+                }
+            }
+        }
+
+        public UserCountInfo UpdateOrInsertUserCountInfoForGuid(ulong guildId, UserCountInfo countInfo) {
+            if (countInfo._id == null) {
+                return InsertUserCountInfoForGuid(guildId, countInfo);
+            }
+
+            countInfo.IsValid();
+            lock (GetGuildLock(guildId)) {
+                using (LiteDatabase = new LiteDatabase(GetGuildFileName(guildId))) {
+                    var collection = LiteDatabase.GetCollection<UserCountInfo>(GuildUserCountsCollectionName);
+                    collection.Update(countInfo);
+                }
+            }
+
+            return GetCountInfoByUserId(guildId, countInfo.DiscordId);
+        }
+
+        public IEnumerable<UserCountInfo> GetAllUserCountInfos(ulong guildId) {
+            lock (GetGuildLock(guildId)) {
+                using (LiteDatabase = new LiteDatabase(GetGuildFileName(guildId))) {
+                    return GetCountQuery(LiteDatabase).ToList();
+                }
+            }
+        }
+
+        private UserCountInfo InsertUserCountInfoForGuid(ulong guildId, UserCountInfo countInfo) {
+            lock (GetGuildLock(guildId)) {
+                using (LiteDatabase = new LiteDatabase(GetGuildFileName(guildId))) {
+                    var collection = LiteDatabase.GetCollection<UserCountInfo>(GuildUserCountsCollectionName);
+                    collection.Insert(countInfo);
+                }
+            }
+            
+            return GetCountInfoByUserId(guildId, countInfo.DiscordId);
+        }
+
 
         public Player UpdateOrInsertPlayerForGuild(ulong guildId, Player player) {
             if (player._id == null) {
@@ -205,6 +250,11 @@ namespace DiscordBotFanatic.Repository {
 
         private ILiteQueryable<Player> GetPlayerQuery(LiteDatabase db) {
             var collection = LiteDatabase.GetCollection<Player>(PlayerCollectionName);
+            return collection.Query();
+        }
+        
+        private ILiteQueryable<UserCountInfo> GetCountQuery(LiteDatabase db) {
+            var collection = LiteDatabase.GetCollection<UserCountInfo>(GuildUserCountsCollectionName);
             return collection.Query();
         }
 

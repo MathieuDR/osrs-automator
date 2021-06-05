@@ -51,6 +51,7 @@ namespace DiscordBotFanatic.Services {
             var t = _commands.AddModulesAsync(Assembly.GetEntryAssembly(), _provider);
             await _commands.AddModuleAsync<PlayerModule>(provider);
             await _commands.AddModuleAsync<AdminModule>(provider);
+            await _commands.AddModuleAsync<CountModule>(provider);
             // await _commands.AddModuleAsync<CompetitionModule>(provider);
             // await _commands.AddModuleAsync<GroupModule>(provider);
             //await _commands.AddModuleAsync<PlayerStatsModule>(provider);
