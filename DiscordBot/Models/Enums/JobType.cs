@@ -2,6 +2,7 @@
     public enum JobType {
         Achievements = 1,
         GroupUpdate = 20,
-        DailyTop = 40
+        MonthlyTop = 40,
+        MonthlyTopGains = 80,
     }
 }
