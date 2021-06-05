@@ -42,32 +42,41 @@ namespace DiscordBotFanatic.Configuration {
         private static IServiceCollectionQuartzConfigurator ConfigureJobs(
             this IServiceCollectionQuartzConfigurator quartzServices) {
             quartzServices.ScheduleJob<AutoUpdateGroupJob>(trigger =>
-                trigger.WithIdentity(JobType.GroupUpdate.ToString(), "wom")
-                    .WithSchedule(CronScheduleBuilder.DailyAtHourAndMinute(14, 30)
+                trigger.WithIdentity(JobType.GroupUpdate+"-evening", "wom")
+                    .WithSchedule(CronScheduleBuilder.DailyAtHourAndMinute(22, 00)
                         .InTimeZone(TimeZoneInfo.FindSystemTimeZoneById("Europe/Berlin"))
                         .WithMisfireHandlingInstructionFireAndProceed())
-                    .WithDescription("Showing achievements for all the servers!")
+                    .WithDescription("Updating in the evening")
+            );
+            
+            quartzServices.ScheduleJob<AutoUpdateGroupJob>(trigger =>
+                trigger.WithIdentity(JobType.GroupUpdate+"-morning", "wom")
+                    .WithSchedule(CronScheduleBuilder.DailyAtHourAndMinute(01, 00)
+                        .InTimeZone(TimeZoneInfo.FindSystemTimeZoneById("Europe/Berlin"))
+                        .WithMisfireHandlingInstructionFireAndProceed())
+                    .WithDescription("Updating in the morning")
             );
             
             quartzServices.ScheduleJob<TopLeaderBoardJob>(trigger =>
-                trigger.WithIdentity(JobType.DailyTop.ToString(), "wom")
-                    // .WithSchedule(CronScheduleBuilder.DailyAtHourAndMinute(14, 30)
-                    //     .InTimeZone(TimeZoneInfo.FindSystemTimeZoneById("Europe/Berlin"))
-                    //     .WithMisfireHandlingInstructionFireAndProceed())
+                trigger.WithIdentity(JobType.MonthlyTop.ToString(), "wom")
+                    .WithSchedule(CronScheduleBuilder.MonthlyOnDayAndHourAndMinute(01, 00,30)
+                        .InTimeZone(TimeZoneInfo.FindSystemTimeZoneById("Europe/Berlin"))
+                        .WithMisfireHandlingInstructionFireAndProceed())
+                    .StartAt(DateBuilder.EvenSecondDate(DateTimeOffset.UtcNow.AddSeconds(10)))
+                    .WithDescription("Showing top hiscores for all the servers!")
+            );
+            
+            quartzServices.ScheduleJob<MonthlyTopDeltasJob>(trigger =>
+                trigger.WithIdentity(JobType.MonthlyTopGains.ToString(), "wom")
+                    .WithSchedule(CronScheduleBuilder.MonthlyOnDayAndHourAndMinute(01, 00,5)
+                        .InTimeZone(TimeZoneInfo.FindSystemTimeZoneById("Europe/Berlin"))
+                        .WithMisfireHandlingInstructionFireAndProceed())
                     .StartAt(DateBuilder.EvenSecondDate(DateTimeOffset.UtcNow.AddSeconds(10)))
                     .WithDescription("Showing top gains for all the servers!")
             );
-            
-           
-
-            // quartzServices.ScheduleJob<AchievementsJob>(trigger =>
-            //     trigger.WithIdentity(JobType.Achievements.ToString(), "wom")
-            //         .StartAt(DateBuilder.EvenSecondDate(DateTimeOffset.UtcNow.AddMinutes(1)))
-            //         .WithSimpleSchedule(x => x.WithIntervalInHours(1).RepeatForever())
-            //         .WithDescription("Showing achievements for all the servers!")
-            // );
 
             return quartzServices;
         }
     }
 }
+
