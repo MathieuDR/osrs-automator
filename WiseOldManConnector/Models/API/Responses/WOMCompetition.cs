@@ -36,6 +36,9 @@ namespace WiseOldManConnector.Models.API.Responses {
 
         [JsonProperty("participantCount")]
         public int? ParticipantCount { get; set; }
+        
+        [JsonProperty("totalGained")]
+        public double TotalGained { get; set; }
 
         [JsonProperty("participants")]
         public List<Participant> Participants { get; set; }

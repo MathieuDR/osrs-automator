@@ -5,13 +5,13 @@ namespace WiseOldManConnector.Models.API.Responses {
     
 
             [JsonProperty("start")]
-            public int Start { get; set; }
+            public double Start { get; set; }
 
             [JsonProperty("end")]
-            public int End { get; set; }
+            public double End { get; set; }
 
             [JsonProperty("gained")]
-            public int Gained { get; set; }
+            public double Gained { get; set; }
         
     }
 }

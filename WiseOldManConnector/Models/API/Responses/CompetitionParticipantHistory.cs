@@ -7,6 +7,6 @@ namespace WiseOldManConnector.Models.API.Responses {
         public DateTime Date { get; set; }
 
         [JsonProperty("value")]
-        public int Value { get; set; }
+        public double Value { get; set; }
     }
 }

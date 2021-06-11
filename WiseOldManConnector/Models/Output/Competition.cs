@@ -15,6 +15,7 @@ namespace WiseOldManConnector.Models.Output {
         public DateTimeOffset? UpdatedDate { get; set; }
         public string Duration { get; set; }
         public int ParticipantCount { get; set; }
+        public double TotalGained { get; set; }    
         public List<CompetitionParticipant> Participants { get; set; }
         private CompetitionLeaderboard _leaderboard;
 
