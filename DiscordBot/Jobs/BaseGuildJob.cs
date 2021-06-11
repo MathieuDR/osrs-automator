@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
 using Discord;
@@ -27,10 +28,27 @@ namespace DiscordBotFanatic.Jobs {
         protected Mapper Mapper { get; }
         protected JobType JobType { get; }
         protected GroupConfig Configuration { get; private set; }
+        public IScheduler Scheduler { get; set; }
+        
+        public IJobDetail Job{ get; set; }
 
+       
+
+        protected async Task CreateRecovery(int minutes = 25) {
+            Console.WriteLine($"Stopping execution");
+                
+            var Trigger = TriggerBuilder.Create()
+                .WithIdentity("recoverTrigger", "recovery")
+                .StartAt(DateBuilder.EvenSecondDate(DateTimeOffset.UtcNow.AddMinutes(minutes)))
+                .Build();
+          
+            await Scheduler.ScheduleJob(Job, Trigger);
+        }
 
         public virtual async Task Execute(IJobExecutionContext context) {
             _ = LogService.Log($"Starting {JobType} job execution", LogEventLevel.Information);
+            Scheduler = context.Scheduler;
+            Job = context.JobDetail.GetJobBuilder().WithIdentity(Guid.NewGuid().ToString(),"recovery").Build();
 
             if (Discord.ConnectionState == ConnectionState.Connected) {
                 foreach (SocketGuild discordGuild in Discord.Guilds) {
@@ -53,6 +71,7 @@ namespace DiscordBotFanatic.Jobs {
 
                     var channel = await GetChannel(discordGuild, settings);
                     if (channel == null) {
+                        _ = discordGuild.DefaultChannel.SendMessageAsync($"No channel set for automated job: {JobType}");
                         continue;
                     }
 
@@ -76,7 +95,7 @@ namespace DiscordBotFanatic.Jobs {
 
             if (channel == null) {
                 _ = LogService.Log("Cannot find channel", LogEventLevel.Warning);
-                _ = guild.DefaultChannel.SendMessageAsync($"Channel not found for automated job: {JobType.Achievements}");
+                _ = guild.DefaultChannel.SendMessageAsync($"Channel not found for automated job: {JobType}");
             }
 
             return Task.FromResult(channel);

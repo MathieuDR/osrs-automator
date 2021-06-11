@@ -70,12 +70,16 @@ namespace DiscordBotFanatic.Services {
             return (await _groupApi.GainedLeaderboards(groupId, metricType, period)).Data;
         }
 
+        public async Task<HighscoreLeaderboard> GetLeaderboard(int groupId, MetricType metricType) {
+            return (await _groupApi.Highscores(groupId, metricType)).Data;
+        }
+
         public async Task<IEnumerable<Achievement>> GetGroupAchievements(int groupId) {
             return (await _groupApi.RecentAchievements(groupId)).Data;
         }
 
-        public async Task<MessageResponse> UpdateGroup(int groupId) {
-            return (await _groupApi.Update(groupId)).Data;
+        public async Task<MessageResponse> UpdateGroup(int groupId, string verificationCode) {
+            return (await _groupApi.Update(groupId, verificationCode)).Data;
         }
 
         public async Task<Player> GetPlayerById(int playerId) {

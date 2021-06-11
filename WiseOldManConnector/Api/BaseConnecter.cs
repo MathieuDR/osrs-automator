@@ -93,6 +93,7 @@ namespace WiseOldManConnector.Api {
             }
 
             if (response.ErrorException != null) {
+                Logger?.Log(LogLevel.Error, null, "Error for [{Resource}, {Parameters:j}]", response.Request.Resource, response.Request.Parameters);
                 throw new BadRequestException(response.ErrorException.Message, response);
             }
 
@@ -152,7 +153,8 @@ namespace WiseOldManConnector.Api {
                             responseMessage = string.Join(", ", collectionBaseResponses.Select(x => x.Message).ToArray());
                             break;
                     }
-
+                    
+                    Logger?.Log(LogLevel.Error, null, "Error for [{Resource}, {Parameters:j}]", response.Request.Resource, response.Request.Parameters);
                     throw new BadRequestException(responseMessage, response);
                 default:
                     throw new ArgumentOutOfRangeException();

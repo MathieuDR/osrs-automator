@@ -19,7 +19,7 @@ namespace DiscordBotFanatic.Jobs {
         }
 
         public override async Task ForGuild(SocketGuild guild, IMessageChannel channel) {
-            var task = _osrsHighscoreService.UpdateGroup(Configuration.WomGroupId);
+            var task = _osrsHighscoreService.UpdateGroup(Configuration.WomGroupId, Configuration.WomVerificationCode);
 
             var decorator = Configuration.WomGroup.Decorate();
 

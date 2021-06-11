@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using DiscordBotFanatic.Models;
 using DiscordBotFanatic.Models.Data;
 using OsrsPlayer = WiseOldManConnector.Models.Output.Player;
 using Player = DiscordBotFanatic.Models.Data.Player;
@@ -19,5 +20,10 @@ namespace DiscordBotFanatic.Repository {
 
         AutomatedJobState GetAutomatedJobState(ulong guildId);
         AutomatedJobState CreateOrUpdateAutomatedJobState(ulong guildId, AutomatedJobState jobState);
+
+        UserCountInfo GetCountInfoByUserId(ulong guildId, ulong userId);
+        
+        UserCountInfo UpdateOrInsertUserCountInfoForGuid(ulong guildId, UserCountInfo countInfo);
+        IEnumerable<UserCountInfo> GetAllUserCountInfos(ulong guildId);
     }
 }

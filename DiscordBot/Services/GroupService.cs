@@ -4,23 +4,27 @@ using System.Linq;
 using System.Threading.Tasks;
 using Discord;
 using DiscordBotFanatic.Helpers;
+using DiscordBotFanatic.Jobs;
 using DiscordBotFanatic.Models.Data;
 using DiscordBotFanatic.Models.Decorators;
 using DiscordBotFanatic.Models.Enums;
 using DiscordBotFanatic.Repository;
 using DiscordBotFanatic.Services.interfaces;
+using Quartz;
 using WiseOldManConnector.Models.Output;
 using WiseOldManConnector.Models.WiseOldMan.Enums;
 
 namespace DiscordBotFanatic.Services {
     public class GroupService : BaseService, IGroupService {
         private readonly IOsrsHighscoreService _highscoreService;
+        private readonly ISchedulerFactory _factory;
         private readonly IDiscordBotRepository _repository;
 
-        public GroupService(ILogService logger, IDiscordBotRepository repository, IOsrsHighscoreService highscoreService) :
+        public GroupService(ILogService logger, IDiscordBotRepository repository, IOsrsHighscoreService highscoreService, ISchedulerFactory factory) :
             base(logger) {
             _repository = repository;
             _highscoreService = highscoreService;
+            _factory = factory;
         }
 
         public async Task<ItemDecorator<Group>> SetGroupForGuild(IGuildUser guildUser, int womGroupId, string verificationCode) {
@@ -119,10 +123,34 @@ namespace DiscordBotFanatic.Services {
                 var competition = await _highscoreService.GetCompetition(emptyCompetition.Id);
                 return competition.DecorateLeaderboard();
             }
-
+            
             // Check for delta gains, overall is standard
             DeltaLeaderboard temp = await _highscoreService.GetTopDeltasOfGroup(settings.WomGroupId, metricType, period);
             return temp.Decorate(settings.WomGroup.Id, settings.WomGroup.Name);
+        }
+
+        public async Task QueueJob(JobType jobType) {
+            var schedulers = await _factory.GetAllSchedulers();
+            var scheduler = schedulers.FirstOrDefault() ?? await _factory.GetScheduler();
+
+            if (scheduler is null) {
+                throw new NullReferenceException($"Cannot make a scheduler");
+            }
+
+            var t = jobType switch {
+                JobType.GroupUpdate => typeof(AutoUpdateGroupJob),
+                JobType.MonthlyTop => typeof(TopLeaderBoardJob),
+                JobType.MonthlyTopGains => typeof(MonthlyTopDeltasJob),
+                _ => throw new ArgumentOutOfRangeException(nameof(jobType), jobType, null)
+            };
+
+            var job = JobBuilder.Create(t)
+                .WithIdentity(Guid.NewGuid().ToString())
+                .Build();
+
+            var trigger = TriggerBuilder.Create().StartAt(DateBuilder.EvenSecondDate(DateTimeOffset.Now.AddSeconds(5))).Build();
+            
+            scheduler.ScheduleJob(job, trigger);
         }
 
         private GroupConfig GetGroupConfig(ulong guildId, bool validate = true) {

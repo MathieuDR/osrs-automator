@@ -29,7 +29,7 @@ namespace WiseOldManConnector.Transformers {
                     .ForMember(dest => dest.EffectiveHours,
                         opt => opt.MapFrom(src => src.EffectiveHoursBossing ?? src.EffectiveHoursPlaying))
                     .ForMember(dest => dest.Value,
-                        opt => opt.MapFrom(src => src.Score ?? src.Kills ?? src.Experience));
+                        opt => opt.MapFrom(src => src.Experience ?? src.Score ?? src.Kills ?? src.Value));
                     
 
                 cfg.CreateMap<WOMCompetition, Competition>()
@@ -117,14 +117,9 @@ namespace WiseOldManConnector.Transformers {
                     .ForMember(dest => dest.Members, opt => opt.MapFrom(src => src));
 
                 cfg.CreateMap<LeaderboardMember, Player>();
-                cfg.CreateMap<LeaderboardMember, Metric>();
-
-                cfg.CreateMap<IEnumerable<LeaderboardMember>, HighscoreLeaderboard>()
-                    .ForMember(dest => dest.Members, opt => opt.MapFrom(src => src));
-
-                cfg.CreateMap<LeaderboardMember, HighscoreMember>()
-                    .ForMember(dest => dest.Player, opt => opt.MapFrom(src => src))
-                    .ForMember(dest => dest.Metric, opt => opt.MapFrom(src => src));
+                cfg.CreateMap<LeaderboardMember, Metric>()
+                        .ForMember(dest => dest.Value,
+                        opt => opt.MapFrom(src =>src.Experience ?? src.Score ?? src.Kills ?? src.Value));
 
                 cfg.CreateMap<IEnumerable<LeaderboardMember>, HighscoreLeaderboard>()
                     .ForMember(dest => dest.Members, opt => opt.MapFrom(src => src));
@@ -132,7 +127,7 @@ namespace WiseOldManConnector.Transformers {
                 cfg.CreateMap<LeaderboardMember, HighscoreMember>()
                     .ForMember(dest => dest.Player, opt => opt.MapFrom(src => src.Player))
                     .ForMember(dest => dest.Metric, opt => opt.MapFrom(src => src));
-
+              
                 cfg.CreateMap<IEnumerable<LeaderboardMember>, RecordLeaderboard>()
                     .ForMember(dest => dest.Members, opt => opt.MapFrom(src => src));
 
@@ -140,11 +135,7 @@ namespace WiseOldManConnector.Transformers {
                     .ForMember(dest => dest.Player, opt => opt.MapFrom(src => src.Player))
                     .ForMember(dest => dest.UpdateDateTime, opt => opt.MapFrom(src => src.Player.UpdatedAt));
 
-                cfg.CreateMap<LeaderboardMember, Player>();
-
-                cfg.CreateMap<LeaderboardMember, Metric>();
-
-                cfg.CreateMap<StatisticsResponse, Statistics>()
+               cfg.CreateMap<StatisticsResponse, Statistics>()
                     .ForMember(dest => dest.Maxed200MExpPlayers, opt => opt.MapFrom(src => src.Maxed200MsCount))
                     .ForMember(dest => dest.MaxedCombatPlayers, opt => opt.MapFrom(src => src.MaxedCombatCount))
                     .ForMember(dest => dest.MaxedTotalPlayers, opt => opt.MapFrom(src => src.MaxedTotalCount));
