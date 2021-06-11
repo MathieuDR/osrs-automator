@@ -12,6 +12,8 @@ using DiscordBotFanatic.Models.Configuration;
 using DiscordBotFanatic.Services.interfaces;
 
 namespace DiscordBotFanatic.Modules {
+    
+    [Group("count")]
     public class CountModule: BaseWaitMessageEmbeddedResponseModule  {
         private readonly ICounterService _counterService;
 
@@ -21,7 +23,7 @@ namespace DiscordBotFanatic.Modules {
         }
 
         [Name("Count")]
-        [Command("count", RunMode = RunMode.Async)]
+        [Command]
         [Summary("Add any number to the tally")]
         [RequireContext(ContextType.Guild)]
         public async Task Count(int additive, IUser user, [Remainder]string reason = null) {
@@ -39,7 +41,7 @@ namespace DiscordBotFanatic.Modules {
         }
 
         [Name("Count")]
-        [Command("count", RunMode = RunMode.Async)]
+        [Command]
         [Summary("See total count")]
         [RequireContext(ContextType.Guild)]
         public async Task GetTotal(IGuildUser user) {
@@ -52,7 +54,7 @@ namespace DiscordBotFanatic.Modules {
         }
         
         [Name("Count history")]
-        [Command("count history", RunMode = RunMode.Async)]
+        [Command("history")]
         [Summary("See count history")]
         [RequireContext(ContextType.Guild)]
         public async Task CountHistory(IGuildUser user) {
@@ -67,7 +69,7 @@ namespace DiscordBotFanatic.Modules {
         }
         
         [Name("Count history")]
-        [Command("count history", RunMode = RunMode.Async)]
+        [Command("history")]
         [Summary("See count history")]
         [RequireContext(ContextType.Guild)]
         public async Task CountHistory() {
@@ -75,7 +77,7 @@ namespace DiscordBotFanatic.Modules {
         }
         
         [Name("Count history")]
-        [Command("count top", RunMode = RunMode.Async)]
+        [Command("top")]
         [Summary("See count history")]
         [RequireContext(ContextType.Guild)]
         public async Task CountTop() {
@@ -83,7 +85,7 @@ namespace DiscordBotFanatic.Modules {
         }
         
         [Name("Count history")]
-        [Command("count top", RunMode = RunMode.Async)]
+        [Command("top")]
         [Summary("See count history")]
         [RequireContext(ContextType.Guild)]
         public async Task CountTop(int quantity) {
@@ -130,6 +132,26 @@ namespace DiscordBotFanatic.Modules {
         private string NicknameById(ulong userId) {
             var user = Context.Guild.GetUser(userId);
             return user?.Nickname ?? "Unknown user";
+        }
+        
+        [Group("treshold")]
+        public class CountConfigModule : BaseWaitMessageEmbeddedResponseModule{
+            private readonly IGroupService _groupService;
+            public CountConfigModule(IGroupService groupService,Mapper mapper, ILogService logger, MessageConfiguration messageConfiguration) : base(mapper, logger, messageConfiguration) {
+                _groupService = groupService;
+            }
+
+            public Task Set(int count, IRole role, [Remainder] string message) {
+                
+            }
+            
+            public Task List() {
+                
+            }
+            
+            public Task Remove(string id) {
+                
+            }
         }
     }
 }
