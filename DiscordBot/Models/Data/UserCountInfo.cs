@@ -1,10 +1,8 @@
 using System.Collections.Generic;
 using System.Linq;
 using Discord;
-using DiscordBotFanatic.Models.Data;
-using DiscordBotFanatic.Modules;
 
-namespace DiscordBotFanatic.Models {
+namespace DiscordBotFanatic.Models.Data {
     public class UserCountInfo : BaseModel {
         public UserCountInfo() { }
         public UserCountInfo(IUser user) : base(user) { }

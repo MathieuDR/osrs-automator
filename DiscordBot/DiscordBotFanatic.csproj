@@ -11,6 +11,9 @@
     <Compile Remove="ImageProcessor\**" />
     <EmbeddedResource Remove="ImageProcessor\**" />
     <None Remove="ImageProcessor\**" />
+    <None Update="appsettings.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
 
   <ItemGroup>

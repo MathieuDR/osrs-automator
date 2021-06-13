@@ -5,19 +5,27 @@ using System.Text;
 using System.Threading.Tasks;
 using AutoMapper;
 using Discord;
+using Discord.Addons.Interactive.Criteria;
 using Discord.Commands;
+using Discord.WebSocket;
 using DiscordBotFanatic.Helpers;
 using DiscordBotFanatic.Models;
 using DiscordBotFanatic.Models.Configuration;
+using DiscordBotFanatic.Models.Data;
+using DiscordBotFanatic.Models.ResponseModels;
+using DiscordBotFanatic.Paginator;
 using DiscordBotFanatic.Services.interfaces;
+using Serilog.Events;
 
 namespace DiscordBotFanatic.Modules {
     
     [Group("count")]
+    [RequireContext(ContextType.Guild)]
     public class CountModule: BaseWaitMessageEmbeddedResponseModule  {
         private readonly ICounterService _counterService;
 
-        public CountModule(Mapper mapper, ILogService logger, MessageConfiguration messageConfiguration, ICounterService counterService) : base(mapper,
+        public CountModule(Mapper mapper, ILogService logger, MessageConfiguration messageConfiguration, 
+            ICounterService counterService) : base(mapper,
             logger, messageConfiguration) {
             _counterService = counterService;
         }
@@ -25,7 +33,6 @@ namespace DiscordBotFanatic.Modules {
         [Name("Count")]
         [Command]
         [Summary("Add any number to the tally")]
-        [RequireContext(ContextType.Guild)]
         public async Task Count(int additive, IUser user, [Remainder]string reason = null) {
             if (additive == 0) {
                 throw new ArgumentException($"Additive must not be 0");
@@ -34,16 +41,52 @@ namespace DiscordBotFanatic.Modules {
             var guildUser = user as IGuildUser ?? throw new ArgumentException("Cannot find user");
             var totalCount = _counterService.Count(guildUser, (IGuildUser)Context.User, additive,reason);
 
+            var tresholdTask = HandleNewCount(totalCount - additive, totalCount, (IGuildUser) user);
+
             var builder = EmbedBuilderHelper.AddCommonProperties(new EmbedBuilder()).WithTitle($"New count for {guildUser.Nickname}")
                 .WithDescription($"Total count: {totalCount}").WithMessageAuthorFooter(Context);
             
             await ModifyWaitMessageAsync(builder.Build());
+            await tresholdTask;
+        }
+
+        private async Task HandleNewCount(int startCount, int newCount, IGuildUser user) {
+            try {
+                var tresholds = await _counterService.GetTresholds(user.GuildId);
+                var channelId = await _counterService.GetChannelForGuild(user.GuildId);
+
+                if (!(Context.Guild.GetChannel(channelId) is ISocketMessageChannel channel)) {
+                    return;
+                }
+                
+                foreach (var treshold in tresholds) {
+                    var tresholdCount = treshold.Treshold;
+
+                    if (startCount < tresholdCount && newCount >= tresholdCount) {
+                        // Hit it
+                        await channel.SendMessageAsync($"{treshold.name} hit for <@{user.Id}>!");
+                        if (treshold.GivenRoleId.HasValue && Context.Guild.GetRole(treshold.GivenRoleId.Value) is IRole role) {
+                            await user.AddRoleAsync(role);
+                        }
+                    }
+
+                    if (startCount >= tresholdCount && newCount < tresholdCount) {
+                        // Remove it
+                        await channel.SendMessageAsync($"<@{user.Id}> has not sufficient points anymore for {treshold.name}");
+                        
+                        if (treshold.GivenRoleId.HasValue && Context.Guild.GetRole(treshold.GivenRoleId.Value) is IRole role) {
+                            await user.RemoveRoleAsync(role);
+                        }
+                    }
+                }
+            } catch (Exception e) {
+                // ignored
+            }
         }
 
         [Name("Count")]
         [Command]
         [Summary("See total count")]
-        [RequireContext(ContextType.Guild)]
         public async Task GetTotal(IGuildUser user) {
             var totalCount = _counterService.TotalCount(user);
         
@@ -52,26 +95,42 @@ namespace DiscordBotFanatic.Modules {
             
             await ModifyWaitMessageAsync(builder.Build());
         }
-        
+
         [Name("Count history")]
         [Command("history")]
         [Summary("See count history")]
-        [RequireContext(ContextType.Guild)]
         public async Task CountHistory(IGuildUser user) {
             var countInfo = _counterService.GetCountInfo(user);
+            var historyPages = CountHistoryToString(countInfo);
 
-            var builder = EmbedBuilderHelper.AddCommonProperties(new EmbedBuilder()).WithTitle($"{user.Nickname} count history")
-                .WithMessageAuthorFooter(Context);
+            if (historyPages.Count == 1){
+                var builder = new EmbedBuilder()
+                    .AddCommonProperties()
+                    .WithTitle($"{user.Nickname} count history")
+                    .WithMessageAuthorFooter(Context)
+                    .WithDescription($"Total count: {countInfo.CurrentCount}.{Environment.NewLine}```diff{Environment.NewLine}{historyPages.First()}```");
+                await ModifyWaitMessageAsync(builder.Build());
+                return;
+            }
             
-            CountHistoryToDescription(builder, countInfo);
+            var pages = historyPages.Select(x => 
+                EmbedBuilderHelper.AddCommonProperties(new EmbedBuilder())
+                    .WithTitle($"{user.Nickname} count history")
+                    .WithMessageAuthorFooter(Context)
+                    .WithDescription($"Total count: {countInfo.CurrentCount}.{Environment.NewLine}```diff{Environment.NewLine}{x}```")).ToList();
             
-            await ModifyWaitMessageAsync(builder.Build());
+            _ = DeleteWaitMessageAsync();
+            
+            // This needs to be refactored! ASAP
+            var message = new CustomPaginatedMessage(new EmbedBuilder()) {
+                Pages = pages
+            };
+            await SendPaginatedMessageAsync(message);
         }
         
         [Name("Count history")]
         [Command("history")]
         [Summary("See count history")]
-        [RequireContext(ContextType.Guild)]
         public async Task CountHistory() {
             await CountHistory((IGuildUser) Context.User);
         }
@@ -79,7 +138,6 @@ namespace DiscordBotFanatic.Modules {
         [Name("Count history")]
         [Command("top")]
         [Summary("See count history")]
-        [RequireContext(ContextType.Guild)]
         public async Task CountTop() {
             await CountTop(10);
         }
@@ -87,7 +145,6 @@ namespace DiscordBotFanatic.Modules {
         [Name("Count history")]
         [Command("top")]
         [Summary("See count history")]
-        [RequireContext(ContextType.Guild)]
         public async Task CountTop(int quantity) {
             if (quantity > 20) {
                 throw new ArgumentException("Not more then 20 members");
@@ -103,17 +160,32 @@ namespace DiscordBotFanatic.Modules {
             await ModifyWaitMessageAsync(builder.Build());
         }
 
-        private void CountHistoryToDescription(EmbedBuilder builder, UserCountInfo countInfo) {
-            var historyBlockBuilder = new StringBuilder();
-            foreach (var count in countInfo.CountHistory) {
+        private List<string> CountHistoryToString( UserCountInfo countInfo) {
+            var pages = new List<string>();
+            int max = 1000;
+            StringBuilder blockbuilder = new StringBuilder();
+
+            var list = countInfo.CountHistory.OrderByDescending(x => x.RequestedOn).ToList();
+            
+            foreach (var count in list) {
+                var historyBlockBuilder = new StringBuilder();
                 historyBlockBuilder.Append(count.Additive > 0 ? "+ " : "- ");
                 historyBlockBuilder.Append($"{Math.Abs(count.Additive)}".PadLeft(4));
                 historyBlockBuilder.Append(string.IsNullOrEmpty(count.Reason)? "".PadRight(25): $", {count.Reason}".PadRight(25));
-                historyBlockBuilder.AppendLine(
-                    $"| By {count.RequestedDiscordTag} on {count.RequestedOn.ToString("d")}");
+                historyBlockBuilder.Append($"| By {count.RequestedDiscordTag} on {count.RequestedOn.ToString("d")}");
+                
+                if (blockbuilder.ToString().Length + historyBlockBuilder.ToString().Length >= max) {
+                    pages.Add(blockbuilder.ToString());
+                    blockbuilder = new StringBuilder();
+                }
+                blockbuilder.AppendLine(historyBlockBuilder.ToString());
+            }
+            
+            if(!string.IsNullOrWhiteSpace(blockbuilder.ToString())) {
+                pages.Add(blockbuilder.ToString());
             }
 
-            builder.WithDescription($"Total count: {countInfo.CurrentCount}.{Environment.NewLine}```diff{Environment.NewLine}{historyBlockBuilder}```");
+            return pages;
         }
         
         private void ListTopMembers(EmbedBuilder builder, List<UserCountInfo> countInfos) {
@@ -135,22 +207,120 @@ namespace DiscordBotFanatic.Modules {
         }
         
         [Group("treshold")]
+        [RequireContext(ContextType.Guild)]
         public class CountConfigModule : BaseWaitMessageEmbeddedResponseModule{
-            private readonly IGroupService _groupService;
-            public CountConfigModule(IGroupService groupService,Mapper mapper, ILogService logger, MessageConfiguration messageConfiguration) : base(mapper, logger, messageConfiguration) {
-                _groupService = groupService;
+            private readonly ICounterService _counterService;
+            public CountConfigModule(ICounterService counterService,Mapper mapper, ILogService logger, MessageConfiguration messageConfiguration) : base(mapper, logger, messageConfiguration) {
+                _counterService = counterService;
             }
 
-            public Task Set(int count, IRole role, [Remainder] string message) {
-                
+            [Name("Set channel for the outputs")]
+            [Command("channel")]
+            [Summary("Set channel for the outputs")]
+            public async Task SetChannel(IChannel channel) {
+                var success = await _counterService.SetChannelForCounts(Context.User as IGuildUser, channel);
+
+                var verb = success ? "Success" : "Failure";
+                var builder = EmbedBuilderHelper.AddCommonProperties(new EmbedBuilder())
+                    .WithTitle(verb)
+                    .WithDescription($"Set {channel.Name} as output channel")
+                    .WithMessageAuthorFooter(Context);
+
+                await ModifyWaitMessageAsync(builder.Build());
+            }
+
+            [Name("Create a new treshold")]
+            [Command("create")]
+            [Summary("Create a new treshold")]
+            public async Task Set(int count, IRole role, [Remainder] string name) {
+                var success = await _counterService.CreateTreshold(Context.User as IGuildUser, count, name, role);
+
+                var verb = success ? "Success" : "Failure";
+                var builder = EmbedBuilderHelper.AddCommonProperties(new EmbedBuilder())
+                    .WithTitle(verb)
+                    .WithDescription($"Added new treshold '{name}' from {count} with role {role.Name}")
+                    .WithColor(role.Color)
+                    .WithMessageAuthorFooter(Context);
+
+                await ModifyWaitMessageAsync(builder.Build());
             }
             
-            public Task List() {
-                
+            [Name("Create a new treshold")]
+            [Command("create")]
+            [Summary("Create a new treshold")]
+            public async Task SetWithoutRole(int count, [Remainder] string name) {
+                var success = await _counterService.CreateTreshold(Context.User as IGuildUser, count, name);
+
+                var verb = success ? "Success" : "Failure";
+                var builder = EmbedBuilderHelper.AddCommonProperties(new EmbedBuilder())
+                    .WithTitle(verb)
+                    .WithDescription($"Added new treshold '{name}' from {count} without role")
+                    .WithMessageAuthorFooter(Context);
+
+                await ModifyWaitMessageAsync(builder.Build());
             }
             
-            public Task Remove(string id) {
+            [Name("See all tresholds")]
+            [Command("list")]
+            [Summary("See all tresholds")]
+            public async Task List() {
+                var tresholds = await _counterService.GetTresholds(Context.Guild.Id);
                 
+                var builder = EmbedBuilderHelper.AddCommonProperties(new EmbedBuilder())
+                    .WithTitle("Current tresholds")
+                    .WithDescription($"```{ToDescription(tresholds)}```")
+                    .WithMessageAuthorFooter(Context);
+
+                await ModifyWaitMessageAsync(builder.Build());
+            }
+
+            private string ToDescription(IEnumerable<CountTreshold> tresholds) {
+                StringBuilder builder = new StringBuilder();
+                var enumerable = tresholds.ToList();
+                
+                // format
+                builder.Append("ID".PadLeft(3));
+                builder.Append(", ");
+                builder.Append($"#:".PadLeft(5));
+                builder.Append("Name".PadRight(15));
+                builder.Append($", role: role{Environment.NewLine}");
+                
+                for (var i = 0; i < enumerable.Count; i++) {
+                    var treshold = enumerable[i];
+
+                    builder.Append(i.ToString().PadLeft(3));
+                    builder.Append(", ");
+
+                    builder.Append($"{treshold.Treshold}:".PadLeft(5));
+                        
+                    var name = string.IsNullOrEmpty(treshold.name) ? "Unnamed" : treshold.name;
+                    builder.Append(name.PadRight(15));
+
+
+                    var role = "none";
+                    if (treshold.GivenRoleId.HasValue) {
+                        role = Context.Guild.GetRole(treshold.GivenRoleId.Value)?.Name ?? "Invalid role";
+                    }
+
+                    builder.Append($", role: {role}{Environment.NewLine}");
+                }
+
+                return builder.ToString();
+            }
+            
+        [Name("Remove an treshold")]
+            [Command("remove")]
+            [Summary("Remove an treshold")]
+            public async Task Remove(int index) {
+                var success = await _counterService.RemoveCount(Context.Guild.Id, index);
+
+                var verb = success ? "Success" : "Failure";
+                var builder = EmbedBuilderHelper.AddCommonProperties(new EmbedBuilder())
+                    .WithTitle(verb)
+                    .WithDescription($"Removed treshold with index {index}")
+                    .WithMessageAuthorFooter(Context);
+
+                await ModifyWaitMessageAsync(builder.Build());
             }
         }
     }

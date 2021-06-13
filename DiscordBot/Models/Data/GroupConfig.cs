@@ -15,5 +15,6 @@ namespace DiscordBotFanatic.Models.Data {
         public Group WomGroup { get; set; }
         public bool AutoAddNewAccounts { get; set; } = false;
         public AutomatedMessagesConfig AutomatedMessagesConfig { get; set; } = new AutomatedMessagesConfig();
+        public CountConfig CountConfig { get; set; }
     }
 }

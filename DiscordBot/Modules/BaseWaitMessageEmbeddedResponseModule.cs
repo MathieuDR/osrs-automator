@@ -30,7 +30,11 @@ namespace DiscordBotFanatic.Modules {
         [DontInject]
         public string Name { get; set; }
 
+        private IDisposable _typingState = null;
+
         protected override void AfterExecute(CommandInfo command) {
+            _typingState?.Dispose();
+            
             if (!_waitMessageHandled) {
                 DeleteWaitMessageAsync();
             }
@@ -43,6 +47,8 @@ namespace DiscordBotFanatic.Modules {
             if (Context == null) {
                 return;
             }
+            
+            _typingState = Context.Channel.EnterTypingState();
 
             MessageUserDisplay = Context.User.Username;
             SocketGuildUser user = Context.Guild?.Users.SingleOrDefault(x => x.Id == Context.User.Id);

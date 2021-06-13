@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
 using Discord;
+using DiscordBotFanatic.Models.Data;
 using DiscordBotFanatic.Models.Decorators;
 using DiscordBotFanatic.Models.Enums;
 using WiseOldManConnector.Models.Output;
@@ -17,5 +18,6 @@ namespace DiscordBotFanatic.Services.interfaces {
         Task<ItemDecorator<Leaderboard>> GetGroupLeaderboard(IGuildUser guildUser);
         Task<ItemDecorator<Leaderboard>> GetGroupLeaderboard(IGuildUser guildUser, MetricType metric, Period period);
         Task QueueJob(JobType jobType);
+      
     }
 }
