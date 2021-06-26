@@ -5,7 +5,7 @@
 
 # Discord bot specific
 appsettings.json
-appsettings.Production.json
+appsettings.*.json
 
 
 # User-specific files
