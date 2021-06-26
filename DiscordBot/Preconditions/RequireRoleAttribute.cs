@@ -1,17 +1,18 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Discord.Commands;
 using Discord.WebSocket;
 
 namespace DiscordBotFanatic.Preconditions {
-    // https://discord.foxbot.me/docs/guides/commands/preconditions.html
     public class RequireRoleAttribute : PreconditionAttribute {
-        // Create a field to store the specified name
-        private readonly string _name;
+        private readonly List<ulong> _ids = new ();
+        private string _idsConcatenated => string.Join(", ", _ids);
 
-        // Create a constructor so the name can be specified
-        public RequireRoleAttribute(string name) => _name = name;
+        public RequireRoleAttribute(ulong id) => _ids.Add(id);
+        
+        public RequireRoleAttribute(ulong[] ids) => _ids.AddRange(ids);
 
         // Override the CheckPermissions method
         public override Task<PreconditionResult> CheckPermissionsAsync(ICommandContext context, CommandInfo command,
@@ -22,13 +23,13 @@ namespace DiscordBotFanatic.Preconditions {
             }
 
             // If this command was executed by a user with the appropriate role, return a success
-            if (gUser.Roles.Any(r => r.Name == _name)) {
+            if (gUser.Roles.Any(r => _ids.Contains(r.Id))) {
                 return Task.FromResult(PreconditionResult.FromSuccess());
             }
 
             // Since it wasn't, fail
             return Task.FromResult(
-                PreconditionResult.FromError($"You must have a role named {_name} to run this command."));
+                PreconditionResult.FromError($"You must have a role with an id in {_idsConcatenated} to run this command."));
         }
     }
 }

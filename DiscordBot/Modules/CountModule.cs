@@ -14,6 +14,7 @@ using DiscordBotFanatic.Models.Configuration;
 using DiscordBotFanatic.Models.Data;
 using DiscordBotFanatic.Models.ResponseModels;
 using DiscordBotFanatic.Paginator;
+using DiscordBotFanatic.Preconditions;
 using DiscordBotFanatic.Services.interfaces;
 using Serilog.Events;
 
@@ -30,6 +31,8 @@ namespace DiscordBotFanatic.Modules {
             _counterService = counterService;
         }
 
+        [RequireUserPermission(GuildPermission.Administrator, Group = "Permission")]
+        [RequireRole(new ulong[]{784510650260914216, 806544893584343092}, Group = "Permission")]
         [Name("Count")]
         [Command]
         [Summary("Add any number to the tally")]
@@ -43,7 +46,7 @@ namespace DiscordBotFanatic.Modules {
 
             var tresholdTask = HandleNewCount(totalCount - additive, totalCount, (IGuildUser) user);
 
-            var builder = EmbedBuilderHelper.AddCommonProperties(new EmbedBuilder()).WithTitle($"New count for {guildUser.Nickname}")
+            var builder = EmbedBuilderHelper.AddCommonProperties(new EmbedBuilder()).WithTitle($"New count for {guildUser.DisplayName()}")
                 .WithDescription($"Total count: {totalCount}").WithMessageAuthorFooter(Context);
             
             await ModifyWaitMessageAsync(builder.Build());
@@ -85,12 +88,25 @@ namespace DiscordBotFanatic.Modules {
         }
 
         [Name("Count")]
-        [Command]
+        [Command("total")]
         [Summary("See total count")]
         public async Task GetTotal(IGuildUser user) {
             var totalCount = _counterService.TotalCount(user);
         
-            var builder = EmbedBuilderHelper.AddCommonProperties(new EmbedBuilder()).WithTitle(user.Nickname)
+            var builder = EmbedBuilderHelper.AddCommonProperties(new EmbedBuilder()).WithTitle(user.DisplayName())
+                .WithDescription($"Total count: {totalCount}").WithMessageAuthorFooter(Context);
+            
+            await ModifyWaitMessageAsync(builder.Build());
+        }
+        
+        [Name("Count")]
+        [Command("total")]
+        [Summary("See total count")]
+        public async Task GetTotal() {
+            IGuildUser user = (IGuildUser) Context.User;
+            var totalCount = _counterService.TotalCount(user);
+        
+            var builder = EmbedBuilderHelper.AddCommonProperties(new EmbedBuilder()).WithTitle(user.DisplayName())
                 .WithDescription($"Total count: {totalCount}").WithMessageAuthorFooter(Context);
             
             await ModifyWaitMessageAsync(builder.Build());
@@ -101,24 +117,27 @@ namespace DiscordBotFanatic.Modules {
         [Summary("See count history")]
         public async Task CountHistory(IGuildUser user) {
             var countInfo = _counterService.GetCountInfo(user);
-            var historyPages = CountHistoryToString(countInfo);
 
-            if (historyPages.Count == 1){
-                var builder = new EmbedBuilder()
-                    .AddCommonProperties()
-                    .WithTitle($"{user.Nickname} count history")
-                    .WithMessageAuthorFooter(Context)
-                    .WithDescription($"Total count: {countInfo.CurrentCount}.{Environment.NewLine}```diff{Environment.NewLine}{historyPages.First()}```");
+            var builder = new EmbedBuilder()
+                .AddCommonProperties()
+                .WithTitle($"{user.DisplayName()} count history")
+                .WithMessageAuthorFooter(Context);
+
+            if (countInfo is null || countInfo.CountHistory.Count == 0) {
+                builder.WithDescription($"Has no history.");
                 await ModifyWaitMessageAsync(builder.Build());
                 return;
             }
             
-            var pages = historyPages.Select(x => 
-                EmbedBuilderHelper.AddCommonProperties(new EmbedBuilder())
-                    .WithTitle($"{user.Nickname} count history")
-                    .WithMessageAuthorFooter(Context)
-                    .WithDescription($"Total count: {countInfo.CurrentCount}.{Environment.NewLine}```diff{Environment.NewLine}{x}```")).ToList();
+            var historyPages = CountHistoryToString(countInfo);
+
+            if (historyPages.Count == 1){
+                builder.WithDescription($"Total count: {countInfo.CurrentCount}.{Environment.NewLine}```diff{Environment.NewLine}{historyPages.First()}```");
+                await ModifyWaitMessageAsync(builder.Build());
+                return;
+            }
             
+            var pages = historyPages.Select(x => builder.WithDescription($"Total count: {countInfo.CurrentCount}.{Environment.NewLine}```diff{Environment.NewLine}{x}```")).ToList();
             _ = DeleteWaitMessageAsync();
             
             // This needs to be refactored! ASAP
@@ -203,9 +222,11 @@ namespace DiscordBotFanatic.Modules {
 
         private string NicknameById(ulong userId) {
             var user = Context.Guild.GetUser(userId);
-            return user?.Nickname ?? "Unknown user";
+            return user?.DisplayName();
         }
         
+        [RequireUserPermission(GuildPermission.Administrator, Group = "Permission")]
+        [RequireRole(new ulong[]{784510650260914216, 806544893584343092}, Group = "Permission")]
         [Group("treshold")]
         [RequireContext(ContextType.Guild)]
         public class CountConfigModule : BaseWaitMessageEmbeddedResponseModule{

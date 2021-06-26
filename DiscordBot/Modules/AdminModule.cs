@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
 using Discord;
@@ -14,7 +16,7 @@ namespace DiscordBotFanatic.Modules {
     [Name("Administrator")]
     [Group("cfg")]
     [RequireUserPermission(GuildPermission.Administrator, Group = "Permission")]
-    [RequireRole("Fanatics Developer", Group = "Permission")]
+    [RequireRole(new ulong[]{784510650260914216, 806544893584343092}, Group = "Permission")]
     public class AdminModule : BaseWaitMessageEmbeddedResponseModule {
         private readonly IGroupService _groupService;
 
@@ -24,21 +26,19 @@ namespace DiscordBotFanatic.Modules {
             base(mapper, logger, messageConfiguration) {
             _groupService = groupService;
         }
-
-        // [Name("Toggle Permission on Role")]
-        // [Command("right")]
-        // [Summary("Toggle a permission for a role.")]
-        // public Task ToggleRolePermission(IRole role, BotPermissions permission) {
-        //     throw new NotImplementedException();
-        // }
-        //
-        // [Name("Toggle Permission on User")]
-        // [Command("right")]
-        // [Summary("Toggle a permission for an user.")]
-        // public Task ToggleUserPermission(IGuildUser user, BotPermissions permission) {
-        //     throw new NotImplementedException();
-        // }
-
+        
+        [Name("DisplayMembers")]
+        [Command("members", RunMode = RunMode.Async)]
+        [Summary("Display all members")]
+        [RequireContext(ContextType.Guild)]
+        public async Task Members() {
+            var members = Context.Guild.Users;
+            var builder = new EmbedBuilder().AddCommonProperties().WithMessageAuthorFooter(Context);
+            builder.Title = $"Success - {members.Count}";
+            builder.Description = string.Join(", ", members.Select(x => x.Username).ToList());
+            await ModifyWaitMessageAsync(builder.Build());
+        }
+        
         [Name("Set WOM group")]
         [Command("womgroup", RunMode = RunMode.Async)]
         [Summary("Set the wom group for guild")]
@@ -51,21 +51,6 @@ namespace DiscordBotFanatic.Modules {
             builder.Description = $"Group set to {decoratedGroup.Item.Name}";
             await ModifyWaitMessageAsync(builder.Build());
         }
-        
-        // [Name("Auto add group")]
-        // [Command("autoadd", RunMode = RunMode.Async)]
-        // [Summary("Auto add group")]
-        // [RequireContext(ContextType.Guild)]
-        // public async Task SetAutoAdd(bool autoAdd) {
-        //     await _groupService.SetAutoAdd(GetGuildUser(), autoAdd);
-        //     var builder = new EmbedBuilder().AddCommonProperties().WithMessageAuthorFooter(Context);
-        //
-        //     builder.Title = $"Success.";
-        //     builder.Description =
-        //         autoAdd ? $"New members will be automatically added." : $"New members will not be automatically added.";
-        //
-        //     await ModifyWaitMessageAsync(builder.Build());
-        // }
 
         [Name("Set Automated message channel")]
         [Command("set automated")]
