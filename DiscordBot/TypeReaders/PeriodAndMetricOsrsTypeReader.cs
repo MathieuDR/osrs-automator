@@ -4,12 +4,12 @@ using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
 using Discord.Commands;
-using DiscordBotFanatic.Helpers;
-using DiscordBotFanatic.Models.Configuration;
-using DiscordBotFanatic.Modules.DiscordCommandArguments;
+using DiscordBot.Helpers;
+using DiscordBot.Models.Configuration;
+using DiscordBot.Modules.DiscordCommandArguments;
 using WiseOldManConnector.Models.WiseOldMan.Enums;
 
-namespace DiscordBotFanatic.TypeReaders {
+namespace DiscordBot.TypeReaders {
     public class PeriodAndMetricOsrsTypeReader : TypeReader {
         private readonly MetricSynonymsConfiguration _config;
 

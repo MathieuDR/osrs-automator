@@ -2,9 +2,9 @@
 using System.Collections.Generic;
 using Discord;
 using Discord.Commands;
-using DiscordBotFanatic.Models.Decorators;
+using DiscordBot.Models.Decorators;
 
-namespace DiscordBotFanatic.Helpers {
+namespace DiscordBot.Helpers {
     public static class EmbedBuilderHelper {
         public static EmbedBuilder AddWiseOldMan(this EmbedBuilder builder, string title = "Wiseoldman.net",
             string url = "http://www.wiseoldman.net") {

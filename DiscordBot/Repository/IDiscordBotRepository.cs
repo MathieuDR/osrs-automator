@@ -1,10 +1,9 @@
 ﻿using System.Collections.Generic;
-using DiscordBotFanatic.Models;
-using DiscordBotFanatic.Models.Data;
+using DiscordBot.Models.Data;
 using OsrsPlayer = WiseOldManConnector.Models.Output.Player;
-using Player = DiscordBotFanatic.Models.Data.Player;
+using Player = DiscordBot.Models.Data.Player;
 
-namespace DiscordBotFanatic.Repository {
+namespace DiscordBot.Repository {
     public interface IDiscordBotRepository {
         Player GetPlayerByOsrsAccount(ulong guildId, int womId);
         Player GetPlayerByOsrsAccount(ulong guildId, string username);

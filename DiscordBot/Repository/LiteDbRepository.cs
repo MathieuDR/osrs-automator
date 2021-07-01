@@ -1,12 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using DiscordBotFanatic.Models;
-using DiscordBotFanatic.Models.Data;
+using DiscordBot.Models.Data;
 using LiteDB;
-using Player = DiscordBotFanatic.Models.Data.Player;
+using Player = DiscordBot.Models.Data.Player;
 
-namespace DiscordBotFanatic.Repository {
+namespace DiscordBot.Repository {
     public class LiteDbRepository : IDiscordBotRepository {
         protected const string PlayerCollectionName = "players";
         protected const string GuildConfigurationCollectionName = "guildConfig";

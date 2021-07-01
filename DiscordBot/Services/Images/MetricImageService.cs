@@ -1,10 +1,10 @@
 ﻿using System;
-using DiscordBotFanatic.Services.interfaces;
+using DiscordBot.Services.interfaces;
 using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.Processing;
 using WiseOldManConnector.Models.Output;
 
-namespace DiscordBotFanatic.Services.Images {
+namespace DiscordBot.Services.Images {
     public class MetricImageService : ScrollImageServiceBase<DeltaMetric> {
         public MetricImageService(ILogService logService) : base(logService) { }
 

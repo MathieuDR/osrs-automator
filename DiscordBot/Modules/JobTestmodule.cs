@@ -1,10 +1,10 @@
 using AutoMapper;
 using Discord;
 using Discord.Commands;
-using DiscordBotFanatic.Models.Configuration;
-using DiscordBotFanatic.Services.interfaces;
+using DiscordBot.Models.Configuration;
+using DiscordBot.Services.interfaces;
 
-namespace DiscordBotFanatic.Modules {
+namespace DiscordBot.Modules {
     [Name("JobTester")]
     [RequireUserPermission(GuildPermission.Administrator, Group = "Permission")]
     public class JobTestModule:BaseWaitMessageEmbeddedResponseModule {

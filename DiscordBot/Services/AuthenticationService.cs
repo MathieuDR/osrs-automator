@@ -1,9 +1,9 @@
 ﻿using System.Threading.Tasks;
 using Discord;
-using DiscordBotFanatic.Models.Enums;
-using DiscordBotFanatic.Services.interfaces;
+using DiscordBot.Models.Enums;
+using DiscordBot.Services.interfaces;
 
-namespace DiscordBotFanatic.Services {
+namespace DiscordBot.Services {
     public class AuthenticationService : IAuthenticationService {
         public Task<bool> IsAllowed(IUserGuild guildUser, BotPermissions permissions) {
             throw new System.NotImplementedException();

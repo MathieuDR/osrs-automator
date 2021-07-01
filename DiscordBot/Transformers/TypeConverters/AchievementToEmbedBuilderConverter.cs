@@ -1,11 +1,11 @@
 ﻿using AutoMapper;
 using Discord;
-using DiscordBotFanatic.Helpers;
+using DiscordBot.Helpers;
 using WiseOldManConnector.Helpers;
 using WiseOldManConnector.Models.Output;
 using WiseOldManConnector.Models.WiseOldMan.Enums;
 
-namespace DiscordBotFanatic.Transformers.TypeConverters {
+namespace DiscordBot.Transformers.TypeConverters {
     public class AchievementToEmbedBuilderConverter : ITypeConverter<Achievement, EmbedBuilder> {
         public EmbedBuilder Convert(Achievement source, EmbedBuilder destination, ResolutionContext context) {
             destination ??= new EmbedBuilder();

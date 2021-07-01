@@ -3,18 +3,18 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Discord;
-using DiscordBotFanatic.Helpers;
-using DiscordBotFanatic.Jobs;
-using DiscordBotFanatic.Models.Data;
-using DiscordBotFanatic.Models.Decorators;
-using DiscordBotFanatic.Models.Enums;
-using DiscordBotFanatic.Repository;
-using DiscordBotFanatic.Services.interfaces;
+using DiscordBot.Helpers;
+using DiscordBot.Jobs;
+using DiscordBot.Models.Data;
+using DiscordBot.Models.Decorators;
+using DiscordBot.Models.Enums;
+using DiscordBot.Repository;
+using DiscordBot.Services.interfaces;
 using Quartz;
 using WiseOldManConnector.Models.Output;
 using WiseOldManConnector.Models.WiseOldMan.Enums;
 
-namespace DiscordBotFanatic.Services {
+namespace DiscordBot.Services {
     public class GroupService : BaseService, IGroupService {
         private readonly IOsrsHighscoreService _highscoreService;
         private readonly ISchedulerFactory _factory;

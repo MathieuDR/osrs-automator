@@ -1,4 +1,4 @@
-﻿namespace DiscordBotFanatic.Models.Decorators {
+﻿namespace DiscordBot.Models.Decorators {
     public class ItemDecorator<T> {
         public ItemDecorator(T item, string title, string link) {
             Item = item;

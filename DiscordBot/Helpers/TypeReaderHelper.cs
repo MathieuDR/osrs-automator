@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
 
-namespace DiscordBotFanatic.Helpers {
+namespace DiscordBot.Helpers {
     public static class TypeReaderHelper {
         public static IEnumerable<string> ToCollectionOfParameters(this string input) {
             return Regex.Matches(input, @"[\""].+?[\""]|[^ ]+").Select(m => m.Value.Replace("\"", ""));

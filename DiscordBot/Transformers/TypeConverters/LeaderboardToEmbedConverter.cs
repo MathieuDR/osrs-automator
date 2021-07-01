@@ -2,7 +2,7 @@
 using Discord;
 using WiseOldManConnector.Models.Output;
 
-namespace DiscordBotFanatic.Transformers.TypeConverters {
+namespace DiscordBot.Transformers.TypeConverters {
     public class LeaderboardToEmbedBuilderConverter : ITypeConverter<Leaderboard, EmbedBuilder> {
         public EmbedBuilder Convert(Leaderboard source, EmbedBuilder destination, ResolutionContext context) {
             //switch (source) {

@@ -1,4 +1,4 @@
-﻿namespace DiscordBotFanatic.Models.ResponseModels {
+﻿namespace DiscordBot.Models.ResponseModels {
     public class EmbedResponse {
         public string AuthorName { get; set; }
         public string Title { get; set; }

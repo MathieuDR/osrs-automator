@@ -2,7 +2,7 @@
 using AutoMapper;
 using Discord;
 
-namespace DiscordBotFanatic.Transformers.TypeConverters {
+namespace DiscordBot.Transformers.TypeConverters {
     public class StringToEmbedConverter : ITypeConverter<string, Embed> {
         public Embed Convert(string source, Embed destination, ResolutionContext context) {
             var builder = new EmbedBuilder();

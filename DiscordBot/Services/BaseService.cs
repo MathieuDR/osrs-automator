@@ -1,6 +1,6 @@
-﻿using DiscordBotFanatic.Services.interfaces;
+﻿using DiscordBot.Services.interfaces;
 
-namespace DiscordBotFanatic.Services {
+namespace DiscordBot.Services {
     public abstract class BaseService {
         public BaseService(ILogService logger) {
             Logger = logger;

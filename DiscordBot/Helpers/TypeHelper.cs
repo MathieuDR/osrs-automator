@@ -3,10 +3,10 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Text;
 using Discord;
-using DiscordBotFanatic.Modules.DiscordCommandArguments;
+using DiscordBot.Modules.DiscordCommandArguments;
 using WiseOldManConnector.Models.WiseOldMan.Enums;
 
-namespace DiscordBotFanatic.Helpers {
+namespace DiscordBot.Helpers {
     public static class TypeHelper {
         public static List<Type> WhiteListedTypesToOutput() {
             return new List<Type>() {

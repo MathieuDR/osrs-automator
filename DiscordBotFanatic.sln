@@ -3,7 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.30011.22
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DiscordBotFanatic", "DiscordBot\DiscordBotFanatic.csproj", "{03AF046B-63E5-413A-8957-7046668CC934}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DiscordBot", "DiscordBot\DiscordBot.csproj", "{03AF046B-63E5-413A-8957-7046668CC934}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WiseOldManConnector", "WiseOldManConnector\WiseOldManConnector.csproj", "{45E122BA-FF26-4CA1-A486-0888EBE3E1DF}"
 EndProject

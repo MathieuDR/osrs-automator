@@ -1,4 +1,4 @@
-﻿namespace DiscordBotFanatic.Models.Configuration {
+﻿namespace DiscordBot.Models.Configuration {
     public class StartupConfiguration {
         public string DatabaseFile { get; set; }
     }

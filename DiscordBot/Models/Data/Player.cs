@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using Discord;
 
-namespace DiscordBotFanatic.Models.Data {
+namespace DiscordBot.Models.Data {
     public class Player : BaseGuildModel {
         public Player() { }
 

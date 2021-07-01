@@ -1,7 +1,7 @@
 using System;
 using Discord;
 
-namespace DiscordBotFanatic.Models.Data {
+namespace DiscordBot.Models.Data {
     public class Count {
         public int Additive { get; set; }
         public ulong RequestedBy { get; set; }

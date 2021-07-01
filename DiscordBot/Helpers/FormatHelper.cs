@@ -3,7 +3,7 @@ using System.Globalization;
 using System.Linq;
 using WiseOldManConnector.Models.Output;
 
-namespace DiscordBotFanatic.Helpers {
+namespace DiscordBot.Helpers {
     public static class FormatHelper {
         private static readonly int[] Experiences = {
             0, 0, 83, 174, 276, 388, 512, 650, 801, 969, 1154, 1358, 1584, 1833, 2107, 2411, 2746, 3115, 3523, 3973,

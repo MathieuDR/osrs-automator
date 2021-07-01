@@ -1,8 +1,8 @@
 ﻿using System.Threading.Tasks;
 using Discord;
-using DiscordBotFanatic.Models.Enums;
+using DiscordBot.Models.Enums;
 
-namespace DiscordBotFanatic.Services.interfaces {
+namespace DiscordBot.Services.interfaces {
     public interface IAuthenticationService {
         public Task<bool> IsAllowed(IUserGuild guildUser, BotPermissions permissions);
         public Task AddPermissions(IUserGuild guildUser, BotPermissions toAdd);

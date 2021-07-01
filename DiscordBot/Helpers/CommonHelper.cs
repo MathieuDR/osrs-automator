@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace DiscordBotFanatic.Helpers {
+namespace DiscordBot.Helpers {
     public static class CommonHelper {
         public static IEnumerable<IEnumerable<T>> Chunk<T>(this IEnumerable<T> source, int chunksize) {
             if (chunksize < 1) throw new InvalidOperationException();

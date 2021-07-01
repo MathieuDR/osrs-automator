@@ -1,9 +1,7 @@
-﻿using System.Threading.Tasks;
-using Discord;
-using Discord.Rest;
-using DiscordBotFanatic.Models.ResponseModels;
+﻿using Discord;
+using DiscordBot.Models.ResponseModels;
 
-namespace DiscordBotFanatic.Helpers {
+namespace DiscordBot.Helpers {
     public static class DiscordHelper {
         public static void AddEmptyField(this EmbedBuilder builder, bool inline = false) {
             builder.AddField("\u200B", "\u200B", inline);

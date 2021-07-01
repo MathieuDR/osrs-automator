@@ -1,3 +1,3 @@
-﻿namespace DiscordBotFanatic.Services.interfaces {
+﻿namespace DiscordBot.Services.interfaces {
     public interface IRepositoryService { }
 }

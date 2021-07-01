@@ -1,6 +1,6 @@
 ﻿using Discord;
 
-namespace DiscordBotFanatic.Models.Data {
+namespace DiscordBot.Models.Data {
     public class BaseGuildModel : BaseModel {
         public BaseGuildModel() { }
 

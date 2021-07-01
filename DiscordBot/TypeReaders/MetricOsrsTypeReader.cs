@@ -5,12 +5,12 @@ using System.Linq;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using Discord.Commands;
-using DiscordBotFanatic.Helpers;
-using DiscordBotFanatic.Models.Configuration;
-using DiscordBotFanatic.Modules.DiscordCommandArguments;
+using DiscordBot.Helpers;
+using DiscordBot.Models.Configuration;
+using DiscordBot.Modules.DiscordCommandArguments;
 using WiseOldManConnector.Models.WiseOldMan.Enums;
 
-namespace DiscordBotFanatic.TypeReaders {
+namespace DiscordBot.TypeReaders {
     public class MetricOsrsTypeReader : TypeReader {
         private readonly MetricSynonymsConfiguration _config;
 

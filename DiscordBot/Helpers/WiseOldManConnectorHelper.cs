@@ -2,12 +2,12 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using DiscordBotFanatic.Models.Decorators;
-using DiscordBotFanatic.Paginator;
+using DiscordBot.Models.Decorators;
+using DiscordBot.Paginator;
 using WiseOldManConnector.Models.Output;
 using WiseOldManConnector.Models.WiseOldMan.Enums;
 
-namespace DiscordBotFanatic.Helpers {
+namespace DiscordBot.Helpers {
     public static class WiseOldManConnectorHelper {
         private static readonly string WiseOldManHost = "wiseoldman.net";
 

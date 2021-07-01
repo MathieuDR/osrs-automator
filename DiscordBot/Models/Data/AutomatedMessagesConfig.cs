@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
-using DiscordBotFanatic.Models.Enums;
+using DiscordBot.Models.Enums;
 
-namespace DiscordBotFanatic.Models.Data {
+namespace DiscordBot.Models.Data {
     public class AutomatedMessagesConfig {
         public Dictionary<JobType, ChannelJobConfiguration> ChannelJobs { get; set; } =
             new Dictionary<JobType, ChannelJobConfiguration>();

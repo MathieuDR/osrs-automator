@@ -6,10 +6,10 @@ using System.Text;
 using System.Threading.Tasks;
 using Discord;
 using Discord.Commands;
-using DiscordBotFanatic.Helpers;
-using DiscordBotFanatic.Models.Configuration;
+using DiscordBot.Helpers;
+using DiscordBot.Models.Configuration;
 
-namespace DiscordBotFanatic.Modules {
+namespace DiscordBot.Modules {
     [Name("Help")]
     public class HelpModule : ModuleBase<SocketCommandContext> {
         private const string HelpSummary = "Help function";

@@ -1,23 +1,23 @@
-﻿using Discord;
-using Discord.Commands;
-using Discord.WebSocket;
-using DiscordBotFanatic.Models.Configuration;
-using DiscordBotFanatic.Modules;
-using DiscordBotFanatic.Modules.DiscordCommandArguments;
-using DiscordBotFanatic.Services.interfaces;
-using DiscordBotFanatic.TypeReaders;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
-using DiscordBotFanatic.Helpers;
-using DiscordBotFanatic.Models;
+using Discord;
+using Discord.Commands;
+using Discord.WebSocket;
+using DiscordBot.Helpers;
+using DiscordBot.Models;
+using DiscordBot.Models.Configuration;
+using DiscordBot.Modules;
+using DiscordBot.Modules.DiscordCommandArguments;
+using DiscordBot.Services.interfaces;
+using DiscordBot.TypeReaders;
 using Serilog.Context;
 using Serilog.Events;
 
-namespace DiscordBotFanatic.Services {
+namespace DiscordBot.Services {
     public class CommandHandlingService {
         private readonly CommandService _commands;
         private readonly BotConfiguration _configuration;

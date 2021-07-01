@@ -1,12 +1,12 @@
 ﻿using System;
 using System.Linq;
-using DiscordBotFanatic.Jobs;
-using DiscordBotFanatic.Models.Enums;
+using DiscordBot.Jobs;
+using DiscordBot.Models.Enums;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Quartz;
 
-namespace DiscordBotFanatic.Configuration {
+namespace DiscordBot.Configuration {
     public static class QuartzConfiguration {
         public static IServiceCollection ConfigureQuartz(this IServiceCollection services, IConfiguration config) {
             // https://www.quartz-scheduler.net/documentation/quartz-3.x/packages/microsoft-di-integration.html#di-aware-job-factories

@@ -8,11 +8,11 @@ using Discord.Addons.Interactive.Criteria;
 using Discord.Addons.Interactive.Paginator;
 using Discord.Commands;
 using Discord.WebSocket;
-using DiscordBotFanatic.Models.ResponseModels;
-using DiscordBotFanatic.Paginator;
-using DiscordBotFanatic.Services.interfaces;
+using DiscordBot.Models.ResponseModels;
+using DiscordBot.Paginator;
+using DiscordBot.Services.interfaces;
 
-namespace DiscordBotFanatic.Modules {
+namespace DiscordBot.Modules {
     [DontAutoLoad]
     public abstract class BaseEmbeddedResponseModule : InteractiveBase<SocketCommandContext> {
         

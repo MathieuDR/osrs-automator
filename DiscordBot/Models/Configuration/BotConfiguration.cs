@@ -1,4 +1,4 @@
-﻿namespace DiscordBotFanatic.Models.Configuration {
+﻿namespace DiscordBot.Models.Configuration {
     public class BotConfiguration {
         public string Token { get; set; }
 

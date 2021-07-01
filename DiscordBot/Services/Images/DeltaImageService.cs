@@ -1,10 +1,10 @@
 ﻿using System;
-using DiscordBotFanatic.Services.interfaces;
+using DiscordBot.Services.interfaces;
 using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.Processing;
 using WiseOldManConnector.Models.Output;
 
-namespace DiscordBotFanatic.Services.Images {
+namespace DiscordBot.Services.Images {
     public class DeltaImageService : ScrollImageServiceBase<Delta> {
         public DeltaImageService(ILogService logService) : base(logService) {
             throw new NotImplementedException();

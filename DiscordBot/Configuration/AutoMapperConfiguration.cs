@@ -1,12 +1,12 @@
 ﻿using AutoMapper;
 using Discord;
-using DiscordBotFanatic.Models.ResponseModels;
-using DiscordBotFanatic.Transformers.TypeConverters;
+using DiscordBot.Models.ResponseModels;
+using DiscordBot.Transformers.TypeConverters;
 using Microsoft.Extensions.DependencyInjection;
 using WiseOldManConnector.Configuration;
 using WiseOldManConnector.Models.Output;
 
-namespace DiscordBotFanatic.Configuration {
+namespace DiscordBot.Configuration {
     internal static class AutoMapperConfiguration {
         public static IServiceCollection ConfigureAutoMapper(this IServiceCollection services) {
             return services.AddSingleton(GetMapper());

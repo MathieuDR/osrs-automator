@@ -1,9 +1,9 @@
 ﻿using AutoMapper;
 using Discord;
-using DiscordBotFanatic.Models.Exceptions;
-using DiscordBotFanatic.Models.ResponseModels;
+using DiscordBot.Models.Exceptions;
+using DiscordBot.Models.ResponseModels;
 
-namespace DiscordBotFanatic.Transformers.TypeConverters {
+namespace DiscordBot.Transformers.TypeConverters {
     public class EmbedResponseToEmbedConverter : ITypeConverter<EmbedResponse, Embed> {
         public Embed Convert(EmbedResponse source, Embed destination, ResolutionContext context) {
             var builder = new EmbedBuilder();

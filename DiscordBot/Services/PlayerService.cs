@@ -4,13 +4,13 @@ using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Threading.Tasks;
 using Discord;
-using DiscordBotFanatic.Helpers;
-using DiscordBotFanatic.Models.Decorators;
-using DiscordBotFanatic.Repository;
-using DiscordBotFanatic.Services.interfaces;
+using DiscordBot.Helpers;
+using DiscordBot.Models.Decorators;
+using DiscordBot.Repository;
+using DiscordBot.Services.interfaces;
 using WiseOldManConnector.Models.Output;
 
-namespace DiscordBotFanatic.Services {
+namespace DiscordBot.Services {
     public class PlayerService : BaseService, IPlayerService {
         private readonly IOsrsHighscoreService _osrsHighscoreService;
         private readonly IDiscordBotRepository _repository;

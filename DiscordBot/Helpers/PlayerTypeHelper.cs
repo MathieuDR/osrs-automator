@@ -1,7 +1,7 @@
 ﻿using WiseOldManConnector.Helpers;
 using WiseOldManConnector.Models.WiseOldMan.Enums;
 
-namespace DiscordBotFanatic.Helpers {
+namespace DiscordBot.Helpers {
     public static class PlayerTypeHelper {
 
         public static string WiseOldManIconUrl(this PlayerType playerType) {

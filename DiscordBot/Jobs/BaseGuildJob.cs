@@ -4,14 +4,14 @@ using System.Threading.Tasks;
 using AutoMapper;
 using Discord;
 using Discord.WebSocket;
-using DiscordBotFanatic.Models.Data;
-using DiscordBotFanatic.Models.Enums;
-using DiscordBotFanatic.Repository;
-using DiscordBotFanatic.Services.interfaces;
+using DiscordBot.Models.Data;
+using DiscordBot.Models.Enums;
+using DiscordBot.Repository;
+using DiscordBot.Services.interfaces;
 using Quartz;
 using Serilog.Events;
 
-namespace DiscordBotFanatic.Jobs {
+namespace DiscordBot.Jobs {
     public abstract class BaseGuildJob : IJob {
         protected BaseGuildJob(DiscordSocketClient discord, ILogService logService, IDiscordBotRepository repository,
             Mapper mapper, JobType jobType) {

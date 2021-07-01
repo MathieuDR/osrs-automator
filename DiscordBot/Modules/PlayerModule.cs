@@ -7,18 +7,14 @@ using Discord;
 using Discord.Addons.Interactive.Criteria;
 using Discord.Commands;
 using Discord.WebSocket;
-using DiscordBotFanatic.Helpers;
-using DiscordBotFanatic.Models.Configuration;
-using DiscordBotFanatic.Models.Decorators;
-using DiscordBotFanatic.Models.ResponseModels;
-using DiscordBotFanatic.Paginator;
-using DiscordBotFanatic.Services.interfaces;
-using Microsoft.Extensions.Options;
+using DiscordBot.Helpers;
+using DiscordBot.Models.Configuration;
+using DiscordBot.Models.ResponseModels;
+using DiscordBot.Paginator;
+using DiscordBot.Services.interfaces;
 using Serilog.Events;
-using WiseOldManConnector.Models.Output;
-using WiseOldManConnector.Models.WiseOldMan.Enums;
 
-namespace DiscordBotFanatic.Modules {
+namespace DiscordBot.Modules {
     [Name("Player module")]
     public class PlayerModule : BaseWaitMessageEmbeddedResponseModule {
         private readonly IPlayerService _playerService;

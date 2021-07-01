@@ -2,11 +2,11 @@
 using System.Threading.Tasks;
 using Discord;
 using Discord.WebSocket;
-using DiscordBotFanatic.Services.interfaces;
+using DiscordBot.Services.interfaces;
 using Quartz;
 using Serilog.Events;
 
-namespace DiscordBotFanatic.Jobs {
+namespace DiscordBot.Jobs {
     public class HelloJob : IJob {
         private readonly DiscordSocketClient _discord;
         private readonly ILogService _service;

@@ -3,14 +3,14 @@ using System.Threading.Tasks;
 using AutoMapper;
 using Discord;
 using Discord.WebSocket;
-using DiscordBotFanatic.Models.Data;
-using DiscordBotFanatic.Models.Enums;
-using DiscordBotFanatic.Repository;
-using DiscordBotFanatic.Services.interfaces;
+using DiscordBot.Models.Data;
+using DiscordBot.Models.Enums;
+using DiscordBot.Repository;
+using DiscordBot.Services.interfaces;
 using Serilog.Events;
 using WiseOldManConnector.Models.Output;
 
-namespace DiscordBotFanatic.Jobs {
+namespace DiscordBot.Jobs {
     public class AchievementsJob : BaseGuildJob {
         private readonly IOsrsHighscoreService _osrsHighscoreService;
 

@@ -3,7 +3,7 @@ using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using WiseOldManConnector.Interfaces;
 
-namespace DiscordBotFanatic.Services {
+namespace DiscordBot.Services {
     public class WisOldManLogger : IWiseOldManLogger{
         private readonly ILogger<WisOldManLogger> _logger;
 

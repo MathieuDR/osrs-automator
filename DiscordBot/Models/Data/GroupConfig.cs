@@ -1,7 +1,7 @@
 ﻿using Discord;
 using WiseOldManConnector.Models.Output;
 
-namespace DiscordBotFanatic.Models.Data {
+namespace DiscordBot.Models.Data {
     public class GroupConfig : BaseGuildModel {
         public GroupConfig() { }
 

@@ -1,10 +1,10 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
 using Discord;
-using DiscordBotFanatic.Models.Decorators;
+using DiscordBot.Models.Decorators;
 using WiseOldManConnector.Models.Output;
 
-namespace DiscordBotFanatic.Services.interfaces {
+namespace DiscordBot.Services.interfaces {
     public interface ICompetitionService {
         Task<ItemDecorator<Competition>> SetCurrentCompetition(IGuildUser guildUser, int id);
         Task<ItemDecorator<Competition>> SetCurrentCompetition(IGuildUser guildUser, string name);

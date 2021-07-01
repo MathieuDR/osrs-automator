@@ -1,6 +1,6 @@
 ﻿using WiseOldManConnector.Models.WiseOldMan.Enums;
 
-namespace DiscordBotFanatic.Modules.DiscordCommandArguments {
+namespace DiscordBot.Modules.DiscordCommandArguments {
     public class MetricArguments : BaseArguments {
         public MetricType? MetricType { get; set; }
     }

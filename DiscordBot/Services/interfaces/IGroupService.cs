@@ -1,13 +1,12 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
 using Discord;
-using DiscordBotFanatic.Models.Data;
-using DiscordBotFanatic.Models.Decorators;
-using DiscordBotFanatic.Models.Enums;
+using DiscordBot.Models.Decorators;
+using DiscordBot.Models.Enums;
 using WiseOldManConnector.Models.Output;
 using WiseOldManConnector.Models.WiseOldMan.Enums;
 
-namespace DiscordBotFanatic.Services.interfaces {
+namespace DiscordBot.Services.interfaces {
     public interface IGroupService {
         public Task<ItemDecorator<Group>> SetGroupForGuild(IGuildUser guildUser, int womGroupId, string verificationCode);
         Task SetAutoAdd(IGuildUser guildUser, bool autoAdd);

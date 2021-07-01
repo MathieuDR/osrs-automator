@@ -1,4 +1,4 @@
-﻿namespace DiscordBotFanatic.Models.Enums {
+﻿namespace DiscordBot.Models.Enums {
     public enum JobType {
         Achievements = 1,
         GroupUpdate = 20,

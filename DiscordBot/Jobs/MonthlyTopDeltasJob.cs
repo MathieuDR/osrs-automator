@@ -1,22 +1,20 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using AutoMapper;
 using Discord;
 using Discord.WebSocket;
-using DiscordBotFanatic.Models.Enums;
-using DiscordBotFanatic.Repository;
-using DiscordBotFanatic.Services.interfaces;
-using DiscordBotFanatic.Transformers;
-using Quartz;
+using DiscordBot.Models.Enums;
+using DiscordBot.Repository;
+using DiscordBot.Services.interfaces;
+using DiscordBot.Transformers;
 using Serilog.Events;
 using WiseOldManConnector.Helpers;
 using WiseOldManConnector.Models.Output;
 using WiseOldManConnector.Models.WiseOldMan.Enums;
 
-namespace DiscordBotFanatic.Jobs {
+namespace DiscordBot.Jobs {
     public class MonthlyTopDeltasJob : BaseGuildJob {
         private readonly IOsrsHighscoreService _osrsHighscoreService;
        

@@ -1,11 +1,11 @@
 using System;
 using System.Text;
-using DiscordBotFanatic.Helpers;
+using DiscordBot.Helpers;
 using WiseOldManConnector.Helpers;
 using WiseOldManConnector.Models.Output;
 using WiseOldManConnector.Models.WiseOldMan.Enums;
 
-namespace DiscordBotFanatic.Transformers {
+namespace DiscordBot.Transformers {
     public static class DeltaLeaderboardHelper {
         private static readonly int IdHash = 3;
         private static readonly int IdSpace = 5;

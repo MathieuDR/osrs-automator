@@ -1,9 +1,8 @@
 using System.Collections.Generic;
 using System.Linq;
-using Discord;
 using LiteDB;
 
-namespace DiscordBotFanatic.Models.Data {
+namespace DiscordBot.Models.Data {
     public class CountConfig {
         public ulong OutputChannelId { get; set; }
         

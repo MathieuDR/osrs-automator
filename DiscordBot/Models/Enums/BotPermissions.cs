@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace DiscordBotFanatic.Models.Enums {
+namespace DiscordBot.Models.Enums {
     [Flags]
     public enum BotPermissions {
         None = 0,

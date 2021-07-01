@@ -2,7 +2,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Discord;
 
-namespace DiscordBotFanatic.Models.Data {
+namespace DiscordBot.Models.Data {
     public class UserCountInfo : BaseModel {
         public UserCountInfo() { }
         public UserCountInfo(IUser user) : base(user) { }

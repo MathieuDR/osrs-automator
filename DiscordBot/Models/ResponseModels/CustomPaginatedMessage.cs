@@ -1,8 +1,8 @@
 ﻿using Discord;
 using Discord.Addons.Interactive.Paginator;
-using DiscordBotFanatic.Helpers;
+using DiscordBot.Helpers;
 
-namespace DiscordBotFanatic.Models.ResponseModels {
+namespace DiscordBot.Models.ResponseModels {
     public class CustomPaginatedMessage : PaginatedMessage {
         public CustomPaginatedMessage() {
             Options = new PaginatedAppearanceOptions {

@@ -1,18 +1,17 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
 using Discord;
 using Discord.Commands;
 using Discord.WebSocket;
-using DiscordBotFanatic.Helpers;
-using DiscordBotFanatic.Models.Configuration;
-using DiscordBotFanatic.Models.Enums;
-using DiscordBotFanatic.Preconditions;
-using DiscordBotFanatic.Services.interfaces;
+using DiscordBot.Helpers;
+using DiscordBot.Models.Configuration;
+using DiscordBot.Models.Enums;
+using DiscordBot.Preconditions;
+using DiscordBot.Services.interfaces;
 
-namespace DiscordBotFanatic.Modules {
+namespace DiscordBot.Modules {
     [Name("Administrator")]
     [Group("cfg")]
     [RequireUserPermission(GuildPermission.Administrator, Group = "Permission")]

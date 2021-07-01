@@ -6,7 +6,7 @@ using System.Reflection;
 using Discord;
 using LiteDB;
 
-namespace DiscordBotFanatic.Models.Data {
+namespace DiscordBot.Models.Data {
     public class BaseModel {
         protected Dictionary<string, string> ValidationDictionary = new Dictionary<string, string>();
 

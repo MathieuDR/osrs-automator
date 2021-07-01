@@ -5,11 +5,11 @@ using Discord;
 using Discord.Addons.Interactive;
 using Discord.Commands;
 using Discord.WebSocket;
-using DiscordBotFanatic.Configuration;
-using DiscordBotFanatic.Models.Configuration;
-using DiscordBotFanatic.Repository;
-using DiscordBotFanatic.Services;
-using DiscordBotFanatic.Services.interfaces;
+using DiscordBot.Configuration;
+using DiscordBot.Models.Configuration;
+using DiscordBot.Repository;
+using DiscordBot.Services;
+using DiscordBot.Services.interfaces;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Quartz;
@@ -19,7 +19,7 @@ using Serilog.Formatting.Json;
 using WiseOldManConnector.Configuration;
 using WiseOldManConnector.Interfaces;
 
-namespace DiscordBotFanatic {
+namespace DiscordBot {
     internal class Program {
         public async Task EntryPointAsync() {
             IConfiguration config = BuildConfig();

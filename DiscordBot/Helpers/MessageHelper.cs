@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Text.RegularExpressions;
 using Discord;
-using DiscordBotFanatic.Models.Configuration;
+using DiscordBot.Models.Configuration;
 
-namespace DiscordBotFanatic.Helpers {
+namespace DiscordBot.Helpers {
     public static class MessageHelper {
         private static readonly Regex EmojiRegex = new Regex(@"\{\{([^\}]+)\}\}", RegexOptions.Compiled);
 

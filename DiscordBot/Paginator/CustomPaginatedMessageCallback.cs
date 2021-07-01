@@ -1,16 +1,14 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Discord;
 using Discord.Addons.Interactive;
 using Discord.Addons.Interactive.Criteria;
 using Discord.Addons.Interactive.Paginator;
 using Discord.Commands;
 using Discord.WebSocket;
-using DiscordBotFanatic.Models.ResponseModels;
+using DiscordBot.Models.ResponseModels;
 
-namespace DiscordBotFanatic.Paginator {
+namespace DiscordBot.Paginator {
     public class CustomPaginatedMessageCallback : PaginatedMessageCallback {
         private readonly string _footerBuilderTemplate;
 

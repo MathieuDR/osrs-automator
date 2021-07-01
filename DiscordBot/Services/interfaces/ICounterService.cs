@@ -2,10 +2,9 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using Discord;
 using Discord.WebSocket;
-using DiscordBotFanatic.Models;
-using DiscordBotFanatic.Models.Data;
+using DiscordBot.Models.Data;
 
-namespace DiscordBotFanatic.Services.interfaces {
+namespace DiscordBot.Services.interfaces {
     public interface ICounterService {
         int TotalCount(IGuildUser user);
         int Count(IGuildUser user, IGuildUser requester, int additive, string reason);

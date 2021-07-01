@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace DiscordBotFanatic.Paginator {
+namespace DiscordBot.Paginator {
     public class PaginatedStringWithContext<T> {
         public String StringValue { get; set; }
         public T Reference { get; set; }

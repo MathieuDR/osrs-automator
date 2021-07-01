@@ -4,11 +4,11 @@ using System.Threading.Tasks;
 using Discord;
 using Discord.Commands;
 using Discord.WebSocket;
-using DiscordBotFanatic.Services.interfaces;
+using DiscordBot.Services.interfaces;
 using Microsoft.Extensions.Logging;
 using Serilog.Events;
 
-namespace DiscordBotFanatic.Services {
+namespace DiscordBot.Services {
     public class LogService : ILogService {
         private readonly ILogger _commandsLogger;
         private readonly ILogger _debugLogger;

@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace DiscordBotFanatic.Helpers {
+namespace DiscordBot.Helpers {
     internal class ChunkedEnumerable<T> : IEnumerable<T> {
         private readonly int _chunkSize;
         private readonly int _start;

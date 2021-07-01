@@ -2,10 +2,10 @@
 using System.Text;
 using AutoMapper;
 using Discord;
-using DiscordBotFanatic.Helpers;
+using DiscordBot.Helpers;
 using WiseOldManConnector.Models.Output;
 
-namespace DiscordBotFanatic.Transformers.TypeConverters {
+namespace DiscordBot.Transformers.TypeConverters {
     public class CompetitionLeaderboardToEmbedBuilderConverter : ITypeConverter<CompetitionLeaderboard, EmbedBuilder> {
         private static readonly int IdHash = 3;
         private static readonly int IdSpace = 5;

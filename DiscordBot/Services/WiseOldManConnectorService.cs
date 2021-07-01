@@ -2,13 +2,13 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using DiscordBotFanatic.Services.interfaces;
+using DiscordBot.Services.interfaces;
 using WiseOldManConnector.Interfaces;
 using WiseOldManConnector.Models.Output;
 using WiseOldManConnector.Models.Requests;
 using WiseOldManConnector.Models.WiseOldMan.Enums;
 
-namespace DiscordBotFanatic.Services {
+namespace DiscordBot.Services {
     public class WiseOldManConnectorService : IOsrsHighscoreService {
         private readonly IWiseOldManCompetitionApi _competitionApi;
         private readonly IWiseOldManGroupApi _groupApi;

@@ -1,11 +1,8 @@
-﻿using System;
-using System.Text;
-using AutoMapper;
+﻿using AutoMapper;
 using Discord;
-using DiscordBotFanatic.Helpers;
 using WiseOldManConnector.Models.Output;
 
-namespace DiscordBotFanatic.Transformers.TypeConverters {
+namespace DiscordBot.Transformers.TypeConverters {
     public class DeltaLeaderboardToEmbedBuilderConverter : ITypeConverter<DeltaLeaderboard, EmbedBuilder> {
         public EmbedBuilder Convert(DeltaLeaderboard source, EmbedBuilder destination, ResolutionContext context) {
             destination ??= new EmbedBuilder();

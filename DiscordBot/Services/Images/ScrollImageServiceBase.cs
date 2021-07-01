@@ -4,13 +4,13 @@ using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Linq;
-using DiscordBotFanatic.Helpers;
-using DiscordBotFanatic.Services.interfaces;
+using DiscordBot.Helpers;
+using DiscordBot.Services.interfaces;
 using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.PixelFormats;
 using SixLabors.ImageSharp.Processing;
 
-namespace DiscordBotFanatic.Services.Images {
+namespace DiscordBot.Services.Images {
     public abstract class ScrollImageServiceBase<T> : ImageServiceBase<T> where T : class {
         private readonly string _scrollBase;
         protected readonly Size HeaderTextOffset;

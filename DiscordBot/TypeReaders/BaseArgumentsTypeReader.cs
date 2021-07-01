@@ -4,9 +4,9 @@ using System.Linq;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using Discord.Commands;
-using DiscordBotFanatic.Modules.DiscordCommandArguments;
+using DiscordBot.Modules.DiscordCommandArguments;
 
-namespace DiscordBotFanatic.TypeReaders {
+namespace DiscordBot.TypeReaders {
     public class BaseArgumentsTypeReader : TypeReader {
         public override Task<TypeReaderResult> ReadAsync(ICommandContext context, string input, IServiceProvider services) {
             List<string> parameters =

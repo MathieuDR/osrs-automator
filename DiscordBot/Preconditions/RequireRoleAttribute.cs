@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 using Discord.Commands;
 using Discord.WebSocket;
 
-namespace DiscordBotFanatic.Preconditions {
+namespace DiscordBot.Preconditions {
     public class RequireRoleAttribute : PreconditionAttribute {
         private readonly List<ulong> _ids = new ();
         private string _idsConcatenated => string.Join(", ", _ids);

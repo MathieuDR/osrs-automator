@@ -3,14 +3,14 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Discord;
-using DiscordBotFanatic.Helpers;
-using DiscordBotFanatic.Models.Data;
-using DiscordBotFanatic.Models.Decorators;
-using DiscordBotFanatic.Repository;
-using DiscordBotFanatic.Services.interfaces;
+using DiscordBot.Helpers;
+using DiscordBot.Models.Data;
+using DiscordBot.Models.Decorators;
+using DiscordBot.Repository;
+using DiscordBot.Services.interfaces;
 using WiseOldManConnector.Models.Output;
 
-namespace DiscordBotFanatic.Services {
+namespace DiscordBot.Services {
     public class CompetitionService : ICompetitionService {
         private readonly IOsrsHighscoreService _highscoreService;
         private readonly IDiscordBotRepository _repository;

@@ -1,11 +1,11 @@
 ﻿using System;
-using DiscordBotFanatic.Services.interfaces;
+using System.Collections.Generic;
+using DiscordBot.Services.interfaces;
 using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.Processing;
-using System.Collections.Generic;
 using WiseOldManConnector.Models.Output;
 
-namespace DiscordBotFanatic.Services.Images {
+namespace DiscordBot.Services.Images {
     public class RecordImageService : ScrollImageServiceBase<Record> {
         public RecordImageService(ILogService logService) : base(logService) { }
 

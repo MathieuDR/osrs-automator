@@ -5,12 +5,12 @@ using AutoMapper;
 using Discord;
 using Discord.Commands;
 using Discord.WebSocket;
-using DiscordBotFanatic.Helpers;
-using DiscordBotFanatic.Models.Configuration;
-using DiscordBotFanatic.Services.interfaces;
+using DiscordBot.Helpers;
+using DiscordBot.Models.Configuration;
+using DiscordBot.Services.interfaces;
 using Serilog.Events;
 
-namespace DiscordBotFanatic.Modules {
+namespace DiscordBot.Modules {
     [DontAutoLoad]
     public abstract class BaseWaitMessageEmbeddedResponseModule : BaseEmbeddedResponseModule {
         private bool _waitMessageHandled;

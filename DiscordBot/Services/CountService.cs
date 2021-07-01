@@ -4,12 +4,11 @@ using System.Linq;
 using System.Threading.Tasks;
 using Discord;
 using Discord.WebSocket;
-using DiscordBotFanatic.Models;
-using DiscordBotFanatic.Models.Data;
-using DiscordBotFanatic.Repository;
-using DiscordBotFanatic.Services.interfaces;
+using DiscordBot.Models.Data;
+using DiscordBot.Repository;
+using DiscordBot.Services.interfaces;
 
-namespace DiscordBotFanatic.Services {
+namespace DiscordBot.Services {
     public class CountService : BaseService, ICounterService {
         private readonly IDiscordBotRepository _repositoryService;
 

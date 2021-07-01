@@ -4,10 +4,10 @@ using System.Threading.Tasks;
 using Discord;
 using Discord.Commands;
 using Discord.WebSocket;
-using DiscordBotFanatic.Services.interfaces;
+using DiscordBot.Services.interfaces;
 using Serilog.Events;
 
-namespace DiscordBotFanatic.Services {
+namespace DiscordBot.Services {
     public class SerilogService : ILogService {
         public SerilogService(DiscordSocketClient discord, CommandService commands) {
             discord.Log += LogDiscordClient;

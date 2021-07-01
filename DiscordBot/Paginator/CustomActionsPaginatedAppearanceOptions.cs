@@ -7,7 +7,7 @@ using Discord.Addons.Interactive.Paginator;
 using Discord.Commands;
 using Discord.Rest;
 
-namespace DiscordBotFanatic.Paginator {
+namespace DiscordBot.Paginator {
     public delegate Task PerformAction(object toDelete, int index);
 
 

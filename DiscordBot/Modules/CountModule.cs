@@ -5,20 +5,16 @@ using System.Text;
 using System.Threading.Tasks;
 using AutoMapper;
 using Discord;
-using Discord.Addons.Interactive.Criteria;
 using Discord.Commands;
 using Discord.WebSocket;
-using DiscordBotFanatic.Helpers;
-using DiscordBotFanatic.Models;
-using DiscordBotFanatic.Models.Configuration;
-using DiscordBotFanatic.Models.Data;
-using DiscordBotFanatic.Models.ResponseModels;
-using DiscordBotFanatic.Paginator;
-using DiscordBotFanatic.Preconditions;
-using DiscordBotFanatic.Services.interfaces;
-using Serilog.Events;
+using DiscordBot.Helpers;
+using DiscordBot.Models.Configuration;
+using DiscordBot.Models.Data;
+using DiscordBot.Models.ResponseModels;
+using DiscordBot.Preconditions;
+using DiscordBot.Services.interfaces;
 
-namespace DiscordBotFanatic.Modules {
+namespace DiscordBot.Modules {
     
     [Group("count")]
     [RequireContext(ContextType.Guild)]
