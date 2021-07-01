@@ -53,6 +53,12 @@
     <ProjectReference Include="..\WiseOldManConnector\WiseOldManConnector.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Content Include="..\README.md">
+      <Link>README.md</Link>
+    </Content>
+  </ItemGroup>
+
 <!--  <Target Name="PostBuild" AfterTargets="PostBuildEvent">-->
 <!--    <Exec Command="mkdir $(TargetDir)Images/;cp -r $(ProjectDir)DiscordBot/Images/* $(TargetDir)Images/" />-->
 <!--  </Target>-->
