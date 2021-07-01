@@ -44,13 +44,10 @@
     <a href="https://github.com/MathieuDR/orsr-discord-automator"><strong>Explore the docs »</strong></a>
     <br />
     <br />
-    <a href="https://github.com/MathieuDR/orsr-discord-automator">View Demo</a>
-    ·
     <a href="https://github.com/MathieuDR/orsr-discord-automator/issues">Report Bug</a>
     ·
     <a href="https://github.com/MathieuDR/orsr-discord-automator/issues">Request Feature</a>
   </p>
-</p>
 
 
 
