@@ -4,6 +4,7 @@
         Def1,
         Lvl3,
         Hp10,
-        F2P
+        F2P,
+        Zerker
     }
 }

@@ -231,6 +231,12 @@ namespace WiseOldManConnector.Models.WiseOldMan.Enums {
         EffectiveHoursBossing,
         
         [EnumMember(Value = "tempoross")]
-        Tempoross
+        Tempoross,
+        
+        [EnumMember(Value = "phosanis_nightmare")]
+        PhosanisNightmare,
+        
+        [EnumMember(Value = "theatre_of_blood_hard_mode")]
+        TheatreOfBloodHardMode
     }
 }

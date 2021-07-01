@@ -79,6 +79,7 @@ namespace WiseOldManConnector.Transformers.TypeConverters {
                 case MetricType.KrilTsutsaroth:
                 case MetricType.Mimic:
                 case MetricType.Nightmare:
+                case MetricType.PhosanisNightmare:
                 case MetricType.Obor:
                 case MetricType.Sarachnis:
                 case MetricType.Scorpia:
@@ -86,6 +87,7 @@ namespace WiseOldManConnector.Transformers.TypeConverters {
                 case MetricType.TheGauntlet:
                 case MetricType.TheCorruptedGauntlet:
                 case MetricType.TheatreOfBlood:
+                case MetricType.TheatreOfBloodHardMode:
                 case MetricType.ThermonuclearSmokeDevil:
                 case MetricType.TzkalZuk:
                 case MetricType.TztokJad:
@@ -95,6 +97,7 @@ namespace WiseOldManConnector.Transformers.TypeConverters {
                 case MetricType.Wintertodt:
                 case MetricType.Zalcano:
                 case MetricType.Zulrah:
+                case MetricType.Tempoross:
                     return DeltaType.Kills;
 
                 default:

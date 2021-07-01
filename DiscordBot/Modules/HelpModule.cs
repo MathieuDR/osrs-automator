@@ -31,7 +31,7 @@ namespace DiscordBot.Modules {
         [Command(HelpCommand)]
         [Summary(HelpSummary)]
         [Alias("?", "info")]
-        public async Task Help(string module = "") {
+        public async Task Help([Remainder] string module = "") {
             EmbedBuilder output = new EmbedBuilder();
             if (string.IsNullOrEmpty(module)) {
                 output.Title = "Help";
@@ -52,18 +52,16 @@ namespace DiscordBot.Modules {
                 output.Title = mod.Name.Replace("Module", "");
                 output.Description = $"{mod.Summary}\n" + (!string.IsNullOrEmpty(mod.Remarks) ? $"({mod.Remarks})\n" : "") +
                                      (mod.Aliases.Any(x => !string.IsNullOrEmpty(x))
-                                         ? $"Prefix(es): {string.Join(",", mod.Aliases)}\n"
+                                         ? $"Prefix(es): {string.Join(", ", mod.Aliases)}\n"
                                          : "") + (mod.Submodules.Any()
-                                         ? $"Submodules: {mod.Submodules.Select(m => m.Name)}\n"
+                                         ? $"Submodules: {string.Join(", ", mod.Submodules.Select(m => m.Name).ToList())}\n"
                                          : "") + " ";
                 AddCommands(mod, ref output);
                 if (_parametersToOutput.Count > 0) {
                     AddParameterInfo(ref output);
                 }
             }
-
-            //AddStandardParameterInfo(output);
-
+            
             await ReplyAsync("", embed: output.Build());
         }
 
@@ -71,14 +69,7 @@ namespace DiscordBot.Modules {
             output.AddField($"Parameter parsing",
                 $"When you have a text parameter with a space, you need to encase the parameter with quotes.{Environment.NewLine}Example: `{prefix} get \"iron man\"`");
         }
-
-        //[Command(HelpCommand)]
-        //[Summary(HelpSummary)]
-        //[Alias(HelpAlias)]
-        //public async Task Help(string command) {
-        //    Task.CompletedTask;
-        //}
-
+        
         public void AddHelp(ModuleInfo module, ref EmbedBuilder builder) {
             foreach (var sub in module.Submodules) AddHelp(sub, ref builder);
             builder.AddField(f => {
@@ -89,8 +80,10 @@ namespace DiscordBot.Modules {
 
         public void AddCommands(ModuleInfo module, ref EmbedBuilder builder) {
             foreach (var command in module.Commands) {
-                command.CheckPreconditionsAsync(Context, _serviceProvider).GetAwaiter().GetResult();
-                AddCommand(command, ref builder);
+                var t = command.CheckPreconditionsAsync(Context, _serviceProvider).GetAwaiter().GetResult();
+                if(t.IsSuccess) {
+                    AddCommand(command, ref builder);
+                }
             }
         }
 

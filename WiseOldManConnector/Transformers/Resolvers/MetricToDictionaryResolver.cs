@@ -72,6 +72,7 @@ namespace WiseOldManConnector.Transformers.Resolvers {
                 {MetricType.KrilTsutsaroth, context.Mapper.Map<Metric>(source.KrilTsutsaroth)},
                 {MetricType.Mimic, context.Mapper.Map<Metric>(source.Mimic)},
                 {MetricType.Nightmare, context.Mapper.Map<Metric>(source.Nightmare)},
+                {MetricType.PhosanisNightmare, context.Mapper.Map<Metric>(source.PhosanisNightmare)},
                 {MetricType.Obor, context.Mapper.Map<Metric>(source.Obor)},
                 {MetricType.Sarachnis, context.Mapper.Map<Metric>(source.Sarachnis)},
                 {MetricType.Scorpia, context.Mapper.Map<Metric>(source.Scorpia)},
@@ -80,6 +81,7 @@ namespace WiseOldManConnector.Transformers.Resolvers {
                 {MetricType.TheGauntlet, context.Mapper.Map<Metric>(source.TheGauntlet)},
                 {MetricType.TheCorruptedGauntlet, context.Mapper.Map<Metric>(source.TheCorruptedGauntlet)},
                 {MetricType.TheatreOfBlood, context.Mapper.Map<Metric>(source.TheatreOfBlood)},
+                {MetricType.TheatreOfBloodHardMode, context.Mapper.Map<Metric>(source.TheatreOfBloodHardMode)},
                 {MetricType.ThermonuclearSmokeDevil, context.Mapper.Map<Metric>(source.ThermonuclearSmokeDevil)},
                 {MetricType.TzkalZuk, context.Mapper.Map<Metric>(source.TzkalZuk)},
                 {MetricType.TztokJad, context.Mapper.Map<Metric>(source.TztokJad)},
@@ -89,6 +91,7 @@ namespace WiseOldManConnector.Transformers.Resolvers {
                 {MetricType.Wintertodt, context.Mapper.Map<Metric>(source.Wintertodt)},
                 {MetricType.Zalcano, context.Mapper.Map<Metric>(source.Zalcano)},
                 {MetricType.Zulrah, context.Mapper.Map<Metric>(source.Zulrah)},
+                {MetricType.Tempoross, context.Mapper.Map<Metric>(source.Tempoross)},
                 {MetricType.EffectiveHoursBossing, context.Mapper.Map<Metric>(source.EffectiveHoursBossing)},
                 {MetricType.EffectiveHoursPlaying, context.Mapper.Map<Metric>(source.EffectiveHoursPlaying)}
             };

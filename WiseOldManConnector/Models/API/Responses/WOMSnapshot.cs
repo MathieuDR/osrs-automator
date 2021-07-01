@@ -197,6 +197,9 @@ namespace WiseOldManConnector.Models.API.Responses {
 
         [JsonProperty("nightmare")]
         public Metric Nightmare { get; set; }
+        
+        [JsonProperty("phosanis_nightmare")]
+        public Metric PhosanisNightmare { get; set; }
 
         [JsonProperty("obor")]
         public Metric Obor { get; set; }
@@ -218,6 +221,9 @@ namespace WiseOldManConnector.Models.API.Responses {
 
         [JsonProperty("theatre_of_blood")]
         public Metric TheatreOfBlood { get; set; }
+        
+        [JsonProperty("theatre_of_blood_hard_mode")]
+        public Metric TheatreOfBloodHardMode { get; set; }
 
         [JsonProperty("thermonuclear_smoke_devil")]
         public Metric ThermonuclearSmokeDevil { get; set; }

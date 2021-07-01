@@ -164,6 +164,9 @@ namespace WiseOldManConnector.Models.API.Responses {
 
         [JsonProperty("theatre_of_blood")]
         public WOMDeltaMetric TheatreOfBlood { get; set; }
+        
+        [JsonProperty("theatre_of_blood_hard_mode")]
+        public Metric TheatreOfBloodHardMode { get; set; }
 
         [JsonProperty("thermonuclear_smoke_devil")]
         public WOMDeltaMetric ThermonuclearSmokeDevil { get; set; }
@@ -191,5 +194,11 @@ namespace WiseOldManConnector.Models.API.Responses {
 
         [JsonProperty("zulrah")]
         public WOMDeltaMetric Zulrah { get; set; }
+        
+        [JsonProperty("tempoross")]
+        public Metric Tempoross { get; set; }
+        
+        [JsonProperty("phosanis_nightmare")]
+        public Metric PhosanisNightmare { get; set; }
     }
 }

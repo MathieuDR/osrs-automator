@@ -80,15 +80,14 @@ namespace DiscordBot.Modules {
         [Command("queue")]
         [Summary("Queue automated job")]
         [RequireContext(ContextType.Guild)]
-        public async Task QueueAutomated(string job) {
-            var jobType = Enum.Parse<JobType>(job, true);
-            _ = _groupService.QueueJob(jobType);
+        public async Task QueueAutomated(JobType job) {
+            _ = _groupService.QueueJob(job);
                 
             var builder = new EmbedBuilder()
                 .AddCommonProperties()
                 .WithMessageAuthorFooter(Context)
                 .WithTitle("Success!")
-                .WithDescription($"Job '{jobType}' queued");
+                .WithDescription($"Job '{job}' queued");
 
             await ModifyWaitMessageAsync(builder.Build());
         }

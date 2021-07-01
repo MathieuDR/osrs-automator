@@ -71,6 +71,7 @@ namespace WiseOldManConnector.Transformers.TypeConverters {
                 {MetricType.KrilTsutsaroth, context.Mapper.Map<DeltaMetric>(source.KrilTsutsaroth)},
                 {MetricType.Mimic, context.Mapper.Map<DeltaMetric>(source.Mimic)},
                 {MetricType.Nightmare, context.Mapper.Map<DeltaMetric>(source.Nightmare)},
+                {MetricType.PhosanisNightmare, context.Mapper.Map<DeltaMetric>(source.PhosanisNightmare)},
                 {MetricType.Obor, context.Mapper.Map<DeltaMetric>(source.Obor)},
                 {MetricType.Sarachnis, context.Mapper.Map<DeltaMetric>(source.Sarachnis)},
                 {MetricType.Scorpia, context.Mapper.Map<DeltaMetric>(source.Scorpia)},
@@ -78,6 +79,7 @@ namespace WiseOldManConnector.Transformers.TypeConverters {
                 {MetricType.TheGauntlet, context.Mapper.Map<DeltaMetric>(source.TheGauntlet)},
                 {MetricType.TheCorruptedGauntlet, context.Mapper.Map<DeltaMetric>(source.TheCorruptedGauntlet)},
                 {MetricType.TheatreOfBlood, context.Mapper.Map<DeltaMetric>(source.TheatreOfBlood)},
+                {MetricType.TheatreOfBloodHardMode, context.Mapper.Map<DeltaMetric>(source.TheatreOfBloodHardMode)},
                 {MetricType.ThermonuclearSmokeDevil, context.Mapper.Map<DeltaMetric>(source.ThermonuclearSmokeDevil)},
                 {MetricType.TzkalZuk, context.Mapper.Map<DeltaMetric>(source.TzkalZuk)},
                 {MetricType.TztokJad, context.Mapper.Map<DeltaMetric>(source.TztokJad)},
@@ -86,7 +88,8 @@ namespace WiseOldManConnector.Transformers.TypeConverters {
                 {MetricType.Vorkath, context.Mapper.Map<DeltaMetric>(source.Vorkath)},
                 {MetricType.Wintertodt, context.Mapper.Map<DeltaMetric>(source.Wintertodt)},
                 {MetricType.Zalcano, context.Mapper.Map<DeltaMetric>(source.Zalcano)},
-                {MetricType.Zulrah, context.Mapper.Map<DeltaMetric>(source.Zulrah)}
+                {MetricType.Zulrah, context.Mapper.Map<DeltaMetric>(source.Zulrah)},
+                {MetricType.Tempoross, context.Mapper.Map<DeltaMetric>(source.Tempoross)}
             };
 
             // Set correct key!
