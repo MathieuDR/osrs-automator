@@ -1,4 +1,5 @@
-﻿using WiseOldManConnector.Models.WiseOldMan.Enums;
+﻿using WiseOldManConnector.Helpers;
+using WiseOldManConnector.Models.WiseOldMan.Enums;
 using WiseOldManConnectorTests.Fixtures;
 using Xunit;
 
@@ -93,7 +94,6 @@ namespace WiseOldManConnectorTests.TransformerTests {
         [InlineData("combat", MetricType.Combat)]
         public void CorrectStringsToMetricTypesGetsConverted(string metric, MetricType expected) {
             var metricType = _fixture.Mapper.Map<MetricType>(metric);
-
             Assert.Equal(expected, metricType);
         }
 
@@ -128,6 +128,7 @@ namespace WiseOldManConnectorTests.TransformerTests {
         [InlineData("chambers_Of_XERIC_challenge_mode", MetricType.ChambersOfXericChallengeMode)]
         [InlineData("VORKATH", MetricType.Vorkath)]
         [InlineData("COMBAT", MetricType.Combat)]
+        [InlineData("Tempoross", MetricType.Tempoross)]
         public void CorrectStringsWithCapitalsToMetricTypesGetsConverted(string metric, MetricType expected) {
             var metricType = _fixture.Mapper.Map<MetricType>(metric);
 
@@ -135,90 +136,21 @@ namespace WiseOldManConnectorTests.TransformerTests {
         }
 
         [Theory]
-        [InlineData(MetricType.Overall)]
-        [InlineData(MetricType.Attack)]
-        [InlineData(MetricType.Defence)]
-        [InlineData(MetricType.Strength)]
-        [InlineData(MetricType.Hitpoints)]
-        [InlineData(MetricType.Ranged)]
-        [InlineData(MetricType.Prayer)]
-        [InlineData(MetricType.Magic)]
-        [InlineData(MetricType.Cooking)]
-        [InlineData(MetricType.Woodcutting)]
-        [InlineData(MetricType.Fletching)]
-        [InlineData(MetricType.Fishing)]
-        [InlineData(MetricType.Firemaking)]
-        [InlineData(MetricType.Crafting)]
-        [InlineData(MetricType.Smithing)]
-        [InlineData(MetricType.Mining)]
-        [InlineData(MetricType.Herblore)]
-        [InlineData(MetricType.Agility)]
-        [InlineData(MetricType.Thieving)]
-        [InlineData(MetricType.Slayer)]
-        [InlineData(MetricType.Farming)]
-        [InlineData(MetricType.Runecrafting)]
-        [InlineData(MetricType.Hunter)]
-        [InlineData(MetricType.Construction)]
-        [InlineData(MetricType.LeaguePoints)]
-        [InlineData(MetricType.BountyHunterHunter)]
-        [InlineData(MetricType.BountyHunterRogue)]
-        [InlineData(MetricType.ClueScrollsAll)]
-        [InlineData(MetricType.ClueScrollsBeginner)]
-        [InlineData(MetricType.ClueScrollsEasy)]
-        [InlineData(MetricType.ClueScrollsMedium)]
-        [InlineData(MetricType.ClueScrollsHard)]
-        [InlineData(MetricType.ClueScrollsElite)]
-        [InlineData(MetricType.ClueScrollsMaster)]
-        [InlineData(MetricType.LastManStanding)]
-        [InlineData(MetricType.AbyssalSire)]
-        [InlineData(MetricType.AlchemicalHydra)]
-        [InlineData(MetricType.BarrowsChests)]
-        [InlineData(MetricType.Bryophyta)]
-        [InlineData(MetricType.Callisto)]
-        [InlineData(MetricType.Cerberus)]
-        [InlineData(MetricType.ChambersOfXeric)]
-        [InlineData(MetricType.ChambersOfXericChallengeMode)]
-        [InlineData(MetricType.ChaosElemental)]
-        [InlineData(MetricType.ChaosFanatic)]
-        [InlineData(MetricType.CommanderZilyana)]
-        [InlineData(MetricType.CorporealBeast)]
-        [InlineData(MetricType.CrazyArchaeologist)]
-        [InlineData(MetricType.DagannothPrime)]
-        [InlineData(MetricType.DagannothRex)]
-        [InlineData(MetricType.DagannothSupreme)]
-        [InlineData(MetricType.DerangedArchaeologist)]
-        [InlineData(MetricType.GeneralGraardor)]
-        [InlineData(MetricType.GiantMole)]
-        [InlineData(MetricType.GrotesqueGuardians)]
-        [InlineData(MetricType.Hespori)]
-        [InlineData(MetricType.KalphiteQueen)]
-        [InlineData(MetricType.KingBlackDragon)]
-        [InlineData(MetricType.Kraken)]
-        [InlineData(MetricType.Kreearra)]
-        [InlineData(MetricType.KrilTsutsaroth)]
-        [InlineData(MetricType.Mimic)]
-        [InlineData(MetricType.Nightmare)]
-        [InlineData(MetricType.Obor)]
-        [InlineData(MetricType.Sarachnis)]
-        [InlineData(MetricType.Scorpia)]
-        [InlineData(MetricType.Skotizo)]
-        [InlineData(MetricType.TheGauntlet)]
-        [InlineData(MetricType.TheCorruptedGauntlet)]
-        [InlineData(MetricType.TheatreOfBlood)]
-        [InlineData(MetricType.ThermonuclearSmokeDevil)]
-        [InlineData(MetricType.TzkalZuk)]
-        [InlineData(MetricType.TztokJad)]
-        [InlineData(MetricType.Venenatis)]
-        [InlineData(MetricType.Vetion)]
-        [InlineData(MetricType.Vorkath)]
-        [InlineData(MetricType.Wintertodt)]
-        [InlineData(MetricType.Zalcano)]
-        [InlineData(MetricType.Zulrah)]
-        [InlineData(MetricType.Combat)]
+        [ClassData(typeof(MetricTypeTestData))]
         public void StringsFromEnumWithCapitalsToMetricTypesGetsConverted(MetricType expected) {
             var metricType = _fixture.Mapper.Map<MetricType>(expected.ToString());
-
             Assert.Equal(expected, metricType);
+        }
+
+        [Theory]
+        [ClassData(typeof(MetricTypeTestData))]
+        public void HasCategory(MetricType metric) {
+            var category = metric.Category();
+            if (metric == MetricType.Combat) {
+                Assert.Equal(MetricTypeCategory.Others, category);
+            } else {
+                Assert.NotEqual(MetricTypeCategory.Others, category);
+            }
         }
     }
 }

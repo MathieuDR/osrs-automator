@@ -4,5 +4,8 @@
         public WOMDelta Experience { get; set; }
         public WOMDelta Score { get; set; }
         public WOMDelta Kills{ get; set; }
+        public WOMDelta Value { get; set; }
+        public WOMDelta Ehb{ get; set; }
+        public WOMDelta Ehp { get; set; }
     }
 }

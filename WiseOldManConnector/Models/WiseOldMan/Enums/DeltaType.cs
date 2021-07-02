@@ -5,6 +5,7 @@
         Score,
         Experience,
         Kills,
-        Hours
+        Hours,
+        Value
     }
 }

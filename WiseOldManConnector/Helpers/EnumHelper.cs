@@ -45,6 +45,10 @@ namespace WiseOldManConnector.Helpers {
             if (GetMetricTypes(MetricTypeCategory.Time).Contains(metricType)) {
                 return MetricTypeCategory.Time;
             }
+            
+            if (GetMetricTypes(MetricTypeCategory.Others).Contains(metricType)) {
+                return MetricTypeCategory.Others;
+            }
 
             throw new ArgumentOutOfRangeException($"Cannot find category of {metricType}");
         }
@@ -52,16 +56,12 @@ namespace WiseOldManConnector.Helpers {
         public static List<MetricType> GetMetricTypes(this MetricTypeCategory category) {
             switch (category) {
                 case MetricTypeCategory.All:
-                    var skills = GetMetricTypes(MetricTypeCategory.Skills);
-                    var activities = GetMetricTypes(MetricTypeCategory.Activities);
-                    var bosses = GetMetricTypes(MetricTypeCategory.Bosses);
-                    var time = GetMetricTypes(MetricTypeCategory.Time);
-
                     var result =  new List<MetricType>();
-                    result.AddRange(skills);
-                    result.AddRange(activities);
-                    result.AddRange(bosses);
-                    result.AddRange(time);
+                    result.AddRange(GetMetricTypes(MetricTypeCategory.Skills));
+                    result.AddRange(GetMetricTypes(MetricTypeCategory.Activities));
+                    result.AddRange(GetMetricTypes(MetricTypeCategory.Bosses));
+                    result.AddRange(GetMetricTypes(MetricTypeCategory.Time));
+                    result.AddRange(GetMetricTypes(MetricTypeCategory.Others));
                     return result;
                 
                 case MetricTypeCategory.Skills:
@@ -73,12 +73,13 @@ namespace WiseOldManConnector.Helpers {
                 case MetricTypeCategory.Time:
                     return TimeMetrics();
                 case MetricTypeCategory.Others:
+                    return OtherMetrics();
                 default:
                     throw new ArgumentOutOfRangeException(nameof(category), category, null);
             }
         }
 
-        public static List<MetricType> BossMetrics() {
+        private static List<MetricType> BossMetrics() {
             return new List<MetricType>() {
                 MetricType.AbyssalSire,
                 MetricType.AlchemicalHydra,
@@ -130,7 +131,7 @@ namespace WiseOldManConnector.Helpers {
             };
         }
 
-        public static List<MetricType> ActivityMetrics() {
+        private static List<MetricType> ActivityMetrics() {
             return new List<MetricType>() {
                 MetricType.LeaguePoints,
                 MetricType.BountyHunterHunter,
@@ -143,19 +144,18 @@ namespace WiseOldManConnector.Helpers {
                 MetricType.ClueScrollsElite,
                 MetricType.ClueScrollsMaster,
                 MetricType.LastManStanding,
+                MetricType.SoulWarsZeal
             };
         }
-        
-        public static List<MetricType> TimeMetrics() {
+
+        private static List<MetricType> TimeMetrics() {
             return new List<MetricType>() {
                 MetricType.EffectiveHoursBossing,
                 MetricType.EffectiveHoursPlaying
             };
         }
-        
-        
 
-        public static List<MetricType> SkillMetrics() {
+        private static List<MetricType> SkillMetrics() {
             return new List<MetricType>() {
                 MetricType.Overall,
                 MetricType.Attack,
@@ -183,5 +183,12 @@ namespace WiseOldManConnector.Helpers {
                 MetricType.Construction,
             };
         }
+
+        private static List<MetricType> OtherMetrics() {
+            return new List<MetricType>() {
+                MetricType.Combat
+            };
+        }
+
     }
 }

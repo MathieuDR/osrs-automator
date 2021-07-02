@@ -625,8 +625,6 @@ namespace WiseOldManConnectorTests.Connectors {
             Assert.True(hasHours);
         }
 
-
-
         [Fact]
         public async Task GainedByUserIdResultsInCollection() {
             int id = TestConfiguration.ValidPlayerId;
@@ -647,6 +645,44 @@ namespace WiseOldManConnectorTests.Connectors {
             Assert.NotNull(response);
             Assert.NotEmpty(response.Data);
             Assert.True(response.Data.Count() == 4);
+        }
+        
+        [Fact]
+        public async Task GainedByUsernameAndPeriodResultsInCollectionWithAllMetrics() {
+            string username = TestConfiguration.ValidPlayerUsernameWithValidCapatilization;
+
+            ConnectorResponse<Deltas> response = await _playerApi.Gained(username, Period.Month);
+            var metrics = response.Data.DeltaMetrics as IDictionary<MetricType, DeltaMetric>;
+            
+            Assert.NotNull(metrics);
+            Assert.NotEmpty(metrics);
+
+            var types = Enum.GetValues(typeof(MetricType)) as MetricType[];
+                var hasHours = false;
+            
+                
+            foreach (var type in types) {
+                _testOutputHelper.WriteLine($"metric: {type}");
+                if (type == MetricType.Combat) {
+                    _testOutputHelper.WriteLine($"Not appliccable");
+                    continue;
+                }
+                
+                Assert.Contains(type, metrics);
+
+                var metric = metrics[type];
+                Assert.Equal(type, metric.MetricType);
+
+                var expected = type.Category() switch {
+                    MetricTypeCategory.Skills => 3,
+                    MetricTypeCategory.Bosses => 3,
+                    MetricTypeCategory.Activities => 2,
+                    MetricTypeCategory.Time => 2,
+                    _ => throw new ArgumentOutOfRangeException()
+                };
+
+                Assert.Equal(expected, metric.Deltas.Count);
+            }
         }
 
         [Theory]

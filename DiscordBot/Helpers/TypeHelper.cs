@@ -30,12 +30,17 @@ namespace DiscordBot.Helpers {
             type = type.GetGenericInfo(builder);
 
             if (type == typeof(IUser) || type == typeof(IGuildUser)) {
-                builder.Append("Mention a(n) user(s) in the channel");
+                builder.Append("Mention an user");
                 identified = true;
             }
 
             if (type == typeof(IRole)) {
                 builder.Append("Mention a role in the guild");
+                identified = true;
+            }
+            
+            if (type == typeof(IChannel)) {
+                builder.Append("Mention a channel");
                 identified = true;
             }
 
@@ -87,8 +92,13 @@ namespace DiscordBot.Helpers {
                 identified = true;
             }
 
-            if (type == typeof(IUser) || type == typeof(IGuildUser)) {
+            if (type == typeof(IUser)) {
                 builder.Append("Discord user");
+                identified = true;
+            }
+            
+            if (type == typeof(IChannel)) {
+                builder.Append("Discord channel");
                 identified = true;
             }
 

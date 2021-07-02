@@ -22,6 +22,18 @@ namespace WiseOldManConnector.Transformers.Resolvers {
             if (source.Kills != null) {
                 destMember.Add(DeltaType.Kills, context.Mapper.Map<Delta>(source.Kills));
             }
+            
+            if (source.Value != null) {
+                destMember.Add(DeltaType.Value, context.Mapper.Map<Delta>(source.Value));
+            }
+            
+            if (source.Ehb != null) {
+                destMember.Add(DeltaType.Hours, context.Mapper.Map<Delta>(source.Ehb));
+            }
+            
+            if (source.Ehp != null) {
+                destMember.Add(DeltaType.Hours, context.Mapper.Map<Delta>(source.Ehp));
+            }
 
             // Set correct types.
             foreach (KeyValuePair<DeltaType, Delta> kvp in destMember) {

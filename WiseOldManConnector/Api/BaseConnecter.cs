@@ -156,6 +156,42 @@ namespace WiseOldManConnector.Api {
                     
                     Logger?.Log(LogLevel.Error, null, "Error for [{Resource}, {Parameters:j}]", response.Request.Resource, response.Request.Parameters);
                     throw new BadRequestException(responseMessage, response);
+                case HttpStatusCode.AlreadyReported:
+                    break;
+                case HttpStatusCode.EarlyHints:
+                    break;
+                case HttpStatusCode.FailedDependency:
+                    break;
+                case HttpStatusCode.IMUsed:
+                    break;
+                case HttpStatusCode.InsufficientStorage:
+                    break;
+                case HttpStatusCode.Locked:
+                    break;
+                case HttpStatusCode.LoopDetected:
+                    break;
+                case HttpStatusCode.MisdirectedRequest:
+                    break;
+                case HttpStatusCode.MultiStatus:
+                    break;
+                case HttpStatusCode.NetworkAuthenticationRequired:
+                    break;
+                case HttpStatusCode.NotExtended:
+                    break;
+                case HttpStatusCode.PermanentRedirect:
+                    break;
+                case HttpStatusCode.PreconditionRequired:
+                    break;
+                case HttpStatusCode.Processing:
+                    break;
+                case HttpStatusCode.RequestHeaderFieldsTooLarge:
+                    break;
+                case HttpStatusCode.UnavailableForLegalReasons:
+                    break;
+                case HttpStatusCode.UnprocessableEntity:
+                    break;
+                case HttpStatusCode.VariantAlsoNegotiates:
+                    break;
                 default:
                     throw new ArgumentOutOfRangeException();
             }
