@@ -79,8 +79,6 @@ namespace DiscordBot.Services {
                 $"{result.Error} - {result.ErrorReason} ({context.Message.Content})"));
 
             var builder = CreateErrorEmbedBuilder(context, result);
-
-
             await context.Channel.SendMessageAsync(embed: builder.Build());
         }
 

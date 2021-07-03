@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -20,11 +21,37 @@ namespace DiscordBot.Modules {
     [RequireContext(ContextType.Guild)]
     public class CountModule: BaseWaitMessageEmbeddedResponseModule  {
         private readonly ICounterService _counterService;
+        private readonly IServiceProvider _serviceProvider;
 
         public CountModule(Mapper mapper, ILogService logger, MessageConfiguration messageConfiguration, 
-            ICounterService counterService) : base(mapper,
+            ICounterService counterService, IServiceProvider serviceProvider) : base(mapper,
             logger, messageConfiguration) {
             _counterService = counterService;
+            _serviceProvider = serviceProvider;
+        }
+
+        private IEnumerable<IUser> GetDiscordUsersFromString( string[] args, out string[] remainingArgs) {
+            remainingArgs = args.Clone() as string[];
+            var result = new List<IUser>();
+            var parser = new UserTypeReader<IGuildUser>();
+
+            for (var i = 0; i < args.Length; i++) {
+                var arg = args[i];
+                var parseResult = parser.ReadAsync(Context, arg, _serviceProvider).GetAwaiter().GetResult();
+                if (parseResult.IsSuccess) {
+                    var readerValue = parseResult.Values.FirstOrDefault();
+                    if (readerValue.Score >= 0.60f) {
+                        result.Add(readerValue.Value as IUser);
+                        remainingArgs[i] = "";
+                        continue;
+                    }
+                }
+
+                break;
+            }
+
+            remainingArgs = remainingArgs.Where(x => !string.IsNullOrEmpty(x)).ToArray();
+            return result;
         }
 
         [RequireUserPermission(GuildPermission.Administrator, Group = "Permission")]
@@ -32,21 +59,68 @@ namespace DiscordBot.Modules {
         [Name("Count")]
         [Command]
         [Summary("Add any number to the tally")]
-        public async Task Count(int additive, IUser user, [Remainder]string reason = null) {
+        public async Task Count(int additive, [Remainder]string args) {
             if (additive == 0) {
                 throw new ArgumentException($"Additive must not be 0");
             }
 
-            var guildUser = user as IGuildUser ?? throw new ArgumentException("Cannot find user");
-            var totalCount = _counterService.Count(guildUser, (IGuildUser)Context.User, additive,reason);
-
-            var tresholdTask = HandleNewCount(totalCount - additive, totalCount, (IGuildUser) user);
-
-            var builder = EmbedBuilderHelper.AddCommonProperties(new EmbedBuilder()).WithTitle($"New count for {guildUser.DisplayName()}")
-                .WithDescription($"Total count: {totalCount}").WithMessageAuthorFooter(Context);
+            var users = GetDiscordUsersFromString(args.ToCollectionOfParameters().ToArray(), out string[] remainingArgs).Distinct();
+            if (!users.Any()) {
+                throw new ArgumentException($"Must enter an user.");
+            }
             
+            List<string> reasonStrings = new List<string>();
+            foreach (var arg in remainingArgs) {
+                if (arg.StartsWith('<') && arg.Contains('>')) {
+                    var indexOfEnd = arg.IndexOf('>');
+                    var substr = arg;
+                    var toAdd = "";
+                    if (indexOfEnd != arg.Length - 1) {
+                        substr = arg.Substring(0, indexOfEnd + 1);
+                        toAdd = arg.Substring(indexOfEnd + 1);
+                    }
+                    
+                    if (MentionUtils.TryParseUser(substr, out ulong userId)) {
+                        reasonStrings.Add(Context.Guild.GetUser(userId).DisplayName() + toAdd);
+                        continue;
+                    } 
+                    
+                    if(MentionUtils.TryParseRole(substr, out ulong roleId)) {
+                        reasonStrings.Add(Context.Guild.GetRole(roleId).Name+ toAdd);
+                        continue;
+                    }
+                    
+                    if(MentionUtils.TryParseChannel(substr, out ulong channelId)) {
+                        reasonStrings.Add(Context.Guild.GetChannel(channelId).Name+ toAdd);
+                        continue;
+                    }
+                }
+                
+                reasonStrings.Add(arg);
+            }
+            var reason = string.Join(" ", reasonStrings);
+           
+
+            var userString = users.Count() == 1 ? "user" : "users";
+            var builder = EmbedBuilderHelper.AddCommonProperties(new EmbedBuilder()).WithTitle($"Adding {additive} points for {users.Count()} {userString}")
+              .WithMessageAuthorFooter(Context);
+
+            StringBuilder descriptionBuilder = new StringBuilder();
+            var tasks = new List<Task>();
+            foreach (var user in users) {
+                var guildUser = user as IGuildUser ?? throw new ArgumentException("Cannot find user");
+                var totalCount = _counterService.Count(guildUser, (IGuildUser)Context.User, additive, reason);
+
+                var tresholdTask = HandleNewCount(totalCount - additive, totalCount, (IGuildUser) user);
+                tasks.Add(tresholdTask);
+
+                descriptionBuilder.AppendLine($"{guildUser.DisplayName()} new total: {totalCount}");
+            }
+
+            builder.WithDescription(descriptionBuilder.ToString());
+
             await ModifyWaitMessageAsync(builder.Build());
-            await tresholdTask;
+            await Task.WhenAll(tasks);
         }
 
         private async Task HandleNewCount(int startCount, int newCount, IGuildUser user) {
