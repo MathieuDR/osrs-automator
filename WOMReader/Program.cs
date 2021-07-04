@@ -4,7 +4,6 @@ using System.IO;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using DiscordBotFanatic.Models.Configuration;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
@@ -34,36 +33,6 @@ namespace WOMReader {
 
             var metrics = new List<MetricType> {
                 MetricType.Overall,
-                MetricType.EffectiveHoursBossing, 
-                MetricType.EffectiveHoursPlaying,
-                MetricType.TheGauntlet,
-                MetricType.TheCorruptedGauntlet,
-                MetricType.Zalcano,
-                MetricType.Thieving,
-                MetricType.Zulrah,
-                MetricType.ChambersOfXeric,
-                MetricType.ChambersOfXericChallengeMode,
-                MetricType.GeneralGraardor,
-                MetricType.CommanderZilyana,
-                MetricType.KrilTsutsaroth,
-                MetricType.Kreearra,
-                MetricType.BarrowsChests,
-                MetricType.Sarachnis,
-                MetricType.CorporealBeast,
-                MetricType.Nightmare,
-                MetricType.GrotesqueGuardians,
-                MetricType.Obor, 
-                MetricType.Bryophyta,
-                MetricType.Hespori,
-                MetricType.Slayer,
-                MetricType.AlchemicalHydra,
-                MetricType.Herblore,
-                MetricType.Mining,
-                MetricType.Agility,
-                MetricType.Fishing,
-                MetricType.Hunter,
-                MetricType.Runecrafting
-
             };
 
 
