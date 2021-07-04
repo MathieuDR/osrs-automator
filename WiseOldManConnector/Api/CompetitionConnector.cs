@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using RestSharp;
+using WiseOldManConnector.Helpers;
 using WiseOldManConnector.Interfaces;
 using WiseOldManConnector.Models;
 using WiseOldManConnector.Models.API.Responses;
@@ -54,6 +55,15 @@ namespace WiseOldManConnector.Api {
         public async Task<ConnectorResponse<Competition>> View(int id) {
             var request = GetNewRestRequest("{id}");
             request.AddParameter("id", id, ParameterType.UrlSegment);
+
+            var result = await ExecuteRequest<WOMCompetition>(request);
+            return GetResponse<Competition>(result);
+        }
+        
+        public async Task<ConnectorResponse<Competition>> View(int id, MetricType metric) {
+            var request = GetNewRestRequest("{id}");
+            request.AddParameter("id", id, ParameterType.UrlSegment);
+            request.AddParameter("metric", metric.GetEnumValueNameOrDefault(), ParameterType.QueryString);
 
             var result = await ExecuteRequest<WOMCompetition>(request);
             return GetResponse<Competition>(result);
