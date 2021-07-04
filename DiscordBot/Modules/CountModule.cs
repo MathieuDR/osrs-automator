@@ -30,30 +30,6 @@ namespace DiscordBot.Modules {
             _serviceProvider = serviceProvider;
         }
 
-        private IEnumerable<IUser> GetDiscordUsersFromString( string[] args, out string[] remainingArgs) {
-            remainingArgs = args.Clone() as string[];
-            var result = new List<IUser>();
-            var parser = new UserTypeReader<IGuildUser>();
-
-            for (var i = 0; i < args.Length; i++) {
-                var arg = args[i];
-                var parseResult = parser.ReadAsync(Context, arg, _serviceProvider).GetAwaiter().GetResult();
-                if (parseResult.IsSuccess) {
-                    var readerValue = parseResult.Values.FirstOrDefault();
-                    if (readerValue.Score >= 0.60f) {
-                        result.Add(readerValue.Value as IUser);
-                        remainingArgs[i] = "";
-                        continue;
-                    }
-                }
-
-                break;
-            }
-
-            remainingArgs = remainingArgs.Where(x => !string.IsNullOrEmpty(x)).ToArray();
-            return result;
-        }
-
         [RequireUserPermission(GuildPermission.Administrator, Group = "Permission")]
         [RequireRole(new ulong[]{784510650260914216, 806544893584343092}, Group = "Permission")]
         [Name("Count")]
@@ -64,42 +40,17 @@ namespace DiscordBot.Modules {
                 throw new ArgumentException($"Additive must not be 0");
             }
 
-            var users = GetDiscordUsersFromString(args.ToCollectionOfParameters().ToArray(), out string[] remainingArgs).Distinct();
+            var users = args
+                .ToCollectionOfParameters()
+                .ToArray()
+                .GetDiscordsUsersListFromStrings(out string[] remainingArgs, Context, _serviceProvider).Distinct()
+                .ToList();
+            
             if (!users.Any()) {
                 throw new ArgumentException($"Must enter an user.");
             }
-            
-            List<string> reasonStrings = new List<string>();
-            foreach (var arg in remainingArgs) {
-                if (arg.StartsWith('<') && arg.Contains('>')) {
-                    var indexOfEnd = arg.IndexOf('>');
-                    var substr = arg;
-                    var toAdd = "";
-                    if (indexOfEnd != arg.Length - 1) {
-                        substr = arg.Substring(0, indexOfEnd + 1);
-                        toAdd = arg.Substring(indexOfEnd + 1);
-                    }
-                    
-                    if (MentionUtils.TryParseUser(substr, out ulong userId)) {
-                        reasonStrings.Add(Context.Guild.GetUser(userId).DisplayName() + toAdd);
-                        continue;
-                    } 
-                    
-                    if(MentionUtils.TryParseRole(substr, out ulong roleId)) {
-                        reasonStrings.Add(Context.Guild.GetRole(roleId).Name+ toAdd);
-                        continue;
-                    }
-                    
-                    if(MentionUtils.TryParseChannel(substr, out ulong channelId)) {
-                        reasonStrings.Add(Context.Guild.GetChannel(channelId).Name+ toAdd);
-                        continue;
-                    }
-                }
-                
-                reasonStrings.Add(arg);
-            }
-            var reason = string.Join(" ", reasonStrings);
-           
+
+            var reason = string.Join(" ", remainingArgs.ParseMentions(Context));
 
             var userString = users.Count() == 1 ? "user" : "users";
             var builder = EmbedBuilderHelper.AddCommonProperties(new EmbedBuilder()).WithTitle($"Adding {additive} points for {users.Count()} {userString}")
