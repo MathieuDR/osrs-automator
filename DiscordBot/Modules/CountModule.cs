@@ -34,7 +34,7 @@ namespace DiscordBot.Modules {
         [RequireRole(new ulong[]{784510650260914216, 806544893584343092}, Group = "Permission")]
         [Name("Count")]
         [Command]
-        [Summary("Add any number to the tally")]
+        [Summary("Add any number to the tally, you can tag multiple users")]
         public async Task Count(int additive, [Remainder]string args) {
             if (additive == 0) {
                 throw new ArgumentException($"Additive must not be 0");
@@ -110,7 +110,7 @@ namespace DiscordBot.Modules {
 
         [Name("Count")]
         [Command("total")]
-        [Summary("See total count")]
+        [Summary("See total count of an user")]
         public async Task GetTotal(IGuildUser user) {
             var totalCount = _counterService.TotalCount(user);
         
@@ -122,7 +122,7 @@ namespace DiscordBot.Modules {
         
         [Name("Count")]
         [Command("total")]
-        [Summary("See total count")]
+        [Summary("See your total count")]
         public async Task GetTotal() {
             IGuildUser user = (IGuildUser) Context.User;
             var totalCount = _counterService.TotalCount(user);
@@ -135,7 +135,7 @@ namespace DiscordBot.Modules {
 
         [Name("Count history")]
         [Command("history")]
-        [Summary("See count history")]
+        [Summary("See count history of an user")]
         public async Task CountHistory(IGuildUser user) {
             var countInfo = _counterService.GetCountInfo(user);
 
@@ -170,21 +170,21 @@ namespace DiscordBot.Modules {
         
         [Name("Count history")]
         [Command("history")]
-        [Summary("See count history")]
+        [Summary("See count history of yourself")]
         public async Task CountHistory() {
             await CountHistory((IGuildUser) Context.User);
         }
         
-        [Name("Count history")]
+        [Name("Top")]
         [Command("top")]
-        [Summary("See count history")]
+        [Summary("See the top 10 users of the server")]
         public async Task CountTop() {
             await CountTop(10);
         }
         
-        [Name("Count history")]
+        [Name("Top")]
         [Command("top")]
-        [Summary("See count history")]
+        [Summary("See the top users of the server. Maximum 20")]
         public async Task CountTop(int quantity) {
             if (quantity > 20) {
                 throw new ArgumentException("Not more then 20 members");
@@ -271,7 +271,7 @@ namespace DiscordBot.Modules {
                 await ModifyWaitMessageAsync(builder.Build());
             }
 
-            [Name("Create a new treshold")]
+            [Name("Create")]
             [Command("create")]
             [Summary("Create a new treshold")]
             public async Task Set(int count, IRole role, [Remainder] string name) {
@@ -287,9 +287,9 @@ namespace DiscordBot.Modules {
                 await ModifyWaitMessageAsync(builder.Build());
             }
             
-            [Name("Create a new treshold")]
+            [Name("Create")]
             [Command("create")]
-            [Summary("Create a new treshold")]
+            [Summary("Create a new treshold without a role")]
             public async Task SetWithoutRole(int count, [Remainder] string name) {
                 var success = await _counterService.CreateTreshold(Context.User as IGuildUser, count, name);
 
@@ -302,9 +302,9 @@ namespace DiscordBot.Modules {
                 await ModifyWaitMessageAsync(builder.Build());
             }
             
-            [Name("See all tresholds")]
+            [Name("List")]
             [Command("list")]
-            [Summary("See all tresholds")]
+            [Summary("See all tresholds in a list format")]
             public async Task List() {
                 var tresholds = await _counterService.GetTresholds(Context.Guild.Id);
                 
@@ -350,7 +350,7 @@ namespace DiscordBot.Modules {
                 return builder.ToString();
             }
             
-        [Name("Remove an treshold")]
+            [Name("Remove")]
             [Command("remove")]
             [Summary("Remove an treshold")]
             public async Task Remove(int index) {
