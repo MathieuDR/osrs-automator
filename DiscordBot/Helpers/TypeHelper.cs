@@ -38,7 +38,7 @@ namespace DiscordBot.Helpers {
                 builder.Append("Mention a role in the guild");
                 identified = true;
             }
-            
+
             if (type == typeof(IChannel)) {
                 builder.Append("Mention a channel");
                 identified = true;
@@ -92,7 +92,7 @@ namespace DiscordBot.Helpers {
                 identified = true;
             }
 
-            if (type == typeof(IUser)) {
+            if (type == typeof(IUser) || type == typeof(IGuildUser)) {
                 builder.Append("Discord user");
                 identified = true;
             }
