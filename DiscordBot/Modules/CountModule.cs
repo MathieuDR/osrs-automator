@@ -108,7 +108,7 @@ namespace DiscordBot.Modules {
             }
         }
 
-        [Name("Count")]
+        [Name("Total count")]
         [Command("total")]
         [Summary("See total count of an user")]
         public async Task GetTotal(IGuildUser user) {
@@ -120,7 +120,7 @@ namespace DiscordBot.Modules {
             await ModifyWaitMessageAsync(builder.Build());
         }
         
-        [Name("Count")]
+        [Name("Total count")]
         [Command("total")]
         [Summary("See your total count")]
         public async Task GetTotal() {
