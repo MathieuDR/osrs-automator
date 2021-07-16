@@ -51,14 +51,21 @@ namespace DiscordBot.Paginator {
                 }
 
                 foreach (var pair in customActionsOptions.EmojiActions) {
-                    if (emote.Equals(pair.Key)) {
-                        pair.Value?.Invoke(Pager.Pages.ElementAt(index), index).ConfigureAwait(true);
-                        break;
+                    if (!emote.Equals(pair.Key)) {
+                        continue;
                     }
+
+                    var action = pair.Value;
+                    if (action is null) {
+                        continue;
+                    }
+
+                    await action.Invoke(Pager.Pages.ElementAt(index), index).ConfigureAwait(true);
+                    break;
                 }
             } catch (Exception e) {
                 await Message.ModifyAsync(m => {
-                    m.Content = $"Something went wrong with handling this reaction!\n`{e.Message}`";
+                    m.Content = $"Something went wrong with handling this reaction!\n**{e.GetType().Name}**\n`{e.Message}`";
                     m.Embed = null;
                 });
                 await Message.RemoveAllReactionsAsync().ConfigureAwait(false);
