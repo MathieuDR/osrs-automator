@@ -15,7 +15,7 @@ namespace DiscordBot.Models.Data {
         public string Nickname { get; set; }
 
         public List<WiseOldManConnector.Models.Output.Player> CoupledOsrsAccounts { get; set; } =
-            new List<WiseOldManConnector.Models.Output.Player>();
+            new ();
 
         public bool EnforceNameTemplate { get; set; }
 
