@@ -18,5 +18,7 @@ namespace DiscordBot.Services.interfaces {
         Task<IEnumerable<Achievement>> GetGroupAchievements(int groupId);
         Task<MessageResponse> UpdateGroup(int groupId, string verificationCode);
         Task<Player> GetPlayerById(int playerId);
+
+        Task<NameChange> RequestNameChange(string oldUsername, string requestedUsername);
     }
 }

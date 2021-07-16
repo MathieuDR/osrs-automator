@@ -23,5 +23,13 @@ namespace DiscordBot.Services.interfaces {
 
         //Task<bool> HasSetUsername(IGuildUser user);
         Task<string> SetUserName(IGuildUser user, string name);
+        /// <summary>
+        /// Preferably use with old username where possible
+        /// </summary>
+        /// <param name="womAccountId">Account Id to query</param>
+        /// <param name="newName">New name</param>
+        /// <returns></returns>
+        Task<NameChange> RequestNameChange(int womAccountId, string newName);
+        Task<NameChange> RequestNameChange(string oldUsername, string newName);
     }
 }

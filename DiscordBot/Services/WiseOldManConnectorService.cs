@@ -13,14 +13,18 @@ namespace DiscordBot.Services {
         private readonly IWiseOldManCompetitionApi _competitionApi;
         private readonly IWiseOldManGroupApi _groupApi;
         private readonly IWiseOldManPlayerApi _playerApi;
+        private readonly IWiseOldManNameApi _nameApi;
 
         public WiseOldManConnectorService(IWiseOldManPlayerApi playerApi, IWiseOldManGroupApi groupApi,
-            IWiseOldManCompetitionApi competitionApi) {
+            IWiseOldManCompetitionApi competitionApi, IWiseOldManNameApi nameApi) {
             _playerApi = playerApi;
             _groupApi = groupApi;
             _competitionApi = competitionApi;
+            _nameApi = nameApi;
         }
 
+       
+        
         public async Task<Player> GetPlayersForUsername(string username) {
             var response = await _playerApi.Search(username);
 
@@ -85,6 +89,10 @@ namespace DiscordBot.Services {
         public async Task<Player> GetPlayerById(int playerId) {
             var response = (await _playerApi.View(playerId));
             return response.Data;
+        }
+
+        public async Task<NameChange> RequestNameChange(string oldUsername, string requestedUsername) {
+            return (await _nameApi.Request(oldUsername, requestedUsername)).Data;
         }
     }
 }

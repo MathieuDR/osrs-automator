@@ -21,29 +21,34 @@ namespace DiscordBot.Services {
             _repository = repository;
         }
 
+        private bool IsPresentById(List<Player> players, int id) {
+            return players.Any(p => p.Id == id);
+        }
+
+        private bool IsIdCoupledInServer(ulong guildId, int id) {
+            return _repository.GetPlayerByOsrsAccount(guildId, id) != null;
+        }
+
         public async Task<ItemDecorator<Player>> CoupleDiscordGuildUserToOsrsAccount(IGuildUser discordUser,
             string proposedOsrsName) {
             proposedOsrsName = proposedOsrsName.ToLowerInvariant();
 
-            var player = _repository.GetPlayerById(discordUser.GuildId, discordUser.Id) ?? new Models.Data.Player(discordUser);
-            CheckIfPlayerIsAlreadyCoupled(discordUser, proposedOsrsName, player);
+            var discordUserPlayer = _repository.GetPlayerById(discordUser.GuildId, discordUser.Id) ?? new Models.Data.Player(discordUser);
+            CheckIfPlayerIsAlreadyCoupled(discordUser, proposedOsrsName, discordUserPlayer);
 
             var osrsPlayer = await _osrsHighscoreService.GetPlayersForUsername(proposedOsrsName);
-
-            if (player.CoupledOsrsAccounts.Any(p => p.Id == osrsPlayer.Id)) {
+            //  Check if coupled with other user by ID
+            if (IsPresentById(discordUserPlayer.CoupledOsrsAccounts, osrsPlayer.Id)) {
                 // Already coupled to this account
-                UpdateExistingPlayerOsrsAccount(discordUser.GuildId, player, osrsPlayer);
+                UpdateExistingPlayerOsrsAccount(discordUser.GuildId, discordUserPlayer, osrsPlayer);
                 return osrsPlayer.Decorate();
             }
 
-            var coupledUser = _repository.GetPlayerByOsrsAccount(discordUser.GuildId, osrsPlayer.Id);
-
-            if (coupledUser != null) {
-                //UpdateExistingPlayerOsrsAccount(discordUser.GuildId, coupledUser, osrsPlayer);
+            if (IsIdCoupledInServer(discordUser.GuildId, osrsPlayer.Id)) {
                 throw new ValidationException($"User {proposedOsrsName} is already registered on this server.");
             }
 
-            AddNewOsrsAccount(discordUser, player, osrsPlayer);
+            AddNewOsrsAccount(discordUser, discordUserPlayer, osrsPlayer);
             return osrsPlayer.Decorate();
         }
 
@@ -61,10 +66,6 @@ namespace DiscordBot.Services {
                 var index = i;
                 var account = accounts[i];
 
-                //if (account.UpdatedAt.AddDays(7) > DateTimeOffset.Now && account.LatestSnapshot != null) {
-                //    continue;
-                //}
-
                 // Account is 7 days old, or doesn't have a snapshot.
                 var task = _osrsHighscoreService.GetPlayerById(account.Id).ContinueWith(antecedent => {
                     var p = antecedent.Result;
@@ -80,10 +81,21 @@ namespace DiscordBot.Services {
                 Task.WaitAll(tasks.ToArray());
 
                 player.CoupledOsrsAccounts = accounts.ToList();
+                player.DefaultPlayerUsername =
+                    accounts.Where(x => x.Id == player.WiseOldManDefaultPlayerId).Select(x => x.DisplayName)
+                        .FirstOrDefault() ?? player.DefaultPlayerUsername;
                 _repository.UpdateOrInsertPlayerForGuild(user.GuildId, player);
             }
 
             return Task.FromResult(accounts.Decorate());
+        }
+
+        public Task<NameChange> RequestNameChange(int womAccountId, string newName) {
+            throw new NotImplementedException($"Pls implement!");
+        }
+        
+        public Task<NameChange> RequestNameChange(string oldName, string newName) {
+            return _osrsHighscoreService.RequestNameChange(oldName, newName);
         }
 
         public Task DeleteCoupledOsrsAccount(IGuildUser user, int id) {
@@ -110,7 +122,7 @@ namespace DiscordBot.Services {
 
         public Task<string> GetDefaultOsrsDisplayName(IGuildUser user) {
             var player = _repository.GetPlayerById(user.GuildId, user.Id);
-            return Task.FromResult(player.DefaultPlayerUsername);
+            return Task.FromResult(player?.DefaultPlayerUsername);
         }
 
         public Task<string> GetUserNickname(IGuildUser user, out bool isOsrsAccount) {
@@ -181,7 +193,7 @@ namespace DiscordBot.Services {
             _repository.UpdateOrInsertPlayerForGuild(discordUser.GuildId, player);
 
             var config = _repository.GetGroupConfig(discordUser.GuildId);
-            if (config.AutoAddNewAccounts) {
+            if (config is not null && config.AutoAddNewAccounts) {
                 _osrsHighscoreService.AddOsrsAccountToToGroup(config.WomGroupId, config.WomVerificationCode, osrsPlayer.Username);
             }
         }
