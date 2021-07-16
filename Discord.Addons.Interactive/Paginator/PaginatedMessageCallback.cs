@@ -15,7 +15,7 @@ namespace Discord.Addons.Interactive.Paginator
         public InteractiveService Interactive { get; private set; }
         public IUserMessage Message { get; private set; }
 
-        public RunMode RunMode => RunMode.Async;
+        public RunMode RunMode { get; protected set; }
         public ICriterion<SocketReaction> Criterion => _criterion;
         public TimeSpan? Timeout => Options.Timeout;
 
@@ -39,6 +39,7 @@ namespace Discord.Addons.Interactive.Paginator
             _criterion = criterion ?? new EmptyCriterion<SocketReaction>();
             Pager = pager;
             Pages = Pager.Pages.Count();
+            RunMode = RunMode.Sync;
             if (Pager.Pages is IEnumerable<EmbedFieldBuilder>)
                 Pages = ((Pager.Pages.Count() - 1) / Options.FieldsPerPage) + 1;
         }

@@ -12,9 +12,12 @@ namespace DiscordBot.Paginator {
     public class CustomPaginatedMessageCallback : PaginatedMessageCallback {
         private readonly string _footerBuilderTemplate;
 
+
         public CustomPaginatedMessageCallback(InteractiveService interactive, SocketCommandContext sourceContext,
             PaginatedMessage pager, ICriterion<SocketReaction> criterion = null) : base(interactive, sourceContext, pager,
             criterion) {
+
+            RunMode = RunMode.Async;
             if (Pager is CustomPaginatedMessage customPaginated) {
                 _footerBuilderTemplate = customPaginated.EmbedWrapper.Footer.Text;
             }
