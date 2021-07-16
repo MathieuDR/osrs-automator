@@ -15,7 +15,7 @@ namespace Discord.Addons.Interactive.Paginator
         public InteractiveService Interactive { get; private set; }
         public IUserMessage Message { get; private set; }
 
-        public RunMode RunMode => RunMode.Sync;
+        public RunMode RunMode => RunMode.Async;
         public ICriterion<SocketReaction> Criterion => _criterion;
         public TimeSpan? Timeout => Options.Timeout;
 
