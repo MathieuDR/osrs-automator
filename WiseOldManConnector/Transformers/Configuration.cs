@@ -139,6 +139,8 @@ namespace WiseOldManConnector.Transformers {
                     .ForMember(dest => dest.Maxed200MExpPlayers, opt => opt.MapFrom(src => src.Maxed200MsCount))
                     .ForMember(dest => dest.MaxedCombatPlayers, opt => opt.MapFrom(src => src.MaxedCombatCount))
                     .ForMember(dest => dest.MaxedTotalPlayers, opt => opt.MapFrom(src => src.MaxedTotalCount));
+
+               cfg.CreateMap<NameChangeResponse, NameChange>();
             });
 
             return new Mapper(config);
