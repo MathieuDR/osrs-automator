@@ -33,7 +33,7 @@ namespace DiscordBot.Services {
                 throw new Exception($"Group does not exist.");
             }
 
-            GroupConfig config = _repository.GetGroupConfig(guildUser.GuildId) ?? new GroupConfig(guildUser);
+            WomGroupConfig config = _repository.GetGroupConfig(guildUser.GuildId) ?? new WomGroupConfig(guildUser);
 
             config.WomVerificationCode = verificationCode;
             config.WomGroup = group;
@@ -44,7 +44,7 @@ namespace DiscordBot.Services {
         }
 
         public async Task SetAutoAdd(IGuildUser guildUser, bool autoAdd) {
-            GroupConfig config = GetGroupConfig(guildUser.GuildId);
+            WomGroupConfig config = GetGroupConfig(guildUser.GuildId);
             if (config.WomGroupId <= 0) {
                 throw new Exception($"No Wise Old Man set for this server.");
             }
@@ -157,7 +157,7 @@ namespace DiscordBot.Services {
 
         
 
-        private GroupConfig GetGroupConfig(ulong guildId, bool validate = true) {
+        private WomGroupConfig GetGroupConfig(ulong guildId, bool validate = true) {
             var result = _repository.GetGroupConfig(guildId);
             if (validate) {
                 if (result == null) {
@@ -169,7 +169,7 @@ namespace DiscordBot.Services {
             return result;
         }
 
-        private Task AddAllPlayersToGroup(IGuildUser guildUser, GroupConfig config) {
+        private Task AddAllPlayersToGroup(IGuildUser guildUser, WomGroupConfig config) {
             var players = _repository.GetAllPlayersForGuild(guildUser.GuildId).ToList();
             var usernames = new List<string>();
 

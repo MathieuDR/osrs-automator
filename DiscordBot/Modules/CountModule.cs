@@ -84,11 +84,11 @@ namespace DiscordBot.Modules {
                 }
                 
                 foreach (var treshold in tresholds) {
-                    var tresholdCount = treshold.Treshold;
+                    var tresholdCount = treshold.Threshold;
 
                     if (startCount < tresholdCount && newCount >= tresholdCount) {
                         // Hit it
-                        await channel.SendMessageAsync($"{treshold.name} hit for <@{user.Id}>!");
+                        await channel.SendMessageAsync($"{treshold.Name} hit for <@{user.Id}>!");
                         if (treshold.GivenRoleId.HasValue && Context.Guild.GetRole(treshold.GivenRoleId.Value) is IRole role) {
                             await user.AddRoleAsync(role);
                         }
@@ -96,7 +96,7 @@ namespace DiscordBot.Modules {
 
                     if (startCount >= tresholdCount && newCount < tresholdCount) {
                         // Remove it
-                        await channel.SendMessageAsync($"<@{user.Id}> has not sufficient points anymore for {treshold.name}");
+                        await channel.SendMessageAsync($"<@{user.Id}> has not sufficient points anymore for {treshold.Name}");
                         
                         if (treshold.GivenRoleId.HasValue && Context.Guild.GetRole(treshold.GivenRoleId.Value) is IRole role) {
                             await user.RemoveRoleAsync(role);
@@ -316,7 +316,7 @@ namespace DiscordBot.Modules {
                 await ModifyWaitMessageAsync(builder.Build());
             }
 
-            private string ToDescription(IEnumerable<CountTreshold> tresholds) {
+            private string ToDescription(IEnumerable<CountThreshold> tresholds) {
                 StringBuilder builder = new StringBuilder();
                 var enumerable = tresholds.ToList();
                 
@@ -333,9 +333,9 @@ namespace DiscordBot.Modules {
                     builder.Append(i.ToString().PadLeft(3));
                     builder.Append(", ");
 
-                    builder.Append($"{treshold.Treshold}:".PadLeft(5));
+                    builder.Append($"{treshold.Threshold}:".PadLeft(5));
                         
-                    var name = string.IsNullOrEmpty(treshold.name) ? "Unnamed" : treshold.name;
+                    var name = string.IsNullOrEmpty(treshold.Name) ? "Unnamed" : treshold.Name;
                     builder.Append(name.PadRight(15));
 
 

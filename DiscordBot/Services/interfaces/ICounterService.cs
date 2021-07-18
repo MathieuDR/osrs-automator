@@ -14,7 +14,7 @@ namespace DiscordBot.Services.interfaces {
         Task<bool> SetChannelForCounts(IGuildUser creator, IChannel outputChannel);
         Task<bool> CreateTreshold(IGuildUser creator, int count, string name, IRole role = null);        
         Task<bool> RemoveCount(ulong guildId, int index);
-        Task<IReadOnlyList<CountTreshold>> GetTresholds(ulong guildId);
+        Task<IReadOnlyList<CountThreshold>> GetTresholds(ulong guildId);
 
         Task<ulong> GetChannelForGuild(ulong guildId);
     }

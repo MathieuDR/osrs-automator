@@ -7,14 +7,14 @@ namespace DiscordBot.Models.Data {
         public ulong OutputChannelId { get; set; }
         
         // public for litedb
-        public List<CountTreshold> _tresholds { get; set; } = new List<CountTreshold>();
+        public List<CountThreshold> _tresholds { get; set; } = new List<CountThreshold>();
         
         [BsonIgnore]
-        public IReadOnlyList<CountTreshold> Tresholds => _tresholds.AsReadOnly();
+        public IReadOnlyList<CountThreshold> Tresholds => _tresholds.AsReadOnly();
 
-        public bool AddTreshold(CountTreshold toAdd) {
+        public bool AddTreshold(CountThreshold toAdd) {
             _tresholds.Add(toAdd);
-            _tresholds = _tresholds.OrderBy(x => x.Treshold).ToList();
+            _tresholds = _tresholds.OrderBy(x => x.Threshold).ToList();
             return true;
         }
 
@@ -22,14 +22,5 @@ namespace DiscordBot.Models.Data {
             _tresholds.RemoveAt(index);
             return true;
         }
-    }
-
-    public class CountTreshold {
-        public ulong CreatorId { get; set; }
-        public string CreatorUsername { get; set; }
-        public int Treshold { get; set; }
-        //public IRole GivenRole { get; set; }
-        public ulong? GivenRoleId { get; set; }
-        public string name { get; set; }
     }
 }

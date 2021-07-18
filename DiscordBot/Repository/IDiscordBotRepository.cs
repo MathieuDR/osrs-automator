@@ -12,9 +12,9 @@ namespace DiscordBot.Repository {
 
         Player GetPlayerById(ulong guildId, ulong id);
         Player InsertPlayerForGuild(ulong guildId, Player player);
-        GroupConfig CreateOrUpdateGroupConfig(GroupConfig config);
-        GroupConfig InsertConfig(GroupConfig config);
-        GroupConfig GetGroupConfig(ulong guildId);
+        WomGroupConfig CreateOrUpdateGroupConfig(WomGroupConfig config);
+        WomGroupConfig InsertConfig(WomGroupConfig config);
+        WomGroupConfig GetGroupConfig(ulong guildId);
         IEnumerable<Player> GetAllPlayersForGuild(in ulong guildId);
 
         AutomatedJobState GetAutomatedJobState(ulong guildId);

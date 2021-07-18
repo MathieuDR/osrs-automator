@@ -2,12 +2,12 @@
 using WiseOldManConnector.Models.Output;
 
 namespace DiscordBot.Models.Data {
-    public class GroupConfig : BaseGuildModel {
-        public GroupConfig() { }
+    public class WomGroupConfig : BaseGuildModel {
+        public WomGroupConfig() { }
 
-        public GroupConfig(IGuildUser user) : this(user.GuildId, user.Id) { }
+        public WomGroupConfig(IGuildUser user) : this(user.GuildId, user.Id) { }
 
-        public GroupConfig(ulong guildId, ulong discordId) : base(guildId, discordId) { }
+        public WomGroupConfig(ulong guildId, ulong discordId) : base(guildId, discordId) { }
 
         public int WomGroupId { get; set; }
 

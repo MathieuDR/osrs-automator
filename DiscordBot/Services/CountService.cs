@@ -60,9 +60,9 @@ namespace DiscordBot.Services {
 
         public Task<bool> CreateTreshold(IGuildUser creator, int count, string name, IRole role = null) {
             var config = GetGroupConigWithValidCountConfig(creator.GuildId);
-            var toAdd = new CountTreshold();
-            toAdd.name = string.IsNullOrEmpty(name) ? "unnamed" : name;
-            toAdd.Treshold = count;
+            var toAdd = new CountThreshold();
+            toAdd.Name = string.IsNullOrEmpty(name) ? "unnamed" : name;
+            toAdd.Threshold = count;
             toAdd.GivenRoleId = role?.Id;
             toAdd.CreatorId = creator.Id;
             toAdd.CreatorUsername = creator.Username;
@@ -87,7 +87,7 @@ namespace DiscordBot.Services {
             return Task.FromResult(result);
         }
 
-        public Task<IReadOnlyList<CountTreshold>> GetTresholds(ulong guildId) {
+        public Task<IReadOnlyList<CountThreshold>> GetTresholds(ulong guildId) {
             var config = GetGroupConigWithValidCountConfig(guildId);
             return Task.FromResult(config.CountConfig.Tresholds);
         }
@@ -97,8 +97,8 @@ namespace DiscordBot.Services {
             return Task.FromResult(config.CountConfig.OutputChannelId);
         }
 
-        private GroupConfig GetGroupConigWithValidCountConfig(ulong guildId) {
-            GroupConfig config = GetGroupConfig(guildId);
+        private WomGroupConfig GetGroupConigWithValidCountConfig(ulong guildId) {
+            WomGroupConfig config = GetGroupConfig(guildId);
 
             if (config.CountConfig is null) {
                 throw new Exception($"Please set up an output channel first.");
@@ -107,7 +107,7 @@ namespace DiscordBot.Services {
             return config;
         }
         
-        private GroupConfig GetGroupConfig(ulong guildId, bool validate = true) {
+        private WomGroupConfig GetGroupConfig(ulong guildId, bool validate = true) {
             var result = _repositoryService.GetGroupConfig(guildId);
             
             if (result == null) {

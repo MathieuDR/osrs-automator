@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using DiscordBot.Models.Data;
 using LiteDB;
-using Player = DiscordBot.Models.Data.Player;
 
 namespace DiscordBot.Repository {
     public class LiteDbRepository : IDiscordBotRepository {
@@ -13,8 +12,8 @@ namespace DiscordBot.Repository {
         protected const string GuildCompetitionCollectionName = "guildCompetitions";
         protected const string GuildJobStateCollectionName = "guildJobState";
         protected const string GuildUserCountsCollectionName = "guildUserCounts";
-        private readonly object _dbLock = new object();
-        private readonly Dictionary<ulong, object> _guildLocks = new Dictionary<ulong, object>();
+        private readonly object _dbLock = new();
+        private readonly Dictionary<ulong, object> _guildLocks = new();
 
         public LiteDbRepository(string fileName) {
             FileName = fileName;
@@ -28,7 +27,7 @@ namespace DiscordBot.Repository {
 
         public Player GetPlayerByOsrsAccount(ulong guildId, int womId) {
             lock (GetGuildLock(guildId)) {
-                using (LiteDatabase = new LiteDatabase(GetGuildFileName(guildId), BsonMapper)) {
+                using (LiteDatabase = GetDatabase(guildId)) {
                     return GetPlayerQuery(LiteDatabase)
                         .Where(p => p.CoupledOsrsAccounts.Select(wom => wom.Id).Any(id => id == womId))
                         .FirstOrDefault();
@@ -39,7 +38,7 @@ namespace DiscordBot.Repository {
         public Player GetPlayerByOsrsAccount(ulong guildId, string username) {
             username = username.ToLowerInvariant();
             lock (GetGuildLock(guildId)) {
-                using (LiteDatabase = new LiteDatabase(GetGuildFileName(guildId), BsonMapper)) {
+                using (LiteDatabase = GetDatabase(guildId)) {
                     return GetPlayerQuery(LiteDatabase).Where(p =>
                             p.CoupledOsrsAccounts.Select(wom => wom.Username).Any(name => name == username))
                         .FirstOrDefault();
@@ -66,7 +65,7 @@ namespace DiscordBot.Repository {
             player.IsValid();
 
             lock (GetGuildLock(guildId)) {
-                using (LiteDatabase = new LiteDatabase(GetGuildFileName(guildId), BsonMapper)) {
+                using (LiteDatabase = GetDatabase(guildId)) {
                     var collection = LiteDatabase.GetCollection<Player>(PlayerCollectionName);
                     collection.Insert(player);
                 }
@@ -75,15 +74,15 @@ namespace DiscordBot.Repository {
             return GetPlayerById(guildId, player.DiscordId);
         }
 
-        public GroupConfig CreateOrUpdateGroupConfig(GroupConfig config) {
+        public WomGroupConfig CreateOrUpdateGroupConfig(WomGroupConfig config) {
             if (config._id == null) {
                 return InsertConfig(config);
             }
 
             config.IsValid();
             lock (GetGuildLock(config.GuildId)) {
-                using (LiteDatabase = new LiteDatabase(GetGuildFileName(config.GuildId), BsonMapper)) {
-                    var collection = LiteDatabase.GetCollection<GroupConfig>(GuildConfigurationCollectionName);
+                using (LiteDatabase = GetDatabase(config.GuildId)) {
+                    var collection = LiteDatabase.GetCollection<WomGroupConfig>(GuildConfigurationCollectionName);
                     collection.Update(config);
                 }
             }
@@ -91,12 +90,12 @@ namespace DiscordBot.Repository {
             return GetGroupConfig(config.GuildId);
         }
 
-        public GroupConfig InsertConfig(GroupConfig config) {
+        public WomGroupConfig InsertConfig(WomGroupConfig config) {
             config.IsValid();
 
             lock (GetGuildLock(config.GuildId)) {
-                using (LiteDatabase = new LiteDatabase(GetGuildFileName(config.GuildId), BsonMapper)) {
-                    var collection = LiteDatabase.GetCollection<GroupConfig>(GuildConfigurationCollectionName);
+                using (LiteDatabase = GetDatabase(config.GuildId)) {
+                    var collection = LiteDatabase.GetCollection<WomGroupConfig>(GuildConfigurationCollectionName);
                     collection.Insert(config);
                 }
             }
@@ -104,9 +103,9 @@ namespace DiscordBot.Repository {
             return GetGroupConfig(config.GuildId);
         }
 
-        public GroupConfig GetGroupConfig(ulong guildId) {
+        public WomGroupConfig GetGroupConfig(ulong guildId) {
             lock (GetGuildLock(guildId)) {
-                using (LiteDatabase = new LiteDatabase(GetGuildFileName(guildId), BsonMapper)) {
+                using (LiteDatabase = GetDatabase(guildId)) {
                     return GetGroupConfigQuery(LiteDatabase).Where(p => p.GuildId == guildId).FirstOrDefault();
                 }
             }
@@ -114,7 +113,7 @@ namespace DiscordBot.Repository {
 
         public IEnumerable<Player> GetAllPlayersForGuild(in ulong guildId) {
             lock (GetGuildLock(guildId)) {
-                using (LiteDatabase = new LiteDatabase(GetGuildFileName(guildId), BsonMapper)) {
+                using (LiteDatabase = GetDatabase(guildId)) {
                     return GetPlayerQuery(LiteDatabase).ToList();
                 }
             }
@@ -122,11 +121,11 @@ namespace DiscordBot.Repository {
 
         public AutomatedJobState GetAutomatedJobState(ulong guildId) {
             lock (GetGuildLock(guildId)) {
-                using (LiteDatabase = new LiteDatabase(GetGuildFileName(guildId), BsonMapper)) {
+                using (LiteDatabase = GetDatabase(guildId)) {
                     var collection = LiteDatabase.GetCollection<AutomatedJobState>(GuildJobStateCollectionName);
 
                     if (collection.Count() > 1) {
-                        throw new Exception($"Multiple job states!");
+                        throw new Exception("Multiple job states!");
                     }
 
                     return collection.Query().Where(j => j.GuildId == guildId).FirstOrDefault();
@@ -140,7 +139,7 @@ namespace DiscordBot.Repository {
             }
 
             lock (GetGuildLock(guildId)) {
-                using (LiteDatabase = new LiteDatabase(GetGuildFileName(guildId), BsonMapper)) {
+                using (LiteDatabase = GetDatabase(guildId)) {
                     var collection = LiteDatabase.GetCollection<AutomatedJobState>(GuildJobStateCollectionName);
                     collection.Update(jobState);
                 }
@@ -151,7 +150,7 @@ namespace DiscordBot.Repository {
 
         public UserCountInfo GetCountInfoByUserId(ulong guildId, ulong userId) {
             lock (GetGuildLock(guildId)) {
-                using (LiteDatabase = new LiteDatabase(GetGuildFileName(guildId), BsonMapper)) {
+                using (LiteDatabase = GetDatabase(guildId)) {
                     return GetCountQuery(LiteDatabase).Where(c => c.DiscordId == userId).FirstOrDefault();
                 }
             }
@@ -164,7 +163,7 @@ namespace DiscordBot.Repository {
 
             countInfo.IsValid();
             lock (GetGuildLock(guildId)) {
-                using (LiteDatabase = new LiteDatabase(GetGuildFileName(guildId), BsonMapper)) {
+                using (LiteDatabase = GetDatabase(guildId)) {
                     var collection = LiteDatabase.GetCollection<UserCountInfo>(GuildUserCountsCollectionName);
                     collection.Update(countInfo);
                 }
@@ -175,23 +174,11 @@ namespace DiscordBot.Repository {
 
         public IEnumerable<UserCountInfo> GetAllUserCountInfos(ulong guildId) {
             lock (GetGuildLock(guildId)) {
-                using (LiteDatabase = new LiteDatabase(GetGuildFileName(guildId), BsonMapper)) {
+                using (LiteDatabase = GetDatabase(guildId)) {
                     return GetCountQuery(LiteDatabase).ToList();
                 }
             }
         }
-
-        private UserCountInfo InsertUserCountInfoForGuid(ulong guildId, UserCountInfo countInfo) {
-            lock (GetGuildLock(guildId)) {
-                using (LiteDatabase = new LiteDatabase(GetGuildFileName(guildId), BsonMapper)) {
-                    var collection = LiteDatabase.GetCollection<UserCountInfo>(GuildUserCountsCollectionName);
-                    collection.Insert(countInfo);
-                }
-            }
-            
-            return GetCountInfoByUserId(guildId, countInfo.DiscordId);
-        }
-
 
         public Player UpdateOrInsertPlayerForGuild(ulong guildId, Player player) {
             if (player._id == null) {
@@ -200,7 +187,7 @@ namespace DiscordBot.Repository {
 
             player.IsValid();
             lock (GetGuildLock(guildId)) {
-                using (LiteDatabase = new LiteDatabase(GetGuildFileName(guildId), BsonMapper)) {
+                using (LiteDatabase = GetDatabase(guildId)) {
                     var collection = LiteDatabase.GetCollection<Player>(PlayerCollectionName);
                     collection.Update(player);
                 }
@@ -211,7 +198,7 @@ namespace DiscordBot.Repository {
 
         public Player GetPlayerById(ulong guildId, ulong id) {
             lock (GetGuildLock(guildId)) {
-                using (LiteDatabase = new LiteDatabase(GetGuildFileName(guildId), BsonMapper)) {
+                using (LiteDatabase = GetDatabase(guildId)) {
                     return GetPlayerQuery(LiteDatabase).Where(p => p.DiscordId == id).FirstOrDefault();
                 }
             }
@@ -219,7 +206,7 @@ namespace DiscordBot.Repository {
 
         public IEnumerable<Player> GetPlayersForGuild(ulong guildId) {
             lock (GetGuildLock(guildId)) {
-                using (LiteDatabase = new LiteDatabase(GetGuildFileName(guildId), BsonMapper)) {
+                using (LiteDatabase = GetDatabase(guildId)) {
                     return GetPlayerQuery(LiteDatabase).ToList();
                 }
             }
@@ -227,7 +214,7 @@ namespace DiscordBot.Repository {
 
         private AutomatedJobState InsertAutomatedJobState(AutomatedJobState jobState) {
             lock (GetGuildLock(jobState.GuildId)) {
-                using (LiteDatabase = new LiteDatabase(GetGuildFileName(jobState.GuildId))) {
+                using (LiteDatabase = GetDatabase(jobState.GuildId)) {
                     var collection = LiteDatabase.GetCollection<AutomatedJobState>(GuildJobStateCollectionName);
                     collection.Insert(jobState);
                 }
@@ -236,16 +223,39 @@ namespace DiscordBot.Repository {
             return GetAutomatedJobState(jobState.GuildId);
         }
 
+        private void Migrate(LiteDatabase liteDatabase) { }
+
+        private LiteDatabase GetDatabase(ulong guildId) {
+            return GetDatabase(GetGuildFileName(guildId));
+        }
+
+        private LiteDatabase GetDatabase(string connectionString) {
+            var liteDatabase = new LiteDatabase(connectionString, BsonMapper);
+            Migrate(liteDatabase);
+            return liteDatabase;
+        }
+
+        private UserCountInfo InsertUserCountInfoForGuid(ulong guildId, UserCountInfo countInfo) {
+            lock (GetGuildLock(guildId)) {
+                using (LiteDatabase = GetDatabase(guildId)) {
+                    var collection = LiteDatabase.GetCollection<UserCountInfo>(GuildUserCountsCollectionName);
+                    collection.Insert(countInfo);
+                }
+            }
+
+            return GetCountInfoByUserId(guildId, countInfo.DiscordId);
+        }
+        
         private string GetGuildFileName(ulong guildId) {
             return $"{guildId}_{FileName}";
         }
 
-        private Object GetGuildLock(ulong guildId) {
+        private object GetGuildLock(ulong guildId) {
             if (_guildLocks.ContainsKey(guildId)) {
                 return _guildLocks[guildId];
             }
 
-            object lockObject = new object();
+            var lockObject = new object();
             _guildLocks.Add(guildId, lockObject);
             return lockObject;
         }
@@ -254,14 +264,14 @@ namespace DiscordBot.Repository {
             var collection = LiteDatabase.GetCollection<Player>(PlayerCollectionName);
             return collection.Query();
         }
-        
+
         private ILiteQueryable<UserCountInfo> GetCountQuery(LiteDatabase db) {
             var collection = LiteDatabase.GetCollection<UserCountInfo>(GuildUserCountsCollectionName);
             return collection.Query();
         }
 
-        private ILiteQueryable<GroupConfig> GetGroupConfigQuery(LiteDatabase db) {
-            var collection = LiteDatabase.GetCollection<GroupConfig>(GuildConfigurationCollectionName);
+        private ILiteQueryable<WomGroupConfig> GetGroupConfigQuery(LiteDatabase db) {
+            var collection = LiteDatabase.GetCollection<WomGroupConfig>(GuildConfigurationCollectionName);
             return collection.Query();
         }
     }
