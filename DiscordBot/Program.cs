@@ -93,8 +93,6 @@ namespace DiscordBot {
                 .AddSingleton<CommandService>()
                 .AddSingleton<CommandHandlingService>()
                 // Logging
-                // ReSharper disable once ObjectCreationAsStatement
-                //.AddLogging(builder => builder.AddConsole(x=> new ConsoleLoggerOptions(){LogToStandardErrorThreshold = LogLevel.Information}))
                 .AddSingleton<ILogService, SerilogService>()
                 .AddLogging(loginBuilder => loginBuilder.AddSerilog(dispose: true))
                 // Extra
@@ -103,19 +101,11 @@ namespace DiscordBot {
                 .AddSingleton(botConfiguration.Messages)
                 .AddSingleton(metricSynonymsConfiguration)
                 .AddSingleton<InteractiveService>()
-                //.AddTransient<HighscoreService>()
                 .AddTransient<IDiscordBotRepository>(x => new LiteDbRepository(configuration.DatabaseFile))
                 .AddTransient<IPlayerService, PlayerService>()
                 .AddTransient<IGroupService, GroupService>()
-                .AddTransient<ICompetitionService, CompetitionService>()
-                .AddTransient<IAuthenticationService, AuthenticationService>()
                 .AddTransient<IOsrsHighscoreService, WiseOldManConnectorService>()
                 .AddTransient<ICounterService, CountService>()
-                //.AddTransient<IOsrsHighscoreService, HighscoreService>()
-                //Omage services
-                //.AddTransient<IImageService<MetricInfo>, MetricImageService>()
-                //.AddTransient<IImageService<DeltaInfo>, DeltaImageService>()
-                //.AddTransient<IImageService<RecordInfo>, RecordImageService>()
                 // Add additional services here
                 .AddTransient<IWiseOldManLogger, WisOldManLogger>()
                 .AddWiseOldManApi()
