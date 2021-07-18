@@ -30,9 +30,9 @@ namespace WiseOldManConnectorTests.Connectors {
 
         [Fact]
         public async Task AchievementByAccomplishedUserIdResultsInCollectionWithMultiple() {
-            var username = TestConfiguration.ValidAccomplishedPlayerId;
+            var id = TestConfiguration.ValidAccomplishedPlayerId;
 
-            var response = await _playerApi.Achievements(username);
+            var response = await _playerApi.Achievements(id);
 
             Assert.NotNull(response);
             Assert.NotEmpty(response.Data);
