@@ -97,8 +97,8 @@ namespace DiscordBot.Services {
             return Task.FromResult(config.CountConfig.OutputChannelId);
         }
 
-        private WomGroupConfig GetGroupConigWithValidCountConfig(ulong guildId) {
-            WomGroupConfig config = GetGroupConfig(guildId);
+        private GuildConfig GetGroupConigWithValidCountConfig(ulong guildId) {
+            GuildConfig config = GetGroupConfig(guildId);
 
             if (config.CountConfig is null) {
                 throw new Exception($"Please set up an output channel first.");
@@ -107,7 +107,7 @@ namespace DiscordBot.Services {
             return config;
         }
         
-        private WomGroupConfig GetGroupConfig(ulong guildId, bool validate = true) {
+        private GuildConfig GetGroupConfig(ulong guildId, bool validate = true) {
             var result = _repositoryService.GetGroupConfig(guildId);
             
             if (result == null) {

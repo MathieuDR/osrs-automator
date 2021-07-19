@@ -74,7 +74,7 @@ namespace DiscordBot.Repository {
             return GetPlayerById(guildId, player.DiscordId);
         }
 
-        public WomGroupConfig CreateOrUpdateGroupConfig(WomGroupConfig config) {
+        public GuildConfig CreateOrUpdateGroupConfig(GuildConfig config) {
             if (config._id == null) {
                 return InsertConfig(config);
             }
@@ -82,7 +82,7 @@ namespace DiscordBot.Repository {
             config.IsValid();
             lock (GetGuildLock(config.GuildId)) {
                 using (LiteDatabase = GetDatabase(config.GuildId)) {
-                    var collection = LiteDatabase.GetCollection<WomGroupConfig>(GuildConfigurationCollectionName);
+                    var collection = LiteDatabase.GetCollection<GuildConfig>(GuildConfigurationCollectionName);
                     collection.Update(config);
                 }
             }
@@ -90,12 +90,12 @@ namespace DiscordBot.Repository {
             return GetGroupConfig(config.GuildId);
         }
 
-        public WomGroupConfig InsertConfig(WomGroupConfig config) {
+        public GuildConfig InsertConfig(GuildConfig config) {
             config.IsValid();
 
             lock (GetGuildLock(config.GuildId)) {
                 using (LiteDatabase = GetDatabase(config.GuildId)) {
-                    var collection = LiteDatabase.GetCollection<WomGroupConfig>(GuildConfigurationCollectionName);
+                    var collection = LiteDatabase.GetCollection<GuildConfig>(GuildConfigurationCollectionName);
                     collection.Insert(config);
                 }
             }
@@ -103,7 +103,7 @@ namespace DiscordBot.Repository {
             return GetGroupConfig(config.GuildId);
         }
 
-        public WomGroupConfig GetGroupConfig(ulong guildId) {
+        public GuildConfig GetGroupConfig(ulong guildId) {
             lock (GetGuildLock(guildId)) {
                 using (LiteDatabase = GetDatabase(guildId)) {
                     return GetGroupConfigQuery(LiteDatabase).Where(p => p.GuildId == guildId).FirstOrDefault();
@@ -270,8 +270,8 @@ namespace DiscordBot.Repository {
             return collection.Query();
         }
 
-        private ILiteQueryable<WomGroupConfig> GetGroupConfigQuery(LiteDatabase db) {
-            var collection = LiteDatabase.GetCollection<WomGroupConfig>(GuildConfigurationCollectionName);
+        private ILiteQueryable<GuildConfig> GetGroupConfigQuery(LiteDatabase db) {
+            var collection = LiteDatabase.GetCollection<GuildConfig>(GuildConfigurationCollectionName);
             return collection.Query();
         }
     }

@@ -27,7 +27,7 @@ namespace DiscordBot.Jobs {
         protected IDiscordBotRepository Repository { get; }
         protected Mapper Mapper { get; }
         protected JobType JobType { get; }
-        protected WomGroupConfig Configuration { get; private set; }
+        protected GuildConfig Configuration { get; private set; }
         public IScheduler Scheduler { get; set; }
         
         public IJobDetail Job{ get; set; }
