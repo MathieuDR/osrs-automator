@@ -2,7 +2,10 @@
 using System.Collections.Generic;
 using System.Linq;
 using DiscordBot.Models.Data;
+using DiscordBot.Repository.Migrations;
 using LiteDB;
+using Serilog;
+using Serilog.Context;
 
 namespace DiscordBot.Repository {
     public class LiteDbRepository : IDiscordBotRepository {
@@ -14,8 +17,12 @@ namespace DiscordBot.Repository {
         protected const string GuildUserCountsCollectionName = "guildUserCounts";
         private readonly object _dbLock = new();
         private readonly Dictionary<ulong, object> _guildLocks = new();
+        private readonly ILogger _logger;
+        private readonly MigrationManager _migrationManager;
 
-        public LiteDbRepository(string fileName) {
+        public LiteDbRepository(ILogger logger, string fileName, MigrationManager migrationManager) {
+            _logger = logger;
+            _migrationManager = migrationManager;
             FileName = fileName;
             BsonMapper = BsonMapper.Global;
         }
@@ -223,7 +230,6 @@ namespace DiscordBot.Repository {
             return GetAutomatedJobState(jobState.GuildId);
         }
 
-        private void Migrate(LiteDatabase liteDatabase) { }
 
         private LiteDatabase GetDatabase(ulong guildId) {
             return GetDatabase(GetGuildFileName(guildId));
@@ -231,7 +237,11 @@ namespace DiscordBot.Repository {
 
         private LiteDatabase GetDatabase(string connectionString) {
             var liteDatabase = new LiteDatabase(connectionString, BsonMapper);
-            Migrate(liteDatabase);
+
+            using (LogContext.PushProperty("db", connectionString)) {
+                _migrationManager.Migrate(liteDatabase);
+            }
+
             return liteDatabase;
         }
 
@@ -245,7 +255,7 @@ namespace DiscordBot.Repository {
 
             return GetCountInfoByUserId(guildId, countInfo.DiscordId);
         }
-        
+
         private string GetGuildFileName(ulong guildId) {
             return $"{guildId}_{FileName}";
         }

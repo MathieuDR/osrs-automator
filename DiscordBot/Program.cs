@@ -8,6 +8,7 @@ using Discord.WebSocket;
 using DiscordBot.Configuration;
 using DiscordBot.Models.Configuration;
 using DiscordBot.Repository;
+using DiscordBot.Repository.Migrations;
 using DiscordBot.Services;
 using DiscordBot.Services.interfaces;
 using Microsoft.Extensions.Configuration;
@@ -79,6 +80,7 @@ namespace DiscordBot {
 
             return new ServiceCollection()
                 // Base
+                .AddSingleton<MigrationManager>()
                 .AddSingleton<DiscordSocketClient>((provider => {
                     var config = new DiscordSocketConfig
                     {
@@ -90,6 +92,7 @@ namespace DiscordBot {
                     var client = new DiscordSocketClient(config);
                     return client;
                 }))
+                .AddSingleton(x=> Log.Logger)
                 .AddSingleton<CommandService>()
                 .AddSingleton<CommandHandlingService>()
                 // Logging
@@ -101,7 +104,7 @@ namespace DiscordBot {
                 .AddSingleton(botConfiguration.Messages)
                 .AddSingleton(metricSynonymsConfiguration)
                 .AddSingleton<InteractiveService>()
-                .AddTransient<IDiscordBotRepository>(x => new LiteDbRepository(configuration.DatabaseFile))
+                .AddTransient<IDiscordBotRepository>(x => new LiteDbRepository(x.GetService<ILogger>(),configuration.DatabaseFile, x.GetService<MigrationManager>()))
                 .AddTransient<IPlayerService, PlayerService>()
                 .AddTransient<IGroupService, GroupService>()
                 .AddTransient<IOsrsHighscoreService, WiseOldManConnectorService>()
