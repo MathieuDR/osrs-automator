@@ -1,8 +1,8 @@
 ﻿using Discord.Commands;
 
 namespace DiscordBot.Models {
-    public class SerilogCommandContextDto {
-        public SerilogCommandContextDto(SocketCommandContext context) {
+    public class SerilogCommandContext {
+        public SerilogCommandContext(SocketCommandContext context) {
             Message = context.Message.Content;
             UserName = context.User.Username;
             Discriminator = context.User.Discriminator;

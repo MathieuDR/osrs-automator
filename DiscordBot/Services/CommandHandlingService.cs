@@ -114,7 +114,7 @@ namespace DiscordBot.Services {
             SocketCommandContext context = new SocketCommandContext(_discord, message);
 
             // Setting logging information.
-            using (LogContext.PushProperty("CommandContextDto", new SerilogCommandContextDto(context))) {
+            using (LogContext.PushProperty("CommandContextDto", new SerilogCommandContext(context))) {
                 var logTask = _logger.LogWithCommandInfoLine($"Command received.", LogEventLevel.Information, null);
 
                 // Execute the command with the command context we just
