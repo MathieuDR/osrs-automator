@@ -584,7 +584,7 @@ namespace WiseOldManConnectorTests.Connectors {
             var response = await _groupApi.Statistics(id);
 
 
-            var types = EnumHelper.GetMetricTypes(MetricTypeCategory.All);
+            var types = EnumHelper.GetMetricTypes(MetricTypeCategory.Queryable);
             var typesInResponse = new List<MetricType>();
 
 
@@ -594,8 +594,7 @@ namespace WiseOldManConnectorTests.Connectors {
             }
 
             foreach (var type in types) {
-                if(type != MetricType.Combat)
-                    Assert.Contains(type, typesInResponse);
+                Assert.Contains(type, typesInResponse);
             }
         }
 

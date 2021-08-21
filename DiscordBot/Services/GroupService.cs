@@ -153,10 +153,6 @@ namespace DiscordBot.Services {
             scheduler.ScheduleJob(job, trigger);
         }
 
-       
-
-        
-
         private GuildConfig GetGroupConfig(ulong guildId, bool validate = true) {
             var result = _repository.GetGroupConfig(guildId);
             if (validate) {

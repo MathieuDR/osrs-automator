@@ -31,7 +31,7 @@ namespace DiscordBot.Jobs {
         public override async Task ForGuild(SocketGuild guild, IMessageChannel channel) {
             _ = LogService.Log("Searching top", LogEventLevel.Information);
 
-            var metrics = MetricTypeCategory.All.GetMetricTypes();
+            var metrics = MetricTypeCategory.Queryable.GetMetricTypes();
 
             List<DeltaLeaderboard> tops = new List<DeltaLeaderboard>();
             

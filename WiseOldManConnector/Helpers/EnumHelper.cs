@@ -56,14 +56,16 @@ namespace WiseOldManConnector.Helpers {
         public static List<MetricType> GetMetricTypes(this MetricTypeCategory category) {
             switch (category) {
                 case MetricTypeCategory.All:
+                    var q = GetMetricTypes(MetricTypeCategory.Queryable);
+                    q.AddRange(GetMetricTypes(MetricTypeCategory.Others));
+                    return q;
+                case MetricTypeCategory.Queryable:
                     var result =  new List<MetricType>();
                     result.AddRange(GetMetricTypes(MetricTypeCategory.Skills));
                     result.AddRange(GetMetricTypes(MetricTypeCategory.Activities));
                     result.AddRange(GetMetricTypes(MetricTypeCategory.Bosses));
                     result.AddRange(GetMetricTypes(MetricTypeCategory.Time));
-                    result.AddRange(GetMetricTypes(MetricTypeCategory.Others));
                     return result;
-                
                 case MetricTypeCategory.Skills:
                     return SkillMetrics();
                 case MetricTypeCategory.Activities:

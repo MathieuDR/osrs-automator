@@ -601,8 +601,7 @@ namespace WiseOldManConnectorTests.Connectors {
 
             ConnectorResponse<Player> response = await _playerApi.View(id);
             
-            var types = EnumHelper.GetMetricTypes(MetricTypeCategory.All);
-            types.RemoveAll(x => x == MetricType.Combat);
+            var types = EnumHelper.GetMetricTypes(MetricTypeCategory.Queryable);
             var hasHours = false;
             
             foreach (var type in types) {
