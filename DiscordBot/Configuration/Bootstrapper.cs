@@ -89,6 +89,8 @@ namespace DiscordBot.Configuration {
                 .AddLogging()
                 .AddDataConnection(configuration)
                 .AddDiscord()
+                .AddBotServices()
+                .AddConfiguration(configuration)
                 .ConfigureQuartz(configuration)
                 .AddWiseOldManApi()
                 .ConfigureAutoMapper();
