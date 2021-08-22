@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using System.Threading;
 using System.Threading.Tasks;
 using Discord;
 using Discord.Addons.Interactive;
@@ -28,41 +29,16 @@ namespace DiscordBot {
             //var schedulerTask = CreateQuartzScheduler();
 
             try {
-                var discordTask = ConfigureDiscord(services, config);
-                var schedulerTask = ConfigureScheduler(services);
-
-                //var scheduler = await schedulerTask;
-                //await scheduler.Start();
-                //await ScheduleTasks(scheduler);
-
-                await discordTask;
-                await schedulerTask;
-
+                var bot = new DiscordBot(config, services);
+                await bot.Run(new CancellationToken());
                 await Task.Delay(-1);
             } catch (Exception e) {
                 Log.Fatal(e, $"FATAL ERROR: ");
-                //await (await schedulerTask).Shutdown();
             }
         }
 
         private static void Main() => new Program().EntryPointAsync().GetAwaiter().GetResult();
-
-        private async Task ConfigureScheduler(IServiceProvider services) {
-            var factory = services.GetRequiredService<ISchedulerFactory>();
-            IScheduler scheduler = await factory.GetScheduler();
-            await scheduler.Start();
-        }
-
-        private async Task ConfigureDiscord(IServiceProvider services, IConfiguration config) {
-            DiscordSocketClient client = services.GetRequiredService<DiscordSocketClient>();
-            await ((CommandHandlingService) services.GetRequiredService(typeof(CommandHandlingService)))
-                .InitializeAsync(services);
-
-            var botConfig = config.GetSection("Bot").Get<BotConfiguration>();
-            
-            await client.LoginAsync(TokenType.Bot, botConfig.Token);
-            await client.StartAsync();
-        }
+        
         private IServiceProvider ConfigureServices(IConfiguration config) {
             StartupConfiguration configuration = config.GetSection("Startup").Get<StartupConfiguration>();
             BotConfiguration botConfiguration = config.GetSection("Bot").Get<BotConfiguration>();

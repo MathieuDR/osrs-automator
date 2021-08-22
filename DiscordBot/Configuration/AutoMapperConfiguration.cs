@@ -7,7 +7,7 @@ using WiseOldManConnector.Configuration;
 using WiseOldManConnector.Models.Output;
 
 namespace DiscordBot.Configuration {
-    internal static class AutoMapperConfiguration {
+    public static class AutoMapperConfiguration {
         public static IServiceCollection ConfigureAutoMapper(this IServiceCollection services) {
             return services.AddSingleton(GetMapper());
         }

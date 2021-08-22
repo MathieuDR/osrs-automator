@@ -1,0 +1,30 @@
+{
+    "embeds": [
+        {
+            "thumbnail": {
+                "url": "https://oldschool.runescape.wiki/images/5/5e/Bones.png?3fbd5"
+            },
+            "author": {
+                "name": "ErkendRserke"
+            },
+            "description": "Just got [Bones](https://oldschool.runescape.wiki/w/Bones) from lvl 5 [Goblin](https://oldschool.runescape.wiki/w/Goblin#Level_5)",
+            "fields": [
+                {
+                    "inline": true,
+                    "name": "Rarity",
+                    "value": "```glsl\n# 1/1.0 (100.0%)\n```"
+                },
+                {
+                    "inline": true,
+                    "name": "HA Value",
+                    "value": "```fix\n0 GP\n```"
+                },
+                {
+                    "inline": true,
+                    "name": "GE Value",
+                    "value": "```fix\n86 GP\n```"
+                }
+            ]
+        }
+    ]
+}

@@ -1,0 +1,30 @@
+{
+    "embeds": [
+        {
+            "thumbnail": {
+                "url": "https://oldschool.runescape.wiki/images/4/44/Coins_1.png?a3fa8"
+            },
+            "author": {
+                "name": "ErkendRserke"
+            },
+            "description": "Just got 5x [Coins](https://oldschool.runescape.wiki/w/Coins) from lvl 5 [Goblin](https://oldschool.runescape.wiki/w/Goblin#Level_5)",
+            "fields": [
+                {
+                    "inline": true,
+                    "name": "Rarity",
+                    "value": "```glsl\n# 1/42.666668 (2.34375%)\n```"
+                },
+                {
+                    "inline": true,
+                    "name": "HA Value",
+                    "value": "```fix\n0 GP\n```"
+                },
+                {
+                    "inline": true,
+                    "name": "GE Value",
+                    "value": "```fix\n5 GP\n```"
+                }
+            ]
+        }
+    ]
+}
