@@ -8,12 +8,14 @@ using AutoMapper;
 using Discord;
 using Discord.Commands;
 using Discord.WebSocket;
+using DiscordBot.Common.Configuration;
+using DiscordBot.Common.Models.Data;
 using DiscordBot.Helpers;
-using DiscordBot.Models.Configuration;
-using DiscordBot.Models.Data;
-using DiscordBot.Models.ResponseModels;
+using DiscordBot.Models;
 using DiscordBot.Preconditions;
 using DiscordBot.Services.interfaces;
+using DiscordBot.Services.Services.interfaces;
+using DiscordBot.Transformers;
 
 namespace DiscordBot.Modules {
     
@@ -60,7 +62,7 @@ namespace DiscordBot.Modules {
             var tasks = new List<Task>();
             foreach (var user in users) {
                 var guildUser = user as IGuildUser ?? throw new ArgumentException("Cannot find user");
-                var totalCount = _counterService.Count(guildUser, (IGuildUser)Context.User, additive, reason);
+                var totalCount = _counterService.Count(guildUser.ToGuildUserDto(), Context.User.ToGuildUserDto(), additive, reason);
 
                 var tresholdTask = HandleNewCount(totalCount - additive, totalCount, (IGuildUser) user);
                 tasks.Add(tresholdTask);
@@ -112,7 +114,7 @@ namespace DiscordBot.Modules {
         [Command("total")]
         [Summary("See total count of an user")]
         public async Task GetTotal(IGuildUser user) {
-            var totalCount = _counterService.TotalCount(user);
+            var totalCount = _counterService.TotalCount(user.ToGuildUserDto());
         
             var builder = EmbedBuilderHelper.AddCommonProperties(new EmbedBuilder()).WithTitle(user.DisplayName())
                 .WithDescription($"Total count: {totalCount}").WithMessageAuthorFooter(Context);
@@ -125,7 +127,7 @@ namespace DiscordBot.Modules {
         [Summary("See your total count")]
         public async Task GetTotal() {
             IGuildUser user = (IGuildUser) Context.User;
-            var totalCount = _counterService.TotalCount(user);
+            var totalCount = _counterService.TotalCount(user.ToGuildUserDto());
         
             var builder = EmbedBuilderHelper.AddCommonProperties(new EmbedBuilder()).WithTitle(user.DisplayName())
                 .WithDescription($"Total count: {totalCount}").WithMessageAuthorFooter(Context);
@@ -137,7 +139,7 @@ namespace DiscordBot.Modules {
         [Command("history")]
         [Summary("See count history of an user")]
         public async Task CountHistory(IGuildUser user) {
-            var countInfo = _counterService.GetCountInfo(user);
+            var countInfo = _counterService.GetCountInfo(user.ToGuildUserDto());
 
             var builder = new EmbedBuilder()
                 .AddCommonProperties()
@@ -190,7 +192,7 @@ namespace DiscordBot.Modules {
                 throw new ArgumentException("Not more then 20 members");
             }
 
-            var topMembers = _counterService.TopCounts(Context.Guild, quantity);
+            var topMembers = _counterService.TopCounts(Context.Guild.ToGuildDto(), quantity);
             var builder = EmbedBuilderHelper.AddCommonProperties(new EmbedBuilder())
                 .WithTitle($"Top counts for {Context.Guild.Name}")
                 .WithMessageAuthorFooter(Context);
@@ -260,7 +262,7 @@ namespace DiscordBot.Modules {
             [Command("channel")]
             [Summary("Set channel for the outputs")]
             public async Task SetChannel(IChannel channel) {
-                var success = await _counterService.SetChannelForCounts(Context.User as IGuildUser, channel);
+                var success = await _counterService.SetChannelForCounts(Context.User .ToGuildUserDto(), channel.ToChannelDto());
 
                 var verb = success ? "Success" : "Failure";
                 var builder = EmbedBuilderHelper.AddCommonProperties(new EmbedBuilder())
@@ -275,7 +277,7 @@ namespace DiscordBot.Modules {
             [Command("create")]
             [Summary("Create a new treshold")]
             public async Task Set(int count, IRole role, [Remainder] string name) {
-                var success = await _counterService.CreateTreshold(Context.User as IGuildUser, count, name, role);
+                var success = await _counterService.CreateTreshold(Context.User.ToGuildUserDto(), count, name, role.ToRoleDto());
 
                 var verb = success ? "Success" : "Failure";
                 var builder = EmbedBuilderHelper.AddCommonProperties(new EmbedBuilder())
@@ -291,7 +293,7 @@ namespace DiscordBot.Modules {
             [Command("create")]
             [Summary("Create a new treshold without a role")]
             public async Task SetWithoutRole(int count, [Remainder] string name) {
-                var success = await _counterService.CreateTreshold(Context.User as IGuildUser, count, name);
+                var success = await _counterService.CreateTreshold(Context.User.ToGuildUserDto(), count, name);
 
                 var verb = success ? "Success" : "Failure";
                 var builder = EmbedBuilderHelper.AddCommonProperties(new EmbedBuilder())

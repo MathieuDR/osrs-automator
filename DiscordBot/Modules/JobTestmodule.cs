@@ -1,7 +1,7 @@
 using AutoMapper;
 using Discord;
 using Discord.Commands;
-using DiscordBot.Models.Configuration;
+using DiscordBot.Common.Configuration;
 using DiscordBot.Services.interfaces;
 
 namespace DiscordBot.Modules {

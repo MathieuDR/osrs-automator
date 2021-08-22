@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using Discord;
 using Discord.Commands;
-using DiscordBot.Models.Decorators;
+using DiscordBot.Common.Models.Decorators;
 
 namespace DiscordBot.Helpers {
     public static class EmbedBuilderHelper {

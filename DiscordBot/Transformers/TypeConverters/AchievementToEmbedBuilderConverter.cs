@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using Discord;
+using DiscordBot.Common.Helpers;
 using DiscordBot.Helpers;
 using WiseOldManConnector.Helpers;
 using WiseOldManConnector.Models.Output;

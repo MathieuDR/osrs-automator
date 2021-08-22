@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Linq;
+using DiscordBot.Common.Models.Enums;
 using DiscordBot.Jobs;
-using DiscordBot.Models.Enums;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Quartz;

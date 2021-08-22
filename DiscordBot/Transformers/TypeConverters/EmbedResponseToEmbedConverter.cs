@@ -1,7 +1,7 @@
 ﻿using AutoMapper;
 using Discord;
-using DiscordBot.Models.Exceptions;
-using DiscordBot.Models.ResponseModels;
+using DiscordBot.Exceptions;
+using DiscordBot.Models;
 
 namespace DiscordBot.Transformers.TypeConverters {
     public class EmbedResponseToEmbedConverter : ITypeConverter<EmbedResponse, Embed> {

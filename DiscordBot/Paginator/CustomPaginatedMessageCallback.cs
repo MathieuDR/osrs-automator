@@ -6,7 +6,7 @@ using Discord.Addons.Interactive.Criteria;
 using Discord.Addons.Interactive.Paginator;
 using Discord.Commands;
 using Discord.WebSocket;
-using DiscordBot.Models.ResponseModels;
+using DiscordBot.Models;
 
 namespace DiscordBot.Paginator {
     public class CustomPaginatedMessageCallback : PaginatedMessageCallback {

@@ -8,7 +8,7 @@ using Discord.Addons.Interactive.Criteria;
 using Discord.Addons.Interactive.Paginator;
 using Discord.Commands;
 using Discord.WebSocket;
-using DiscordBot.Models.ResponseModels;
+using DiscordBot.Models;
 using DiscordBot.Paginator;
 using DiscordBot.Services.interfaces;
 

@@ -1,6 +1,6 @@
 ﻿using AutoMapper;
 using Discord;
-using DiscordBot.Models.ResponseModels;
+using DiscordBot.Models;
 using DiscordBot.Transformers.TypeConverters;
 using Microsoft.Extensions.DependencyInjection;
 using WiseOldManConnector.Configuration;

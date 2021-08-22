@@ -7,12 +7,14 @@ using Discord;
 using Discord.Addons.Interactive.Criteria;
 using Discord.Commands;
 using Discord.WebSocket;
+using DiscordBot.Common.Configuration;
+using DiscordBot.Common.Models.Decorators;
 using DiscordBot.Helpers;
-using DiscordBot.Models.Configuration;
-using DiscordBot.Models.Decorators;
-using DiscordBot.Models.ResponseModels;
+using DiscordBot.Models;
 using DiscordBot.Paginator;
 using DiscordBot.Services.interfaces;
+using DiscordBot.Services.Services.interfaces;
+using DiscordBot.Transformers;
 using Serilog.Events;
 using WiseOldManConnector.Models.Output;
 using WiseOldManConnector.Models.Output.Exceptions;
@@ -35,7 +37,7 @@ namespace DiscordBot.Modules {
         [Summary("Add an OSRS name.")]
         [RequireContext(ContextType.Guild)]
         public async Task AddOsrsName([Remainder] string name) {
-            var playerDecorator = await _playerService.CoupleDiscordGuildUserToOsrsAccount(GetGuildUser(), name);
+            var playerDecorator = await _playerService.CoupleDiscordGuildUserToOsrsAccount(GetGuildUser().ToGuildUserDto(), name);
 
             var builder = new EmbedBuilder()
                 .AddWiseOldMan(playerDecorator)
@@ -51,8 +53,8 @@ namespace DiscordBot.Modules {
         [Summary("Cycle through accounts ")]
         [RequireContext(ContextType.Guild)]
         public async Task CycleThroughAccounts() {
-            var accountDecorators = (await _playerService.GetAllOsrsAccounts(GetGuildUser())).ToList();
-            var defaultAccount = await _playerService.GetDefaultOsrsDisplayName(GetGuildUser());
+            var accountDecorators = (await _playerService.GetAllOsrsAccounts(GetGuildUser().ToGuildUserDto())).ToList();
+            var defaultAccount = await _playerService.GetDefaultOsrsDisplayName(GetGuildUser().ToGuildUserDto());
 
 
             if (!accountDecorators.Any()) {
@@ -110,9 +112,9 @@ namespace DiscordBot.Modules {
             IUserMessage message) {
             // Delete from original decorator, so our select keeps working #BAD
             var decorator = accounts[index];
-            await _playerService.DeleteCoupledOsrsAccount(GetGuildUser(), decorator.Item.Id);
+            await _playerService.DeleteCoupledOsrsAccount(GetGuildUser().ToGuildUserDto(), decorator.Item.Id);
 
-            var newDefault = await _playerService.GetDefaultOsrsDisplayName(GetGuildUser());
+            var newDefault = await _playerService.GetDefaultOsrsDisplayName(GetGuildUser().ToGuildUserDto());
             _ = message?.ModifyAsync(props => props.Content = string.Format(FormatString, newDefault));
             accounts.RemoveAt(index);
         }
@@ -120,7 +122,7 @@ namespace DiscordBot.Modules {
         private async Task SelectMain(object selected, int index, List<ItemDecorator<Player>> accounts,
             IUserMessage message) {
             var playerDecorator = accounts[index];
-            var newDefault = await _playerService.SetDefaultAccount(GetGuildUser(), playerDecorator.Item);
+            var newDefault = await _playerService.SetDefaultAccount(GetGuildUser().ToGuildUserDto(), playerDecorator.Item);
 
             _ = message?.ModifyAsync(props => props.Content = string.Format(FormatString, newDefault));
         }

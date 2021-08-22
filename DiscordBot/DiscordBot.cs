@@ -4,7 +4,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Discord;
 using Discord.WebSocket;
-using DiscordBot.Models.Configuration;
+using DiscordBot.Common.Configuration;
 using DiscordBot.Services;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;

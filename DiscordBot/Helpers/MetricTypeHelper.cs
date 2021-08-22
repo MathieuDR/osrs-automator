@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using DiscordBot.Models.Configuration;
+using DiscordBot.Common.Configuration;
 using WiseOldManConnector.Models.WiseOldMan.Enums;
 
 namespace DiscordBot.Helpers {

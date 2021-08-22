@@ -5,11 +5,13 @@ using AutoMapper;
 using Discord;
 using Discord.Commands;
 using Discord.WebSocket;
+using DiscordBot.Common.Configuration;
+using DiscordBot.Common.Models.Enums;
 using DiscordBot.Helpers;
-using DiscordBot.Models.Configuration;
-using DiscordBot.Models.Enums;
 using DiscordBot.Preconditions;
 using DiscordBot.Services.interfaces;
+using DiscordBot.Services.Services.interfaces;
+using DiscordBot.Transformers;
 
 namespace DiscordBot.Modules {
     [Name("Administrator")]
@@ -43,7 +45,7 @@ namespace DiscordBot.Modules {
         [Summary("Set the wom group for guild")]
         [RequireContext(ContextType.Guild)]
         public async Task SetWomGroup(int womGroup, string verificationCode) {
-            var decoratedGroup = await _groupService.SetGroupForGuild(GetGuildUser(), womGroup, verificationCode);
+            var decoratedGroup = await _groupService.SetGroupForGuild(GetGuildUser().ToGuildUserDto(), womGroup, verificationCode);
             var builder = new EmbedBuilder().AddWiseOldMan(decoratedGroup);
 
             builder.Title = $"Success.";
@@ -57,7 +59,7 @@ namespace DiscordBot.Modules {
         [RequireContext(ContextType.Guild)]
         public async Task SetAutoChannel(string job, IChannel channel) {
             //var channel = Context.Channel;
-            var messageChannel = (ISocketMessageChannel) channel;
+            var messageChannel = (ITextChannel) channel;
 
             if (messageChannel == null) {
                 throw new Exception($"Channel wasn't a message channel. Try a different one.");
@@ -65,7 +67,7 @@ namespace DiscordBot.Modules {
 
             var jobType = Enum.Parse<JobType>(job, true);
 
-            await _groupService.SetAutomationJobChannel(jobType, GetGuildUser(), messageChannel);
+            await _groupService.SetAutomationJobChannel(jobType, GetGuildUser().ToGuildUserDto(), messageChannel.ToChannelDto());
 
             var builder = new EmbedBuilder()
                 .AddCommonProperties()
@@ -98,7 +100,7 @@ namespace DiscordBot.Modules {
         [RequireContext(ContextType.Guild)]
         public async Task ToggleAutomatedJob(string job) {
             var jobType = Enum.Parse<JobType>(job, true);
-            bool activated = await _groupService.ToggleAutomationJob(jobType, GetGuildUser().Guild);
+            bool activated = await _groupService.ToggleAutomationJob(jobType, GetGuildUser().Guild.ToGuildDto());
 
             string verb = activated ? "activated" : "deactivated";
 
@@ -116,7 +118,7 @@ namespace DiscordBot.Modules {
         [Summary("Views the current configuration settings")]
         [RequireContext(ContextType.Guild)]
         public async Task ViewSettings() {
-            var settings = await _groupService.GetSettingsDictionary(GetGuildUser().Guild);
+            var settings = await _groupService.GetSettingsDictionary(GetGuildUser().Guild.ToGuildDto());
 
             var builder = new EmbedBuilder()
                 .AddCommonProperties()

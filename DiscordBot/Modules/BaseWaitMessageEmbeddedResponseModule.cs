@@ -5,8 +5,8 @@ using AutoMapper;
 using Discord;
 using Discord.Commands;
 using Discord.WebSocket;
+using DiscordBot.Common.Configuration;
 using DiscordBot.Helpers;
-using DiscordBot.Models.Configuration;
 using DiscordBot.Services.interfaces;
 using Serilog.Events;
 

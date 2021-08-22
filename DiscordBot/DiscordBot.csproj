@@ -61,6 +61,8 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Discord.Addons.Interactive\Discord.Addons.Interactive.csproj" />
+    <ProjectReference Include="..\DiscordBot.Common\DiscordBot.Common.csproj" />
+    <ProjectReference Include="..\DiscordBot.Services\DiscordBot.Services.csproj" />
     <ProjectReference Include="..\WiseOldManConnector\WiseOldManConnector.csproj" />
   </ItemGroup>
 

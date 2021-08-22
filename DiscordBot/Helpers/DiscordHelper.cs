@@ -1,10 +1,9 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using Discord;
 using Discord.Commands;
-using DiscordBot.Models.ResponseModels;
+using DiscordBot.Models;
 
 namespace DiscordBot.Helpers {
     public static class DiscordHelper {
