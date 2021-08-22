@@ -34,6 +34,8 @@ namespace DiscordBot {
                 await Task.Delay(-1);
             } catch (Exception e) {
                 Log.Fatal(e, $"FATAL ERROR: ");
+            } finally {
+                Log.CloseAndFlush();
             }
         }
 
