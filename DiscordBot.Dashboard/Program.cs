@@ -5,7 +5,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Serilog;
 
-namespace WebApp {
+namespace Dashboard {
     public class Program {
         public static async Task Main(string[] args) {
             Startup.CreateLogger();
@@ -22,7 +22,10 @@ namespace WebApp {
         private static IHostBuilder CreateHostBuilder(string[] args) {
             return Host.CreateDefaultBuilder(args)
                     .UseSerilog()
-                    .ConfigureWebHostDefaults(webBuilder => { webBuilder.UseStartup<Startup>(); })
+                    .ConfigureWebHostDefaults(webBuilder => {
+                        webBuilder.UseStartup<Startup>();
+                        webBuilder.UseUrls("http://*:5829");
+                    })
                     .ConfigureServices((context, collection) => {
                         collection.AddHostedService<DiscordBot.DiscordBot>();
                     })

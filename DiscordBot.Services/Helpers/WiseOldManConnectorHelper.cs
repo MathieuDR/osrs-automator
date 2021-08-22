@@ -6,7 +6,7 @@ using DiscordBot.Common.Models.Decorators;
 using WiseOldManConnector.Models.Output;
 using WiseOldManConnector.Models.WiseOldMan.Enums;
 
-namespace DiscordBot.Common.Helpers {
+namespace DiscordBot.Services.Helpers {
     public static class WiseOldManConnectorHelper {
         private static readonly string WiseOldManHost = "wiseoldman.net";
 

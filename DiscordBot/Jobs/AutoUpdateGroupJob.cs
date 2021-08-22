@@ -3,10 +3,10 @@ using System.Threading.Tasks;
 using AutoMapper;
 using Discord;
 using Discord.WebSocket;
-using DiscordBot.Common.Helpers;
 using DiscordBot.Common.Models.Enums;
+using DiscordBot.Data.Repository;
 using DiscordBot.Helpers;
-using DiscordBot.Repository;
+using DiscordBot.Services.Helpers;
 using DiscordBot.Services.interfaces;
 using DiscordBot.Services.Services.interfaces;
 

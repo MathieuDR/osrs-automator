@@ -1,13 +1,6 @@
-using Discord;
-using Discord.Addons.Interactive;
-using Discord.Commands;
-using Discord.WebSocket;
+using Dashboard.Configuration;
+using Dashboard.Configuration.Options;
 using DiscordBot.Configuration;
-using DiscordBot.Models.Configuration;
-using DiscordBot.Repository;
-using DiscordBot.Repository.Migrations;
-using DiscordBot.Services;
-using DiscordBot.Services.interfaces;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
@@ -21,12 +14,8 @@ using Serilog;
 using Serilog.Events;
 using Serilog.Formatting.Json;
 using Swashbuckle.AspNetCore.SwaggerGen;
-using WebApp.Configuration;
-using WebApp.Configuration.Options;
-using WiseOldManConnector.Configuration;
-using WiseOldManConnector.Interfaces;
 
-namespace WebApp {
+namespace Dashboard {
     public class Startup {
         public Startup(IConfiguration configuration) {
             Configuration = configuration;
@@ -39,8 +28,8 @@ namespace WebApp {
         // For more information on how to configure your application, visit https://go.microsoft.com/fwlink/?LinkID=398940
         public void ConfigureServices(IServiceCollection services) {
             ApiOptions = Configuration.GetSection("WebApp").GetSection("Api").Get<ApiOptions>();
-            // services.AddRazorPages();
-            // services.AddServerSideBlazor();
+            services.AddRazorPages();
+            services.AddServerSideBlazor();
             services.AddMvc();
             services.AddApiVersioning(options => {
                 options.AssumeDefaultVersionWhenUnspecified = true;
@@ -88,20 +77,20 @@ namespace WebApp {
             } else {
                 app.UseExceptionHandler("/Error");
                 // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
-                app.UseHsts();
+                //app.UseHsts();
             }
             
             ConfigureSwagger(app, apiVersionDescriptionProvider);
 
-            app.UseHttpsRedirection();
+            //app.UseHttpsRedirection();
             app.UseStaticFiles();
 
             app.UseRouting();
 
             app.UseEndpoints(endpoints => {
                 endpoints.MapControllers();
-                // endpoints.MapBlazorHub();
-                // endpoints.MapFallbackToPage("/_Host");
+                endpoints.MapBlazorHub();
+                endpoints.MapFallbackToPage("/_Host");
             });
             
         }

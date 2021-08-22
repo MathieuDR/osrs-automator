@@ -5,7 +5,7 @@ using Microsoft.Extensions.Options;
 using Microsoft.OpenApi.Models;
 using Swashbuckle.AspNetCore.SwaggerGen;
 
-namespace WebApp.Configuration.Options {
+namespace Dashboard.Configuration.Options {
     /// <summary>
     ///     Configures the Swagger generation options.
     /// </summary>

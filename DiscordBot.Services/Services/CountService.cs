@@ -4,7 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using DiscordBot.Common.Models.Data;
 using DiscordBot.Common.Models.DiscordDtos;
-using DiscordBot.Repository;
+using DiscordBot.Data.Repository;
 using DiscordBot.Services.Services.interfaces;
 using Microsoft.Extensions.Logging;
 

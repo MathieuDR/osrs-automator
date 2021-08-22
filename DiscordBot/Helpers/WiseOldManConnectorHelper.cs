@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
-using DiscordBot.Common.Helpers;
 using DiscordBot.Paginator;
+using DiscordBot.Services.Helpers;
 using WiseOldManConnector.Models.Output;
 
 namespace DiscordBot.Helpers {

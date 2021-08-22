@@ -3,8 +3,8 @@ using Discord.Addons.Interactive;
 using Discord.Commands;
 using Discord.WebSocket;
 using DiscordBot.Common.Configuration;
-using DiscordBot.Repository;
-using DiscordBot.Repository.Migrations;
+using DiscordBot.Data.Repository;
+using DiscordBot.Data.Repository.Migrations;
 using DiscordBot.Services;
 using DiscordBot.Services.interfaces;
 using DiscordBot.Services.Services;
@@ -60,6 +60,7 @@ namespace DiscordBot.Configuration {
 
         private static IServiceCollection AddBotServices(this IServiceCollection serviceCollection) {
             serviceCollection
+                .AddTransient<IDiscordService, DiscordService>()
                 .AddTransient<IPlayerService, PlayerService>()
                 .AddTransient<IGroupService, GroupService>()
                 .AddTransient<IOsrsHighscoreService, WiseOldManConnectorService>()

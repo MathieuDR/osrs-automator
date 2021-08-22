@@ -1,6 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 
-namespace WebApp.Controllers.V2 {
+namespace Dashboard.Controllers.V2 {
     [ApiController]
     [ApiVersion( "2.0" )]
     [Route( "api/v{version:apiVersion}/[controller]" )]

@@ -3,7 +3,7 @@ using DiscordBot.Common.Models.Data;
 using OsrsPlayer = WiseOldManConnector.Models.Output.Player;
 using Player = DiscordBot.Common.Models.Data.Player;
 
-namespace DiscordBot.Repository {
+namespace DiscordBot.Data.Repository {
     public interface IDiscordBotRepository {
         Player GetPlayerByOsrsAccount(ulong guildId, int womId);
         Player GetPlayerByOsrsAccount(ulong guildId, string username);

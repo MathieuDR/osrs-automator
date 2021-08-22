@@ -1,7 +1,7 @@
 ﻿using AutoMapper;
 using Discord;
-using DiscordBot.Common.Helpers;
 using DiscordBot.Helpers;
+using DiscordBot.Services.Helpers;
 using WiseOldManConnector.Helpers;
 using WiseOldManConnector.Models.Output;
 using WiseOldManConnector.Models.WiseOldMan.Enums;

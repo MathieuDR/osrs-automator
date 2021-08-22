@@ -2,12 +2,12 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using DiscordBot.Common.Helpers;
 using DiscordBot.Common.Models.Data;
 using DiscordBot.Common.Models.Decorators;
 using DiscordBot.Common.Models.DiscordDtos;
 using DiscordBot.Common.Models.Enums;
-using DiscordBot.Repository;
+using DiscordBot.Data.Repository;
+using DiscordBot.Services.Helpers;
 using DiscordBot.Services.Services.interfaces;
 using Microsoft.Extensions.Logging;
 using Quartz;

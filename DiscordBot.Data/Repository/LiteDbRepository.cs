@@ -2,12 +2,12 @@
 using System.Collections.Generic;
 using System.Linq;
 using DiscordBot.Common.Models.Data;
-using DiscordBot.Repository.Migrations;
+using DiscordBot.Data.Repository.Migrations;
 using LiteDB;
 using Serilog;
 using Serilog.Context;
 
-namespace DiscordBot.Repository {
+namespace DiscordBot.Data.Repository {
     public class LiteDbRepository : IDiscordBotRepository {
         protected const string PlayerCollectionName = "players";
         protected const string GuildConfigurationCollectionName = "guildConfig";
