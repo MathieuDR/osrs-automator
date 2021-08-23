@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 using DiscordBot.Common.Models.Data;
 using DiscordBot.Common.Models.DiscordDtos;
 using DiscordBot.Data.Repository;
-using DiscordBot.Services.Services.interfaces;
+using DiscordBot.Services.Interfaces;
 using Microsoft.Extensions.Logging;
 
 namespace DiscordBot.Services.Services {
@@ -58,7 +58,7 @@ namespace DiscordBot.Services.Services {
             return Task.FromResult(true);
         }
 
-        public Task<bool> CreateTreshold(GuildUser creator, int count, string name, Role role = null) {
+        public Task<bool> CreateThreshold(GuildUser creator, int count, string name, Role role = null) {
             var config = GetGroupConigWithValidCountConfig(creator.GuildId);
             var toAdd = new CountThreshold();
             toAdd.Name = string.IsNullOrEmpty(name) ? "unnamed" : name;
@@ -87,7 +87,7 @@ namespace DiscordBot.Services.Services {
             return Task.FromResult(result);
         }
 
-        public Task<IReadOnlyList<CountThreshold>> GetTresholds(ulong guildId) {
+        public Task<IReadOnlyList<CountThreshold>> GetThresholds(ulong guildId) {
             var config = GetGroupConigWithValidCountConfig(guildId);
             return Task.FromResult(config.CountConfig.Tresholds);
         }

@@ -8,7 +8,7 @@ using DiscordBot.Data.Repository;
 using DiscordBot.Helpers;
 using DiscordBot.Services.Helpers;
 using DiscordBot.Services.interfaces;
-using DiscordBot.Services.Services.interfaces;
+using DiscordBot.Services.Interfaces;
 
 namespace DiscordBot.Jobs {
     public class AutoUpdateGroupJob : BaseGuildJob {

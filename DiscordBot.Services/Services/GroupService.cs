@@ -8,7 +8,7 @@ using DiscordBot.Common.Models.DiscordDtos;
 using DiscordBot.Common.Models.Enums;
 using DiscordBot.Data.Repository;
 using DiscordBot.Services.Helpers;
-using DiscordBot.Services.Services.interfaces;
+using DiscordBot.Services.Interfaces;
 using Microsoft.Extensions.Logging;
 using Quartz;
 using WiseOldManConnector.Models.Output;

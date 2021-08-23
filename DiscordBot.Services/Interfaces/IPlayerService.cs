@@ -4,7 +4,7 @@ using DiscordBot.Common.Models.Decorators;
 using DiscordBot.Common.Models.DiscordDtos;
 using WiseOldManConnector.Models.Output;
 
-namespace DiscordBot.Services.Services.interfaces {
+namespace DiscordBot.Services.Interfaces {
     public interface IPlayerService {
         /// <summary>
         /// Couples a discord user with an osrs user.

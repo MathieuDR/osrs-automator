@@ -13,7 +13,7 @@ using DiscordBot.Helpers;
 using DiscordBot.Models;
 using DiscordBot.Paginator;
 using DiscordBot.Services.interfaces;
-using DiscordBot.Services.Services.interfaces;
+using DiscordBot.Services.Interfaces;
 using DiscordBot.Transformers;
 using Serilog.Events;
 using WiseOldManConnector.Models.Output;

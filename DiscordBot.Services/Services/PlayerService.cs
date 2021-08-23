@@ -7,7 +7,7 @@ using DiscordBot.Common.Models.Decorators;
 using DiscordBot.Common.Models.DiscordDtos;
 using DiscordBot.Data.Repository;
 using DiscordBot.Services.Helpers;
-using DiscordBot.Services.Services.interfaces;
+using DiscordBot.Services.Interfaces;
 using Microsoft.Extensions.Logging;
 using WiseOldManConnector.Models.Output;
 

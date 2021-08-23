@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using DiscordBot.Services.Services.interfaces;
+using DiscordBot.Services.Interfaces;
 using WiseOldManConnector.Interfaces;
 using WiseOldManConnector.Models.Output;
 using WiseOldManConnector.Models.Requests;

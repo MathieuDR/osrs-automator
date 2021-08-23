@@ -14,7 +14,7 @@ using DiscordBot.Helpers;
 using DiscordBot.Models;
 using DiscordBot.Preconditions;
 using DiscordBot.Services.interfaces;
-using DiscordBot.Services.Services.interfaces;
+using DiscordBot.Services.Interfaces;
 using DiscordBot.Transformers;
 
 namespace DiscordBot.Modules {
@@ -78,7 +78,7 @@ namespace DiscordBot.Modules {
 
         private async Task HandleNewCount(int startCount, int newCount, IGuildUser user) {
             try {
-                var tresholds = await _counterService.GetTresholds(user.GuildId);
+                var tresholds = await _counterService.GetThresholds(user.GuildId);
                 var channelId = await _counterService.GetChannelForGuild(user.GuildId);
 
                 if (!(Context.Guild.GetChannel(channelId) is ISocketMessageChannel channel)) {
@@ -277,7 +277,7 @@ namespace DiscordBot.Modules {
             [Command("create")]
             [Summary("Create a new treshold")]
             public async Task Set(int count, IRole role, [Remainder] string name) {
-                var success = await _counterService.CreateTreshold(Context.User.ToGuildUserDto(), count, name, role.ToRoleDto());
+                var success = await _counterService.CreateThreshold(Context.User.ToGuildUserDto(), count, name, role.ToRoleDto());
 
                 var verb = success ? "Success" : "Failure";
                 var builder = EmbedBuilderHelper.AddCommonProperties(new EmbedBuilder())
@@ -293,7 +293,7 @@ namespace DiscordBot.Modules {
             [Command("create")]
             [Summary("Create a new treshold without a role")]
             public async Task SetWithoutRole(int count, [Remainder] string name) {
-                var success = await _counterService.CreateTreshold(Context.User.ToGuildUserDto(), count, name);
+                var success = await _counterService.CreateThreshold(Context.User.ToGuildUserDto(), count, name);
 
                 var verb = success ? "Success" : "Failure";
                 var builder = EmbedBuilderHelper.AddCommonProperties(new EmbedBuilder())
@@ -308,7 +308,7 @@ namespace DiscordBot.Modules {
             [Command("list")]
             [Summary("See all tresholds in a list format")]
             public async Task List() {
-                var tresholds = await _counterService.GetTresholds(Context.Guild.Id);
+                var tresholds = await _counterService.GetThresholds(Context.Guild.Id);
                 
                 var builder = EmbedBuilderHelper.AddCommonProperties(new EmbedBuilder())
                     .WithTitle("Current tresholds")

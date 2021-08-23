@@ -3,7 +3,7 @@ using System.Threading.Tasks;
 using WiseOldManConnector.Models.Output;
 using WiseOldManConnector.Models.WiseOldMan.Enums;
 
-namespace DiscordBot.Services.Services.interfaces {
+namespace DiscordBot.Services.Interfaces {
     public interface IOsrsHighscoreService {
         Task<Player> GetPlayersForUsername(string username);
         Task<Group> GetGroupById(int womGroupId);

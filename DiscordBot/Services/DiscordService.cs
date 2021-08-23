@@ -1,8 +1,8 @@
 using System.Threading.Tasks;
 using Discord.WebSocket;
 using DiscordBot.Common.Models.DiscordDtos;
+using DiscordBot.Services.Interfaces;
 using DiscordBot.Services.Services;
-using DiscordBot.Services.Services.interfaces;
 using FluentResults;
 using Microsoft.Extensions.Logging;
 

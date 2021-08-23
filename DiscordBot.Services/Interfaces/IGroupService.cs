@@ -6,7 +6,7 @@ using DiscordBot.Common.Models.Enums;
 using WiseOldManConnector.Models.Output;
 using WiseOldManConnector.Models.WiseOldMan.Enums;
 
-namespace DiscordBot.Services.Services.interfaces {
+namespace DiscordBot.Services.Interfaces {
     public interface IGroupService {
         public Task<ItemDecorator<Group>> SetGroupForGuild(GuildUser guildUser, int womGroupId, string verificationCode);
         Task SetAutoAdd(GuildUser guildUser, bool autoAdd);

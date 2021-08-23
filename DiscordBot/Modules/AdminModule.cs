@@ -10,7 +10,7 @@ using DiscordBot.Common.Models.Enums;
 using DiscordBot.Helpers;
 using DiscordBot.Preconditions;
 using DiscordBot.Services.interfaces;
-using DiscordBot.Services.Services.interfaces;
+using DiscordBot.Services.Interfaces;
 using DiscordBot.Transformers;
 
 namespace DiscordBot.Modules {
