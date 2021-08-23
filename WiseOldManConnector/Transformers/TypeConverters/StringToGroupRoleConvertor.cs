@@ -1,5 +1,6 @@
 ﻿using System;
 using AutoMapper;
+using WiseOldManConnector.Helpers;
 using WiseOldManConnector.Models.WiseOldMan.Enums;
 
 namespace WiseOldManConnector.Transformers.TypeConverters {
@@ -15,15 +16,7 @@ namespace WiseOldManConnector.Transformers.TypeConverters {
                 return destination;
             }
 
-
-            
-            var lowerInvariant = source.ToLowerInvariant();
-            destination = lowerInvariant switch {
-                "member" => GroupRole.Member,
-                "leader" => GroupRole.Leader,
-                _ => throw new ArgumentOutOfRangeException(nameof(source), source, null)
-            };
-            
+            destination = source.ToEnum<GroupRole>();
 
             return destination;
         }

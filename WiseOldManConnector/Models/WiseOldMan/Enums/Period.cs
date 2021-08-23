@@ -10,7 +10,7 @@ namespace WiseOldManConnector.Models.WiseOldMan.Enums {
         Month,
         [EnumMember(Value = "year")]
         Year,
-        [EnumMember(Value = "6h")]
-        SixHours
+        [EnumMember(Value = "5min")]
+        FiveMinutes
     }
 }

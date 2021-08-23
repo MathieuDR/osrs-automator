@@ -11,11 +11,24 @@ namespace WiseOldManConnector.Helpers {
             var memInfo = enumType.GetMember(enumVal.ToString());
             var attr = memInfo.FirstOrDefault()?.GetCustomAttributes(false).OfType<EnumMemberAttribute>().FirstOrDefault();
 
-            if (attr != null) { 
+            if (attr != null) {
                 return attr.Value;
             }
 
             return enumVal.ToString();
+        }
+
+        public static T ToEnum<T>(this string source) {
+            var enumType = typeof(T);
+            foreach (var name in Enum.GetNames(enumType)) {
+                var enumMemberAttribute = ((EnumMemberAttribute[]) enumType.GetField(name).GetCustomAttributes(typeof(EnumMemberAttribute), true))
+                    .Single();
+                if (enumMemberAttribute.Value.ToLowerInvariant() == source.ToLowerInvariant()) {
+                    return (T) Enum.Parse(enumType, name);
+                }
+            }
+
+            return default;
         }
 
         public static string FriendlyName(this MetricType metricType, bool capitalize = false) {
@@ -37,7 +50,7 @@ namespace WiseOldManConnector.Helpers {
             if (GetMetricTypes(MetricTypeCategory.Skills).Contains(metricType)) {
                 return MetricTypeCategory.Skills;
             }
-            
+
             if (GetMetricTypes(MetricTypeCategory.Activities).Contains(metricType)) {
                 return MetricTypeCategory.Activities;
             }
@@ -45,7 +58,7 @@ namespace WiseOldManConnector.Helpers {
             if (GetMetricTypes(MetricTypeCategory.Time).Contains(metricType)) {
                 return MetricTypeCategory.Time;
             }
-            
+
             if (GetMetricTypes(MetricTypeCategory.Others).Contains(metricType)) {
                 return MetricTypeCategory.Others;
             }
@@ -60,7 +73,7 @@ namespace WiseOldManConnector.Helpers {
                     q.AddRange(GetMetricTypes(MetricTypeCategory.Others));
                     return q;
                 case MetricTypeCategory.Queryable:
-                    var result =  new List<MetricType>();
+                    var result = new List<MetricType>();
                     result.AddRange(GetMetricTypes(MetricTypeCategory.Skills));
                     result.AddRange(GetMetricTypes(MetricTypeCategory.Activities));
                     result.AddRange(GetMetricTypes(MetricTypeCategory.Bosses));
@@ -82,7 +95,7 @@ namespace WiseOldManConnector.Helpers {
         }
 
         private static List<MetricType> BossMetrics() {
-            return new List<MetricType>() {
+            return new() {
                 MetricType.AbyssalSire,
                 MetricType.AlchemicalHydra,
                 MetricType.BarrowsChests,
@@ -129,12 +142,12 @@ namespace WiseOldManConnector.Helpers {
                 MetricType.Vorkath,
                 MetricType.Wintertodt,
                 MetricType.Zalcano,
-                MetricType.Zulrah,
+                MetricType.Zulrah
             };
         }
 
         private static List<MetricType> ActivityMetrics() {
-            return new List<MetricType>() {
+            return new() {
                 MetricType.LeaguePoints,
                 MetricType.BountyHunterHunter,
                 MetricType.BountyHunterRogue,
@@ -151,14 +164,14 @@ namespace WiseOldManConnector.Helpers {
         }
 
         private static List<MetricType> TimeMetrics() {
-            return new List<MetricType>() {
+            return new() {
                 MetricType.EffectiveHoursBossing,
                 MetricType.EffectiveHoursPlaying
             };
         }
 
         private static List<MetricType> SkillMetrics() {
-            return new List<MetricType>() {
+            return new() {
                 MetricType.Overall,
                 MetricType.Attack,
                 MetricType.Defence,
@@ -182,15 +195,14 @@ namespace WiseOldManConnector.Helpers {
                 MetricType.Farming,
                 MetricType.Runecrafting,
                 MetricType.Hunter,
-                MetricType.Construction,
+                MetricType.Construction
             };
         }
 
         private static List<MetricType> OtherMetrics() {
-            return new List<MetricType>() {
+            return new() {
                 MetricType.Combat
             };
         }
-
     }
 }

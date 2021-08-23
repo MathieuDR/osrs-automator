@@ -35,8 +35,8 @@ namespace WiseOldManConnectorTests.Connectors {
             
             Assert.NotNull(response);
             Assert.NotNull(response.Data);
-            Assert.Equal(username, response.Data.OldName);
-            Assert.Equal(newName, response.Data.NewName);
+            Assert.Equal(username.ToLower(), response.Data.OldName.ToLower());
+            Assert.Equal(newName.ToLower(), response.Data.NewName.ToLower());
         }
         
         [Fact]

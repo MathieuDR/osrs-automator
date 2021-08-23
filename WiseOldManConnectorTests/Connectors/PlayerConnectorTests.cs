@@ -755,7 +755,7 @@ namespace WiseOldManConnectorTests.Connectors {
         [InlineData(new object[] {4029, MetricType.Fishing, null})]
         [InlineData(new object[] {4029, null, Period.Week})]
         [InlineData(new object[] {4029, MetricType.Fishing, Period.Week})]
-        [InlineData(new object[] {4029, MetricType.Fishing, Period.SixHours})]
+        [InlineData(new object[] {4029, MetricType.Fishing, Period.FiveMinutes})]
         public async Task RecordsByUserIdAndParametersResultInCollection(int id, MetricType? metric, Period? period) {
             ConnectorCollectionResponse<Record> response;
 
