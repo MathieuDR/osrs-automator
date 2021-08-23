@@ -1,5 +1,9 @@
 using Dashboard.Configuration;
 using Dashboard.Configuration.Options;
+using Dashboard.InputFormatters;
+using Dashboard.Models.ApiRequests.DiscordEmbed;
+using Dashboard.Transformers;
+using DiscordBot.Common.Dtos.Runescape;
 using DiscordBot.Configuration;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -30,7 +34,9 @@ namespace Dashboard {
             ApiOptions = Configuration.GetSection("WebApp").GetSection("Api").Get<ApiOptions>();
             services.AddRazorPages();
             services.AddServerSideBlazor();
-            services.AddMvc();
+            services.AddMvc(options => {
+                options.InputFormatters.Add(new BypassFormDataInputFormatter());
+            });
             services.AddApiVersioning(options => {
                 options.AssumeDefaultVersionWhenUnspecified = true;
                 options.DefaultApiVersion = new ApiVersion(ApiOptions.VersionMajor, ApiOptions.VersionMinor);
@@ -57,6 +63,8 @@ namespace Dashboard {
             });
 
             services.AddDiscordBot(Configuration);
+            
+            services.AddTransient<IMapper<Embed, RunescapeDrop>, EmbedToRunescapeDropMapper>();
         }
         
 
