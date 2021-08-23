@@ -1,0 +1,30 @@
+{
+    "embeds": [
+        {
+            "thumbnail": {
+                "url": "https://oldschool.runescape.wiki/images/5/5e/Bones.png?3fbd5"
+            },
+            "author": {
+                "name": "arstiE"
+            },
+            "description": "Just got 3x [Triton blunders](https://oldschool.runescape.wiki/w/Bones) from lvl 213 [Kree'bra](https://oldschool.runescape.wiki/w/Goblin#Level_5)",
+            "fields": [
+                {
+                    "inline": true,
+                    "name": "Rarity",
+                    "value": "```glsl\n# 1/59.0 (100.0%)\n```"
+                },
+                {
+                    "inline": true,
+                    "name": "HA Value",
+                    "value": "```fix\n123 GP\n```"
+                },
+                {
+                    "inline": true,
+                    "name": "GE Value",
+                    "value": "```fix\n900GP\n```"
+                }
+            ]
+        }
+    ]
+}
