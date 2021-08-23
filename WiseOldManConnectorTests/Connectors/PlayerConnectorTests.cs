@@ -715,10 +715,10 @@ namespace WiseOldManConnectorTests.Connectors {
         }
 
         [Theory]
-        [InlineData(new object[] {"ErkendRserke",null, null})]
-        [InlineData(new object[] {"ErkendRserke", MetricType.Fishing, null})]
-        [InlineData(new object[] {"ErkendRserke", null, Period.Week})]
-        [InlineData(new object[] {"ErkendRserke", MetricType.Thieving, Period.Month})]
+        [InlineData("ErkendRserke", null, null)]
+        [InlineData("ErkendRserke", MetricType.Fishing, null)]
+        [InlineData("ErkendRserke", null, Period.Week)]
+        [InlineData("ErkendRserke", MetricType.Thieving, Period.Month)]
         public async Task RecordsByUsernameAndParametersResultInCollection(string username, MetricType? metric, Period? period) {
             ConnectorCollectionResponse<Record> response;
 
@@ -751,11 +751,11 @@ namespace WiseOldManConnectorTests.Connectors {
         }
 
         [Theory]
-        [InlineData(new object[] {4029,null, null})]
-        [InlineData(new object[] {4029, MetricType.Fishing, null})]
-        [InlineData(new object[] {4029, null, Period.Week})]
-        [InlineData(new object[] {4029, MetricType.Fishing, Period.Week})]
-        [InlineData(new object[] {4029, MetricType.Fishing, Period.FiveMinutes})]
+        [InlineData(4029, null, null)]
+        [InlineData(4029, MetricType.Fishing, null)]
+        [InlineData(4029, null, Period.Week)]
+        [InlineData(4029, MetricType.Fishing, Period.Week)]
+        [InlineData(4029, MetricType.Fishing, Period.FiveMinutes)]
         public async Task RecordsByUserIdAndParametersResultInCollection(int id, MetricType? metric, Period? period) {
             ConnectorCollectionResponse<Record> response;
 
