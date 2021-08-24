@@ -4,16 +4,14 @@ using System.Linq;
 using System.Threading.Tasks;
 using DiscordBot.Common.Models.Data;
 using DiscordBot.Common.Models.DiscordDtos;
-using DiscordBot.Data.Repository;
+using DiscordBot.Data.Factory;
+using DiscordBot.Data.Interfaces;
 using DiscordBot.Services.Interfaces;
 using Microsoft.Extensions.Logging;
 
 namespace DiscordBot.Services.Services {
     public class CountService : BaseService, ICounterService {
-        private readonly IDiscordBotRepository _repositoryService;
-
-        public CountService(ILogger<CountService> logger, IDiscordBotRepository repositoryService) : base(logger) {
-            _repositoryService = repositoryService;
+        public CountService(ILogger<CountService> logger, RepositoryStrategy repositoryStrategy) : base(logger, repositoryStrategy) {
         }
 
 
@@ -27,7 +25,9 @@ namespace DiscordBot.Services.Services {
             var newCount = new Count(requester.Id, requester.Username, additive, reason);
             count.CountHistory.Add(newCount);
 
-            _repositoryService.UpdateOrInsertUserCountInfoForGuid(user.GuildId, count);
+            var repo = GetRepository<IUserCountInfoRepository>(user.GuildId);
+            repo.UpdateOrInsert(count);
+
             return count.CurrentCount;
         }
 
@@ -36,30 +36,32 @@ namespace DiscordBot.Services.Services {
         }
 
         public List<UserCountInfo> TopCounts(Guild guild, int quantity) {
-            var all = _repositoryService.GetAllUserCountInfos(guild.Id).ToList();
+            var repo = GetRepository<IUserCountInfoRepository>(guild.Id);
+            var all = repo.GetAll().Value;
             return all.OrderByDescending(c => c.CurrentCount).Take(quantity).ToList();
         }
 
        
 
         private UserCountInfo GetOrCreateUserCountInfo(GuildUser user, GuildUser requester = null) {
-            var result = _repositoryService.GetCountInfoByUserId(user.GuildId, user.Id) ??
-                         new UserCountInfo(requester?.Id ?? user.Id) {DiscordId = user.Id};
+            var repo = GetRepository<IUserCountInfoRepository>(user.GuildId);
+            var result = repo.GetByDiscordUserId(user.Id).Value ?? new UserCountInfo(requester?.Id ?? user.Id) {DiscordId = user.Id};
 
             return result;
         }
         
-        public Task<bool> SetChannelForCounts(GuildUser creator, Channel outputChannel) {
-            var config = GetGroupConfig(creator.GuildId);
+        public Task<bool> SetChannelForCounts(GuildUser user, Channel outputChannel) {
+            var repo = GetRepository<IGuildConfigRepository>(user.GuildId);
+            var config = GetGroupConfig(user.GuildId);
             config.CountConfig ??= new CountConfig();
             
             config.CountConfig.OutputChannelId = outputChannel.Id;
-            _repositoryService.CreateOrUpdateGroupConfig(config);
+            repo.UpdateOrInsert(config);
             return Task.FromResult(true);
         }
 
         public Task<bool> CreateThreshold(GuildUser creator, int count, string name, Role role = null) {
-            var config = GetGroupConigWithValidCountConfig(creator.GuildId);
+            var config = GetGroupConfigWithValidCountConfig(creator.GuildId);
             var toAdd = new CountThreshold();
             toAdd.Name = string.IsNullOrEmpty(name) ? "unnamed" : name;
             toAdd.Threshold = count;
@@ -70,34 +72,36 @@ namespace DiscordBot.Services.Services {
             var result = config.CountConfig.AddTreshold(toAdd);
             
             if (result) {
-                _repositoryService.CreateOrUpdateGroupConfig(config);
+                var repo = GetRepository<IGuildConfigRepository>(creator.GuildId);
+                repo.UpdateOrInsert(config);
             }
 
             return Task.FromResult(result);
         }
 
         public Task<bool> RemoveCount(ulong guildId, int index) {
-            var config = GetGroupConigWithValidCountConfig(guildId);
+            var config = GetGroupConfigWithValidCountConfig(guildId);
             var result = config.CountConfig.RemoveAtIndex(index);
 
             if (result) {
-                _repositoryService.CreateOrUpdateGroupConfig(config);
+                var repo = GetRepository<IGuildConfigRepository>(guildId);
+                repo.UpdateOrInsert(config);
             }
 
             return Task.FromResult(result);
         }
 
         public Task<IReadOnlyList<CountThreshold>> GetThresholds(ulong guildId) {
-            var config = GetGroupConigWithValidCountConfig(guildId);
+            var config = GetGroupConfigWithValidCountConfig(guildId);
             return Task.FromResult(config.CountConfig.Tresholds);
         }
 
         public Task<ulong> GetChannelForGuild(ulong guildId) {
-            var config = GetGroupConigWithValidCountConfig(guildId);
+            var config = GetGroupConfigWithValidCountConfig(guildId);
             return Task.FromResult(config.CountConfig.OutputChannelId);
         }
 
-        private GuildConfig GetGroupConigWithValidCountConfig(ulong guildId) {
+        private GuildConfig GetGroupConfigWithValidCountConfig(ulong guildId) {
             GuildConfig config = GetGroupConfig(guildId);
 
             if (config.CountConfig is null) {
@@ -108,7 +112,8 @@ namespace DiscordBot.Services.Services {
         }
         
         private GuildConfig GetGroupConfig(ulong guildId, bool validate = true) {
-            var result = _repositoryService.GetGroupConfig(guildId);
+            var repo = GetRepository<IGuildConfigRepository>(guildId);
+            var result =  repo.GetSingle().Value;
             
             if (result == null) {
                 throw new Exception($"Guild has no configuration. Please set the config");

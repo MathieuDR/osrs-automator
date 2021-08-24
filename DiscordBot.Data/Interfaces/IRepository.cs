@@ -12,6 +12,6 @@ namespace DiscordBot.Data.Interfaces {
         public Result Insert(T toInsert);
         public Result Update(T toUpdate);
         public Result UpdateOrInsert(T entity);
-        public Result Delete { get; set; }
+        public Result Delete(T toDelete);
     }
 }

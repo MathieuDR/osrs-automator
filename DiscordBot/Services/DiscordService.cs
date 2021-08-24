@@ -7,10 +7,12 @@ using FluentResults;
 using Microsoft.Extensions.Logging;
 
 namespace DiscordBot.Services {
-    public class DiscordService : BaseService, IDiscordService {
+    public class DiscordService : IDiscordService {
+        private readonly ILogger<DiscordService> _logger;
         private readonly DiscordSocketClient _client;
 
-        public DiscordService(ILogger<DiscordService> logger, DiscordSocketClient client) : base(logger) {
+        public DiscordService(ILogger<DiscordService> logger, DiscordSocketClient client) {
+            _logger = logger;
             _client = client;
         }
 

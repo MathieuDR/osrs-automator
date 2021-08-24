@@ -6,6 +6,8 @@ using DiscordBot.Common.Models.Data;
 using DiscordBot.Common.Models.Decorators;
 using DiscordBot.Common.Models.DiscordDtos;
 using DiscordBot.Common.Models.Enums;
+using DiscordBot.Data.Factory;
+using DiscordBot.Data.Interfaces;
 using DiscordBot.Data.Repository;
 using DiscordBot.Services.Helpers;
 using DiscordBot.Services.Interfaces;
@@ -18,11 +20,9 @@ namespace DiscordBot.Services.Services {
     public class GroupService : BaseService, IGroupService {
         private readonly IOsrsHighscoreService _highscoreService;
         private readonly ISchedulerFactory _factory;
-        private readonly IDiscordBotRepository _repository;
 
-        public GroupService(ILogger<GroupService> logger, IDiscordBotRepository repository, IOsrsHighscoreService highscoreService, ISchedulerFactory factory) :
-            base(logger) {
-            _repository = repository;
+        public GroupService(ILogger<GroupService> logger, RepositoryStrategy repositoryStrategy, IOsrsHighscoreService highscoreService, ISchedulerFactory factory) :
+            base(logger, repositoryStrategy) {
             _highscoreService = highscoreService;
             _factory = factory;
         }
@@ -32,18 +32,20 @@ namespace DiscordBot.Services.Services {
             if (group == null) {
                 throw new Exception($"Group does not exist.");
             }
-
-            GuildConfig config = _repository.GetGroupConfig(guildUser.GuildId) ?? new GuildConfig(guildUser.GuildId, guildUser.Id);
+            
+            var repo = GetRepository<GuildConfigRepository>(guildUser.GuildId);
+            GuildConfig config = repo.GetSingle().Value ?? new GuildConfig(guildUser.GuildId, guildUser.Id);
 
             config.WomVerificationCode = verificationCode;
             config.WomGroup = group;
             config.WomGroupId = group.Id;
 
-            _repository.CreateOrUpdateGroupConfig(config);
+            repo.UpdateOrInsert(config);
             return group.Decorate();
         }
 
         public async Task SetAutoAdd(GuildUser guildUser, bool autoAdd) {
+            var repo = GetRepository<GuildConfigRepository>(guildUser.GuildId);
             GuildConfig config = GetGroupConfig(guildUser.GuildId);
             if (config.WomGroupId <= 0) {
                 throw new Exception($"No Wise Old Man set for this server.");
@@ -57,7 +59,7 @@ namespace DiscordBot.Services.Services {
                 }
             });
 
-            _repository.CreateOrUpdateGroupConfig(config);
+            repo.UpdateOrInsert(config);
             await _;
         }
 
@@ -73,7 +75,8 @@ namespace DiscordBot.Services.Services {
                 config.AutomatedMessagesConfig.ChannelJobs.Add(jobType, setting);
             }
 
-            _repository.CreateOrUpdateGroupConfig(config);
+            var repo = GetRepository<GuildConfigRepository>(user.GuildId);
+            repo.UpdateOrInsert(config);
             return Task.CompletedTask;
         }
 
@@ -87,7 +90,8 @@ namespace DiscordBot.Services.Services {
 
             var setting = config.AutomatedMessagesConfig.ChannelJobs[jobType];
             setting.Activated = !setting.Activated;
-            _repository.CreateOrUpdateGroupConfig(config);
+            var repo = GetRepository<GuildConfigRepository>(guild.Id);
+            repo.UpdateOrInsert(config);
             return Task.FromResult(setting.Activated);
         }
 
@@ -155,7 +159,8 @@ namespace DiscordBot.Services.Services {
         }
 
         private GuildConfig GetGroupConfig(ulong guildId, bool validate = true) {
-            var result = _repository.GetGroupConfig(guildId);
+            var repo = GetRepository<GuildConfigRepository>(guildId);
+            var result = repo.GetSingle().Value;
             if (validate) {
                 if (result == null) {
                     throw new Exception($"Guild has no configuration. Please set the config");
@@ -167,7 +172,8 @@ namespace DiscordBot.Services.Services {
         }
 
         private Task AddAllPlayersToGroup(GuildUser guildUser, GuildConfig config) {
-            var players = _repository.GetAllPlayersForGuild(guildUser.GuildId).ToList();
+            var repo = GetRepository<IPlayerRepository>(guildUser.GuildId);
+            var players = repo.GetAll().Value;
             var usernames = new List<string>();
 
             foreach (var player in players) {

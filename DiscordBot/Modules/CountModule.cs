@@ -250,7 +250,7 @@ namespace DiscordBot.Modules {
         
         [RequireUserPermission(GuildPermission.Administrator, Group = "Permission")]
         [RequireRole(new ulong[]{784510650260914216, 806544893584343092}, Group = "Permission")]
-        [Group("treshold")]
+        [Group("threshold")]
         [RequireContext(ContextType.Guild)]
         public class CountConfigModule : BaseWaitMessageEmbeddedResponseModule{
             private readonly ICounterService _counterService;

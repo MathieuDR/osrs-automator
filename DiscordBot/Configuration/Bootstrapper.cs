@@ -3,7 +3,8 @@ using Discord.Addons.Interactive;
 using Discord.Commands;
 using Discord.WebSocket;
 using DiscordBot.Common.Configuration;
-using DiscordBot.Data.Repository;
+using DiscordBot.Data;
+using DiscordBot.Data.Factory;
 using DiscordBot.Data.Repository.Migrations;
 using DiscordBot.Services;
 using DiscordBot.Services.interfaces;
@@ -19,11 +20,24 @@ namespace DiscordBot.Configuration {
     public static class Bootstrapper {
         private static IServiceCollection AddDataConnection(this IServiceCollection serviceCollection,
             IConfiguration configuration) {
-            var config = configuration.GetSection("Startup").Get<StartupConfiguration>();
+
             serviceCollection
                 .AddSingleton<MigrationManager>()
-                .AddTransient<IDiscordBotRepository>(x => new LiteDbRepository(x.GetService<ILogger>(),
-                    config.DatabaseFile, x.GetService<MigrationManager>()));
+                .AddSingleton<LiteDbManager>()
+                .AddTransient<GuildConfigLiteDbRepositoryFactory>()
+                .AddTransient<PlayerLiteDbRepositoryFactory>()
+                .AddTransient<UserCountInfoLiteDbRepositoryFactory>()
+                .AddTransient<AutomatedJobStateLiteDbRepositoryFactory>()
+                .AddSingleton(x =>
+                    new RepositoryStrategy(new IRepositoryFactory[] {
+                        x.GetRequiredService<PlayerLiteDbRepositoryFactory>(),
+                        x.GetRequiredService<GuildConfigLiteDbRepositoryFactory>(),
+                        x.GetRequiredService<UserCountInfoLiteDbRepositoryFactory>(),
+                        x.GetRequiredService<AutomatedJobStateLiteDbRepositoryFactory>()
+                    }))
+                .AddOptions<LiteDbOptions>().Configure<IConfiguration>(((options, configuration1) => configuration.GetSection(LiteDbOptions.SectionName).Bind(options)));
+                // .AddTransient<IDiscordBotRepository>(x => new LiteDbRepository(x.GetService<ILogger>(),
+                //     config.DatabaseFile, x.GetService<MigrationManager>()));
 
 
             return serviceCollection;

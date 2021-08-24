@@ -9,7 +9,7 @@ namespace DiscordBot.Services.Interfaces {
         int Count(GuildUser user, GuildUser requester, int additive, string reason);
         UserCountInfo GetCountInfo(GuildUser user);
         List<UserCountInfo> TopCounts(Guild contextGuild, int quantity);
-        Task<bool> SetChannelForCounts(GuildUser creator, Channel outputChannel);
+        Task<bool> SetChannelForCounts(GuildUser user, Channel outputChannel);
         Task<bool> CreateThreshold(GuildUser creator, int count, string name, Role role = null);        
         Task<bool> RemoveCount(ulong guildId, int index);
         Task<IReadOnlyList<CountThreshold>> GetThresholds(ulong guildId);

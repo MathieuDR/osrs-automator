@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using DiscordBot.Common.Models.Data;
 using DiscordBot.Data.Interfaces;
 using FluentResults;
@@ -11,31 +12,53 @@ namespace DiscordBot.Data.Repository {
         public BaseLiteDbRepository(ILogger logger, LiteDatabase database) {
             Logger = logger;
             LiteDatabase = database;
+            
+            // if (string.IsNullOrEmpty(collectionName)) {
+            //     throw new ArgumentException(nameof(collectionName));
+            // }
+            
+            // CollectionName = collectionName;
         }
 
         public ILogger Logger { get; }
         public LiteDatabase LiteDatabase { get; }
+        public abstract string CollectionName { get; }
+
+        protected ILiteCollection<T> GetCollection() {
+            return LiteDatabase.GetCollection<T>(CollectionName);
+        }
 
         public virtual Result<IEnumerable<T>> GetAll() {
-            throw new NotImplementedException();
+            return Result.Ok(GetCollection().FindAll());
         }
 
         public virtual Result<T> Get(ObjectId id) {
-            throw new NotImplementedException();
+            return Result.Ok(GetCollection().Query().Where(x => x._id == id).FirstOrDefault());
         }
 
         public virtual Result Insert(T toInsert) {
-            throw new NotImplementedException();
+            var collection = GetCollection();
+            collection.Insert(toInsert);
+            return Result.Ok();
         }
 
         public virtual Result Update(T toUpdate) {
-            throw new NotImplementedException();
+            var collection = GetCollection();
+            collection.Update(toUpdate);
+            return Result.Ok();
         }
 
         public virtual Result UpdateOrInsert(T entity) {
-            throw new NotImplementedException();
+            if (entity._id is not null) {
+                return Update(entity);
+            }
+
+            return Insert(entity);
         }
 
-        public virtual Result Delete { get; set; }
+        public virtual Result Delete(T toDelete) {
+            var collection = GetCollection();
+            return collection.Delete(toDelete._id) ? Result.Ok() : Result.Fail("Delete failed");
+        }
     }
 }

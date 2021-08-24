@@ -47,8 +47,4 @@ namespace DiscordBot.Data {
             return liteDatabase;
         }
     }
-
-    public class LiteDbOptions {
-        public string FileName { get; set; }
-    }
 }

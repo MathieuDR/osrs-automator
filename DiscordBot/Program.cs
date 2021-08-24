@@ -8,6 +8,9 @@ using Discord.Commands;
 using Discord.WebSocket;
 using DiscordBot.Common.Configuration;
 using DiscordBot.Configuration;
+using DiscordBot.Data;
+using DiscordBot.Data.Factory;
+using DiscordBot.Data.Interfaces;
 using DiscordBot.Data.Repository;
 using DiscordBot.Data.Repository.Migrations;
 using DiscordBot.Services;
@@ -44,57 +47,7 @@ namespace DiscordBot {
         private static void Main() => new Program().EntryPointAsync().GetAwaiter().GetResult();
         
         private IServiceProvider ConfigureServices(IConfiguration config) {
-            StartupConfiguration configuration = config.GetSection("Startup").Get<StartupConfiguration>();
-            BotConfiguration botConfiguration = config.GetSection("Bot").Get<BotConfiguration>();
-            // WiseOldManConfiguration manConfiguration = config.GetSection("WiseOldMan").Get<WiseOldManConfiguration>();
-            MetricSynonymsConfiguration metricSynonymsConfiguration =
-                config.GetSection("MetricSynonyms").Get<MetricSynonymsConfiguration>();
-
-            Log.Logger = new LoggerConfiguration()
-                .Enrich.FromLogContext()
-                .MinimumLevel
-                .Debug()
-                .WriteTo.RollingFile(new JsonFormatter(), "logs/osrs_bot.log")
-                .WriteTo.Console(restrictedToMinimumLevel: LogEventLevel.Information)
-                .CreateLogger();
-
-            return new ServiceCollection()
-                // Base
-                .AddSingleton<MigrationManager>()
-                .AddSingleton<DiscordSocketClient>((provider => {
-                    var config = new DiscordSocketConfig
-                    {
-                        AlwaysDownloadUsers = true,
-                        MessageCacheSize = 100,
-                        GatewayIntents = GatewayIntents.GuildMembers | GatewayIntents.GuildMessages | GatewayIntents.GuildMessageReactions | GatewayIntents.GuildMembers | GatewayIntents.Guilds,
-                        
-                    };
-                    var client = new DiscordSocketClient(config);
-                    return client;
-                }))
-                .AddSingleton(x=> Log.Logger)
-                .AddSingleton<CommandService>()
-                .AddSingleton<CommandHandlingService>()
-                // Logging
-                .AddSingleton<ILogService, SerilogService>()
-                .AddLogging(loginBuilder => loginBuilder.AddSerilog(dispose: true))
-                // Extra
-                .AddSingleton(config)
-                .AddSingleton(botConfiguration)
-                .AddSingleton(botConfiguration.Messages)
-                .AddSingleton(metricSynonymsConfiguration)
-                .AddSingleton<InteractiveService>()
-                .AddTransient<IDiscordBotRepository>(x => new LiteDbRepository(x.GetService<ILogger>(),configuration.DatabaseFile, x.GetService<MigrationManager>()))
-                .AddTransient<IPlayerService, PlayerService>()
-                .AddTransient<IGroupService, GroupService>()
-                .AddTransient<IOsrsHighscoreService, WiseOldManConnectorService>()
-                .AddTransient<ICounterService, CountService>()
-                // Add additional services here
-                .AddTransient<IWiseOldManLogger, WisOldManLogger>()
-                .AddWiseOldManApi()
-                .ConfigureQuartz(config)
-                .ConfigureAutoMapper()
-                .BuildServiceProvider();
+            throw new NotImplementedException("Currently only supported through dashboard");
         }
 
         private IConfiguration BuildConfig() {
