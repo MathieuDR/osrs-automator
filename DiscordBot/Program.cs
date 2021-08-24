@@ -9,7 +9,6 @@ using Discord.WebSocket;
 using DiscordBot.Common.Configuration;
 using DiscordBot.Configuration;
 using DiscordBot.Data;
-using DiscordBot.Data.Factory;
 using DiscordBot.Data.Interfaces;
 using DiscordBot.Data.Repository;
 using DiscordBot.Data.Repository.Migrations;

@@ -1,7 +1,7 @@
 using System;
 using System.Threading.Tasks;
 using DiscordBot.Common.Dtos.Runescape;
-using DiscordBot.Data.Factory;
+using DiscordBot.Data.Strategies;
 using DiscordBot.Services.Interfaces;
 using FluentResults;
 using Microsoft.Extensions.Logging;

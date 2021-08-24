@@ -4,8 +4,8 @@ using System.Linq;
 using System.Threading.Tasks;
 using DiscordBot.Common.Models.Data;
 using DiscordBot.Common.Models.DiscordDtos;
-using DiscordBot.Data.Factory;
 using DiscordBot.Data.Interfaces;
+using DiscordBot.Data.Strategies;
 using DiscordBot.Services.Interfaces;
 using Microsoft.Extensions.Logging;
 

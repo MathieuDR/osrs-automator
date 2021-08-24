@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using DiscordBot.Data.Configuration;
 using DiscordBot.Data.Repository.Migrations;
 using LiteDB;
 using Microsoft.Extensions.Logging;

@@ -1,5 +1,5 @@
-﻿using DiscordBot.Data.Factory;
-using DiscordBot.Data.Interfaces;
+﻿using DiscordBot.Data.Interfaces;
+using DiscordBot.Data.Strategies;
 using Microsoft.Extensions.Logging;
 
 namespace DiscordBot.Services.Services {
