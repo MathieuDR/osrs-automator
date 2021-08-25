@@ -12,7 +12,7 @@ namespace WebAppTests.Deserialization {
         [Theory]
         [MemberData(nameof(DiscordEmbedFiles.AllFiles), MemberType = typeof(DiscordEmbedFiles))]
         public void CanDeserializeIntoDiscordEmbed(string pathToJson) {
-            var json = File.ReadAllText(DiscordEmbedFiles.FirstFile);
+            var json = File.ReadAllText(pathToJson);
 
             var discordEmbeds = JsonSerializer.Deserialize<EmbedCollection>(json);
       
