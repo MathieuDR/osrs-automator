@@ -11,8 +11,23 @@ namespace DiscordBot.Services.Services {
     
 
         public Task<Result> HandleDrop(RunescapeDrop drop, string base64Image) {
+            // Save to DB
+            // Set or update job with ID: {recipient:username}
+            // If Job already exist, reset timer + Options
+            // Timer: 1 sec, Clue's: 30 sec
             throw new NotImplementedException();
         }
+        
+        // Job
+        // Gather all of username
+        // Filter
+        // -- Filtered keywords
+        // --- Total value/HA
+        // --- Check for collection log item
+        // if exceeds for a post?
+        // --create post
+        // --send post to all discord guilds where that username is registered (atm all)
+        // remove from db, end Job
 
         public AutomatedDropperService(ILogger<AutomatedDropperService> logger, RepositoryStrategy repositoryStrategy) : base(logger, repositoryStrategy) { }
     }
