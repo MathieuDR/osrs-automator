@@ -658,9 +658,7 @@ namespace WiseOldManConnectorTests.Connectors {
             Assert.NotEmpty(metrics);
 
             var types = Enum.GetValues(typeof(MetricType)) as MetricType[];
-                var hasHours = false;
-            
-                
+
             foreach (var type in types) {
                 _testOutputHelper.WriteLine($"metric: {type}");
                 if (type == MetricType.Combat) {
