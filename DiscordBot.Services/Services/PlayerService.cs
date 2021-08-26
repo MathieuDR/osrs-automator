@@ -44,7 +44,7 @@ namespace DiscordBot.Services.Services {
                 throw new ValidationException($"User {proposedOsrsName} is already registered on this server.");
             }
 
-            AddNewOsrsAccount(user, discordUserPlayer, osrsPlayer);
+            await AddNewOsrsAccount(user, discordUserPlayer, osrsPlayer);
             return osrsPlayer.Decorate();
         }
 
@@ -164,7 +164,7 @@ namespace DiscordBot.Services.Services {
 
             if (player.CoupledOsrsAccounts.All(x => x.Id != osrsPlayer.Id)) {
                 // Should never really happen though..
-                AddNewOsrsAccount(discordUser, player, osrsPlayer);
+                await AddNewOsrsAccount(discordUser, player, osrsPlayer);
             }
 
             player.DefaultPlayerUsername = osrsPlayer.DisplayName;
