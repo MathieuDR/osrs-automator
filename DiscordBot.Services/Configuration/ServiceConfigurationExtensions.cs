@@ -27,7 +27,8 @@ namespace DiscordBot.Services.Configuration {
                 .AddTransient<IPlayerService, PlayerService>()
                 .AddTransient<IGroupService, GroupService>()
                 .AddTransient<IOsrsHighscoreService, WiseOldManConnectorService>()
-                .AddTransient<ICounterService, CountService>();
+                .AddTransient<ICounterService, CountService>()
+                .AddTransient<IAutomatedDropperService, AutomatedDropperService>();
             
             return serviceCollection;
         }

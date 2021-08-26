@@ -4,6 +4,6 @@ using FluentResults;
 
 namespace DiscordBot.Services.Interfaces {
     public interface IAutomatedDropperService {
-        public Task<Result> HandleDrop(RunescapeDrop drop, string base64Image);
+        public Task<Result> HandleDropRequest(RunescapeDrop drop, string base64Image);
     }
 }

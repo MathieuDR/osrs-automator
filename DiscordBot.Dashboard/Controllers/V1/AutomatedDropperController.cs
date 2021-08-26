@@ -38,7 +38,7 @@ namespace Dashboard.Controllers.V1 {
             }
             
             var image = await ToBase64String(file);
-            _ = _dropperService.HandleDrop(dropResult.Value, image);
+            _ = _dropperService.HandleDropRequest(dropResult.Value, image);
             
             return Ok();
         }
