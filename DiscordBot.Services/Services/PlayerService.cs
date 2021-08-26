@@ -18,7 +18,7 @@ namespace DiscordBot.Services.Services {
         private readonly IOsrsHighscoreService _osrsHighscoreService;
 
         public PlayerService(ILogger<PlayerService> logger, IDiscordService discordService, IOsrsHighscoreService osrsHighscoreService,
-            RepositoryStrategy repositoryStrategy) :
+            IRepositoryStrategy repositoryStrategy) :
             base(logger, repositoryStrategy) {
             _discordService = discordService;
             _osrsHighscoreService = osrsHighscoreService;

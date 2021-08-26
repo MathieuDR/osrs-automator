@@ -11,7 +11,7 @@ using Microsoft.Extensions.Logging;
 
 namespace DiscordBot.Services.Services {
     public class CountService : BaseService, ICounterService {
-        public CountService(ILogger<CountService> logger, RepositoryStrategy repositoryStrategy) : base(logger, repositoryStrategy) {
+        public CountService(ILogger<CountService> logger, IRepositoryStrategy repositoryStrategy) : base(logger, repositoryStrategy) {
         }
 
 

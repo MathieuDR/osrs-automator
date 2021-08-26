@@ -14,7 +14,7 @@ namespace DiscordBot.Services.Services {
         private readonly IWiseOldManGroupApi _groupApi;
         private readonly IWiseOldManPlayerApi _playerApi;
         private readonly IWiseOldManNameApi _nameApi;
-
+        
         public WiseOldManConnectorService(IWiseOldManPlayerApi playerApi, IWiseOldManGroupApi groupApi,
             IWiseOldManCompetitionApi competitionApi, IWiseOldManNameApi nameApi) {
             _playerApi = playerApi;

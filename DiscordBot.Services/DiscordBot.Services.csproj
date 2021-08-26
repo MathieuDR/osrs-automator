@@ -13,6 +13,8 @@
     <ItemGroup>
       <PackageReference Include="FluentResults" Version="2.5.0" />
       <PackageReference Include="Quartz" Version="3.3.3" />
+      <PackageReference Include="Refit" Version="6.0.94" />
+      <PackageReference Include="Refit.HttpClientFactory" Version="6.0.94" />
     </ItemGroup>
 
 </Project>

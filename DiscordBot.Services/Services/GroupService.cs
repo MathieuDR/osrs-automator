@@ -21,7 +21,7 @@ namespace DiscordBot.Services.Services {
         private readonly IOsrsHighscoreService _highscoreService;
         private readonly ISchedulerFactory _factory;
 
-        public GroupService(ILogger<GroupService> logger, RepositoryStrategy repositoryStrategy, IOsrsHighscoreService highscoreService, ISchedulerFactory factory) :
+        public GroupService(ILogger<GroupService> logger, IRepositoryStrategy repositoryStrategy, IOsrsHighscoreService highscoreService, ISchedulerFactory factory) :
             base(logger, repositoryStrategy) {
             _highscoreService = highscoreService;
             _factory = factory;

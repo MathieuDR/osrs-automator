@@ -9,6 +9,7 @@ using DiscordBot.Data.Factories;
 using DiscordBot.Data.Repository.Migrations;
 using DiscordBot.Data.Strategies;
 using DiscordBot.Services;
+using DiscordBot.Services.Configuration;
 using DiscordBot.Services.interfaces;
 using DiscordBot.Services.Interfaces;
 using DiscordBot.Services.Services;
@@ -30,7 +31,7 @@ namespace DiscordBot.Configuration {
                 .AddTransient<PlayerLiteDbRepositoryFactory>()
                 .AddTransient<UserCountInfoLiteDbRepositoryFactory>()
                 .AddTransient<AutomatedJobStateLiteDbRepositoryFactory>()
-                .AddSingleton(x =>
+                .AddSingleton<IRepositoryStrategy>(x =>
                     new RepositoryStrategy(new IRepositoryFactory[] {
                         x.GetRequiredService<PlayerLiteDbRepositoryFactory>(),
                         x.GetRequiredService<GuildConfigLiteDbRepositoryFactory>(),
@@ -76,11 +77,7 @@ namespace DiscordBot.Configuration {
 
         private static IServiceCollection AddBotServices(this IServiceCollection serviceCollection) {
             serviceCollection
-                .AddTransient<IDiscordService, DiscordService>()
-                .AddTransient<IPlayerService, PlayerService>()
-                .AddTransient<IGroupService, GroupService>()
-                .AddTransient<IOsrsHighscoreService, WiseOldManConnectorService>()
-                .AddTransient<ICounterService, CountService>();
+                .AddTransient<IDiscordService, DiscordService>();
 
             return serviceCollection;
         }
@@ -105,6 +102,7 @@ namespace DiscordBot.Configuration {
         public static IServiceCollection AddDiscordBot(this IServiceCollection serviceCollection,
             IConfiguration configuration) {
             serviceCollection
+                .AddDiscordBotServices()
                 .AddLogging()
                 .AddDataConnection(configuration)
                 .AddDiscord()

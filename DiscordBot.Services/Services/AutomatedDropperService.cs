@@ -29,6 +29,6 @@ namespace DiscordBot.Services.Services {
         // --send post to all discord guilds where that username is registered (atm all)
         // remove from db, end Job
 
-        public AutomatedDropperService(ILogger<AutomatedDropperService> logger, RepositoryStrategy repositoryStrategy) : base(logger, repositoryStrategy) { }
+        public AutomatedDropperService(ILogger<AutomatedDropperService> logger, IRepositoryStrategy repositoryStrategy) : base(logger, repositoryStrategy) { }
     }
 }
