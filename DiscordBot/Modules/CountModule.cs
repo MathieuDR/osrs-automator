@@ -105,7 +105,7 @@ namespace DiscordBot.Modules {
                         }
                     }
                 }
-            } catch (Exception e) {
+            } catch (Exception) {
                 // ignored
             }
         }
