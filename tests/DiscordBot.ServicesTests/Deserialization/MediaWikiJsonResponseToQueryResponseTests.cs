@@ -10,7 +10,8 @@ namespace DiscordBot.ServicesTests.Deserialization {
     public class MediaWikiJsonResponseToQueryResponseTests {
         [Theory]
         [MemberData(nameof(WikiResponseFiles.AllFiles), MemberType = typeof(WikiResponseFiles))]
-        public void CanDeserializeIntoDiscordEmbed(string pathToJson, int pages, int _) {
+        public void CanDeserializeIntoDiscordEmbed(string pathToJson, int pages)
+        {
             var json = File.ReadAllText(pathToJson);
 
             var response = JsonSerializer.Deserialize<QueryResponse>(json);
