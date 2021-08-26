@@ -17,4 +17,9 @@
       <PackageReference Include="Refit.HttpClientFactory" Version="6.0.94" />
     </ItemGroup>
 
+    <ItemGroup>
+        <AssemblyAttribute Include="System.Runtime.CompilerServices.InternalsVisibleTo">
+            <_Parameter1>DiscordBot.ServicesTests</_Parameter1>
+        </AssemblyAttribute>
+    </ItemGroup>
 </Project>

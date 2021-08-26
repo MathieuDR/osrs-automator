@@ -31,5 +31,7 @@
     <ItemGroup>
       <ProjectReference Include="..\..\DiscordBot.Services\DiscordBot.Services.csproj" />
     </ItemGroup>
+    
+    
 
 </Project>

@@ -13,7 +13,7 @@ using Microsoft.Extensions.Logging;
 using WiseOldManConnector.Models.Output;
 
 namespace DiscordBot.Services.Services {
-    public class PlayerService : BaseService, IPlayerService {
+    internal class PlayerService : RepositoryService, IPlayerService {
         private readonly IDiscordService _discordService;
         private readonly IOsrsHighscoreService _osrsHighscoreService;
 

@@ -1,7 +1,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using DiscordBot.Data.Strategies;
 using DiscordBot.Services.ExternalServices;
 using DiscordBot.Services.Interfaces;
 using DiscordBot.Services.Models.MediaWikiApi;
@@ -10,15 +9,16 @@ using FluentResults;
 using Microsoft.Extensions.Logging;
 
 namespace DiscordBot.Services.Services {
-    public class CollectionLogItemProvider : BaseService, ICollectionLogItemProvider{
-        private readonly IOsrsWikiApi _wikiApi;
+    internal class CollectionLogItemProvider : BaseService, ICollectionLogItemProvider {
         private const string PageTitle = "Collection log";
+        private readonly IOsrsWikiApi _wikiApi;
 
         private IEnumerable<string> _collectionLogItems;
 
-        public CollectionLogItemProvider(ILogger<CollectionLogItemProvider> logger, IRepositoryStrategy repositoryStrategy, IOsrsWikiApi wikiApi) : base(logger, repositoryStrategy) {
+        public CollectionLogItemProvider(ILogger<CollectionLogItemProvider> logger, IOsrsWikiApi wikiApi) : base(logger) {
             _wikiApi = wikiApi;
         }
+
         public async ValueTask<Result<IEnumerable<string>>> GetCollectionLogItemNames() {
             if (_collectionLogItems is null) {
                 var wikiResult = await GetItemsFromApi();
@@ -32,6 +32,11 @@ namespace DiscordBot.Services.Services {
             return Result.Ok(_collectionLogItems);
         }
 
+        public Result ResetCache() {
+            _collectionLogItems = null;
+            return Result.Ok();
+        }
+
         private async Task<Result<IEnumerable<string>>> GetItemsFromApi() {
             var queryResult = await _wikiApi.GetPage(PageTitle);
 
@@ -41,17 +46,12 @@ namespace DiscordBot.Services.Services {
             }
 
             var revision = page.Value.Revisions.FirstOrDefault();
-            
+
             if (revision is null) {
                 return Result.Fail("No revision in page in api request");
             }
 
             return MediaWikiContentToItemsParser.GetItems(revision.Content);
-        }
-
-        public Result ResetCache() {
-            _collectionLogItems = null;
-            return Result.Ok();
         }
     }
 }

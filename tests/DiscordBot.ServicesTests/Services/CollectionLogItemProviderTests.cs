@@ -33,8 +33,7 @@ namespace DiscordBot.ServicesTests.Services {
 
         [Fact]
         public async Task RequestItemsDoesNotFail() {
-            var sut = new CollectionLogItemProvider(Substitute.For<ILogger<CollectionLogItemProvider>>(), Substitute.For<IRepositoryStrategy>(),
-                GetWikiMock());
+            var sut = new CollectionLogItemProvider(Substitute.For<ILogger<CollectionLogItemProvider>>(), GetWikiMock());
 
             var result = await sut.GetCollectionLogItemNames();
             result.Should().NotBeNull();
@@ -43,8 +42,7 @@ namespace DiscordBot.ServicesTests.Services {
 
         [Fact]
         public async Task RequestItemsProvidesListOfItems() {
-            var sut = new CollectionLogItemProvider(Substitute.For<ILogger<CollectionLogItemProvider>>(), Substitute.For<IRepositoryStrategy>(),
-                GetWikiMock());
+            var sut = new CollectionLogItemProvider(Substitute.For<ILogger<CollectionLogItemProvider>>(), GetWikiMock());
 
             var result = await sut.GetCollectionLogItemNames();
             result.Value.Should().NotBeNullOrEmpty();
@@ -53,8 +51,7 @@ namespace DiscordBot.ServicesTests.Services {
         [Fact]
         public async Task RequestItemsRequestsApiOnce() {
             var mock = GetWikiMock();
-            var sut = new CollectionLogItemProvider(Substitute.For<ILogger<CollectionLogItemProvider>>(), Substitute.For<IRepositoryStrategy>(),
-                mock);
+            var sut = new CollectionLogItemProvider(Substitute.For<ILogger<CollectionLogItemProvider>>(), mock);
 
             _ = await sut.GetCollectionLogItemNames();
             await mock.Received(1).GetPage(WikiPage);
@@ -63,8 +60,7 @@ namespace DiscordBot.ServicesTests.Services {
         [Fact]
         public async Task RequestItemsRequestsApiAfterReset() {
             var mock = GetWikiMock();
-            var sut = new CollectionLogItemProvider(Substitute.For<ILogger<CollectionLogItemProvider>>(), Substitute.For<IRepositoryStrategy>(),
-                mock);
+            var sut = new CollectionLogItemProvider(Substitute.For<ILogger<CollectionLogItemProvider>>(), mock);
 
             _ = await sut.GetCollectionLogItemNames();
             sut.ResetCache();
@@ -75,8 +71,7 @@ namespace DiscordBot.ServicesTests.Services {
 
         [Fact]
         public async Task RequestItemsUsesParses() {
-            var sut = new CollectionLogItemProvider(Substitute.For<ILogger<CollectionLogItemProvider>>(), Substitute.For<IRepositoryStrategy>(),
-                GetWikiMock());
+            var sut = new CollectionLogItemProvider(Substitute.For<ILogger<CollectionLogItemProvider>>(), GetWikiMock());
 
             var result = (await sut.GetCollectionLogItemNames()).Value;
             result.Should().Contain("Rum");

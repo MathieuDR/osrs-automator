@@ -7,7 +7,7 @@ using FluentResults;
 using Microsoft.Extensions.Logging;
 
 namespace DiscordBot.Services.Services {
-    public class AutomatedDropperService : BaseService, IAutomatedDropperService {
+    internal class AutomatedDropperService : RepositoryService, IAutomatedDropperService {
     
 
         public Task<Result> HandleDrop(RunescapeDrop drop, string base64Image) {

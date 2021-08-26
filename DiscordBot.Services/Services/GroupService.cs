@@ -17,7 +17,7 @@ using WiseOldManConnector.Models.Output;
 using WiseOldManConnector.Models.WiseOldMan.Enums;
 
 namespace DiscordBot.Services.Services {
-    public class GroupService : BaseService, IGroupService {
+    internal class GroupService : RepositoryService, IGroupService {
         private readonly IOsrsHighscoreService _highscoreService;
         private readonly ISchedulerFactory _factory;
 
