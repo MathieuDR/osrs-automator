@@ -75,7 +75,6 @@ namespace DiscordBot.Modules {
                     Content = string.Format(FormatString, defaultAccount),
                     Options = new CustomActionsPaginatedAppearanceOptions {
                         Delete = async (toDelete, i) => {
-                            throw new Exception("tsetr");
                             await DeleteAccount(toDelete, i, accountDecorators, pagedMessage);
                         },
                         Select = async (selected, i) => {
