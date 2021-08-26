@@ -155,7 +155,7 @@ namespace DiscordBot.Services.Services {
 
             var trigger = TriggerBuilder.Create().StartAt(DateBuilder.EvenSecondDate(DateTimeOffset.Now.AddSeconds(5))).Build();
             
-            scheduler.ScheduleJob(job, trigger);
+            await scheduler.ScheduleJob(job, trigger);
         }
 
         private GuildConfig GetGroupConfig(ulong guildId, bool validate = true) {

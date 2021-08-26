@@ -96,7 +96,7 @@ namespace DiscordBot.Services.Services {
             return _osrsHighscoreService.RequestNameChange(oldName, newName);
         }
 
-        public Task DeleteCoupledOsrsAccount(GuildUser user, int id) {
+        public async Task DeleteCoupledOsrsAccount(GuildUser user, int id) {
             var player = GetPlayerConfigurationOrThrowException(user);
 
             if (player.CoupledOsrsAccounts.Count == 1) {
@@ -107,13 +107,13 @@ namespace DiscordBot.Services.Services {
             player.CoupledOsrsAccounts.RemoveAt(index);
 
             if (player.WiseOldManDefaultPlayerId == id) {
-                SetDefaultAccount(user, player.CoupledOsrsAccounts.FirstOrDefault(), player);
+                await SetDefaultAccount(user, player.CoupledOsrsAccounts.FirstOrDefault(), player);
             }
 
             var repo = GetRepository<IPlayerRepository>(user.GuildId);
             repo.UpdateOrInsert(player);
 
-            return Task.CompletedTask;
+            return;
         }
 
         public Task<string> SetDefaultAccount(GuildUser user, Player player) {
@@ -196,13 +196,13 @@ namespace DiscordBot.Services.Services {
             return config;
         }
 
-        private void AddNewOsrsAccount(GuildUser discordUser, Common.Models.Data.Player player, Player osrsPlayer) {
+        private async Task AddNewOsrsAccount(GuildUser discordUser, Common.Models.Data.Player player, Player osrsPlayer) {
             // New account
             player.CoupledOsrsAccounts.Add(osrsPlayer);
 
             if (player.CoupledOsrsAccounts.Count == 1) {
                 // RISKY LOOP!
-                SetDefaultAccount(discordUser, osrsPlayer, player);
+                await SetDefaultAccount(discordUser, osrsPlayer, player);
             }
 
             var repo = GetRepository<IPlayerRepository>(discordUser.GuildId);
@@ -211,7 +211,7 @@ namespace DiscordBot.Services.Services {
             var configRepo = GetRepository<IGuildConfigRepository>(discordUser.GuildId);
             var config = configRepo.GetSingle().Value;
             if (config is not null && config.AutoAddNewAccounts) {
-                _osrsHighscoreService.AddOsrsAccountToToGroup(config.WomGroupId, config.WomVerificationCode, osrsPlayer.Username);
+                await _osrsHighscoreService.AddOsrsAccountToToGroup(config.WomGroupId, config.WomVerificationCode, osrsPlayer.Username);
             }
         }
 
