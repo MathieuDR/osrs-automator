@@ -12,10 +12,9 @@ using Quartz;
 namespace DiscordBot.Services.Services {
     internal class AutomatedDropperService : RepositoryService, IAutomatedDropperService {
         private readonly ISchedulerFactory _schedulerFactory;
-        // private readonly IJob _baseJob;
 
-        public AutomatedDropperService(ILogger<AutomatedDropperService> logger, IRepositoryStrategy repositoryStrategy, ISchedulerFactory schedulerFactory) : base(logger, repositoryStrategy) {
-            
+        public AutomatedDropperService(ILogger<AutomatedDropperService> logger, IRepositoryStrategy repositoryStrategy,
+            ISchedulerFactory schedulerFactory) : base(logger, repositoryStrategy) {
             _schedulerFactory = schedulerFactory;
         }
 
@@ -24,19 +23,17 @@ namespace DiscordBot.Services.Services {
             if (schedulingResult.IsFailed) {
                 return schedulingResult;
             }
-            
+
             return Result.Ok();
-            
+
             // Save to DB
-            // Set or update job with ID: {recipient:username}
-            // If Job already exist, reset timer + Options
-            // Timer: 1 sec, Clue's: 30 sec
         }
 
         private async Task<IScheduler> GetScheduler() {
             var schedulers = await _schedulerFactory.GetAllSchedulers();
             return schedulers.FirstOrDefault() ?? await _schedulerFactory.GetScheduler();
         }
+
         private async Task<Result> ScheduleJob(RunescapeDrop drop) {
             try {
                 var scheduler = await GetScheduler();
@@ -56,7 +53,7 @@ namespace DiscordBot.Services.Services {
                 Logger.LogError(e, "Error when scheduling job: {guid}", guid);
                 return Result.Fail($"Cannot schedule job. ID of failure: {guid}");
             }
-            
+
             return Result.Ok();
         }
 
@@ -77,7 +74,7 @@ namespace DiscordBot.Services.Services {
             var result = JobBuilder.Create<HandleRunescapeDropJob>()
                 .WithIdentity(jobKey)
                 .WithDescription("Handling of runescape drop, received through an API request")
-                .RequestRecovery(true)
+                .RequestRecovery()
                 .UsingJobData("user", user)
                 .Build();
 
@@ -96,7 +93,7 @@ namespace DiscordBot.Services.Services {
         }
 
         private JobKey CreateJobKeyByRecipient(string recipientUsername) {
-            return new (recipientUsername, "automated-dropper");
+            return new(recipientUsername, "automated-dropper");
         }
 
         // Job
@@ -109,6 +106,5 @@ namespace DiscordBot.Services.Services {
         // --create post
         // --send post to all discord guilds where that username is registered (atm all)
         // remove from db, end Job
-
     }
 }

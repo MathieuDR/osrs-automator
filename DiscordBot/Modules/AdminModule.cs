@@ -4,7 +4,6 @@ using System.Threading.Tasks;
 using AutoMapper;
 using Discord;
 using Discord.Commands;
-using Discord.WebSocket;
 using DiscordBot.Common.Configuration;
 using DiscordBot.Common.Models.Enums;
 using DiscordBot.Helpers;

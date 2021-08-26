@@ -25,13 +25,4 @@ namespace DiscordBot.Services.Jobs {
 
         protected abstract Task<Result> DoWork();
     }
-
-    public class HandleRunescapeDropJob : BaseJob {
-        public HandleRunescapeDropJob(ILogger<HandleRunescapeDropJob> logger) : base(logger) { }
-        protected override Task<Result> DoWork() {
-            Logger.LogInformation("Now we would handle our stuff");
-
-            return Task.FromResult(Result.Ok());
-        }
-    }
 }
