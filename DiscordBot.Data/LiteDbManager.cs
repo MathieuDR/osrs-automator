@@ -8,11 +8,13 @@ using Serilog.Context;
 
 namespace DiscordBot.Data {
     public class LiteDbManager {
-        private object createLock = new object();
+        private readonly object _createLock = new object();
+        private readonly object _commonLock = new object();
         private readonly ILogger<LiteDbManager> _logger;
         private readonly MigrationManager _manager;
         private readonly LiteDbOptions _options;
         private readonly Dictionary<ulong, LiteDatabase> _databases = new Dictionary<ulong, LiteDatabase>();
+        private LiteDatabase _commonDatabase;
         public BsonMapper BsonMapper { get; set; }
 
         public LiteDbManager(ILogger<LiteDbManager> logger, IOptions<LiteDbOptions> options,MigrationManager manager) {
@@ -20,12 +22,21 @@ namespace DiscordBot.Data {
             _manager = manager;
             _options = options.Value;
         }
+
+        private string CreateConnectionString(string identifier = "common") => $"{_options.PathPrefix}{identifier}_{_options.FileSuffix}.db";
         private string GetGuildFileName(ulong guildId) {
-            return $"{guildId}_{_options.FileName}";
+            return CreateConnectionString(guildId.ToString());
+        }
+
+        public LiteDatabase GetCommonDatabase() {
+            lock (_commonLock) {
+                _logger.LogTrace("Requesting Common LiteDb");
+                return _commonDatabase ??= CreateDatabase(CreateConnectionString());
+            }
         }
         
         public LiteDatabase GetDatabase(ulong guildId) {
-            lock (createLock) {
+            lock (_createLock) {
                 _logger.LogTrace("Requesting LiteDb for {guild}", guildId);
                 
                 if (!_databases.TryGetValue(guildId, out LiteDatabase database)) {

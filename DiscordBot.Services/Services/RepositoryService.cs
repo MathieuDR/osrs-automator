@@ -9,23 +9,19 @@ namespace DiscordBot.Services.Services {
             RepositoryStrategy = repositoryStrategy;
         }
 
-        public ulong? GuildId { get; set; }
-
         protected IRepositoryStrategy RepositoryStrategy { get; }
 
-        protected T GetRepository<T>(ulong guildId) where T : class, IRepository {
+        [Obsolete("Method1 is deprecated, please use RepositoryStrategy.")]
+        protected T GetRepository<T>(ulong? guildId = null) where T : class, IRepository {
             var type = typeof(T);
-            
             Logger.LogDebug("Trying to create repo: {type}", type.Name);
-            return RepositoryStrategy.CreateRepository(type, guildId) as T;
-        }
-        
-        protected T GetRepository<T>() where T : class, IRepository {
-            if (!GuildId.HasValue) {
-                throw new NullReferenceException(nameof(GuildId));
+            
+            if (!guildId.HasValue) {
+                return RepositoryStrategy.CreateRepository<T>();
             }
 
-            return GetRepository<T>(GuildId.Value);
+            return RepositoryStrategy.CreateRepository<T>(guildId.Value);
         }
+        
     }
 }

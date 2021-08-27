@@ -1,5 +1,9 @@
+using System;
+using System.IO;
+using System.Linq;
 using System.Threading.Tasks;
 using Discord.WebSocket;
+using DiscordBot.Common.Models.Data;
 using DiscordBot.Common.Models.DiscordDtos;
 using DiscordBot.Services.Interfaces;
 using DiscordBot.Services.Services;
@@ -29,6 +33,27 @@ namespace DiscordBot.Services {
 
             await discordUser.ModifyAsync(x => x.Nickname = nickname);
             return Result.Ok();
+        }
+
+        public async Task<Result> PrintRunescapeDataDrop(RunescapeDropData data, ulong guildId, ulong channelId) {
+            var imagesArr = data.Images.ToArray();
+            var channel =_client.GetGuild(guildId).GetTextChannel(channelId);
+            await channel.SendMessageAsync($"New automated drop handled. Drops: {data.Drops.Count()} ({Math.Max(data.TotalValue, data.TotalHaValue)}), images: {imagesArr.Count()}");
+            
+            await channel.SendMessageAsync($"drops: {string.Join(", ", data.Drops.Select(x=> $"{x.Item.Name} x{x.Amount} ({Math.Max(x.TotalValue, x.TotalHaValue)})" ))}");
+
+            for (var i = 0; i < imagesArr.Length; i++) {
+                var image = imagesArr[i];
+                var stream = ToStream(image);
+                await channel.SendFileAsync(stream, "image.png", $"Image {i}/{imagesArr.Count()}");
+            }
+            
+            return Result.Ok();
+        }
+        
+        private static Stream ToStream(string image) {
+            var bytes = Convert.FromBase64String(image);
+            return new MemoryStream(bytes);
         }
     }
 }

@@ -31,12 +31,14 @@ namespace DiscordBot.Configuration {
                 .AddTransient<PlayerLiteDbRepositoryFactory>()
                 .AddTransient<UserCountInfoLiteDbRepositoryFactory>()
                 .AddTransient<AutomatedJobStateLiteDbRepositoryFactory>()
+                .AddTransient<RunescapeDropDataRepositoryFactory>()
                 .AddSingleton<IRepositoryStrategy>(x =>
                     new RepositoryStrategy(new IRepositoryFactory[] {
                         x.GetRequiredService<PlayerLiteDbRepositoryFactory>(),
                         x.GetRequiredService<GuildConfigLiteDbRepositoryFactory>(),
                         x.GetRequiredService<UserCountInfoLiteDbRepositoryFactory>(),
-                        x.GetRequiredService<AutomatedJobStateLiteDbRepositoryFactory>()
+                        x.GetRequiredService<AutomatedJobStateLiteDbRepositoryFactory>(),
+                        x.GetRequiredService<RunescapeDropDataRepositoryFactory>()
                     }))
                 .AddOptions<LiteDbOptions>().Configure<IConfiguration>(((options, configuration1) => configuration.GetSection(LiteDbOptions.SectionName).Bind(options)));
                 // .AddTransient<IDiscordBotRepository>(x => new LiteDbRepository(x.GetService<ILogger>(),

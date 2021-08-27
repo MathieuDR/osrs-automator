@@ -1,4 +1,5 @@
 using System.Threading.Tasks;
+using DiscordBot.Common.Models.Data;
 using FluentResults;
 using Microsoft.Extensions.Logging;
 using Quartz;

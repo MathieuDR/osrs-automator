@@ -6,6 +6,31 @@ using System.Reflection;
 using LiteDB;
 
 namespace DiscordBot.Common.Models.Data {
+    public record BaseRecord {
+        [BsonId]
+        public ObjectId Id { get; init; }
+
+        public DateTime CreatedOn { get; init; } = DateTime.Now;
+        
+        public virtual Dictionary<string, string> ToDictionary() {
+            var t = GetType();
+            PropertyInfo[] props = t.GetProperties();
+            var dict = new Dictionary<string, string>();
+
+            foreach (PropertyInfo prp in props) {
+                object value = prp.GetValue(this, new object[] { });
+                string friendlyValue = "not set";
+
+                if (value != null) {
+                    friendlyValue = value.ToString();
+                }
+
+                dict.Add(prp.Name, friendlyValue);
+            }
+
+            return dict;
+        }
+    }
     public class BaseModel {
         protected Dictionary<string, string> ValidationDictionary = new Dictionary<string, string>();
 

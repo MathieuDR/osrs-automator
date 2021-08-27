@@ -27,10 +27,10 @@ namespace Dashboard.Controllers.V1 {
             _dropperService = dropperService;
         }
 
-        [HttpPost("dropper")]
+        [HttpPost("dropper/{endpoint:guid}")]
         public async Task<IActionResult> Get([FromBody]EmbedCollection bodyEmbeds, 
             [ModelBinder(BinderType = typeof(JsonModelBinder))]EmbedCollection formEmbeds, 
-            [FromForm] IFormFile file) {
+            [FromForm] IFormFile file, [FromRoute] Guid endpoint) {
             _logger.LogInformation("Received drop");
             var dropResult = GetDrop(bodyEmbeds, formEmbeds);
             if (dropResult.IsFailed) {
@@ -38,7 +38,7 @@ namespace Dashboard.Controllers.V1 {
             }
             
             var image = await ToBase64String(file);
-            _ = _dropperService.HandleDropRequest(dropResult.Value, image);
+            _ = _dropperService.HandleDropRequest(endpoint, dropResult.Value, image);
             
             return Ok();
         }
