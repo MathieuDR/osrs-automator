@@ -7,7 +7,6 @@ using Discord;
 using Discord.WebSocket;
 using DiscordBot.Common.Models.Enums;
 using DiscordBot.Data.Interfaces;
-using DiscordBot.Data.Repository;
 using DiscordBot.Services.interfaces;
 using DiscordBot.Services.Interfaces;
 using DiscordBot.Transformers;
@@ -31,7 +30,7 @@ namespace DiscordBot.Jobs {
 
             var metrics = MetricTypeCategory.Queryable.GetMetricTypes();
 
-            List<HighscoreLeaderboard> tops = new List<HighscoreLeaderboard>();
+            var tops = new List<HighscoreLeaderboard>();
             try {
                 foreach (var metric in metrics) {
                     _ = LogService.Log($"Calling for {metric}", LogEventLevel.Information);
@@ -44,7 +43,6 @@ namespace DiscordBot.Jobs {
                 return;
             }
 
-            
 
             // var embeds = new List<Embed>();
             var metricMessages = new List<string>();
@@ -69,7 +67,7 @@ namespace DiscordBot.Jobs {
 
                 builder.Append(metricMessage);
             }
-            
+
             // Last message
             if (builder.Length > 0) {
                 _ = channel.SendMessageAsync(builder.ToString());

@@ -15,13 +15,12 @@ namespace DiscordBot.Services.Services {
         protected T GetRepository<T>(ulong? guildId = null) where T : class, IRepository {
             var type = typeof(T);
             Logger.LogDebug("Trying to create repo: {type}", type.Name);
-            
+
             if (!guildId.HasValue) {
                 return RepositoryStrategy.CreateRepository<T>();
             }
 
             return RepositoryStrategy.CreateRepository<T>(guildId.Value);
         }
-        
     }
 }

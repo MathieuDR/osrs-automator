@@ -1,6 +1,4 @@
-using System;
 using System.Collections.Generic;
-using System.Linq;
 using DiscordBot.Common.Models.Data;
 using DiscordBot.Data.Interfaces;
 using FluentResults;
@@ -17,10 +15,6 @@ namespace DiscordBot.Data.Repository {
         public ILogger Logger { get; }
         public LiteDatabase LiteDatabase { get; }
         public abstract string CollectionName { get; }
-
-        protected ILiteCollection<T> GetCollection() {
-            return LiteDatabase.GetCollection<T>(CollectionName);
-        }
 
         public virtual Result<IEnumerable<T>> GetAll() {
             return Result.Ok(GetCollection().FindAll());
@@ -54,8 +48,12 @@ namespace DiscordBot.Data.Repository {
             var collection = GetCollection();
             return collection.Delete(toDelete._id) ? Result.Ok() : Result.Fail("Delete failed");
         }
+
+        protected ILiteCollection<T> GetCollection() {
+            return LiteDatabase.GetCollection<T>(CollectionName);
+        }
     }
-    
+
     public abstract class BaseRecordLiteDbRepository<T> : IRecordRepository<T> where T : BaseRecord, new() {
         public BaseRecordLiteDbRepository(ILogger logger, LiteDatabase database) {
             Logger = logger;
@@ -65,10 +63,6 @@ namespace DiscordBot.Data.Repository {
         public ILogger Logger { get; }
         public LiteDatabase LiteDatabase { get; }
         public abstract string CollectionName { get; }
-
-        protected ILiteCollection<T> GetCollection() {
-            return LiteDatabase.GetCollection<T>(CollectionName);
-        }
 
         public virtual Result<IEnumerable<T>> GetAll() {
             return Result.Ok(GetCollection().FindAll());
@@ -101,6 +95,10 @@ namespace DiscordBot.Data.Repository {
         public virtual Result Delete(T toDelete) {
             var collection = GetCollection();
             return collection.Delete(toDelete.Id) ? Result.Ok() : Result.Fail("Delete failed");
+        }
+
+        protected ILiteCollection<T> GetCollection() {
+            return LiteDatabase.GetCollection<T>(CollectionName);
         }
     }
 }

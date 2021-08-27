@@ -6,7 +6,7 @@ namespace WiseOldManConnector.Transformers.TypeConverters {
     internal class StringToPlayerBuildConverter : ITypeConverter<string, PlayerBuild> {
         public PlayerBuild Convert(string source, PlayerBuild destination, ResolutionContext context) {
             //var lowerInvariant = source.ToLowerInvariant();
-            if (Enum.TryParse(typeof(PlayerBuild), source, true, out object temp)) {
+            if (Enum.TryParse(typeof(PlayerBuild), source, true, out var temp)) {
                 destination = (PlayerBuild) temp;
                 return destination;
             }

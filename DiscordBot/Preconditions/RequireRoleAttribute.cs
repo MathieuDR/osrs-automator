@@ -7,12 +7,17 @@ using Discord.WebSocket;
 
 namespace DiscordBot.Preconditions {
     public class RequireRoleAttribute : PreconditionAttribute {
-        private readonly List<ulong> _ids = new ();
-        private string _idsConcatenated => string.Join(", ", _ids);
+        private readonly List<ulong> _ids = new();
 
-        public RequireRoleAttribute(ulong id) => _ids.Add(id);
-        
-        public RequireRoleAttribute(ulong[] ids) => _ids.AddRange(ids);
+        public RequireRoleAttribute(ulong id) {
+            _ids.Add(id);
+        }
+
+        public RequireRoleAttribute(ulong[] ids) {
+            _ids.AddRange(ids);
+        }
+
+        private string _idsConcatenated => string.Join(", ", _ids);
 
         // Override the CheckPermissions method
         public override Task<PreconditionResult> CheckPermissionsAsync(ICommandContext context, CommandInfo command,

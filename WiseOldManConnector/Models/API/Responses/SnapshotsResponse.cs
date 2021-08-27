@@ -14,6 +14,5 @@ namespace WiseOldManConnector.Models.API.Responses {
 
         [JsonProperty("year")]
         public List<WOMSnapshot> Year { get; set; }
-
     }
 }

@@ -10,12 +10,12 @@ using Serilog.Context;
 
 namespace DiscordBot.Data.Repository {
     public class LiteDbRepository : IDiscordBotRepository {
-         protected const string PlayerCollectionName = "players";
+        protected const string PlayerCollectionName = "players";
         protected const string GuildConfigurationCollectionName = "guildConfig";
         protected const string GuildEventCollectionName = "guildEvents";
         protected const string GuildCompetitionCollectionName = "guildCompetitions";
         protected const string GuildJobStateCollectionName = "guildJobState";
-         protected const string GuildUserCountsCollectionName = "guildUserCounts";
+        protected const string GuildUserCountsCollectionName = "guildUserCounts";
         private readonly object _dbLock = new();
         private readonly Dictionary<ulong, object> _guildLocks = new();
         private readonly ILogger _logger;

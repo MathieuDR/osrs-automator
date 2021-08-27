@@ -8,9 +8,8 @@ namespace WiseOldManConnector.Models.Requests {
         public int? PlayerId { get; set; }
 
         public override void IsValid() {
-
             if (!Metric.HasValue && !PlayerId.HasValue && string.IsNullOrWhiteSpace(Title) && string.IsNullOrWhiteSpace(Status)) {
-                ValidationDictionary.Add(nameof(CompetitionRequest), $"At least one parameter should be filled in.");
+                ValidationDictionary.Add(nameof(CompetitionRequest), "At least one parameter should be filled in.");
             }
 
             base.IsValid();

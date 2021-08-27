@@ -8,22 +8,26 @@ using Serilog.Context;
 
 namespace DiscordBot.Data {
     public class LiteDbManager {
-        private readonly object _createLock = new object();
-        private readonly object _commonLock = new object();
+        private readonly object _commonLock = new();
+        private readonly object _createLock = new();
+        private readonly Dictionary<ulong, LiteDatabase> _databases = new();
         private readonly ILogger<LiteDbManager> _logger;
         private readonly MigrationManager _manager;
         private readonly LiteDbOptions _options;
-        private readonly Dictionary<ulong, LiteDatabase> _databases = new Dictionary<ulong, LiteDatabase>();
         private LiteDatabase _commonDatabase;
-        public BsonMapper BsonMapper { get; set; }
 
-        public LiteDbManager(ILogger<LiteDbManager> logger, IOptions<LiteDbOptions> options,MigrationManager manager) {
+        public LiteDbManager(ILogger<LiteDbManager> logger, IOptions<LiteDbOptions> options, MigrationManager manager) {
             _logger = logger;
             _manager = manager;
             _options = options.Value;
         }
 
-        private string CreateConnectionString(string identifier = "common") => $"{_options.PathPrefix}{identifier}_{_options.FileSuffix}.db";
+        public BsonMapper BsonMapper { get; set; }
+
+        private string CreateConnectionString(string identifier = "common") {
+            return $"{_options.PathPrefix}{identifier}_{_options.FileSuffix}.db";
+        }
+
         private string GetGuildFileName(ulong guildId) {
             return CreateConnectionString(guildId.ToString());
         }
@@ -34,17 +38,17 @@ namespace DiscordBot.Data {
                 return _commonDatabase ??= CreateDatabase(CreateConnectionString());
             }
         }
-        
+
         public LiteDatabase GetDatabase(ulong guildId) {
             lock (_createLock) {
                 _logger.LogTrace("Requesting LiteDb for {guild}", guildId);
-                
-                if (!_databases.TryGetValue(guildId, out LiteDatabase database)) {
+
+                if (!_databases.TryGetValue(guildId, out var database)) {
                     _logger.LogTrace("Creating LiteDb for {guild}", guildId);
                     database = CreateDatabase(GetGuildFileName(guildId));
-                    _databases.Add(guildId,database);
+                    _databases.Add(guildId, database);
                 }
-                
+
                 return database;
             }
         }

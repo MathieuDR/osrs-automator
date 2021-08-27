@@ -2,8 +2,7 @@ using System.Collections.Generic;
 using System.Text.Json.Serialization;
 
 namespace Dashboard.Models.ApiRequests.DiscordEmbed {
-    public class Embed
-    {
+    public class Embed {
         [JsonPropertyName("thumbnail")]
         public Thumbnail Thumbnail { get; set; }
 

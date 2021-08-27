@@ -10,12 +10,11 @@ namespace DiscordBot.ServicesTests.Deserialization {
     public class MediaWikiJsonResponseToQueryResponseTests {
         [Theory]
         [MemberData(nameof(WikiResponseFiles.AllFiles), MemberType = typeof(WikiResponseFiles))]
-        public void CanDeserializeIntoDiscordEmbed(string pathToJson, int pages)
-        {
+        public void CanDeserializeIntoDiscordEmbed(string pathToJson, int pages) {
             var json = File.ReadAllText(pathToJson);
 
             var response = JsonSerializer.Deserialize<QueryResponse>(json);
-      
+
             response.Should().NotBeNull();
             response.Query.Pages.Should().HaveCount(pages);
             foreach (var page in response.Query.Pages) {
@@ -23,8 +22,6 @@ namespace DiscordBot.ServicesTests.Deserialization {
                 page.Value.Revisions.FirstOrDefault().Should().NotBeNull();
                 page.Value.Revisions.FirstOrDefault().Content.Should().NotBeNullOrEmpty();
             }
-
         }
-
     }
 }

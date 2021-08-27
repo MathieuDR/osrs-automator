@@ -5,10 +5,10 @@ using LiteDB;
 namespace DiscordBot.Common.Models.Data {
     public class CountConfig {
         public ulong OutputChannelId { get; set; }
-        
+
         // public for litedb
-        public List<CountThreshold> _tresholds { get; set; } = new List<CountThreshold>();
-        
+        public List<CountThreshold> _tresholds { get; set; } = new();
+
         [BsonIgnore]
         public IReadOnlyList<CountThreshold> Tresholds => _tresholds.AsReadOnly();
 

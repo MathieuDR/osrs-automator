@@ -12,34 +12,37 @@ namespace WiseOldManConnector.Transformers.TypeConverters {
 
             if (source.Day != null) {
                 var dayRecords = context.Mapper.Map<IEnumerable<Record>>(source.Day).ToList();
-                foreach (Record dayRecord in dayRecords) {
-                    dayRecord.Period = Period.Day;    
+                foreach (var dayRecord in dayRecords) {
+                    dayRecord.Period = Period.Day;
                 }
-                
+
                 result.AddRange(dayRecords);
             }
 
             if (source.Week != null) {
                 var weekDeltas = context.Mapper.Map<IEnumerable<Record>>(source.Week).ToList();
-                foreach (Record weekDelta in weekDeltas) {
-                    weekDelta.Period = Period.Week;    
+                foreach (var weekDelta in weekDeltas) {
+                    weekDelta.Period = Period.Week;
                 }
+
                 result.AddRange(weekDeltas);
             }
 
             if (source.Month != null) {
                 var monthDeltas = context.Mapper.Map<IEnumerable<Record>>(source.Month).ToList();
-                foreach (Record monthDelta in monthDeltas) {
-                    monthDelta.Period = Period.Month;    
+                foreach (var monthDelta in monthDeltas) {
+                    monthDelta.Period = Period.Month;
                 }
+
                 result.AddRange(monthDeltas);
             }
 
             if (source.Year != null) {
                 var yearDeltas = context.Mapper.Map<IEnumerable<Record>>(source.Year).ToList();
-                foreach (Record yearDelta in yearDeltas) {
-                    yearDelta.Period = Period.Year;    
+                foreach (var yearDelta in yearDeltas) {
+                    yearDelta.Period = Period.Year;
                 }
+
                 result.AddRange(yearDeltas);
             }
 

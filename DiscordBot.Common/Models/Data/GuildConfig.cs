@@ -11,7 +11,7 @@ namespace DiscordBot.Common.Models.Data {
         public string WomVerificationCode { get; set; }
         public Group WomGroup { get; set; }
         public bool AutoAddNewAccounts { get; set; } = false;
-        public AutomatedMessagesConfig AutomatedMessagesConfig { get; set; } = new AutomatedMessagesConfig();
+        public AutomatedMessagesConfig AutomatedMessagesConfig { get; set; } = new();
         public CountConfig CountConfig { get; set; }
     }
 }

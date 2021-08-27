@@ -9,18 +9,18 @@ using WiseOldManConnector.Models.WiseOldMan.Enums;
 namespace DiscordBot.Helpers {
     public static class TypeHelper {
         public static List<Type> WhiteListedTypesToOutput() {
-            return new List<Type>() {
+            return new() {
                 typeof(BaseArguments),
                 typeof(MetricArguments),
                 typeof(PeriodArguments),
                 typeof(PeriodAndMetricArguments),
-                typeof(UserListWithImageArguments),
+                typeof(UserListWithImageArguments)
             };
         }
 
         public static string ToFriendlyExplenation(this Type type) {
-            StringBuilder builder = new StringBuilder();
-            bool identified = false;
+            var builder = new StringBuilder();
+            var identified = false;
 
             if (type == null) {
                 builder.Append("Null");
@@ -52,8 +52,8 @@ namespace DiscordBot.Helpers {
         }
 
         public static string ToFriendlyName(this Type type, bool isSpecific = false) {
-            StringBuilder builder = new StringBuilder();
-            bool identified = false;
+            var builder = new StringBuilder();
+            var identified = false;
 
             if (type == null) {
                 builder.Append("Null");
@@ -96,7 +96,7 @@ namespace DiscordBot.Helpers {
                 builder.Append("Discord user");
                 identified = true;
             }
-            
+
             if (type == typeof(IChannel)) {
                 builder.Append("Discord channel");
                 identified = true;

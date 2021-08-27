@@ -14,9 +14,9 @@ namespace DiscordBot.Paginator {
     public class CustomActionsPaginatedAppearanceOptions : PaginatedAppearanceOptions {
         public IEmote DeleteEmoji = new Emoji("🗑️");
 
-        public IEmote SelectEmoji = new Emoji("👍");
-
         public IDictionary<IEmote, PerformAction> EmojiActions = new Dictionary<IEmote, PerformAction>();
+
+        public IEmote SelectEmoji = new Emoji("👍");
 
         public CustomActionsPaginatedAppearanceOptions() {
             JumpDisplayOptions = JumpDisplayOptions.Never;
@@ -42,7 +42,7 @@ namespace DiscordBot.Paginator {
             }
 
             if (EmojiActions.Any()) {
-                foreach (KeyValuePair<IEmote, PerformAction> pair in EmojiActions) {
+                foreach (var pair in EmojiActions) {
                     _ = message.AddReactionAsync(pair.Key).ConfigureAwait(AwaitReactionDictionary);
                 }
             }

@@ -20,7 +20,7 @@ namespace DiscordBot.Helpers {
 
         public static EmbedBuilder AddWiseldManAuthor(this EmbedBuilder builder, string title = "Wiseoldman.net",
             string url = "http://www.wiseoldman.net") {
-            builder.Author = new EmbedAuthorBuilder() {
+            builder.Author = new EmbedAuthorBuilder {
                 Name = title,
                 IconUrl = "https://wiseoldman.net/img/logo.png",
                 Url = url
@@ -35,7 +35,7 @@ namespace DiscordBot.Helpers {
 
         public static EmbedBuilder AddWiseOldManAuthor(this EmbedBuilder builder, string title = null,
             string resourceUrl = null) {
-            builder.Author = new EmbedAuthorBuilder() {
+            builder.Author = new EmbedAuthorBuilder {
                 Name = string.IsNullOrWhiteSpace(title) ? "Wiseoldman.net" : title,
                 IconUrl = "https://wiseoldman.net/img/logo.png",
                 Url = string.IsNullOrWhiteSpace(resourceUrl) ? "" : resourceUrl
@@ -53,16 +53,16 @@ namespace DiscordBot.Helpers {
 
         public static EmbedBuilder WithMessageAuthorFooter(this EmbedBuilder builder, ICommandContext context,
             string appendToFooter = "") {
-            string footerText = $"Requested by {context.User.Username}.";
+            var footerText = $"Requested by {context.User.Username}.";
             if (!string.IsNullOrWhiteSpace(appendToFooter)) {
                 footerText += $", {appendToFooter}";
             }
 
-            builder.Footer = new EmbedFooterBuilder() {
+            builder.Footer = new EmbedFooterBuilder {
                 IconUrl = context.User.GetAvatarUrl(),
                 Text = footerText
             };
-            
+
             return builder;
         }
 
@@ -70,13 +70,13 @@ namespace DiscordBot.Helpers {
         public static EmbedBuilder CreateAuthorFromMessageAuthor(this EmbedBuilder builder, ICommandContext context,
             string url = null,
             string appendToUsername = null) {
-            string footerText = $"{context.User.Username}";
+            var footerText = $"{context.User.Username}";
 
             if (!string.IsNullOrWhiteSpace(appendToUsername)) {
                 footerText += $", {appendToUsername}";
             }
 
-            builder.Author = new EmbedAuthorBuilder() {
+            builder.Author = new EmbedAuthorBuilder {
                 IconUrl = context.User.GetAvatarUrl(),
                 Name = footerText,
                 Url = url
@@ -86,7 +86,7 @@ namespace DiscordBot.Helpers {
         }
 
         public static EmbedBuilder AddFieldsFromDictionary(this EmbedBuilder builder, Dictionary<string, string> dictionary) {
-            foreach (KeyValuePair<string, string> pair in dictionary) {
+            foreach (var pair in dictionary) {
                 builder.AddField(pair.Key, pair.Value);
             }
 

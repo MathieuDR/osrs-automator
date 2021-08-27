@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Threading.Tasks;
 using RestSharp;
 using WiseOldManConnector.Helpers;
@@ -8,8 +7,6 @@ using WiseOldManConnector.Models;
 using WiseOldManConnector.Models.API.Responses;
 using WiseOldManConnector.Models.Output;
 using WiseOldManConnector.Models.WiseOldMan.Enums;
-using Record = WiseOldManConnector.Models.Output.Record;
-using Snapshot = WiseOldManConnector.Models.Output.Snapshot;
 
 namespace WiseOldManConnector.Api {
     internal class PlayerConnector : BaseConnecter, IWiseOldManPlayerApi {
@@ -39,13 +36,14 @@ namespace WiseOldManConnector.Api {
             username = username.ToLowerInvariant();
             request.AddJsonBody(new {username});
 
-            PlayerResponse result = await ExecuteRequest<PlayerResponse>(request);
+            var result = await ExecuteRequest<PlayerResponse>(request);
             return GetResponse<Player>(result);
         }
 
         #endregion
 
         #region import
+
         public async Task<ConnectorResponse<MessageResponse>> Import(string username) {
             var request = GetNewRestRequest("import");
             request.Method = Method.POST;
@@ -54,6 +52,7 @@ namespace WiseOldManConnector.Api {
             var result = await ExecuteRequest<WOMMessageResponse>(request);
             return GetResponse<MessageResponse>(result);
         }
+
         #endregion
 
         #region competitions
@@ -62,7 +61,7 @@ namespace WiseOldManConnector.Api {
             var request = GetNewRestRequest("/{id}/competitions");
             request.AddParameter("id", id, ParameterType.UrlSegment);
 
-            IEnumerable<WOMCompetition> result = await ExecuteCollectionRequest<WOMCompetition>(request);
+            var result = await ExecuteCollectionRequest<WOMCompetition>(request);
             return GetResponse<WOMCompetition, Competition>(result);
         }
 
@@ -139,7 +138,7 @@ namespace WiseOldManConnector.Api {
             return GetResponse<WOMSnapshot, Snapshot>(result);
         }
 
-       public async Task<ConnectorCollectionResponse<Snapshot>> Snapshots(string username, Period period) {
+        public async Task<ConnectorCollectionResponse<Snapshot>> Snapshots(string username, Period period) {
             var request = GetNewRestRequest("/username/{username}/snapshots");
             request.AddParameter("username", username, ParameterType.UrlSegment);
             request.AddParameter("period", period.GetEnumValueNameOrDefault());
@@ -155,7 +154,7 @@ namespace WiseOldManConnector.Api {
         public async Task<ConnectorCollectionResponse<Deltas>> Gained(int id) {
             var request = GetNewRestRequest("/{id}/gained");
             request.AddParameter("id", id, ParameterType.UrlSegment);
-            
+
             var result = await ExecuteRequest<DeltaFullResponse>(request);
             return GetCollectionResponse<Deltas>(result);
         }
@@ -234,13 +233,13 @@ namespace WiseOldManConnector.Api {
                 request.AddParameter("period", period.Value.GetEnumValueNameOrDefault());
             }
 
-            var queryResult  = await ExecuteCollectionRequest<WOMRecord>(request);
-            
+            var queryResult = await ExecuteCollectionRequest<WOMRecord>(request);
+
             var result = GetResponse<WOMRecord, Record>(queryResult);
 
             // We fill in username ourselves. Since it's not added by the response
             foreach (var item in result.Data) {
-                item.Player = new Player(){Username = username};
+                item.Player = new Player {Username = username};
             }
 
             return result;

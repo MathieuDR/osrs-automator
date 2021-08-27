@@ -5,10 +5,10 @@ using WiseOldManConnector.Deserializers;
 using WiseOldManConnector.Models.WiseOldMan.Enums;
 
 namespace WiseOldManConnector.Models.API.Responses {
-    interface IMetricBearer<T> where T: class, new(){
+    internal interface IMetricBearer<T> where T : class, new() {
         Dictionary<MetricType, T> Metrics { get; }
     }
-    
+
     [JsonConverter(typeof(ObjectWithMetricsConvertor<WOMSnapshot, Metric>))]
     internal class WOMSnapshot : BaseResponse, IMetricBearer<Metric> {
         [JsonProperty("createdAt")]
@@ -17,6 +17,6 @@ namespace WiseOldManConnector.Models.API.Responses {
         [JsonProperty("importedAt")]
         public object ImportedAt { get; set; }
 
-        public Dictionary<MetricType, Metric> Metrics { get; set; } = new Dictionary<MetricType, Metric>();
+        public Dictionary<MetricType, Metric> Metrics { get; set; } = new();
     }
 }

@@ -7,7 +7,6 @@ using Discord;
 using Discord.WebSocket;
 using DiscordBot.Common.Models.Enums;
 using DiscordBot.Data.Interfaces;
-using DiscordBot.Data.Repository;
 using DiscordBot.Services.interfaces;
 using DiscordBot.Services.Interfaces;
 using DiscordBot.Transformers;
@@ -19,14 +18,14 @@ using WiseOldManConnector.Models.WiseOldMan.Enums;
 namespace DiscordBot.Jobs {
     public class MonthlyTopDeltasJob : BaseGuildJob {
         private readonly IOsrsHighscoreService _osrsHighscoreService;
-       
+
         private readonly Period _period;
 
         public MonthlyTopDeltasJob(DiscordSocketClient discord, ILogService logService, IDiscordBotRepository repository,
             Mapper mapper, IOsrsHighscoreService osrsHighscoreService) : base(discord,
             logService, repository, mapper, JobType.MonthlyTopGains) {
             _osrsHighscoreService = osrsHighscoreService;
-            
+
             _period = Period.Month;
         }
 
@@ -35,10 +34,10 @@ namespace DiscordBot.Jobs {
 
             var metrics = MetricTypeCategory.Queryable.GetMetricTypes();
 
-            List<DeltaLeaderboard> tops = new List<DeltaLeaderboard>();
-            
+            var tops = new List<DeltaLeaderboard>();
+
             try {
-                foreach (var metric in metrics) {   
+                foreach (var metric in metrics) {
                     _ = LogService.Log($"Calling for {metric}", LogEventLevel.Information);
                     var top = await _osrsHighscoreService.GetTopDeltasOfGroup(Configuration.WomGroupId, metric, _period);
                     tops.Add(top);
@@ -70,7 +69,7 @@ namespace DiscordBot.Jobs {
 
                 builder.Append(metricMessage);
             }
-            
+
             // Last message
             if (builder.Length > 0) {
                 _ = channel.SendMessageAsync(builder.ToString());

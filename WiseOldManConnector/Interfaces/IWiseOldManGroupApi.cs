@@ -4,12 +4,11 @@ using WiseOldManConnector.Models;
 using WiseOldManConnector.Models.Output;
 using WiseOldManConnector.Models.Requests;
 using WiseOldManConnector.Models.WiseOldMan.Enums;
-using Achievement = WiseOldManConnector.Models.Output.Achievement;
-using Group = WiseOldManConnector.Models.Output.Group;
 
 namespace WiseOldManConnector.Interfaces {
     public interface IWiseOldManGroupApi {
         #region groups
+
         Task<ConnectorCollectionResponse<Group>> Search();
         Task<ConnectorCollectionResponse<Group>> Search(string name);
         Task<ConnectorCollectionResponse<Group>> Search(string name, int limit, int offset);
@@ -29,7 +28,9 @@ namespace WiseOldManConnector.Interfaces {
         Task<ConnectorResponse<Statistics>> Statistics(int id);
         Task<ConnectorResponse<VerificationGroup>> Create(CreateGroupRequest request);
         Task<ConnectorResponse<Group>> Edit(int id, EditGroupRequest request);
+
         Task<ConnectorResponse<MessageResponse>> Delete(int id, string verificationCode);
+
         //Task<ConnectorResponse<WOMGroup>> AddMembers(string verificationCode, IEnumerable<GroupMember> members);
         Task<ConnectorResponse<Group>> AddMembers(int id, string verificationCode, IEnumerable<MemberRequest> members);
         Task<ConnectorResponse<Group>> RemoveMembers(int id, string verificationCode, IEnumerable<string> members);

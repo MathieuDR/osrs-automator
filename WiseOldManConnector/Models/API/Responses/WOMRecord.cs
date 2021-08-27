@@ -3,9 +3,9 @@ using Newtonsoft.Json;
 
 namespace WiseOldManConnector.Models.API.Responses {
     internal class WOMRecord : BaseResponse {
-
         [JsonProperty("value")]
         public double Value { get; set; }
+
         [JsonProperty("period")]
         public string Period { get; set; }
 
@@ -16,13 +16,13 @@ namespace WiseOldManConnector.Models.API.Responses {
         public DateTime UpdatedAt { get; set; }
 
         [JsonProperty("id")]
-        public int Id{ get; set; }
+        public int Id { get; set; }
 
         [JsonProperty("playerId")]
-        public int PlayerId{ get; set; }
-        
+        public int PlayerId { get; set; }
+
         [JsonProperty("player")]
-        public PlayerResponse Player{ get; set; }
+        public PlayerResponse Player { get; set; }
 
         //[JsonProperty("type")]
         //public string PlayerType { get; set; }

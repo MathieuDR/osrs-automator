@@ -11,9 +11,8 @@ namespace WiseOldManConnector.Transformers.TypeConverters {
             var deltas = context.Mapper.Map<IEnumerable<Deltas>>(source);
 
             if (deltas.Count() > 1) {
-                throw new Exception($"Too many deltas");
+                throw new Exception("Too many deltas");
             }
-
 
 
             return destination;

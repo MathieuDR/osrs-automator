@@ -3,6 +3,6 @@
         Achievements = 1,
         GroupUpdate = 20,
         MonthlyTop = 40,
-        MonthlyTopGains = 80,
+        MonthlyTopGains = 80
     }
 }

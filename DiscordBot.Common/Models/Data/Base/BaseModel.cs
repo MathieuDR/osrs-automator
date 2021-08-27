@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
-using System.Reflection;
 using LiteDB;
 
 namespace DiscordBot.Common.Models.Data {
@@ -11,15 +10,15 @@ namespace DiscordBot.Common.Models.Data {
         public ObjectId Id { get; init; }
 
         public DateTime CreatedOn { get; init; } = DateTime.Now;
-        
+
         public virtual Dictionary<string, string> ToDictionary() {
             var t = GetType();
-            PropertyInfo[] props = t.GetProperties();
+            var props = t.GetProperties();
             var dict = new Dictionary<string, string>();
 
-            foreach (PropertyInfo prp in props) {
-                object value = prp.GetValue(this, new object[] { });
-                string friendlyValue = "not set";
+            foreach (var prp in props) {
+                var value = prp.GetValue(this, new object[] { });
+                var friendlyValue = "not set";
 
                 if (value != null) {
                     friendlyValue = value.ToString();
@@ -31,8 +30,9 @@ namespace DiscordBot.Common.Models.Data {
             return dict;
         }
     }
+
     public class BaseModel {
-        protected Dictionary<string, string> ValidationDictionary = new Dictionary<string, string>();
+        protected Dictionary<string, string> ValidationDictionary = new();
 
         public BaseModel() {
             CreatedOn = DateTime.Now;
@@ -51,7 +51,7 @@ namespace DiscordBot.Common.Models.Data {
 
         public virtual void IsValid() {
             if (CreatedByDiscordId <= 0) {
-                ValidationDictionary.Add(nameof(CreatedByDiscordId), $"created by Id must be higher then 0");
+                ValidationDictionary.Add(nameof(CreatedByDiscordId), "created by Id must be higher then 0");
             }
 
             if (ValidationDictionary.Any()) {
@@ -62,12 +62,12 @@ namespace DiscordBot.Common.Models.Data {
 
         public virtual Dictionary<string, string> ToDictionary() {
             var t = GetType();
-            PropertyInfo[] props = t.GetProperties();
+            var props = t.GetProperties();
             var dict = new Dictionary<string, string>();
 
-            foreach (PropertyInfo prp in props) {
-                object value = prp.GetValue(this, new object[] { });
-                string friendlyValue = "not set";
+            foreach (var prp in props) {
+                var value = prp.GetValue(this, new object[] { });
+                var friendlyValue = "not set";
 
                 if (value != null) {
                     friendlyValue = value.ToString();

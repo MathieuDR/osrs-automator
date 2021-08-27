@@ -11,7 +11,8 @@ using Xunit;
 
 namespace WebAppTests.Mappers {
     public class EmbedToRunescapeMapperTests {
-        private IMapper<Embed, RunescapeDrop> _mapper;
+        private readonly IMapper<Embed, RunescapeDrop> _mapper;
+
         public EmbedToRunescapeMapperTests() {
             _mapper = new EmbedToRunescapeDropMapper();
         }
@@ -35,7 +36,7 @@ namespace WebAppTests.Mappers {
         public void MappingShouldHaveCorrectPlayerType(string path, PlayerType type) {
             var result = _mapper.Map(GetEmbedFromFile(path));
             var value = result.Value;
-   
+
             value.Recipient.PlayerType.Should().Be(type);
         }
 
@@ -44,19 +45,19 @@ namespace WebAppTests.Mappers {
         public void MappingShouldHaveCorrectQuantity(string path, int quantity) {
             var result = _mapper.Map(GetEmbedFromFile(path));
             var value = result.Value;
-   
+
             value.Amount.Should().Be(quantity);
         }
-        
+
         [Theory]
         [MemberData(nameof(DiscordEmbedFiles.WithNames), MemberType = typeof(DiscordEmbedFiles))]
         public void MappingShouldHaveCorrectName(string path, string name) {
             var result = _mapper.Map(GetEmbedFromFile(path));
             var value = result.Value;
-   
+
             value.Recipient.Username.Should().Be(name);
         }
-        
+
         [Theory]
         [MemberData(nameof(DiscordEmbedFiles.WithRarity), MemberType = typeof(DiscordEmbedFiles))]
         public void MappingShouldHaveCorrectRarities(string path, float rarity) {
@@ -64,9 +65,9 @@ namespace WebAppTests.Mappers {
             var drop = result.Value;
 
             drop.Rarity.Should().Be(rarity);
-            drop.RarityPercent.Should().Be(1/rarity);
+            drop.RarityPercent.Should().Be(1 / rarity);
         }
-        
+
         [Theory]
         [MemberData(nameof(DiscordEmbedFiles.WithItem), MemberType = typeof(DiscordEmbedFiles))]
         public void MappingShouldHaveCorrectItemInfo(string path, string item, string url, string icon) {
@@ -77,7 +78,7 @@ namespace WebAppTests.Mappers {
             drop.Item.Url.Should().Be(url);
             drop.Item.Thumbnail.Should().Be(icon);
         }
-        
+
         [Theory]
         [MemberData(nameof(DiscordEmbedFiles.WithSources), MemberType = typeof(DiscordEmbedFiles))]
         public void MappingShouldHaveCorrectSourceInfo(string path, string name, int? level, string url) {
@@ -88,13 +89,13 @@ namespace WebAppTests.Mappers {
             drop.Source.Url.Should().Be(url);
             drop.Source.Level.Should().Be(level);
         }
-        
+
         [Theory]
         [MemberData(nameof(DiscordEmbedFiles.WithValues), MemberType = typeof(DiscordEmbedFiles))]
-        public void MappingShouldHaveCorrectValues(string path,int amount, int value, int haValue) {
+        public void MappingShouldHaveCorrectValues(string path, int amount, int value, int haValue) {
             var result = _mapper.Map(GetEmbedFromFile(path));
             var drop = result.Value;
-   
+
             drop.TotalValue.Should().Be(value);
             drop.TotalHaValue.Should().Be(haValue);
             drop.Item.Value.Should().Be(value / amount);

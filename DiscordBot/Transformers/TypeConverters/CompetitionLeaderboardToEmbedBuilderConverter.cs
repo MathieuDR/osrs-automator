@@ -19,7 +19,7 @@ namespace DiscordBot.Transformers.TypeConverters {
                 destination.Title = $"{source.MetricType.ToString()} competition - leaderboard.";
             }
 
-            StringBuilder description = new StringBuilder();
+            var description = new StringBuilder();
             description.Append("#".PadLeft(IdHash).PadRight(IdSpace));
             description.Append("Name".PadRight(NameSpace));
             description.Append("Experience");
@@ -28,8 +28,8 @@ namespace DiscordBot.Transformers.TypeConverters {
 
             var bound = Math.Min(source.Members.Count, 20);
 
-            for (int i = 0; i < bound; i++) {
-                CompetitionParticipant competitionParticipant = source.Members[i];
+            for (var i = 0; i < bound; i++) {
+                var competitionParticipant = source.Members[i];
 
                 description.Append($"{i + 1}, ".PadLeft(IdSpace));
                 description.Append(competitionParticipant.Player.DisplayName.PadRight(NameSpace));

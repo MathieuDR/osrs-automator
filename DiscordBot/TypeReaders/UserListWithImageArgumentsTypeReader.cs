@@ -27,15 +27,15 @@ namespace DiscordBot.TypeReaders {
 
             if (usersCollection == null) {
                 return await Task.FromResult(TypeReaderResult.FromError(CommandError.ParseFailed,
-                    $"No users in channel. Cannot parse user mentions"));
+                    "No users in channel. Cannot parse user mentions"));
             }
 
             if (parameters.Count != parameters.Distinct().Count()) {
                 return await Task.FromResult(TypeReaderResult.FromError(CommandError.ParseFailed,
-                    $"Repeating values in arguments."));
+                    "Repeating values in arguments."));
             }
 
-            foreach (string parameter in parameters) {
+            foreach (var parameter in parameters) {
                 var cts = new CancellationTokenSource();
                 if (MentionUtils.TryParseUser(parameter, out var userId)) {
                     // ReSharper disable once PossibleMultipleEnumeration
@@ -71,12 +71,12 @@ namespace DiscordBot.TypeReaders {
 
             if (!result.Users.Any()) {
                 return await Task.FromResult(TypeReaderResult.FromError(CommandError.BadArgCount,
-                    $"Need at least one user mentioned"));
+                    "Need at least one user mentioned"));
             }
 
             if (string.IsNullOrEmpty(result.ImageUrl)) {
                 return await Task.FromResult(TypeReaderResult.FromError(CommandError.BadArgCount,
-                    $"Need an image url or attachment."));
+                    "Need an image url or attachment."));
             }
 
             return await Task.FromResult(TypeReaderResult.FromSuccess(result));

@@ -41,7 +41,7 @@ namespace DiscordBot.Transformers {
             for (var i = 0; i < bound; i++) {
                 var member = source.Members[i];
 
-                if (member.Delta.Gained<=0) {
+                if (member.Delta.Gained <= 0) {
                     break;
                 }
 
@@ -53,14 +53,13 @@ namespace DiscordBot.Transformers {
                         break;
                     default:
                         description.Append(member.Delta.Gained.FormatNumber().PadLeft(NumberSpace) + Environment.NewLine);
-                        break;     
+                        break;
                 }
-                
             }
 
             return description.ToString();
         }
-        
+
         public static string MembersToString(this HighscoreLeaderboard source, int maxMembers = 20) {
             var description = new StringBuilder();
             description.Append("#".PadLeft(IdHash).PadRight(IdSpace));
@@ -98,9 +97,8 @@ namespace DiscordBot.Transformers {
                         break;
                     default:
                         description.Append(member.Metric.Value.FormatNumber().PadLeft(NumberSpace) + Environment.NewLine);
-                        break;     
+                        break;
                 }
-                
             }
 
             return description.ToString();

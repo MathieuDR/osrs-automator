@@ -3,7 +3,6 @@ using System.Linq;
 using System.Text.Json;
 using Dashboard.Models.ApiRequests.DiscordEmbed;
 using FluentAssertions;
-using WebAppTests.Mappers;
 using WebAppTests.Resources.EmbedJsons;
 using Xunit;
 
@@ -15,12 +14,12 @@ namespace WebAppTests.Deserialization {
             var json = File.ReadAllText(pathToJson);
 
             var discordEmbeds = JsonSerializer.Deserialize<EmbedCollection>(json);
-      
+
             discordEmbeds.Should().NotBeNull();
             discordEmbeds.Embeds.Should().NotBeNull();
             discordEmbeds.Embeds.Should().HaveCount(1);
         }
-        
+
         [Fact]
         public void DeserializeIntoDiscordEmbedHasAuthor() {
             var json = File.ReadAllText(DiscordEmbedFiles.FirstFile);
@@ -32,7 +31,7 @@ namespace WebAppTests.Deserialization {
             discordEmbed.Author.Name.Should().Be("ErkendRserke");
             discordEmbed.Author.Icon.Should().BeNullOrEmpty();
         }
-        
+
         [Fact]
         public void DeserializeJsonWithImIntoDiscordEmbedHasImAuthorIcon() {
             var json = File.ReadAllText(DiscordEmbedFiles.FirstImFile);

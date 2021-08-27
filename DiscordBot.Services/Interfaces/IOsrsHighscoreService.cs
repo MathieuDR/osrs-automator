@@ -13,7 +13,7 @@ namespace DiscordBot.Services.Interfaces {
         Task<Competition> GetCompetition(string competitionTitle);
         Task<IEnumerable<Competition>> GetAllCompetitionsForGroup(int groupId);
         Task<DeltaLeaderboard> GetTopDeltasOfGroup(int groupId, MetricType metricType, Period period);
-        
+
         Task<HighscoreLeaderboard> GetLeaderboard(int groupId, MetricType metricType);
         Task<IEnumerable<Achievement>> GetGroupAchievements(int groupId);
         Task<MessageResponse> UpdateGroup(int groupId, string verificationCode);

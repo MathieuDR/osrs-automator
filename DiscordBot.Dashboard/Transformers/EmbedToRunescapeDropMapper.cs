@@ -32,7 +32,7 @@ namespace Dashboard.Transformers {
                 destination.IsPet = true;
                 return Result.Ok(destination);
             }
-            
+
             var rarityResult = SetRarity(source, destination);
 
             if (rarityResult.IsFailed) {
@@ -71,7 +71,7 @@ namespace Dashboard.Transformers {
 
             var lvl = Regex.Match(source.Description, patterns.Lvl);
             destination.Source.Level = lvl.Success ? int.Parse(lvl.Groups[1].Value) : null;
-            
+
             // Needs to be done after amount.
             var valueResult = SetValues(source, destination);
             if (valueResult.IsFailed) {
@@ -113,13 +113,13 @@ namespace Dashboard.Transformers {
             destination.Rarity = rarity;
             return Result.Ok();
         }
-        
+
         private static Result SetValues(Embed source, RunescapeDrop destination) {
             var valueField = source.Fields.FirstOrDefault(x => x.Name.ToLowerInvariant() == "ge value");
             if (valueField is null) {
                 return Result.Fail("No value field present");
             }
-            
+
             var haValueField = source.Fields.FirstOrDefault(x => x.Name.ToLowerInvariant() == "ha value");
             if (haValueField is null) {
                 return Result.Fail("No ha value field present");
@@ -130,7 +130,7 @@ namespace Dashboard.Transformers {
 
             destination.Item.Value = value / destination.Amount;
             destination.Item.HaValue = haValue / destination.Amount;
-            
+
             return Result.Ok();
         }
     }

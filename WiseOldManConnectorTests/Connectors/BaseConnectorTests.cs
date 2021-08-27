@@ -7,17 +7,19 @@ using Xunit;
 
 namespace WiseOldManConnectorTests.Connectors {
     public class BaseConnectorTests : ConnectorTests {
+        private readonly IWiseOldManPlayerApi _playerApi;
+
         public BaseConnectorTests(ApiFixture fixture) : base(fixture) {
             _playerApi = fixture.ServiceProvider.GetService<IWiseOldManPlayerApi>();
         }
 
-        private readonly IWiseOldManPlayerApi _playerApi;
-
         [Fact]
         public async Task ViewPlayerByInvalidId() {
-            int id = -1;
+            var id = -1;
 
-            Task Act() => _playerApi.View(id);
+            Task Act() {
+                return _playerApi.View(id);
+            }
 
             var exception = await Assert.ThrowsAsync<BadRequestException>(Act);
 

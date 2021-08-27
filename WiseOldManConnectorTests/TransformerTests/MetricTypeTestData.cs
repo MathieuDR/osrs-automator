@@ -8,11 +8,13 @@ namespace WiseOldManConnectorTests.TransformerTests {
         public IEnumerator<object[]> GetEnumerator() {
             var metrics = Enum.GetValues(typeof(MetricType)) as MetricType[];
 
-            foreach (MetricType metricType in metrics) {
+            foreach (var metricType in metrics) {
                 yield return new object[] {metricType};
             }
         }
 
-        IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
+        IEnumerator IEnumerable.GetEnumerator() {
+            return GetEnumerator();
+        }
     }
 }

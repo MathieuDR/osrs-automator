@@ -6,14 +6,13 @@ using Discord.WebSocket;
 using DiscordBot.Common.Models.Data;
 using DiscordBot.Common.Models.DiscordDtos;
 using DiscordBot.Services.Interfaces;
-using DiscordBot.Services.Services;
 using FluentResults;
 using Microsoft.Extensions.Logging;
 
 namespace DiscordBot.Services {
     public class DiscordService : IDiscordService {
-        private readonly ILogger<DiscordService> _logger;
         private readonly DiscordSocketClient _client;
+        private readonly ILogger<DiscordService> _logger;
 
         public DiscordService(ILogger<DiscordService> logger, DiscordSocketClient client) {
             _logger = logger;
@@ -37,20 +36,22 @@ namespace DiscordBot.Services {
 
         public async Task<Result> PrintRunescapeDataDrop(RunescapeDropData data, ulong guildId, ulong channelId) {
             var imagesArr = data.Images.ToArray();
-            var channel =_client.GetGuild(guildId).GetTextChannel(channelId);
-            await channel.SendMessageAsync($"New automated drop handled. Drops: {data.Drops.Count()} ({Math.Max(data.TotalValue, data.TotalHaValue)}), images: {imagesArr.Count()}");
-            
-            await channel.SendMessageAsync($"drops: {string.Join(", ", data.Drops.Select(x=> $"{x.Item.Name} x{x.Amount} ({Math.Max(x.TotalValue, x.TotalHaValue)})" ))}");
+            var channel = _client.GetGuild(guildId).GetTextChannel(channelId);
+            await channel.SendMessageAsync(
+                $"New automated drop handled. Drops: {data.Drops.Count()} ({Math.Max(data.TotalValue, data.TotalHaValue)}), images: {imagesArr.Count()}");
+
+            await channel.SendMessageAsync(
+                $"drops: {string.Join(", ", data.Drops.Select(x => $"{x.Item.Name} x{x.Amount} ({Math.Max(x.TotalValue, x.TotalHaValue)})"))}");
 
             for (var i = 0; i < imagesArr.Length; i++) {
                 var image = imagesArr[i];
                 var stream = ToStream(image);
                 await channel.SendFileAsync(stream, "image.png", $"Image {i}/{imagesArr.Count()}");
             }
-            
+
             return Result.Ok();
         }
-        
+
         private static Stream ToStream(string image) {
             var bytes = Convert.FromBase64String(image);
             return new MemoryStream(bytes);

@@ -9,9 +9,9 @@ namespace WiseOldManConnector.Transformers.TypeConverters {
             if (string.IsNullOrEmpty(source)) {
                 return null;
             }
-            
+
             //var lowerInvariant = source.ToLowerInvariant();
-            if (Enum.TryParse(typeof(GroupRole), source, true, out object temp)) {
+            if (Enum.TryParse(typeof(GroupRole), source, true, out var temp)) {
                 destination = (GroupRole) temp;
                 return destination;
             }

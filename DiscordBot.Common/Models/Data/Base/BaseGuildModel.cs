@@ -5,7 +5,7 @@
         public BaseGuildModel(ulong guildId, ulong discordId) : base(discordId) {
             GuildId = guildId;
         }
-        
+
         public ulong GuildId { get; set; }
     }
 }

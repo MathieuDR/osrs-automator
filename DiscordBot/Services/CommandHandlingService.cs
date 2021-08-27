@@ -67,7 +67,7 @@ namespace DiscordBot.Services {
 
             // ...or even log the result (the method used should fit into
             // your existing log handler)
-            await _logger.LogWithCommandInfoLine($"Command executed.", LogEventLevel.Information, null);
+            await _logger.LogWithCommandInfoLine("Command executed.", LogEventLevel.Information, null);
         }
 
         public async Task CreateErrorMessage(ICommandContext context, IResult result) {
@@ -91,7 +91,7 @@ namespace DiscordBot.Services {
             }
 
             // Create a number to track where the prefix ends and the command begins
-            int argPos = 0;
+            var argPos = 0;
 
             // Determine if the message is a command based on the prefix and make sure no bots trigger commands
             if (message.Content.Trim() == _configuration.CustomPrefix.Trim() ||
@@ -99,7 +99,7 @@ namespace DiscordBot.Services {
                 var commands = _commands.Search("help").Commands.ToList();
 
                 await commands.FirstOrDefault().ExecuteAsync(new SocketCommandContext(_discord, message),
-                    new List<object>() {null}, new List<object>() {null}, _provider);
+                    new List<object> {null}, new List<object> {null}, _provider);
 
                 return;
             }
@@ -111,24 +111,24 @@ namespace DiscordBot.Services {
 
 
             // Create a WebSocket-based command context based on the message
-            SocketCommandContext context = new SocketCommandContext(_discord, message);
+            var context = new SocketCommandContext(_discord, message);
 
             // Setting logging information.
             using (LogContext.PushProperty("CommandContextDto", new SerilogCommandContext(context))) {
-                var logTask = _logger.LogWithCommandInfoLine($"Command received.", LogEventLevel.Information, null);
+                var logTask = _logger.LogWithCommandInfoLine("Command received.", LogEventLevel.Information, null);
 
                 // Execute the command with the command context we just
                 // created, along with the service provider for precondition checks.
 
                 // Keep in mind that result does not indicate a return value
                 // rather an object stating if the command executed successfully.
-                await _commands.ExecuteAsync(context: context, argPos: argPos, services: _provider);
+                await _commands.ExecuteAsync(context, argPos, _provider);
                 await logTask;
             }
         }
 
         private EmbedBuilder CreateErrorEmbedBuilder(ICommandContext context, IResult result) {
-            EmbedBuilder builder = new EmbedBuilder().AddCommonProperties().WithMessageAuthorFooter(context);
+            var builder = new EmbedBuilder().AddCommonProperties().WithMessageAuthorFooter(context);
 
             builder.Title = "Uh oh! Something went wrong.";
 
@@ -139,7 +139,7 @@ namespace DiscordBot.Services {
                 HelpModule.AddStandardParameterInfo(builder, _configuration.CustomPrefix);
             }
 
-            builder.AddField($"Get more help", $"Please use `{_configuration.CustomPrefix} help` for this bot's usage");
+            builder.AddField("Get more help", $"Please use `{_configuration.CustomPrefix} help` for this bot's usage");
             return builder;
         }
     }

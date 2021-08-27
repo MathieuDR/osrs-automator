@@ -2,8 +2,7 @@
 using Newtonsoft.Json;
 
 namespace WiseOldManConnector.Models.API.Responses {
-    internal class RecordResponse : BaseResponse{
-
+    internal class RecordResponse : BaseResponse {
         [JsonProperty("day")]
         public List<WOMRecord> Day { get; set; }
 
@@ -15,6 +14,5 @@ namespace WiseOldManConnector.Models.API.Responses {
 
         [JsonProperty("year")]
         public List<WOMRecord> Year { get; set; }
-
     }
 }

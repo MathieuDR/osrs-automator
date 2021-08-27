@@ -6,7 +6,7 @@ namespace WiseOldManConnector.Transformers.TypeConverters {
     internal class StringToMetricTypeConverter : ITypeConverter<string, MetricType> {
         public MetricType Convert(string source, MetricType destination, ResolutionContext context) {
             //var lowerInvariant = source.ToLowerInvariant();
-            if (Enum.TryParse(typeof(MetricType), source, true, out object temp)) {
+            if (Enum.TryParse(typeof(MetricType), source, true, out var temp)) {
                 destination = (MetricType) temp;
                 return destination;
             }
@@ -20,25 +20,25 @@ namespace WiseOldManConnector.Transformers.TypeConverters {
             var lowerInvariant = source.ToLowerInvariant();
             destination = lowerInvariant switch {
                 "overall" => MetricType.Overall,
-                "attack" => MetricType.Attack, 
+                "attack" => MetricType.Attack,
                 "defence" => MetricType.Defence,
-                "strength" => MetricType.Strength, 
+                "strength" => MetricType.Strength,
                 "hitpoints" => MetricType.Hitpoints,
                 "ranged" => MetricType.Ranged,
-                "prayer" => MetricType.Prayer, 
-                "magic" => MetricType.Magic, 
+                "prayer" => MetricType.Prayer,
+                "magic" => MetricType.Magic,
                 "cooking" => MetricType.Cooking,
-                "woodcutting" => MetricType.Woodcutting, 
-                "fletching" => MetricType.Fletching, 
+                "woodcutting" => MetricType.Woodcutting,
+                "fletching" => MetricType.Fletching,
                 "fishing" => MetricType.Fishing,
-                "firemaking" => MetricType.Firemaking, 
-                "crafting" => MetricType.Crafting, 
+                "firemaking" => MetricType.Firemaking,
+                "crafting" => MetricType.Crafting,
                 "smithing" => MetricType.Smithing,
-                "mining" => MetricType.Mining, 
+                "mining" => MetricType.Mining,
                 "herblore" => MetricType.Herblore,
                 "agility" => MetricType.Agility,
-                "thieving" => MetricType.Thieving, 
-                "slayer" => MetricType.Slayer, 
+                "thieving" => MetricType.Thieving,
+                "slayer" => MetricType.Slayer,
                 "farming" => MetricType.Farming,
                 "runecrafting" => MetricType.Runecrafting,
                 "hunter" => MetricType.Hunter,

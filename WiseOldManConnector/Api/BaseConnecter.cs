@@ -30,17 +30,19 @@ namespace WiseOldManConnector.Api {
         protected abstract string Area { get; }
 
         private void LogRequest(RestRequest request) {
-            Logger?.Log(LogLevel.Information, null, "Request sent to Wise old man API. [{Resource}, {Parameters:j}]", request.Resource, request.Parameters);
+            Logger?.Log(LogLevel.Information, null, "Request sent to Wise old man API. [{Resource}, {Parameters:j}]", request.Resource,
+                request.Parameters);
         }
 
 
         private void LogResponse(IRestResponse response) {
-            Logger?.Log(LogLevel.Information, null, "Response received from Wise Old Man API. [{Resource}, {Content:j}]", response.Content, response.Request.Resource);
+            Logger?.Log(LogLevel.Information, null, "Response received from Wise Old Man API. [{Resource}, {Content:j}]", response.Content,
+                response.Request.Resource);
         }
 
         protected async Task<T> ExecuteRequest<T>(RestRequest request) where T : IResponse {
             LogRequest(request);
-            IRestResponse<T> result = await Client.ExecuteAsync<T>(request);
+            var result = await Client.ExecuteAsync<T>(request);
             LogResponse(result);
 
             ValidateResponse(result);
@@ -49,7 +51,7 @@ namespace WiseOldManConnector.Api {
 
         protected async Task<IEnumerable<T>> ExecuteCollectionRequest<T>(RestRequest request) where T : IResponse {
             LogRequest(request);
-            IRestResponse<List<T>> result = await Client.ExecuteAsync<List<T>>(request);
+            var result = await Client.ExecuteAsync<List<T>>(request);
             LogResponse(result);
 
             ValidateResponse(result);
@@ -76,12 +78,12 @@ namespace WiseOldManConnector.Api {
         }
 
         protected RestRequest GetNewRestRequest(string resourcePath) {
-            string resource = $"{Area}";
+            var resource = $"{Area}";
             if (!string.IsNullOrEmpty(resource)) {
                 resource = $"{resource}/{resourcePath}";
             }
 
-            var request =  new RestRequest(resource, DataFormat.Json);
+            var request = new RestRequest(resource, DataFormat.Json);
             request.JsonSerializer = new JsonNetSerializer();
             return request;
         }
@@ -89,7 +91,7 @@ namespace WiseOldManConnector.Api {
         private void ValidateResponse<T>(IRestResponse<T> response) {
             if (response == null) {
                 // SHOULD NEVER HAPPEN I THINK
-                throw new NullReferenceException($"We did not receive a response. Please try again later or contact the administration.");
+                throw new NullReferenceException("We did not receive a response. Please try again later or contact the administration.");
             }
 
             if (response.ErrorException != null) {
@@ -142,8 +144,8 @@ namespace WiseOldManConnector.Api {
                 case HttpStatusCode.UpgradeRequired:
                 case HttpStatusCode.UseProxy:
                 case HttpStatusCode.TooManyRequests:
-                    string responseMessage = "";
-                    object data = response.Data ?? (object) JsonConvert.DeserializeObject<WOMMessageResponse>(response.Content);
+                    var responseMessage = "";
+                    var data = response.Data ?? (object) JsonConvert.DeserializeObject<WOMMessageResponse>(response.Content);
 
                     switch (data) {
                         case BaseResponse messageResponse:
@@ -153,8 +155,9 @@ namespace WiseOldManConnector.Api {
                             responseMessage = string.Join(", ", collectionBaseResponses.Select(x => x.Message).ToArray());
                             break;
                     }
-                    
-                    Logger?.Log(LogLevel.Error, null, "Error for [{Resource}, {Parameters:j}]", response.Request.Resource, response.Request.Parameters);
+
+                    Logger?.Log(LogLevel.Error, null, "Error for [{Resource}, {Parameters:j}]", response.Request.Resource,
+                        response.Request.Parameters);
                     throw new BadRequestException(responseMessage, response);
                 case HttpStatusCode.AlreadyReported:
                     break;

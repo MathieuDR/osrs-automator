@@ -1,5 +1,4 @@
 using System;
-using System.ComponentModel;
 using System.Threading;
 using System.Threading.Tasks;
 using Discord;
@@ -12,11 +11,11 @@ using Microsoft.Extensions.Hosting;
 using Quartz;
 
 namespace DiscordBot {
-    public class DiscordBot: BackgroundService {
+    public class DiscordBot : BackgroundService {
         private readonly IConfiguration _config;
         private readonly IServiceProvider _services;
         private DiscordSocketClient _client;
-        
+
         public DiscordBot(IConfiguration config, IServiceProvider services) {
             _config = config;
             _services = services;
@@ -39,7 +38,7 @@ namespace DiscordBot {
         }
 
         private async Task ConfigureDiscord() {
-             _client = _services.GetRequiredService<DiscordSocketClient>();
+            _client = _services.GetRequiredService<DiscordSocketClient>();
             await ((CommandHandlingService) _services.GetRequiredService(typeof(CommandHandlingService)))
                 .InitializeAsync(_services);
 
@@ -47,7 +46,6 @@ namespace DiscordBot {
 
             await _client.LoginAsync(TokenType.Bot, botConfig.Token);
             await _client.StartAsync();
-            
         }
 
         protected override Task ExecuteAsync(CancellationToken stoppingToken) {

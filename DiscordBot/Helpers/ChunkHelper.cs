@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 
 namespace DiscordBot.Helpers {
@@ -14,7 +15,7 @@ namespace DiscordBot.Helpers {
             _start = start;
         }
 
-        System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator() {
+        IEnumerator IEnumerable.GetEnumerator() {
             return GetEnumerator();
         }
 
@@ -42,9 +43,7 @@ namespace DiscordBot.Helpers {
                 }
             }
 
-            object System.Collections.IEnumerator.Current {
-                get { return Current; }
-            }
+            object IEnumerator.Current => Current;
 
             public bool MoveNext() {
                 _position++;
@@ -86,7 +85,7 @@ namespace DiscordBot.Helpers {
             SourceEumerable = source;
         }
 
-        private IEnumerable<T> SourceEumerable { get; set; }
+        private IEnumerable<T> SourceEumerable { get; }
 
         public bool Get(int pos, out T item) {
             if (_currentEnumeration != null && _currentEnumeration.Position > pos) {
@@ -98,7 +97,7 @@ namespace DiscordBot.Helpers {
                 _currentEnumeration = new Enumeration {Position = -1, Source = SourceEumerable.GetEnumerator(), AtEnd = false};
             }
 
-            item = default(T);
+            item = default;
             if (_currentEnumeration.AtEnd) {
                 return false;
             }

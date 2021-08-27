@@ -15,7 +15,6 @@ using DiscordBot.Services.interfaces;
 namespace DiscordBot.Modules {
     [DontAutoLoad]
     public abstract class BaseEmbeddedResponseModule : InteractiveBase<SocketCommandContext> {
-        
         protected BaseEmbeddedResponseModule(Mapper mapper, ILogService logger) {
             Mapper = mapper;
             Logger = logger;
@@ -42,12 +41,12 @@ namespace DiscordBot.Modules {
 
 
         protected PaginatedMessage ConvertToPaginatedMessage(IPageableResponse responseObject) {
-            return new PaginatedMessage() {
+            return new() {
                 AlternateDescription = responseObject.AlternatedDescription,
                 Pages = Mapper.Map<IEnumerable<Embed>>(responseObject.Pages),
-                Options = new PaginatedAppearanceOptions() {
+                Options = new PaginatedAppearanceOptions {
                     JumpDisplayOptions = JumpDisplayOptions.Never,
-                    DisplayInformationIcon = false,
+                    DisplayInformationIcon = false
                 },
                 Author = BuildUserAsAuthor(),
                 Content = "TEST",
@@ -57,21 +56,21 @@ namespace DiscordBot.Modules {
         }
 
         protected EmbedAuthorBuilder BuildUserAsAuthor() {
-            return new EmbedAuthorBuilder() {
+            return new() {
                 IconUrl = Context.User.GetAvatarUrl(),
                 Name = Context.User.Username
             };
         }
 
         protected EmbedFooterBuilder BuildUserForFooter() {
-            return new EmbedFooterBuilder() {
+            return new() {
                 IconUrl = Context.User.GetAvatarUrl(),
                 Text = Context.User.Username
             };
         }
 
         protected IGuildUser GetGuildUser() {
-            return Context.User as IGuildUser ?? throw new Exception($"User is not in a server.");
+            return Context.User as IGuildUser ?? throw new Exception("User is not in a server.");
         }
     }
 }

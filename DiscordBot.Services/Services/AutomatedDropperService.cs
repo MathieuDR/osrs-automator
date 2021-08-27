@@ -28,11 +28,12 @@ namespace DiscordBot.Services.Services {
                 Logger.LogInformation("Not allowed endpoint: {endpoint}", endpoint);
                 return allowedCheckResult;
             }
-            
+
             //Save to DB
             var saveInformationResult = SaveDropData(endpoint, drop, base64Image);
             if (saveInformationResult.IsFailed) {
-                Logger.LogWarning("Could not save drop with endpoint {endpoint}, data: {@drop} and {verb} image", endpoint, drop, string.IsNullOrEmpty(base64Image) ? "without" : "with");
+                Logger.LogWarning("Could not save drop with endpoint {endpoint}, data: {@drop} and {verb} image", endpoint, drop,
+                    string.IsNullOrEmpty(base64Image) ? "without" : "with");
                 return saveInformationResult;
             }
 
@@ -55,13 +56,16 @@ namespace DiscordBot.Services.Services {
             // Update
             var dropList = data.Drops.ToList();
             var imageList = data.Images.ToList();
-            data = data with { Endpoint = endpoint, Drops = dropList, Images = imageList};
-            
+            data = data with {Endpoint = endpoint, Drops = dropList, Images = imageList};
+
             if (drop is not null) {
-                data = data with { RecipientUsername = drop.Recipient.Username, RecipientPlayerType = drop.Recipient.PlayerType, Endpoint = endpoint, Drops = dropList, Images = imageList};
+                data = data with {
+                    RecipientUsername = drop.Recipient.Username, RecipientPlayerType = drop.Recipient.PlayerType, Endpoint = endpoint,
+                    Drops = dropList, Images = imageList
+                };
                 dropList.Add(drop);
             }
-            
+
             if (!base64Image.IsNullOrWhiteSpace()) {
                 imageList.Add(base64Image);
             }
@@ -91,7 +95,7 @@ namespace DiscordBot.Services.Services {
                 }
 
                 Logger.LogInformation("Creating new job: {@key} at {time}", jobKey, newTrigger.StartTimeUtc.TimeOfDay);
-                var job = CreateJobWithKey(endpoint ,jobKey);
+                var job = CreateJobWithKey(endpoint, jobKey);
                 await scheduler.ScheduleJob(job, newTrigger);
             } catch (Exception e) {
                 var guid = Guid.NewGuid();
@@ -127,7 +131,6 @@ namespace DiscordBot.Services.Services {
         }
 
         private ITrigger CreateTriggerByDrop(RunescapeDrop drop) {
-            
             var waitTimeInSeconds = drop is not null && drop.Source.Name.ToLowerInvariant().Contains("clue") ? 60 : 2;
 
             var trigger = TriggerBuilder.Create()

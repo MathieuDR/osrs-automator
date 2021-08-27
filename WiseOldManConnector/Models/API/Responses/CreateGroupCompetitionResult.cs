@@ -3,8 +3,7 @@ using System.Collections.Generic;
 using Newtonsoft.Json;
 
 namespace WiseOldManConnector.Models.API.Responses {
-    internal class CreateGroupCompetitionResult:BaseResponse
-    {
+    internal class CreateGroupCompetitionResult : BaseResponse {
         [JsonProperty("id")]
         public int Id { get; set; }
 
@@ -32,5 +31,4 @@ namespace WiseOldManConnector.Models.API.Responses {
         [JsonProperty("participants")]
         public IList<Participant> Participants { get; set; }
     }
-
 }

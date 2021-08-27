@@ -54,7 +54,7 @@ namespace DiscordBot.Services {
         }
 
         public Task LogStopWatch(string area, Stopwatch stopwatch) {
-            LogMessage lgMessage = new LogMessage(LogSeverity.Info, area, $"Timer: {stopwatch.ElapsedMilliseconds}ms");
+            var lgMessage = new LogMessage(LogSeverity.Info, area, $"Timer: {stopwatch.ElapsedMilliseconds}ms");
             return Log(lgMessage);
         }
 
@@ -63,8 +63,8 @@ namespace DiscordBot.Services {
             return Task.CompletedTask;
         }
 
-        
-        public Task Log(string message, LogEventLevel level,  params object[] arguments) {
+
+        public Task Log(string message, LogEventLevel level, params object[] arguments) {
             _debugLogger.Log(LogLevelFromLogEventLevel(level), message, arguments);
             return Task.CompletedTask;
         }
@@ -74,10 +74,12 @@ namespace DiscordBot.Services {
             throw new NotImplementedException();
         }
 
-        private static LogLevel LogLevelFromSeverity(LogSeverity severity)
-            => (LogLevel) (Math.Abs((int) severity - 5));
+        private static LogLevel LogLevelFromSeverity(LogSeverity severity) {
+            return (LogLevel) Math.Abs((int) severity - 5);
+        }
 
-        private static LogLevel LogLevelFromLogEventLevel(LogEventLevel LogEventLevel)
-            => (LogLevel) LogEventLevel;
+        private static LogLevel LogLevelFromLogEventLevel(LogEventLevel LogEventLevel) {
+            return (LogLevel) LogEventLevel;
+        }
     }
 }

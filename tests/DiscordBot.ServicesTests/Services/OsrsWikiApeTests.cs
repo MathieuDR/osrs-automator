@@ -24,7 +24,7 @@ namespace DiscordBot.ServicesTests.Services {
             request.Query.Pages.FirstOrDefault().Value.Revisions.Should().HaveCount(1);
             request.Query.Pages.FirstOrDefault().Value.Revisions.FirstOrDefault().Content.Should().NotBeNullOrEmpty();
         }
-        
+
         [Fact]
         public async Task OsrsWikiShouldReturnCorrectPage() {
             var serviceCollection = new ServiceCollection();
@@ -38,7 +38,7 @@ namespace DiscordBot.ServicesTests.Services {
             request.Query.Should().NotBeNull();
             request.Query.Pages.Should().ContainKey("199935");
         }
-        
+
         [Fact]
         public void OsrsWikiShouldBeProvided() {
             var serviceCollection = new ServiceCollection();

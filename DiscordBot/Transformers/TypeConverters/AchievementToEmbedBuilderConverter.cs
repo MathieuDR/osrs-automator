@@ -11,8 +11,8 @@ namespace DiscordBot.Transformers.TypeConverters {
         public EmbedBuilder Convert(Achievement source, EmbedBuilder destination, ResolutionContext context) {
             destination ??= new EmbedBuilder();
 
-            string metricWomIcon = source.Metric.GetEnumValueNameOrDefault();
-            string metricWomBackground = source.Metric == MetricType.Combat
+            var metricWomIcon = source.Metric.GetEnumValueNameOrDefault();
+            var metricWomBackground = source.Metric == MetricType.Combat
                 ? MetricType.Strength.GetEnumValueNameOrDefault()
                 : metricWomIcon;
 
@@ -23,11 +23,9 @@ namespace DiscordBot.Transformers.TypeConverters {
                 .WithImageUrl($"https://wiseoldman.net/img/runescape/backgrounds/{metricWomBackground}.png");
 
 
-            
+            var typeOfMetric = context.Mapper.Map<DeltaType>(source.Metric);
 
-            DeltaType typeOfMetric = context.Mapper.Map<DeltaType>(source.Metric);
-
-            string append = "";
+            var append = "";
             switch (typeOfMetric) {
                 case DeltaType.Score:
                     switch (source.Metric) {

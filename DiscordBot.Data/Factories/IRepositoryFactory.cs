@@ -7,5 +7,6 @@ namespace DiscordBot.Data.Factories {
         public IRepository Create(ulong guildId);
         public IRepository Create();
     }
-    public interface IRepositoryFactory<out T> :IRepositoryFactory where T : IRepository { }
+
+    public interface IRepositoryFactory<out T> : IRepositoryFactory where T : IRepository { }
 }

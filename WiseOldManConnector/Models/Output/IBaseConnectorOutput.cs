@@ -1,5 +1,3 @@
 ﻿namespace WiseOldManConnector.Models.Output {
-    public interface IBaseConnectorOutput {
-        
-    }
+    public interface IBaseConnectorOutput { }
 }

@@ -27,7 +27,7 @@ namespace DiscordBot.ServicesTests.Parser {
             result.IsFailed.Should().BeFalse();
             result.Value.Should().NotBeNullOrEmpty();
         }
-        
+
         [Fact]
         public void ParsingShouldFailForBadString() {
             var str = "badstring";
@@ -37,7 +37,7 @@ namespace DiscordBot.ServicesTests.Parser {
             result.IsSuccess.Should().BeFalse();
             result.IsFailed.Should().BeTrue();
         }
-        
+
         [Fact]
         public void ParsingShouldHaveAllItems() {
             var file = WikiResponseFiles.Files.FirstOrDefault();
@@ -47,7 +47,7 @@ namespace DiscordBot.ServicesTests.Parser {
             result.Should().NotBeNull();
             result.Value.Should().HaveCount(file.ItemQuantities);
         }
-        
+
         [Fact]
         public void ParsingShouldHaveItemNames() {
             var file = WikiResponseFiles.Files.FirstOrDefault();
@@ -59,7 +59,7 @@ namespace DiscordBot.ServicesTests.Parser {
             result.Value.Should().Contain("Dragon thrownaxe");
         }
 
-        
+
         [Fact]
         public void ParsingShouldHaveItemNamesWithApostrophes() {
             var file = WikiResponseFiles.Files.FirstOrDefault();
@@ -70,7 +70,7 @@ namespace DiscordBot.ServicesTests.Parser {
             result.Value.Should().Contain("Verac's brassard");
             result.Value.Should().Contain("Inquisitor's great helm");
         }
-        
+
         [Fact]
         public void ParsingShouldHaveItemNamesWithDashes() {
             var file = WikiResponseFiles.Files.FirstOrDefault();
@@ -80,7 +80,7 @@ namespace DiscordBot.ServicesTests.Parser {
             result.Should().NotBeNull();
             result.Value.Should().Contain("Zul-andra teleport");
         }
-        
+
         [Fact]
         public void ParsingShouldHaveItemNamesWithNumbers() {
             var file = WikiResponseFiles.Files.FirstOrDefault();
@@ -91,7 +91,7 @@ namespace DiscordBot.ServicesTests.Parser {
             result.Value.Should().Contain("Godsword shard 1");
             result.Value.Should().Contain("Sinhaza shroud tier 4");
         }
-        
+
         [Fact]
         public void ParsingShouldHaveItemNamesWithBraces() {
             var file = WikiResponseFiles.Files.FirstOrDefault();
@@ -102,7 +102,7 @@ namespace DiscordBot.ServicesTests.Parser {
             result.Value.Should().Contain("Bronze platelegs (t)");
             result.Value.Should().Contain("Sinhaza shroud tier 4");
         }
-        
+
         [Fact]
         public void ParsingShouldHaveItemNamesWithSpecialCases() {
             var file = WikiResponseFiles.Files.FirstOrDefault();
@@ -112,8 +112,5 @@ namespace DiscordBot.ServicesTests.Parser {
             result.Should().NotBeNull();
             result.Value.Should().Contain("Supply crate");
         }
-        
-
-        
     }
 }

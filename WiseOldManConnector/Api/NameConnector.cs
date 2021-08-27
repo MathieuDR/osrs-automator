@@ -10,10 +10,10 @@ using WiseOldManConnector.Models.Output;
 using WiseOldManConnector.Models.WiseOldMan.Enums;
 
 namespace WiseOldManConnector.Api {
-    internal class NameConnector: BaseConnecter, IWiseOldManNameApi {
+    internal class NameConnector : BaseConnecter, IWiseOldManNameApi {
         public NameConnector(IServiceProvider provider) : base(provider) { }
         protected override string Area { get; } = "names";
-        
+
         public Task<ConnectorCollectionResponse<NameChange>> View(int limit = 20, int offset = 0) {
             throw new NotImplementedException();
         }
@@ -45,14 +45,14 @@ namespace WiseOldManConnector.Api {
         public async Task<ConnectorCollectionResponse<NameChange>> Request(IEnumerable<Tuple<string, string>> items) {
             var request = GetNewRestRequest();
             request.Method = Method.POST;
-            
+
             request.AddJsonBody(items.Select(x => new {
                 oldName = x.Item1,
                 newName = x.Item2
             }));
 
             var result = await ExecuteCollectionRequest<NameChangeResponse>(request);
-            return GetResponse<NameChangeResponse,NameChange>(result);
+            return GetResponse<NameChangeResponse, NameChange>(result);
         }
     }
 }

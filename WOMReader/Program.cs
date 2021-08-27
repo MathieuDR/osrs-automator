@@ -32,7 +32,7 @@ namespace WOMReader {
             var services = ConfigureServices(config);
 
             var metrics = new List<MetricType> {
-                MetricType.Overall,
+                MetricType.Overall
             };
 
 
@@ -43,13 +43,16 @@ namespace WOMReader {
 
             using (LogContext.PushProperty("Group", womConfig.GroupId)) {
                 var competitionsResponse = await groupApi.Competitions(womConfig.GroupId);
-                var competitions = competitionsResponse.Data.Where(x=> x.EndDate <= DateTimeOffset.Now).OrderByDescending(c => c.StartDate).ToList();
+                var competitions = competitionsResponse.Data.Where(x => x.EndDate <= DateTimeOffset.Now).OrderByDescending(c => c.StartDate).ToList();
 
                 var dict = new Dictionary<string, List<AggregratedDelta>>();
 
                 for (var index = 0; index < competitions.Count; index++) {
                     var competition = competitions[index];
-                    using (LogContext.PushProperty("competition", new {competition.Id, competition.Metric, competition.Title, competition.Duration, competition.StartDate, competition.EndDate})) {
+                    using (LogContext.PushProperty("competition",
+                        new {
+                            competition.Id, competition.Metric, competition.Title, competition.Duration, competition.StartDate, competition.EndDate
+                        })) {
                         logger.LogInformation($"Competition {competition.Title} - {competition.Metric}");
                         logger.LogInformation(
                             $"Time {competition.StartDate} - {competition.EndDate} ({competition.Duration})");
@@ -98,16 +101,14 @@ namespace WOMReader {
 
                                 delta.Gained.Add(metric, participant.CompetitionDelta.Gained);
                             }
-
                         }
-                        logger.LogInformation($"Sleep one minute");
-                        Thread.Sleep(60*1000);
-                        logger.LogInformation($"Waking");
+
+                        logger.LogInformation("Sleep one minute");
+                        Thread.Sleep(60 * 1000);
+                        logger.LogInformation("Waking");
                     }
 
                     logger.LogInformation("__________________________________________");
-                    
-                    
                 }
 
                 logger.LogInformation("__________________________________________");
@@ -126,7 +127,7 @@ namespace WOMReader {
                         foreach (var gainedKvp in aggregratedDelta.Gained) {
                             var i = metrics.IndexOf(gainedKvp.Key);
                             gained[i] += gainedKvp.Value;
-                            
+
                             metricDuration[i] = metricDuration[i].Add(aggregratedDelta.Duration);
                         }
                     }
@@ -136,7 +137,7 @@ namespace WOMReader {
 
                     for (var i = 0; i < metrics.Count; i++) {
                         var metric = metrics[i];
-                        if(gained[i] > 0) {
+                        if (gained[i] > 0) {
                             logger.LogInformation(
                                 $"{metric}, TTL: {Math.Round(gained[i], 2)}, AVG: {Math.Round(gained[i] / metricDuration[i].TotalDays, 2)} for {Math.Round(metricDuration[i].TotalDays, 2)} days");
                         } else {

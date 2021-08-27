@@ -1,5 +1,4 @@
-﻿using System.Collections;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 using WiseOldManConnector.Models;
 using WiseOldManConnector.Models.Output;
 using WiseOldManConnector.Models.WiseOldMan.Enums;
@@ -58,6 +57,7 @@ namespace WiseOldManConnector.Interfaces {
 
         //Task<ConnectorResponse<Snapshots>> Snapshots(int id);
         Task<ConnectorCollectionResponse<Snapshot>> Snapshots(int id, Period period);
+
         //Task<ConnectorResponse<Snapshots>> Snapshots(string username);
         Task<ConnectorCollectionResponse<Snapshot>> Snapshots(string username, Period period);
 

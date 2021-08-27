@@ -14,7 +14,8 @@ namespace Dashboard {
                 await CreateHostBuilder(args).Build().RunAsync();
             } catch (Exception e) {
                 Log.Fatal(e, "FATAL ERROR: ");
-            } finally {
+            }
+            finally {
                 Log.CloseAndFlush();
             }
         }
@@ -26,9 +27,7 @@ namespace Dashboard {
                         webBuilder.UseStartup<Startup>();
                         webBuilder.UseUrls("http://*:5829");
                     })
-                    .ConfigureServices((context, collection) => {
-                        collection.AddHostedService<DiscordBot.DiscordBot>();
-                    })
+                    .ConfigureServices((context, collection) => { collection.AddHostedService<DiscordBot.DiscordBot>(); })
                 ;
         }
     }

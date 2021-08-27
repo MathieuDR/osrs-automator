@@ -10,7 +10,7 @@ namespace DiscordBot.Transformers.TypeConverters {
             if (string.IsNullOrEmpty(destination.Title)) {
                 destination.Title = $"{source.MetricType.ToString()} - leaderboard.";
             }
-            
+
             destination.Description = $"```{source.MembersToString()}```";
 
             destination.AddField("Total on leaderboard", source.PageSize, true);

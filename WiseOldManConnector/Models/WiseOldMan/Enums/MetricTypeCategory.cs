@@ -5,7 +5,7 @@
         Bosses = 2,
         Activities = 3,
         Time = 4,
-        Others = 10, 
-        Queryable = 11,
+        Others = 10,
+        Queryable = 11
     }
 }

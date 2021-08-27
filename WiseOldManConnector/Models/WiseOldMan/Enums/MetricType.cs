@@ -4,44 +4,64 @@ namespace WiseOldManConnector.Models.WiseOldMan.Enums {
     public enum MetricType {
         [EnumMember(Value = "overall")]
         Overall = 1,
+
         [EnumMember(Value = "attack")]
         Attack,
+
         [EnumMember(Value = "defence")]
         Defence,
+
         [EnumMember(Value = "strength")]
         Strength,
+
         [EnumMember(Value = "hitpoints")]
         Hitpoints,
+
         [EnumMember(Value = "ranged")]
         Ranged,
+
         [EnumMember(Value = "prayer")]
         Prayer,
+
         [EnumMember(Value = "magic")]
         Magic,
+
         [EnumMember(Value = "cooking")]
         Cooking,
+
         [EnumMember(Value = "woodcutting")]
         Woodcutting,
+
         [EnumMember(Value = "fletching")]
         Fletching,
+
         [EnumMember(Value = "fishing")]
         Fishing,
+
         [EnumMember(Value = "firemaking")]
         Firemaking,
+
         [EnumMember(Value = "crafting")]
         Crafting,
+
         [EnumMember(Value = "smithing")]
         Smithing,
+
         [EnumMember(Value = "mining")]
         Mining,
+
         [EnumMember(Value = "herblore")]
         Herblore,
+
         [EnumMember(Value = "agility")]
         Agility,
+
         [EnumMember(Value = "thieving")]
         Thieving,
+
         [EnumMember(Value = "slayer")]
         Slayer,
+
         [EnumMember(Value = "farming")]
         Farming,
 
@@ -86,6 +106,7 @@ namespace WiseOldManConnector.Models.WiseOldMan.Enums {
 
         [EnumMember(Value = "last_man_standing")]
         LastManStanding,
+
         [EnumMember(Value = "soul_wars_zeal")]
         SoulWarsZeal,
 
@@ -229,13 +250,13 @@ namespace WiseOldManConnector.Models.WiseOldMan.Enums {
 
         [EnumMember(Value = "ehb")]
         EffectiveHoursBossing,
-        
+
         [EnumMember(Value = "tempoross")]
         Tempoross,
-        
+
         [EnumMember(Value = "phosanis_nightmare")]
         PhosanisNightmare,
-        
+
         [EnumMember(Value = "theatre_of_blood_hard_mode")]
         TheatreOfBloodHardMode
     }

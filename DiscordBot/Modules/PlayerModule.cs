@@ -74,18 +74,12 @@ namespace DiscordBot.Modules {
                     Pages = pages,
                     Content = string.Format(FormatString, defaultAccount),
                     Options = new CustomActionsPaginatedAppearanceOptions {
-                        Delete = async (toDelete, i) => {
-                            await DeleteAccount(toDelete, i, accountDecorators, pagedMessage);
-                        },
-                        Select = async (selected, i) => {
-                            await SelectMain(selected, i, accountDecorators, pagedMessage);
-                        },
+                        Delete = async (toDelete, i) => { await DeleteAccount(toDelete, i, accountDecorators, pagedMessage); },
+                        Select = async (selected, i) => { await SelectMain(selected, i, accountDecorators, pagedMessage); },
                         EmojiActions = new Dictionary<IEmote, PerformAction> {
                             {
                                 new Emoji("✏️"),
-                                async (selected, i) => {
-                                    await RenameAccount(selected, i, accountDecorators, pagedMessage);
-                                }
+                                async (selected, i) => { await RenameAccount(selected, i, accountDecorators, pagedMessage); }
                             }
                         }
                     }
@@ -177,7 +171,8 @@ namespace DiscordBot.Modules {
                 responseString = $"{e.GetType().Name} - {e.Message}";
                 sendMessage = false;
                 throw;
-            } finally {
+            }
+            finally {
                 if (sendMessage) {
                     _ = Context.Channel.SendMessageAsync(responseString);
                 }

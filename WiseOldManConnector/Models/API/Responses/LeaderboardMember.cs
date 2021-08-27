@@ -2,7 +2,7 @@
 using Newtonsoft.Json;
 
 namespace WiseOldManConnector.Models.API.Responses {
-    internal class LeaderboardMember : BaseResponse{
+    internal class LeaderboardMember : BaseResponse {
         [JsonProperty("player")]
         public PlayerResponse Player { get; set; }
 
@@ -28,7 +28,7 @@ namespace WiseOldManConnector.Models.API.Responses {
         public int? Experience { get; set; }
 
         [JsonProperty("value")]
-        public int? Value{ get; set; }
+        public int? Value { get; set; }
 
         [JsonProperty("level")]
         public int? Level { get; set; }

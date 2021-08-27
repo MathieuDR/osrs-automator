@@ -8,8 +8,8 @@ namespace WiseOldManConnector.Transformers.TypeConverters {
         public DeltaType Convert(MetricType source, DeltaType destination, ResolutionContext context) {
             var category = source.Category();
             switch (category) {
-              case MetricTypeCategory.Skills:
-                  return DeltaType.Experience;
+                case MetricTypeCategory.Skills:
+                    return DeltaType.Experience;
                 case MetricTypeCategory.Bosses:
                     return DeltaType.Kills;
                 case MetricTypeCategory.Activities:

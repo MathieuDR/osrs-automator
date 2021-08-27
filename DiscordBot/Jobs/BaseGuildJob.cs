@@ -29,29 +29,16 @@ namespace DiscordBot.Jobs {
         protected JobType JobType { get; }
         protected GuildConfig Configuration { get; private set; }
         public IScheduler Scheduler { get; set; }
-        
-        public IJobDetail Job{ get; set; }
 
-       
-
-        protected async Task CreateRecovery(int minutes = 25) {
-            Console.WriteLine($"Stopping execution");
-                
-            var Trigger = TriggerBuilder.Create()
-                .WithIdentity("recoverTrigger", "recovery")
-                .StartAt(DateBuilder.EvenSecondDate(DateTimeOffset.UtcNow.AddMinutes(minutes)))
-                .Build();
-          
-            await Scheduler.ScheduleJob(Job, Trigger);
-        }
+        public IJobDetail Job { get; set; }
 
         public virtual async Task Execute(IJobExecutionContext context) {
             _ = LogService.Log($"Starting {JobType} job execution", LogEventLevel.Information);
             Scheduler = context.Scheduler;
-            Job = context.JobDetail.GetJobBuilder().WithIdentity(Guid.NewGuid().ToString(),"recovery").Build();
+            Job = context.JobDetail.GetJobBuilder().WithIdentity(Guid.NewGuid().ToString(), "recovery").Build();
 
             if (Discord.ConnectionState == ConnectionState.Connected) {
-                foreach (SocketGuild discordGuild in Discord.Guilds) {
+                foreach (var discordGuild in Discord.Guilds) {
                     _ = LogService.Log($"Guild: {discordGuild.Name}, starting", LogEventLevel.Information);
                     Configuration = Repository.GetGroupConfig(discordGuild.Id);
 
@@ -87,10 +74,22 @@ namespace DiscordBot.Jobs {
             _ = LogService.Log($"Ending {JobType} job execution", LogEventLevel.Information);
         }
 
+
+        protected async Task CreateRecovery(int minutes = 25) {
+            Console.WriteLine("Stopping execution");
+
+            var Trigger = TriggerBuilder.Create()
+                .WithIdentity("recoverTrigger", "recovery")
+                .StartAt(DateBuilder.EvenSecondDate(DateTimeOffset.UtcNow.AddMinutes(minutes)))
+                .Build();
+
+            await Scheduler.ScheduleJob(Job, Trigger);
+        }
+
         public abstract Task ForGuild(SocketGuild guild, IMessageChannel channel);
 
         protected Task<ISocketMessageChannel> GetChannel(SocketGuild guild, ChannelJobConfiguration config) {
-            ISocketMessageChannel channel =
+            var channel =
                 (ISocketMessageChannel) guild.Channels.FirstOrDefault(c => c.Id == config.ChannelId);
 
             if (channel == null) {

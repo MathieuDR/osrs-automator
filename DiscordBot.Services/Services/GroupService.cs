@@ -18,23 +18,24 @@ using WiseOldManConnector.Models.WiseOldMan.Enums;
 
 namespace DiscordBot.Services.Services {
     internal class GroupService : RepositoryService, IGroupService {
-        private readonly IOsrsHighscoreService _highscoreService;
         private readonly ISchedulerFactory _factory;
+        private readonly IOsrsHighscoreService _highscoreService;
 
-        public GroupService(ILogger<GroupService> logger, IRepositoryStrategy repositoryStrategy, IOsrsHighscoreService highscoreService, ISchedulerFactory factory) :
+        public GroupService(ILogger<GroupService> logger, IRepositoryStrategy repositoryStrategy, IOsrsHighscoreService highscoreService,
+            ISchedulerFactory factory) :
             base(logger, repositoryStrategy) {
             _highscoreService = highscoreService;
             _factory = factory;
         }
 
         public async Task<ItemDecorator<Group>> SetGroupForGuild(GuildUser guildUser, int womGroupId, string verificationCode) {
-            Group group = await _highscoreService.GetGroupById(womGroupId);
+            var group = await _highscoreService.GetGroupById(womGroupId);
             if (group == null) {
-                throw new Exception($"Group does not exist.");
+                throw new Exception("Group does not exist.");
             }
-            
+
             var repo = GetRepository<GuildConfigRepository>(guildUser.GuildId);
-            GuildConfig config = repo.GetSingle().Value ?? new GuildConfig(guildUser.GuildId, guildUser.Id);
+            var config = repo.GetSingle().Value ?? new GuildConfig(guildUser.GuildId, guildUser.Id);
 
             config.WomVerificationCode = verificationCode;
             config.WomGroup = group;
@@ -46,9 +47,9 @@ namespace DiscordBot.Services.Services {
 
         public async Task SetAutoAdd(GuildUser guildUser, bool autoAdd) {
             var repo = GetRepository<GuildConfigRepository>(guildUser.GuildId);
-            GuildConfig config = GetGroupConfig(guildUser.GuildId);
+            var config = GetGroupConfig(guildUser.GuildId);
             if (config.WomGroupId <= 0) {
-                throw new Exception($"No Wise Old Man set for this server.");
+                throw new Exception("No Wise Old Man set for this server.");
             }
 
             config.AutoAddNewAccounts = autoAdd;
@@ -85,7 +86,7 @@ namespace DiscordBot.Services.Services {
 
             //ChannelJobConfiguration setting;
             if (!config.AutomatedMessagesConfig.ChannelJobs.ContainsKey(jobType)) {
-                throw new Exception($"No configuration for this jobtype set. Perhaps you need to set a channel.");
+                throw new Exception("No configuration for this jobtype set. Perhaps you need to set a channel.");
             }
 
             var setting = config.AutomatedMessagesConfig.ChannelJobs[jobType];
@@ -127,9 +128,9 @@ namespace DiscordBot.Services.Services {
                 var competition = await _highscoreService.GetCompetition(emptyCompetition.Id);
                 return competition.DecorateLeaderboard();
             }
-            
+
             // Check for delta gains, overall is standard
-            DeltaLeaderboard temp = await _highscoreService.GetTopDeltasOfGroup(settings.WomGroupId, metricType, period);
+            var temp = await _highscoreService.GetTopDeltasOfGroup(settings.WomGroupId, metricType, period);
             return temp.Decorate(settings.WomGroup.Id, settings.WomGroup.Name);
         }
 
@@ -138,7 +139,7 @@ namespace DiscordBot.Services.Services {
             var scheduler = schedulers.FirstOrDefault() ?? await _factory.GetScheduler();
 
             if (scheduler is null) {
-                throw new NullReferenceException($"Cannot make a scheduler");
+                throw new NullReferenceException("Cannot make a scheduler");
             }
 
             var t = typeof(GroupService);
@@ -154,7 +155,7 @@ namespace DiscordBot.Services.Services {
                 .Build();
 
             var trigger = TriggerBuilder.Create().StartAt(DateBuilder.EvenSecondDate(DateTimeOffset.Now.AddSeconds(5))).Build();
-            
+
             await scheduler.ScheduleJob(job, trigger);
         }
 
@@ -163,7 +164,7 @@ namespace DiscordBot.Services.Services {
             var result = repo.GetSingle().Value;
             if (validate) {
                 if (result == null) {
-                    throw new Exception($"Guild has no configuration. Please set the config");
+                    throw new Exception("Guild has no configuration. Please set the config");
                 }
             }
 

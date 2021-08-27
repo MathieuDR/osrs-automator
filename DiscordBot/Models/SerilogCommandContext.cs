@@ -22,9 +22,7 @@ namespace DiscordBot.Models {
         public string Guild { get; set; }
         public bool IsPrivate { get; set; }
 
-        public string MessageLocation {
-            get { return IsPrivate ? "Direct Message" : $"{Channel} ({Guild})"; }
-        }
+        public string MessageLocation => IsPrivate ? "Direct Message" : $"{Channel} ({Guild})";
 
         public override string ToString() {
             return $"{User} in {MessageLocation}: \"{Message}\"";

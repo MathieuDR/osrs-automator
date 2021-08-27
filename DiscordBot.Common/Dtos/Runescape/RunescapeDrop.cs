@@ -2,12 +2,12 @@ using WiseOldManConnector.Models.WiseOldMan.Enums;
 
 namespace DiscordBot.Common.Dtos.Runescape {
     public class RunescapeDrop {
-
         public RunescapeDrop() {
             Item = new RunescapeItem();
             Source = new RunescapeSource();
             Recipient = new Player();
         }
+
         public RunescapeItem Item { get; set; }
         public int Amount { get; set; }
         public int TotalValue => Item.Value * Amount;
@@ -19,6 +19,7 @@ namespace DiscordBot.Common.Dtos.Runescape {
         public bool IsPet { get; set; }
 
         public Player Recipient { get; set; }
+
         public class Player {
             public PlayerType PlayerType { get; set; }
             public string IconUrl { get; set; }

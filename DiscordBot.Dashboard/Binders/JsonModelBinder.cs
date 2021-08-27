@@ -4,7 +4,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 
 namespace Dashboard.Binders {
-    public class JsonModelBinder :IModelBinder{
+    public class JsonModelBinder : IModelBinder {
         public Task BindModelAsync(ModelBindingContext bindingContext) {
             if (bindingContext == null) {
                 throw new ArgumentNullException(nameof(bindingContext));
@@ -31,7 +31,6 @@ namespace Dashboard.Binders {
 
             bindingContext.Result = ModelBindingResult.Success(result);
             return Task.CompletedTask;
-
         }
     }
 }

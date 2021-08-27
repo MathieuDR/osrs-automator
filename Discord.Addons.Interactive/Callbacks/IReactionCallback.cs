@@ -4,10 +4,8 @@ using Discord.Addons.Interactive.Criteria;
 using Discord.Commands;
 using Discord.WebSocket;
 
-namespace Discord.Addons.Interactive.Callbacks
-{
-    public interface IReactionCallback
-    {
+namespace Discord.Addons.Interactive.Callbacks {
+    public interface IReactionCallback {
         RunMode RunMode { get; }
         ICriterion<SocketReaction> Criterion { get; }
         TimeSpan? Timeout { get; }

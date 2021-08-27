@@ -7,6 +7,7 @@ using Quartz.Util;
 namespace DiscordBot.Services.Parsers {
     public class MediaWikiContentToItemsParser {
         private const string RegexPattern = @"{{plink\|(?<item>[^}|]+)(?>\|pic[^}|]+)?(?>\|txt=(?<itemTxt>[^}|]+))?[^}]*}}";
+
         public static Result<IEnumerable<string>> GetItems(string mediaWikiContent) {
             var matches = Regex.Matches(mediaWikiContent, RegexPattern);
             if (!matches.Any()) {

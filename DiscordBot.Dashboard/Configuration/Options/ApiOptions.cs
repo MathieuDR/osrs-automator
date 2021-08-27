@@ -1,6 +1,5 @@
 namespace Dashboard.Configuration.Options {
     public class ApiOptions {
-        
         public int VersionMajor { get; set; }
         public int VersionMinor { get; set; }
         public string Version => $"v{VersionMajor}.{VersionMinor}";

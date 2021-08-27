@@ -10,7 +10,7 @@ namespace WiseOldManConnector.Models.WiseOldMan.Enums {
 
         [EnumMember(Value = "leader")]
         Leader = 1,
-        
+
         [EnumMember(Value = "jagex moderator")]
         JagexModerator,
 

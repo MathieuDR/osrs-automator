@@ -6,7 +6,6 @@ using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
 using WiseOldManConnector.Helpers;
 using WiseOldManConnector.Interfaces;
-using WiseOldManConnector.Models.Output;
 using WiseOldManConnector.Models.Output.Exceptions;
 using WiseOldManConnector.Models.Requests;
 using WiseOldManConnector.Models.WiseOldMan.Enums;
@@ -14,10 +13,10 @@ using WiseOldManConnectorTests.Configuration;
 using WiseOldManConnectorTests.Fixtures;
 using Xunit;
 using Xunit.Abstractions;
-using Record = WiseOldManConnector.Models.Output.Record;
 
 namespace WiseOldManConnectorTests.Connectors {
     public class GroupConnectorTests : ConnectorTests {
+        private readonly IWiseOldManGroupApi _groupApi;
         private readonly ITestOutputHelper _testOutputHelper;
 
         public GroupConnectorTests(ApiFixture fixture, ITestOutputHelper testOutputHelper) : base(fixture) {
@@ -25,16 +24,14 @@ namespace WiseOldManConnectorTests.Connectors {
             _groupApi = fixture.ServiceProvider.GetService<IWiseOldManGroupApi>();
         }
 
-        private readonly IWiseOldManGroupApi _groupApi;
-
         [Theory]
-        [InlineData(new object[] {MetricType.Agility, Period.Week})]
-        [InlineData(new object[] {MetricType.Agility, Period.Month})]
-        [InlineData(new object[] {MetricType.Runecrafting, Period.Week})]
-        [InlineData(new object[] {MetricType.AbyssalSire, Period.Week})]
-        [InlineData(new object[] {MetricType.TheCorruptedGauntlet, Period.Month})]
+        [InlineData(MetricType.Agility, Period.Week)]
+        [InlineData(MetricType.Agility, Period.Month)]
+        [InlineData(MetricType.Runecrafting, Period.Week)]
+        [InlineData(MetricType.AbyssalSire, Period.Week)]
+        [InlineData(MetricType.TheCorruptedGauntlet, Period.Month)]
         public async Task GainedLeaderBoardGivesResultOfSameMetricAndPeriod(MetricType metric, Period period) {
-            int id = TestConfiguration.ValidGroupId;
+            var id = TestConfiguration.ValidGroupId;
 
             var response = await _groupApi.GainedLeaderboards(id, metric, period);
 
@@ -43,12 +40,12 @@ namespace WiseOldManConnectorTests.Connectors {
         }
 
         [Theory]
-        [InlineData(new object[] {MetricType.Agility})]
-        [InlineData(new object[] {MetricType.Runecrafting})]
-        [InlineData(new object[] {MetricType.TheCorruptedGauntlet})]
-        [InlineData(new object[] {MetricType.Vetion})]
+        [InlineData(MetricType.Agility)]
+        [InlineData(MetricType.Runecrafting)]
+        [InlineData(MetricType.TheCorruptedGauntlet)]
+        [InlineData(MetricType.Vetion)]
         public async Task HighscoresGivesResultOfSameMetric(MetricType metric) {
-            int id = TestConfiguration.ValidGroupId;
+            var id = TestConfiguration.ValidGroupId;
 
             var response = await _groupApi.Highscores(id, metric);
 
@@ -57,13 +54,13 @@ namespace WiseOldManConnectorTests.Connectors {
         }
 
         [Theory]
-        [InlineData(new object[] {MetricType.Agility, Period.Week})]
-        [InlineData(new object[] {MetricType.Agility, Period.Month})]
-        [InlineData(new object[] {MetricType.Runecrafting, Period.Week})]
-        [InlineData(new object[] {MetricType.AbyssalSire, Period.Week})]
-        [InlineData(new object[] {MetricType.TheCorruptedGauntlet, Period.Month})]
+        [InlineData(MetricType.Agility, Period.Week)]
+        [InlineData(MetricType.Agility, Period.Month)]
+        [InlineData(MetricType.Runecrafting, Period.Week)]
+        [InlineData(MetricType.AbyssalSire, Period.Week)]
+        [InlineData(MetricType.TheCorruptedGauntlet, Period.Month)]
         public async Task RecordLeaderBoardGivesResultOfSameMetricAndPeriod(MetricType metric, Period period) {
-            int id = TestConfiguration.ValidGroupId;
+            var id = TestConfiguration.ValidGroupId;
 
             var response = await _groupApi.RecordLeaderboards(id, metric, period);
 
@@ -72,16 +69,16 @@ namespace WiseOldManConnectorTests.Connectors {
         }
 
         private string GetClanName() {
-            string id = Convert.ToBase64String(Guid.NewGuid().ToByteArray());
+            var id = Convert.ToBase64String(Guid.NewGuid().ToByteArray());
             id = Regex.Replace(id, "[/+=]", "");
-            string suffix = " .NETCONNECTOR";
+            var suffix = " .NETCONNECTOR";
 
             if (id.Length + suffix.Length > 30) {
                 id = id.Substring(0, 30 - suffix.Length);
             }
 
-            var result=$"{id}{suffix}";
-            
+            var result = $"{id}{suffix}";
+
             _testOutputHelper.WriteLine(result);
             return result;
         }
@@ -97,29 +94,29 @@ namespace WiseOldManConnectorTests.Connectors {
         public async Task AddingMembersHasNewMembersTask() {
             var cname = GetClanName();
             var cc = "MyClanChat";
-            var createRequest = new CreateGroupRequest(cname, cc, new List<MemberRequest>() {
-                new MemberRequest() {Name = "Den Badjas", Role = GroupRole.Leader}
+            var createRequest = new CreateGroupRequest(cname, cc, new List<MemberRequest> {
+                new() {Name = "Den Badjas", Role = GroupRole.Leader}
             });
 
 
             var createResponse = await _groupApi.Create(createRequest);
 
 
-            var request = new List<MemberRequest>() {
-                new MemberRequest() {
+            var request = new List<MemberRequest> {
+                new() {
                     Name = "WouterPils", Role = GroupRole.Member
                 },
-                new MemberRequest() {
+                new() {
                     Name = "ErkendRserke", Role = GroupRole.Leader
                 }
             };
-            
+
             try {
                 var response = await _groupApi.AddMembers(createResponse.Data.Id, createResponse.Data.VerificationCode, request);
                 Assert.NotNull(response.Data);
                 Assert.Equal(request.Count() + createRequest.Members.Count(), response.Data.Members.Count);
 
-                foreach (MemberRequest member in request) {
+                foreach (var member in request) {
                     Assert.Contains(response.Data.Members,
                         player => player.DisplayName.Equals(member.Name, StringComparison.InvariantCultureIgnoreCase));
 
@@ -136,7 +133,7 @@ namespace WiseOldManConnectorTests.Connectors {
 
         [Fact]
         public async Task CompetitionsForValidGroupWithCompetitionsResultInCompetitions() {
-            int id = TestConfiguration.ValidGroupId;
+            var id = TestConfiguration.ValidGroupId;
 
             var response = await _groupApi.Competitions(id);
 
@@ -145,7 +142,7 @@ namespace WiseOldManConnectorTests.Connectors {
 
         [Fact]
         public async Task CompetitionsResultsInValidCompetition() {
-            int id = TestConfiguration.ValidGroupId;
+            var id = TestConfiguration.ValidGroupId;
 
             var response = await _groupApi.Competitions(id);
             var compToTest = response.Data.FirstOrDefault();
@@ -162,9 +159,9 @@ namespace WiseOldManConnectorTests.Connectors {
         public async Task CreateGroupResultsInGroupWithCorrectParams() {
             var cname = GetClanName();
             var cc = "MyClanChat";
-            var request = new CreateGroupRequest(cname, cc, new List<MemberRequest>() {
-                new MemberRequest() {Name = "ErkendRserke"},
-                new MemberRequest() {Name = "Den Badjas", Role = GroupRole.Leader}
+            var request = new CreateGroupRequest(cname, cc, new List<MemberRequest> {
+                new() {Name = "ErkendRserke"},
+                new() {Name = "Den Badjas", Role = GroupRole.Leader}
             });
 
             var response = await _groupApi.Create(request);
@@ -176,7 +173,7 @@ namespace WiseOldManConnectorTests.Connectors {
                 Assert.Equal(request.ClanChat, response.Data.ClanChat);
                 Assert.Equal(request.Name, response.Data.Name);
 
-                foreach (MemberRequest member in request.Members) {
+                foreach (var member in request.Members) {
                     Assert.Contains(response.Data.Members,
                         player => player.DisplayName.Equals(member.Name, StringComparison.InvariantCultureIgnoreCase));
                     Assert.Equal(member.Role,
@@ -194,9 +191,9 @@ namespace WiseOldManConnectorTests.Connectors {
         public async Task CreateGroupResultsInGroupWithVerificationCode() {
             var cname = GetClanName();
             var cc = "MyClanChat";
-            var request = new CreateGroupRequest(cname, cc, new List<MemberRequest>() {
-                new MemberRequest() {Name = "ErkendRserke"},
-                new MemberRequest() {Name = "Den Badjas", Role = GroupRole.Leader}
+            var request = new CreateGroupRequest(cname, cc, new List<MemberRequest> {
+                new() {Name = "ErkendRserke"},
+                new() {Name = "Den Badjas", Role = GroupRole.Leader}
             });
 
             var response = await _groupApi.Create(request);
@@ -212,9 +209,9 @@ namespace WiseOldManConnectorTests.Connectors {
 
         [Fact]
         public async Task DeleteGroupResultsInDeletedGroupMessage() {
-            var request = new CreateGroupRequest(GetClanName(), "myChat", new List<MemberRequest>() {
-                new MemberRequest() {Name = "ErkendRserke"},
-                new MemberRequest() {Name = "Den Badjas", Role = GroupRole.Leader}
+            var request = new CreateGroupRequest(GetClanName(), "myChat", new List<MemberRequest> {
+                new() {Name = "ErkendRserke"},
+                new() {Name = "Den Badjas", Role = GroupRole.Leader}
             });
 
             var createdGroup = await _groupApi.Create(request);
@@ -229,9 +226,9 @@ namespace WiseOldManConnectorTests.Connectors {
         public async Task EditedGroupHasEditedParameters() {
             var cname = GetClanName();
             var cc = "MyClanChat";
-            var createRequest = new CreateGroupRequest(cname, cc, new List<MemberRequest>() {
-                new MemberRequest() {Name = "ErkendRserke"},
-                new MemberRequest() {Name = "Den Badjas", Role = GroupRole.Leader}
+            var createRequest = new CreateGroupRequest(cname, cc, new List<MemberRequest> {
+                new() {Name = "ErkendRserke"},
+                new() {Name = "Den Badjas", Role = GroupRole.Leader}
             });
 
 
@@ -239,7 +236,7 @@ namespace WiseOldManConnectorTests.Connectors {
 
 
             var request = new EditGroupRequest(createResponse.Data.VerificationCode, GetClanName(), "MySecondChat",
-                new[] {new MemberRequest() {Name = "WouterPils"}});
+                new[] {new MemberRequest {Name = "WouterPils"}});
 
             var response = await _groupApi.Edit(createResponse.Data.Id, request);
 
@@ -249,7 +246,7 @@ namespace WiseOldManConnectorTests.Connectors {
                 Assert.Equal(request.ClanChat, response.Data.ClanChat);
                 Assert.Equal(request.Name, response.Data.Name);
 
-                foreach (MemberRequest member in request.Members) {
+                foreach (var member in request.Members) {
                     Assert.Contains(response.Data.Members,
                         player => player.DisplayName.Equals(member.Name, StringComparison.InvariantCultureIgnoreCase));
                     Assert.Equal(member.Role,
@@ -265,7 +262,7 @@ namespace WiseOldManConnectorTests.Connectors {
 
         [Fact]
         public async Task GainedLeaderBoardGivesCorrectPagingSize() {
-            int id = TestConfiguration.ValidGroupId;
+            var id = TestConfiguration.ValidGroupId;
             var metric = MetricType.Slayer;
             var period = Period.Month;
             var size = 7;
@@ -280,7 +277,7 @@ namespace WiseOldManConnectorTests.Connectors {
 
         [Fact]
         public async Task GainedLeaderBoardHasValidDelta() {
-            int id = TestConfiguration.ValidGroupId;
+            var id = TestConfiguration.ValidGroupId;
             var metric = MetricType.EffectiveHoursPlaying;
             var period = Period.Month;
 
@@ -292,7 +289,7 @@ namespace WiseOldManConnectorTests.Connectors {
 
         [Fact]
         public async Task GainedLeaderBoardHasValidDeltaMemberTimes() {
-            int id = TestConfiguration.ValidGroupId;
+            var id = TestConfiguration.ValidGroupId;
             var metric = MetricType.Slayer;
             var period = Period.Month;
 
@@ -304,7 +301,7 @@ namespace WiseOldManConnectorTests.Connectors {
 
         [Fact]
         public async Task GainedLeaderBoardHasValidPlayers() {
-            int id = TestConfiguration.ValidGroupId;
+            var id = TestConfiguration.ValidGroupId;
             var metric = MetricType.Slayer;
             var period = Period.Month;
 
@@ -320,7 +317,7 @@ namespace WiseOldManConnectorTests.Connectors {
 
         [Fact]
         public async Task HighscoresGivesCorrectPagingSize() {
-            int id = TestConfiguration.ValidGroupId;
+            var id = TestConfiguration.ValidGroupId;
             var metric = MetricType.Slayer;
             var size = 7;
             var offset = 1;
@@ -334,7 +331,7 @@ namespace WiseOldManConnectorTests.Connectors {
 
         [Fact]
         public async Task HighscoresHasValidHighscore() {
-            int id = TestConfiguration.ValidGroupId;
+            var id = TestConfiguration.ValidGroupId;
             var metric = MetricType.Slayer;
 
             var response = await _groupApi.Highscores(id, metric);
@@ -348,7 +345,7 @@ namespace WiseOldManConnectorTests.Connectors {
 
         [Fact]
         public async Task HighscoresHasValidPlayers() {
-            int id = TestConfiguration.ValidGroupId;
+            var id = TestConfiguration.ValidGroupId;
             var metric = MetricType.Slayer;
 
             var response = await _groupApi.Highscores(id, metric);
@@ -360,23 +357,23 @@ namespace WiseOldManConnectorTests.Connectors {
             Assert.True(player.UpdatedAt < DateTimeOffset.Now);
             Assert.True(player.RegisteredAt < DateTimeOffset.Now);
         }
-        
+
         [Fact]
         public async Task HighscoresHasValidCategory() {
-            int id = TestConfiguration.ValidGroupId;
+            var id = TestConfiguration.ValidGroupId;
             var metric = MetricType.Slayer;
 
             var response = await _groupApi.Highscores(id, metric);
             var member = response.Data.Members.FirstOrDefault();
 
-            
-            Assert.Equal(metric,member.MetricType);
-            Assert.Equal(metric,response.Data.MetricType);
+
+            Assert.Equal(metric, member.MetricType);
+            Assert.Equal(metric, response.Data.MetricType);
         }
 
         [Fact]
         public async Task MembersFromGroupResultInValidPlayers() {
-            int id = TestConfiguration.ValidGroupId;
+            var id = TestConfiguration.ValidGroupId;
 
             var response = await _groupApi.GetMembers(id);
             var player = response.Data.FirstOrDefault();
@@ -392,7 +389,7 @@ namespace WiseOldManConnectorTests.Connectors {
 
         [Fact]
         public async Task MembersFromValidGroupResultsInMultipleMembers() {
-            int id = TestConfiguration.ValidGroupId;
+            var id = TestConfiguration.ValidGroupId;
 
             var response = await _groupApi.GetMembers(id);
 
@@ -402,7 +399,7 @@ namespace WiseOldManConnectorTests.Connectors {
 
         [Fact]
         public async Task MonthlyTopPlayerResultsInValidPlayer() {
-            int id = TestConfiguration.ValidGroupId;
+            var id = TestConfiguration.ValidGroupId;
 
             var response = await _groupApi.GetMonthTopMember(id);
             var player = response.Data.Player;
@@ -419,7 +416,7 @@ namespace WiseOldManConnectorTests.Connectors {
 
         [Fact]
         public async Task MonthlyTopPlayOfValidGroupResultsInPlayer() {
-            int id = TestConfiguration.ValidGroupId;
+            var id = TestConfiguration.ValidGroupId;
 
             var response = await _groupApi.GetMonthTopMember(id);
 
@@ -430,7 +427,7 @@ namespace WiseOldManConnectorTests.Connectors {
 
         [Fact]
         public async Task RecentAchievementHasAchievements() {
-            int id = TestConfiguration.ValidGroupId;
+            var id = TestConfiguration.ValidGroupId;
             var size = 7;
             var offset = 1;
 
@@ -441,7 +438,7 @@ namespace WiseOldManConnectorTests.Connectors {
 
         [Fact]
         public async Task RecentAchievementHasCorrectPaging() {
-            int id = TestConfiguration.ValidGroupId;
+            var id = TestConfiguration.ValidGroupId;
             var size = 7;
             var offset = 1;
 
@@ -452,7 +449,7 @@ namespace WiseOldManConnectorTests.Connectors {
 
         [Fact]
         public async Task RecentAchievementsHasValidAchievements() {
-            int id = TestConfiguration.ValidGroupId;
+            var id = TestConfiguration.ValidGroupId;
 
             var response = await _groupApi.RecentAchievements(id);
             var achievement = response.Data.FirstOrDefault();
@@ -466,7 +463,7 @@ namespace WiseOldManConnectorTests.Connectors {
 
         [Fact]
         public async Task RecordLeaderBoardGivesCorrectPagingSize() {
-            int id = TestConfiguration.ValidGroupId;
+            var id = TestConfiguration.ValidGroupId;
             var metric = MetricType.Slayer;
             var period = Period.Month;
             var size = 7;
@@ -481,7 +478,7 @@ namespace WiseOldManConnectorTests.Connectors {
 
         [Fact]
         public async Task RecordLeaderBoardHasValidDeltaRecordTimes() {
-            int id = TestConfiguration.ValidGroupId;
+            var id = TestConfiguration.ValidGroupId;
             var metric = MetricType.Slayer;
             var period = Period.Month;
 
@@ -493,7 +490,7 @@ namespace WiseOldManConnectorTests.Connectors {
 
         [Fact]
         public async Task RecordLeaderBoardHasValidPlayers() {
-            int id = TestConfiguration.ValidGroupId;
+            var id = TestConfiguration.ValidGroupId;
             var metric = MetricType.Slayer;
             var period = Period.Month;
 
@@ -509,12 +506,12 @@ namespace WiseOldManConnectorTests.Connectors {
 
         [Fact]
         public async Task RecordLeaderBoardHasValidRecord() {
-            int id = TestConfiguration.ValidGroupId;
+            var id = TestConfiguration.ValidGroupId;
             var metric = MetricType.Slayer;
             var period = Period.Month;
 
             var response = await _groupApi.RecordLeaderboards(id, metric, period);
-            Record record = response.Data.Members.FirstOrDefault();
+            var record = response.Data.Members.FirstOrDefault();
 
             Assert.True(record.Value > 0);
         }
@@ -529,7 +526,7 @@ namespace WiseOldManConnectorTests.Connectors {
 
         [Fact]
         public async Task SearchingGroupsWithSpecificNameResultsInOneResult() {
-            string specificGroupName = TestConfiguration.SpecificGroupName;
+            var specificGroupName = TestConfiguration.SpecificGroupName;
 
             var response = await _groupApi.Search(specificGroupName);
 
@@ -540,8 +537,8 @@ namespace WiseOldManConnectorTests.Connectors {
 
         [Fact]
         public async Task SearchingGroupsWithUnspecificNameAndPagingResultsInMultipleResultsWithPageLimit() {
-            string unspecificGroupName = TestConfiguration.UnspecificGroupName;
-            int pageLimit = 3;
+            var unspecificGroupName = TestConfiguration.UnspecificGroupName;
+            var pageLimit = 3;
 
             var response = await _groupApi.Search(unspecificGroupName, pageLimit, 0);
 
@@ -554,7 +551,7 @@ namespace WiseOldManConnectorTests.Connectors {
 
         [Fact]
         public async Task SearchingGroupsWithUnspecificNameResultsInMultipleResults() {
-            string unspecificGroupName = TestConfiguration.UnspecificGroupName;
+            var unspecificGroupName = TestConfiguration.UnspecificGroupName;
 
             var response = await _groupApi.Search(unspecificGroupName);
 
@@ -566,7 +563,7 @@ namespace WiseOldManConnectorTests.Connectors {
 
         [Fact]
         public async Task StatisticsGivesValidStatistics() {
-            int id = TestConfiguration.ValidGroupId;
+            var id = TestConfiguration.ValidGroupId;
 
             var response = await _groupApi.Statistics(id);
 
@@ -579,16 +576,16 @@ namespace WiseOldManConnectorTests.Connectors {
 
         [Fact]
         public async Task StatisticsSnapshotHoldsAllMetricsWithValues() {
-            int id = TestConfiguration.ValidGroupId;
+            var id = TestConfiguration.ValidGroupId;
 
             var response = await _groupApi.Statistics(id);
 
 
-            var types = EnumHelper.GetMetricTypes(MetricTypeCategory.Queryable);
+            var types = MetricTypeCategory.Queryable.GetMetricTypes();
             var typesInResponse = new List<MetricType>();
 
 
-            foreach (KeyValuePair<MetricType, Metric> metric in response.Data.AverageStats.AllMetrics) {
+            foreach (var metric in response.Data.AverageStats.AllMetrics) {
                 Assert.NotNull(metric.Value);
                 typesInResponse.Add(metric.Key);
             }
@@ -600,7 +597,7 @@ namespace WiseOldManConnectorTests.Connectors {
 
         [Fact]
         public async Task ViewGroupResultsInValidGroup() {
-            int id = TestConfiguration.ValidGroupId;
+            var id = TestConfiguration.ValidGroupId;
 
             var response = await _groupApi.View(id);
 
@@ -614,16 +611,19 @@ namespace WiseOldManConnectorTests.Connectors {
 
         [Fact]
         public async Task ViewGroupWithInvalidIdResultsInError() {
-            int id = TestConfiguration.InvalidGroupId;
+            var id = TestConfiguration.InvalidGroupId;
 
-            Task Act() => _groupApi.View(id);
+            Task Act() {
+                return _groupApi.View(id);
+            }
+
             var exception = await Assert.ThrowsAsync<BadRequestException>(Act);
             Assert.NotEmpty(exception.Message);
         }
 
         [Fact]
         public async Task ViewGroupWithValidIdResultsInGroupResult() {
-            int id = TestConfiguration.ValidGroupId;
+            var id = TestConfiguration.ValidGroupId;
 
             var response = await _groupApi.View(id);
 

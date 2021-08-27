@@ -2,7 +2,7 @@
 using Newtonsoft.Json;
 
 namespace WiseOldManConnector.Models.API.Responses {
-    internal class WOMGroup :BaseResponse{
+    internal class WOMGroup : BaseResponse {
         [JsonProperty("id")]
         public int Id { get; set; }
 
@@ -14,12 +14,12 @@ namespace WiseOldManConnector.Models.API.Responses {
 
         [JsonProperty("memberCount")]
         public int MemberCount { get; set; }
-        
+
         [JsonProperty("clanChat")]
         public string ClanChat { get; set; }
-        
+
         [JsonProperty("verified")]
-        public Boolean Verified { get; set; }
+        public bool Verified { get; set; }
 
         [JsonProperty("createdAt")]
         public DateTime CreatedAt { get; set; }

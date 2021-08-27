@@ -7,7 +7,8 @@ using DiscordBot.Services.interfaces;
 namespace DiscordBot.Modules {
     [Name("JobTester")]
     [RequireUserPermission(GuildPermission.Administrator, Group = "Permission")]
-    public class JobTestModule:BaseWaitMessageEmbeddedResponseModule {
-        public JobTestModule(Mapper mapper, ILogService logger, MessageConfiguration messageConfiguration) : base(mapper, logger, messageConfiguration) { }
+    public class JobTestModule : BaseWaitMessageEmbeddedResponseModule {
+        public JobTestModule(Mapper mapper, ILogService logger, MessageConfiguration messageConfiguration) : base(mapper, logger,
+            messageConfiguration) { }
     }
 }

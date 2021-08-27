@@ -12,7 +12,7 @@ namespace DiscordBot.Services.Configuration {
                 .AddServices()
                 .AddExternalServices();
         }
-        
+
         private static IServiceCollection AddExternalServices(this IServiceCollection serviceCollection) {
             serviceCollection
                 .AddRefitClient<IOsrsWikiApi>()
@@ -20,7 +20,7 @@ namespace DiscordBot.Services.Configuration {
 
             return serviceCollection;
         }
-        
+
         private static IServiceCollection AddServices(this IServiceCollection serviceCollection) {
             serviceCollection
                 .AddTransient<ICollectionLogItemProvider, CollectionLogItemProvider>()
@@ -29,7 +29,7 @@ namespace DiscordBot.Services.Configuration {
                 .AddTransient<IOsrsHighscoreService, WiseOldManConnectorService>()
                 .AddTransient<ICounterService, CountService>()
                 .AddTransient<IAutomatedDropperService, AutomatedDropperService>();
-            
+
             return serviceCollection;
         }
     }

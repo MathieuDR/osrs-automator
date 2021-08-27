@@ -2,8 +2,7 @@ using System.Collections.Generic;
 using System.Text.Json.Serialization;
 
 namespace DiscordBot.Services.Models.MediaWikiApi {
-    public class Revision
-    {
+    public class Revision {
         [JsonPropertyName("contentformat")]
         public string Contentformat { get; set; }
 
@@ -14,8 +13,7 @@ namespace DiscordBot.Services.Models.MediaWikiApi {
         public string Content { get; set; }
     }
 
-    public class Page
-    {
+    public class Page {
         [JsonPropertyName("pageid")]
         public int Pageid { get; set; }
 
@@ -29,21 +27,16 @@ namespace DiscordBot.Services.Models.MediaWikiApi {
         public List<Revision> Revisions { get; set; }
     }
 
-    public class Query
-    {
+    public class Query {
         [JsonPropertyName("pages")]
         public Dictionary<string, Page> Pages { get; set; }
     }
 
-    public class QueryResponse
-    {
+    public class QueryResponse {
         [JsonPropertyName("batchcomplete")]
         public string Batchcomplete { get; set; }
 
         [JsonPropertyName("query")]
         public Query Query { get; set; }
     }
-
-        
-    
 }

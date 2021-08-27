@@ -17,9 +17,9 @@ namespace DiscordBot.Modules {
 
         private readonly CommandService _commandService;
         private readonly BotConfiguration _configuration;
-        private readonly IServiceProvider _serviceProvider;
 
         private readonly Dictionary<string, Type> _parametersToOutput;
+        private readonly IServiceProvider _serviceProvider;
 
         public HelpModule(CommandService commandService, IServiceProvider serviceProvider, BotConfiguration configuration) {
             _commandService = commandService;
@@ -32,7 +32,7 @@ namespace DiscordBot.Modules {
         [Summary(HelpSummary)]
         [Alias("?", "info")]
         public async Task Help([Remainder] string module = "") {
-            EmbedBuilder output = new EmbedBuilder();
+            var output = new EmbedBuilder();
             if (string.IsNullOrEmpty(module)) {
                 output.Title = "Help";
                 output.AddField("**Module help**",
@@ -61,17 +61,20 @@ namespace DiscordBot.Modules {
                     AddParameterInfo(ref output);
                 }
             }
-            
+
             await ReplyAsync("", embed: output.Build());
         }
 
         public static void AddStandardParameterInfo(EmbedBuilder output, string prefix) {
-            output.AddField($"Parameter parsing",
+            output.AddField("Parameter parsing",
                 $"When you have a text parameter with a space, you need to encase the parameter with quotes.{Environment.NewLine}Example: `{prefix} get \"iron man\"`");
         }
-        
+
         public void AddHelp(ModuleInfo module, ref EmbedBuilder builder) {
-            foreach (var sub in module.Submodules) AddHelp(sub, ref builder);
+            foreach (var sub in module.Submodules) {
+                AddHelp(sub, ref builder);
+            }
+
             builder.AddField(f => {
                 f.Name = $"Module: **{module.Name}**";
                 f.Value = $"Commands: {string.Join(", ", module.Commands.Select(x => $"`{x.Name}`"))}";
@@ -81,7 +84,7 @@ namespace DiscordBot.Modules {
         public void AddCommands(ModuleInfo module, ref EmbedBuilder builder) {
             foreach (var command in module.Commands) {
                 var t = command.CheckPreconditionsAsync(Context, _serviceProvider).GetAwaiter().GetResult();
-                if(t.IsSuccess) {
+                if (t.IsSuccess) {
                     AddCommand(command, ref builder);
                 }
             }
@@ -99,8 +102,11 @@ namespace DiscordBot.Modules {
         }
 
         public string GetParameters(CommandInfo command) {
-            StringBuilder output = new StringBuilder();
-            if (!command.Parameters.Any()) return output.ToString();
+            var output = new StringBuilder();
+            if (!command.Parameters.Any()) {
+                return output.ToString();
+            }
+
             foreach (var param in command.Parameters) {
                 if (!_parametersToOutput.ContainsKey(param.Type.FullName ?? string.Empty)) {
                     _parametersToOutput.Add(param.Type.FullName ?? string.Empty, param.Type);
@@ -108,12 +114,11 @@ namespace DiscordBot.Modules {
 
                 if (param.IsOptional) {
                     output.Append($"[{param.Name}:{param.Type.ToFriendlyName()}");
-                    if (param.DefaultValue != null &&
-                        (param.Type == typeof(string) && !string.IsNullOrEmpty(param.DefaultValue.ToString()))) {
+                    if (param.DefaultValue != null && param.Type == typeof(string) && !string.IsNullOrEmpty(param.DefaultValue.ToString())) {
                         output.Append($" = {param.DefaultValue}");
                     }
 
-                    output.Append($"] ");
+                    output.Append("] ");
                 } else if (param.IsMultiple) {
                     output.Append($"|{param.Name}:{param.Type.ToFriendlyName()}| ");
                 } else if (param.IsRemainder) {
@@ -134,27 +139,32 @@ namespace DiscordBot.Modules {
         }
 
         public string GetPrefix(ModuleInfo module) {
-            string output = "";
-            if (module.Parent != null) output = $"{GetPrefix(module.Parent)}{output}";
-            if (module.Aliases.Any())
+            var output = "";
+            if (module.Parent != null) {
+                output = $"{GetPrefix(module.Parent)}{output}";
+            }
+
+            if (module.Aliases.Any()) {
                 output += string.Concat(module.Aliases.FirstOrDefault(), " ");
+            }
+
             return output;
         }
 
         private void AddPrefixHelp(EmbedBuilder output) {
-            output.AddField($"Prefixes",
+            output.AddField("Prefixes",
                 $"`{_configuration.CustomPrefix}` or a mention towards me!{Environment.NewLine}For example `{_configuration.CustomPrefix} help`");
             //output.AddField($"Parameters", $"`{_configuration.CustomPrefix}` or a mention towards me!{Environment.NewLine}For example `{_configuration.CustomPrefix} help`");
         }
 
         private void AddParameterInfo(ref EmbedBuilder output) {
-            List<StringBuilder> builders = TypesToFriendlyDescription(_parametersToOutput).OrderBy(x => x.Length).ToList();
-            int chunkSize = 1024;
-            StringBuilder fieldBuilder = new StringBuilder();
-            string continueString = "";
+            var builders = TypesToFriendlyDescription(_parametersToOutput).OrderBy(x => x.Length).ToList();
+            var chunkSize = 1024;
+            var fieldBuilder = new StringBuilder();
+            var continueString = "";
 
             // what a nice function..
-            foreach (StringBuilder builder in builders) {
+            foreach (var builder in builders) {
                 // It's too big, lets output all
                 if (fieldBuilder.Length + builder.Length > chunkSize) {
                     output.AddField($"Parameters {continueString}", fieldBuilder.ToString());
@@ -165,7 +175,7 @@ namespace DiscordBot.Modules {
 
                 if (builder.Length > chunkSize) {
                     // Too big for one field, lets split it up in multiple.. god
-                    string description = builder.ToString();
+                    var description = builder.ToString();
                     while (description.Length > chunkSize) {
                         var lastIndex = description.Substring(0, chunkSize).LastIndexOf(",", StringComparison.Ordinal);
                         if (lastIndex == -1) {
@@ -194,11 +204,11 @@ namespace DiscordBot.Modules {
         }
 
         private List<StringBuilder> TypesToFriendlyDescription(Dictionary<string, Type> types) {
-            List<StringBuilder> result = new List<StringBuilder>();
-            Dictionary<string, Type> extraTypes = new Dictionary<string, Type>();
-            foreach (KeyValuePair<string, Type> keyValuePair in types) {
-                StringBuilder builder = new StringBuilder();
-                Type type = keyValuePair.Value;
+            var result = new List<StringBuilder>();
+            var extraTypes = new Dictionary<string, Type>();
+            foreach (var keyValuePair in types) {
+                var builder = new StringBuilder();
+                var type = keyValuePair.Value;
 
                 if (type == null) {
                     continue;
@@ -222,7 +232,7 @@ namespace DiscordBot.Modules {
                 builder.Append($"**{type.ToFriendlyName(true)}** {Environment.NewLine}");
 
                 if (type.IsEnum) {
-                    List<string> values = new List<string>();
+                    var values = new List<string>();
                     foreach (var x in type.GetFields()) {
                         if (!x.Name.Equals("value__")) {
                             values.Add(Enum.Parse(type, x.Name).ToString());
@@ -237,7 +247,7 @@ namespace DiscordBot.Modules {
                     var list = properties.Where(x =>
                         !types.ContainsKey(x.PropertyType.FullName ?? string.Empty) &&
                         !extraTypes.ContainsKey(x.PropertyType.FullName ?? string.Empty)).ToList();
-                    Dictionary<string, Type> dictionary = new Dictionary<string, Type>();
+                    var dictionary = new Dictionary<string, Type>();
                     foreach (var item in list) {
                         if (!dictionary.ContainsKey(item.PropertyType.FullName ?? string.Empty)) {
                             dictionary.Add(item.PropertyType.FullName ?? string.Empty, item.PropertyType);

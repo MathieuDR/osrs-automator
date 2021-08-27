@@ -7,45 +7,95 @@ using Discord.Addons.Interactive.Criteria;
 using Discord.Commands;
 using Discord.WebSocket;
 
-namespace Discord.Addons.Interactive.Paginator
-{
-    public class PaginatedMessageCallback : IReactionCallback
-    {
-        public SocketCommandContext Context { get; }
-        public InteractiveService Interactive { get; private set; }
-        public IUserMessage Message { get; private set; }
-
-        public RunMode RunMode { get; protected set; }
-        public ICriterion<SocketReaction> Criterion => _criterion;
-        public TimeSpan? Timeout => Options.Timeout;
-
-        public DateTimeOffset LastInteraction { get; set; } = DateTimeOffset.Now;
-
-        private readonly ICriterion<SocketReaction> _criterion;
+namespace Discord.Addons.Interactive.Paginator {
+    public class PaginatedMessageCallback : IReactionCallback {
         protected readonly PaginatedMessage Pager;
-
-        protected PaginatedAppearanceOptions Options => Pager.Options;
-        protected int Pages;
         protected int Page = 1;
-        
+        protected int Pages;
 
-        public PaginatedMessageCallback(InteractiveService interactive, 
+
+        public PaginatedMessageCallback(InteractiveService interactive,
             SocketCommandContext sourceContext,
             PaginatedMessage pager,
-            ICriterion<SocketReaction> criterion = null)
-        {
+            ICriterion<SocketReaction> criterion = null) {
             Interactive = interactive;
             Context = sourceContext;
-            _criterion = criterion ?? new EmptyCriterion<SocketReaction>();
+            Criterion = criterion ?? new EmptyCriterion<SocketReaction>();
             Pager = pager;
             Pages = Pager.Pages.Count();
             RunMode = RunMode.Sync;
-            if (Pager.Pages is IEnumerable<EmbedFieldBuilder>)
-                Pages = ((Pager.Pages.Count() - 1) / Options.FieldsPerPage) + 1;
+            if (Pager.Pages is IEnumerable<EmbedFieldBuilder>) {
+                Pages = (Pager.Pages.Count() - 1) / Options.FieldsPerPage + 1;
+            }
         }
 
-        public async Task DisplayAsync()
-        {
+        public InteractiveService Interactive { get; }
+        public IUserMessage Message { get; private set; }
+
+        public DateTimeOffset LastInteraction { get; set; } = DateTimeOffset.Now;
+
+        protected PaginatedAppearanceOptions Options => Pager.Options;
+        public SocketCommandContext Context { get; }
+
+        public RunMode RunMode { get; protected set; }
+        public ICriterion<SocketReaction> Criterion { get; }
+
+        public TimeSpan? Timeout => Options.Timeout;
+
+        public virtual async Task<bool> HandleCallbackAsync(SocketReaction reaction) {
+            LastInteraction = DateTimeOffset.Now;
+
+            var emote = reaction.Emote;
+            _ = Message.RemoveReactionAsync(reaction.Emote, reaction.User.Value);
+
+            if (emote.Equals(Options.First)) {
+                Page = 1;
+            } else if (emote.Equals(Options.Next)) {
+                if (Page >= Pages) {
+                    return false;
+                }
+
+                ++Page;
+            } else if (emote.Equals(Options.Back)) {
+                if (Page <= 1) {
+                    return false;
+                }
+
+                --Page;
+            } else if (emote.Equals(Options.Last)) {
+                Page = Pages;
+            } else if (emote.Equals(Options.Stop)) {
+                Interactive.RemoveReactionCallback(Message);
+                await Message.RemoveAllReactionsAsync().ConfigureAwait(false);
+                return true;
+            } else if (emote.Equals(Options.Jump)) {
+                _ = Task.Run(async () => {
+                    var criteria = new Criteria<SocketMessage>()
+                        .AddCriterion(new EnsureSourceChannelCriterion())
+                        .AddCriterion(new EnsureFromUserCriterion(reaction.UserId))
+                        .AddCriterion(new EnsureIsIntegerCriterion());
+                    var response = await Interactive.NextMessageAsync(Context, criteria, TimeSpan.FromSeconds(15));
+                    var request = int.Parse(response.Content);
+                    if (request < 1 || request > Pages) {
+                        _ = response.DeleteAsync().ConfigureAwait(false);
+                        await Interactive.ReplyAndDeleteAsync(Context, Options.Stop.Name);
+                        return;
+                    }
+
+                    Page = request;
+                    _ = response.DeleteAsync().ConfigureAwait(false);
+                    await RenderAsync().ConfigureAwait(false);
+                });
+            } else if (emote.Equals(Options.Info)) {
+                await Interactive.ReplyAndDeleteAsync(Context, Options.InformationText, timeout: Options.InfoTimeout);
+                return false;
+            }
+
+            await RenderAsync().ConfigureAwait(false);
+            return false;
+        }
+
+        public async Task DisplayAsync() {
             var embed = BuildEmbed();
             var message = await Context.Channel.SendMessageAsync(Pager.Content, embed: embed).ConfigureAwait(false);
             Message = message;
@@ -54,8 +104,7 @@ namespace Discord.Addons.Interactive.Paginator
             _ = Options.AddReactions(message, Context, Pages);
 
             // TODO: (Next major version) timeouts need to be handled at the service-level!
-            if (Timeout != null)
-            {
+            if (Timeout != null) {
                 _ = Task.Delay(Timeout.Value).ContinueWith(_ => TimeOutHandler());
             }
         }
@@ -75,65 +124,6 @@ namespace Discord.Addons.Interactive.Paginator
             return Task.CompletedTask;
         }
 
-        public virtual async Task<bool> HandleCallbackAsync(SocketReaction reaction)
-        {
-            LastInteraction = DateTimeOffset.Now;
-            
-            var emote = reaction.Emote;
-            _ = Message.RemoveReactionAsync(reaction.Emote, reaction.User.Value);
-
-            if (emote.Equals(Options.First))
-                Page = 1;
-            else if (emote.Equals(Options.Next))
-            {
-                if (Page >= Pages)
-                    return false;
-                ++Page;
-            }
-            else if (emote.Equals(Options.Back))
-            {
-                if (Page <= 1)
-                    return false;
-                --Page;
-            }
-            else if (emote.Equals(Options.Last))
-                Page = Pages;
-            else if (emote.Equals(Options.Stop)) {
-                Interactive.RemoveReactionCallback(Message);
-                await Message.RemoveAllReactionsAsync().ConfigureAwait(false);
-                return true;
-            }
-            else if (emote.Equals(Options.Jump))
-            {
-                _ = Task.Run(async () =>
-                {
-                    var criteria = new Criteria<SocketMessage>()
-                        .AddCriterion(new EnsureSourceChannelCriterion())
-                        .AddCriterion(new EnsureFromUserCriterion(reaction.UserId))
-                        .AddCriterion(new EnsureIsIntegerCriterion());
-                    var response = await Interactive.NextMessageAsync(Context, criteria, TimeSpan.FromSeconds(15));
-                    var request = int.Parse(response.Content);
-                    if (request < 1 || request > Pages)
-                    {
-                        _ = response.DeleteAsync().ConfigureAwait(false);
-                        await Interactive.ReplyAndDeleteAsync(Context, Options.Stop.Name);
-                        return;
-                    }
-                    Page = request;
-                    _ = response.DeleteAsync().ConfigureAwait(false);
-                    await RenderAsync().ConfigureAwait(false);
-                });
-            }
-            else if (emote.Equals(Options.Info))
-            {
-                await Interactive.ReplyAndDeleteAsync(Context, Options.InformationText, timeout: Options.InfoTimeout);
-                return false;
-            }
-            
-            await RenderAsync().ConfigureAwait(false);
-            return false;
-        }
-        
         protected virtual Embed BuildEmbed() {
             var pageIndex = Page - 1;
 
@@ -142,8 +132,7 @@ namespace Discord.Addons.Interactive.Paginator
                 .WithColor(Pager.Color)
                 .WithTitle(Pager.Title);
 
-            if (Pager.Pages is IEnumerable<EmbedFieldBuilder> efb)
-            {
+            if (Pager.Pages is IEnumerable<EmbedFieldBuilder> efb) {
                 builder.Fields = efb.Skip(pageIndex * Options.FieldsPerPage).Take(Options.FieldsPerPage).ToList();
                 builder.Description = Pager.AlternateDescription;
             } else {
@@ -154,12 +143,11 @@ namespace Discord.Addons.Interactive.Paginator
                     builder.Description = Pager.Pages.ElementAt(Page - 1).ToString();
                 }
             }
-            
+
             return builder.Build();
         }
 
-        private async Task RenderAsync()
-        {
+        private async Task RenderAsync() {
             var embed = BuildEmbed();
             await Message.ModifyAsync(m => m.Embed = embed).ConfigureAwait(false);
         }

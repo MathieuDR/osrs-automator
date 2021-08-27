@@ -1,8 +1,7 @@
 using System.Text.Json.Serialization;
 
 namespace Dashboard.Models.ApiRequests.DiscordEmbed {
-    public class Field
-    {
+    public class Field {
         [JsonPropertyName("inline")]
         public bool Inline { get; set; }
 

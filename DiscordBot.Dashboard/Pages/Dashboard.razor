@@ -11,14 +11,15 @@
 </ul>
 
 @code {
+
     [Inject]
     public ICollectionLogItemProvider CollectionLogItemProvider { get; set; }
 
-    public List<string> LogItems { get; set; } = new List<string>();
+    public List<string> LogItems { get; set; } = new();
 
     protected override async Task OnInitializedAsync() {
         var items = await CollectionLogItemProvider.GetCollectionLogItemNames();
-        LogItems = items.Value.OrderBy(x=>x).ToList();
+        LogItems = items.Value.OrderBy(x => x).ToList();
 
         await base.OnInitializedAsync();
     }

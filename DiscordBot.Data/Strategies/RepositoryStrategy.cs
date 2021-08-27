@@ -14,7 +14,7 @@ namespace DiscordBot.Data.Strategies {
         public IRepository CreateRepository(Type type, ulong guildId) {
             var factory = _factories
                 .FirstOrDefault(f => f.AppliesTo(type, true));
-            
+
             if (factory == null) {
                 throw new InvalidOperationException($"{type} not registered");
             }
@@ -25,7 +25,7 @@ namespace DiscordBot.Data.Strategies {
         public IRepository CreateRepository(Type type) {
             var factory = _factories
                 .FirstOrDefault(f => f.AppliesTo(type, false));
-            
+
             if (factory == null) {
                 throw new InvalidOperationException($"{type} not registered");
             }

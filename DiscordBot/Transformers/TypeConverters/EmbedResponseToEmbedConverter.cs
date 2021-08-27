@@ -9,7 +9,7 @@ namespace DiscordBot.Transformers.TypeConverters {
             var builder = new EmbedBuilder();
 
             if (string.IsNullOrWhiteSpace(source.Title) && string.IsNullOrWhiteSpace(source.Description)) {
-                throw new ResponseException($"Response object must have a title or description.", null);
+                throw new ResponseException("Response object must have a title or description.", null);
             }
 
             if (!string.IsNullOrWhiteSpace(source.AuthorName)) {

@@ -1,14 +1,14 @@
 namespace DiscordBot.Common.Models.DiscordDtos {
     public class Channel {
-
         public Channel() { }
 
         public Channel(ulong thirdParty) {
             ThirdPartyId = thirdParty;
         }
+
         public ulong Id { get; set; }
         public string Name { get; set; }
-        private ulong? ThirdPartyId { get; set; }
+        private ulong? ThirdPartyId { get; }
 
         public ulong? GuildId => IsGuildChannel ? ThirdPartyId : null;
         public ulong? RecipientId => IsDMChannel ? ThirdPartyId : null;

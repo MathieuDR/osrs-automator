@@ -126,8 +126,8 @@ namespace WiseOldManConnector.Api {
             result.Data.Page = 0;
             result.Data.PageSize = 20;
             result.Data.MetricType = metric;
-            
-            foreach (HighscoreMember member in result.Data.Members) {
+
+            foreach (var member in result.Data.Members) {
                 member.MetricType = metric;
             }
 
@@ -147,7 +147,7 @@ namespace WiseOldManConnector.Api {
             result.Data.Page = offset;
             result.Data.PageSize = limit;
 
-            foreach (HighscoreMember member in result.Data.Members) {
+            foreach (var member in result.Data.Members) {
                 member.MetricType = metric;
             }
 
@@ -274,7 +274,7 @@ namespace WiseOldManConnector.Api {
             var restRequest = GetNewRestRequest("{id}/update-all");
             restRequest.AddParameter("id", id, ParameterType.UrlSegment);
             restRequest.Method = Method.POST;
-           
+
             restRequest.AddJsonBody(new {
                 verificationCode
             });

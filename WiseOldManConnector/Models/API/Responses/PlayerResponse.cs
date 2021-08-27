@@ -3,7 +3,6 @@ using Newtonsoft.Json;
 
 namespace WiseOldManConnector.Models.API.Responses {
     internal class PlayerResponse : BaseResponse {
-
         [JsonProperty("id")]
         public int Id { get; set; }
 

@@ -7,9 +7,9 @@ using Serilog;
 namespace DiscordBot.Data.Repository.Migrations {
     public class MigrationManager {
         private readonly ILogger _logger;
+        private readonly List<IMigration> _migrations;
 
         private int? _currentMigration;
-        private readonly List<IMigration> _migrations;
 
         public MigrationManager(ILogger logger) {
             _logger = logger;

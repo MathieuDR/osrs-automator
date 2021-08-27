@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Text.RegularExpressions;
@@ -11,7 +10,7 @@ using WiseOldManConnector.Models.WiseOldMan.Enums;
 namespace DiscordBot.TypeReaders {
     public class PeriodOsrsTypeReader : TypeReader {
         public override Task<TypeReaderResult> ReadAsync(ICommandContext context, string input, IServiceProvider services) {
-            List<string> parameters =
+            var parameters =
                 Regex.Matches(input, @"[\""].+?[\""]|[^ ]+").Select(m => m.Value.Replace("\"", "")).ToList();
 
             if (!parameters.Any()) {
@@ -19,13 +18,13 @@ namespace DiscordBot.TypeReaders {
             }
 
             if (parameters.Count > 2) {
-                return Task.FromResult(TypeReaderResult.FromError(CommandError.BadArgCount, $"Too many arguments!"));
+                return Task.FromResult(TypeReaderResult.FromError(CommandError.BadArgCount, "Too many arguments!"));
             }
 
             var result = new PeriodArguments();
 
-            foreach (string parameter in parameters) {
-                if (Enum.TryParse(typeof(Period), parameter, true, out object period)) {
+            foreach (var parameter in parameters) {
+                if (Enum.TryParse(typeof(Period), parameter, true, out var period)) {
                     Debug.Assert(period != null, nameof(period) + " != null");
                     result.Period = (Period) period;
                 } else if (string.IsNullOrEmpty(result.Name)) {

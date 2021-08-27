@@ -16,7 +16,7 @@ namespace DiscordBot.Modules {
     [Name("Administrator")]
     [Group("cfg")]
     [RequireUserPermission(GuildPermission.Administrator, Group = "Permission")]
-    [RequireRole(new ulong[]{784510650260914216, 806544893584343092}, Group = "Permission")]
+    [RequireRole(new ulong[] {784510650260914216, 806544893584343092}, Group = "Permission")]
     public class AdminModule : BaseWaitMessageEmbeddedResponseModule {
         private readonly IGroupService _groupService;
 
@@ -26,7 +26,7 @@ namespace DiscordBot.Modules {
             base(mapper, logger, messageConfiguration) {
             _groupService = groupService;
         }
-        
+
         [Name("DisplayMembers")]
         [Command("members", RunMode = RunMode.Async)]
         [Summary("Display all members")]
@@ -38,7 +38,7 @@ namespace DiscordBot.Modules {
             builder.Description = string.Join(", ", members.Select(x => x.Username).ToList());
             await ModifyWaitMessageAsync(builder.Build());
         }
-        
+
         [Name("Set WOM group")]
         [Command("womgroup", RunMode = RunMode.Async)]
         [Summary("Set the wom group for guild")]
@@ -47,7 +47,7 @@ namespace DiscordBot.Modules {
             var decoratedGroup = await _groupService.SetGroupForGuild(GetGuildUser().ToGuildUserDto(), womGroup, verificationCode);
             var builder = new EmbedBuilder().AddWiseOldMan(decoratedGroup);
 
-            builder.Title = $"Success.";
+            builder.Title = "Success.";
             builder.Description = $"Group set to {decoratedGroup.Item.Name}";
             await ModifyWaitMessageAsync(builder.Build());
         }
@@ -61,7 +61,7 @@ namespace DiscordBot.Modules {
             var messageChannel = (ITextChannel) channel;
 
             if (messageChannel == null) {
-                throw new Exception($"Channel wasn't a message channel. Try a different one.");
+                throw new Exception("Channel wasn't a message channel. Try a different one.");
             }
 
             var jobType = Enum.Parse<JobType>(job, true);
@@ -83,7 +83,7 @@ namespace DiscordBot.Modules {
         [RequireContext(ContextType.Guild)]
         public async Task QueueAutomated(JobType job) {
             _ = _groupService.QueueJob(job);
-                
+
             var builder = new EmbedBuilder()
                 .AddCommonProperties()
                 .WithMessageAuthorFooter(Context)
@@ -99,9 +99,9 @@ namespace DiscordBot.Modules {
         [RequireContext(ContextType.Guild)]
         public async Task ToggleAutomatedJob(string job) {
             var jobType = Enum.Parse<JobType>(job, true);
-            bool activated = await _groupService.ToggleAutomationJob(jobType, GetGuildUser().Guild.ToGuildDto());
+            var activated = await _groupService.ToggleAutomationJob(jobType, GetGuildUser().Guild.ToGuildDto());
 
-            string verb = activated ? "activated" : "deactivated";
+            var verb = activated ? "activated" : "deactivated";
 
             var builder = new EmbedBuilder()
                 .AddCommonProperties()

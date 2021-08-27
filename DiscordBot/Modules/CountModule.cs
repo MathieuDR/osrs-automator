@@ -1,5 +1,4 @@
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -18,14 +17,13 @@ using DiscordBot.Services.Interfaces;
 using DiscordBot.Transformers;
 
 namespace DiscordBot.Modules {
-    
     [Group("count")]
     [RequireContext(ContextType.Guild)]
-    public class CountModule: BaseWaitMessageEmbeddedResponseModule  {
+    public class CountModule : BaseWaitMessageEmbeddedResponseModule {
         private readonly ICounterService _counterService;
         private readonly IServiceProvider _serviceProvider;
 
-        public CountModule(Mapper mapper, ILogService logger, MessageConfiguration messageConfiguration, 
+        public CountModule(Mapper mapper, ILogService logger, MessageConfiguration messageConfiguration,
             ICounterService counterService, IServiceProvider serviceProvider) : base(mapper,
             logger, messageConfiguration) {
             _counterService = counterService;
@@ -33,32 +31,32 @@ namespace DiscordBot.Modules {
         }
 
         [RequireUserPermission(GuildPermission.Administrator, Group = "Permission")]
-        [RequireRole(new ulong[]{784510650260914216, 806544893584343092}, Group = "Permission")]
+        [RequireRole(new ulong[] {784510650260914216, 806544893584343092}, Group = "Permission")]
         [Name("Count")]
         [Command]
         [Summary("Add any number to the tally, you can tag multiple users")]
-        public async Task Count(int additive, [Remainder]string args) {
+        public async Task Count(int additive, [Remainder] string args) {
             if (additive == 0) {
-                throw new ArgumentException($"Additive must not be 0");
+                throw new ArgumentException("Additive must not be 0");
             }
 
             var users = args
                 .ToCollectionOfParameters()
                 .ToArray()
-                .GetDiscordsUsersListFromStrings(out string[] remainingArgs, Context, _serviceProvider).Distinct()
+                .GetDiscordsUsersListFromStrings(out var remainingArgs, Context, _serviceProvider).Distinct()
                 .ToList();
-            
+
             if (!users.Any()) {
-                throw new ArgumentException($"Must enter an user.");
+                throw new ArgumentException("Must enter an user.");
             }
 
             var reason = string.Join(" ", remainingArgs.ParseMentions(Context));
 
             var userString = users.Count() == 1 ? "user" : "users";
-            var builder = EmbedBuilderHelper.AddCommonProperties(new EmbedBuilder()).WithTitle($"Adding {additive} points for {users.Count()} {userString}")
-              .WithMessageAuthorFooter(Context);
+            var builder = new EmbedBuilder().AddCommonProperties().WithTitle($"Adding {additive} points for {users.Count()} {userString}")
+                .WithMessageAuthorFooter(Context);
 
-            StringBuilder descriptionBuilder = new StringBuilder();
+            var descriptionBuilder = new StringBuilder();
             var tasks = new List<Task>();
             foreach (var user in users) {
                 var guildUser = user as IGuildUser ?? throw new ArgumentException("Cannot find user");
@@ -84,7 +82,7 @@ namespace DiscordBot.Modules {
                 if (!(Context.Guild.GetChannel(channelId) is ISocketMessageChannel channel)) {
                     return;
                 }
-                
+
                 foreach (var treshold in tresholds) {
                     var tresholdCount = treshold.Threshold;
 
@@ -99,7 +97,7 @@ namespace DiscordBot.Modules {
                     if (startCount >= tresholdCount && newCount < tresholdCount) {
                         // Remove it
                         await channel.SendMessageAsync($"<@{user.Id}> has not sufficient points anymore for {treshold.Name}");
-                        
+
                         if (treshold.GivenRoleId.HasValue && Context.Guild.GetRole(treshold.GivenRoleId.Value) is IRole role) {
                             await user.RemoveRoleAsync(role);
                         }
@@ -115,23 +113,23 @@ namespace DiscordBot.Modules {
         [Summary("See total count of an user")]
         public async Task GetTotal(IGuildUser user) {
             var totalCount = _counterService.TotalCount(user.ToGuildUserDto());
-        
-            var builder = EmbedBuilderHelper.AddCommonProperties(new EmbedBuilder()).WithTitle(user.DisplayName())
+
+            var builder = new EmbedBuilder().AddCommonProperties().WithTitle(user.DisplayName())
                 .WithDescription($"Total count: {totalCount}").WithMessageAuthorFooter(Context);
-            
+
             await ModifyWaitMessageAsync(builder.Build());
         }
-        
+
         [Name("Total count")]
         [Command("total")]
         [Summary("See your total count")]
         public async Task GetTotal() {
-            IGuildUser user = (IGuildUser) Context.User;
+            var user = (IGuildUser) Context.User;
             var totalCount = _counterService.TotalCount(user.ToGuildUserDto());
-        
-            var builder = EmbedBuilderHelper.AddCommonProperties(new EmbedBuilder()).WithTitle(user.DisplayName())
+
+            var builder = new EmbedBuilder().AddCommonProperties().WithTitle(user.DisplayName())
                 .WithDescription($"Total count: {totalCount}").WithMessageAuthorFooter(Context);
-            
+
             await ModifyWaitMessageAsync(builder.Build());
         }
 
@@ -147,43 +145,45 @@ namespace DiscordBot.Modules {
                 .WithMessageAuthorFooter(Context);
 
             if (countInfo is null || countInfo.CountHistory.Count == 0) {
-                builder.WithDescription($"Has no history.");
+                builder.WithDescription("Has no history.");
                 await ModifyWaitMessageAsync(builder.Build());
                 return;
             }
-            
+
             var historyPages = CountHistoryToString(countInfo);
 
-            if (historyPages.Count == 1){
-                builder.WithDescription($"Total count: {countInfo.CurrentCount}.{Environment.NewLine}```diff{Environment.NewLine}{historyPages.First()}```");
+            if (historyPages.Count == 1) {
+                builder.WithDescription(
+                    $"Total count: {countInfo.CurrentCount}.{Environment.NewLine}```diff{Environment.NewLine}{historyPages.First()}```");
                 await ModifyWaitMessageAsync(builder.Build());
                 return;
             }
-            
-            var pages = historyPages.Select(x => builder.WithDescription($"Total count: {countInfo.CurrentCount}.{Environment.NewLine}```diff{Environment.NewLine}{x}```")).ToList();
+
+            var pages = historyPages.Select(x =>
+                builder.WithDescription($"Total count: {countInfo.CurrentCount}.{Environment.NewLine}```diff{Environment.NewLine}{x}```")).ToList();
             _ = DeleteWaitMessageAsync();
-            
+
             // This needs to be refactored! ASAP
             var message = new CustomPaginatedMessage(new EmbedBuilder()) {
                 Pages = pages
             };
             await SendPaginatedMessageAsync(message);
         }
-        
+
         [Name("Count history")]
         [Command("history")]
         [Summary("See count history of yourself")]
         public async Task CountHistory() {
             await CountHistory((IGuildUser) Context.User);
         }
-        
+
         [Name("Top")]
         [Command("top")]
         [Summary("See the top 10 users of the server")]
         public async Task CountTop() {
             await CountTop(10);
         }
-        
+
         [Name("Top")]
         [Command("top")]
         [Summary("See the top users of the server. Maximum 20")]
@@ -193,48 +193,49 @@ namespace DiscordBot.Modules {
             }
 
             var topMembers = _counterService.TopCounts(Context.Guild.ToGuildDto(), quantity);
-            var builder = EmbedBuilderHelper.AddCommonProperties(new EmbedBuilder())
+            var builder = new EmbedBuilder().AddCommonProperties()
                 .WithTitle($"Top counts for {Context.Guild.Name}")
                 .WithMessageAuthorFooter(Context);
-            
+
             ListTopMembers(builder, topMembers);
-            
+
             await ModifyWaitMessageAsync(builder.Build());
         }
 
-        private List<string> CountHistoryToString( UserCountInfo countInfo) {
+        private List<string> CountHistoryToString(UserCountInfo countInfo) {
             var pages = new List<string>();
-            int max = 1000;
-            StringBuilder blockbuilder = new StringBuilder();
+            var max = 1000;
+            var blockbuilder = new StringBuilder();
 
             var list = countInfo.CountHistory.OrderByDescending(x => x.RequestedOn).ToList();
-            
+
             foreach (var count in list) {
                 var historyBlockBuilder = new StringBuilder();
                 historyBlockBuilder.Append(count.Additive > 0 ? "+ " : "- ");
                 historyBlockBuilder.Append($"{Math.Abs(count.Additive)}".PadLeft(4));
-                historyBlockBuilder.Append(string.IsNullOrEmpty(count.Reason)? "".PadRight(25): $", {count.Reason}".PadRight(25));
+                historyBlockBuilder.Append(string.IsNullOrEmpty(count.Reason) ? "".PadRight(25) : $", {count.Reason}".PadRight(25));
                 historyBlockBuilder.Append($"| By {count.RequestedDiscordTag} on {count.RequestedOn.ToString("d")}");
-                
+
                 if (blockbuilder.ToString().Length + historyBlockBuilder.ToString().Length >= max) {
                     pages.Add(blockbuilder.ToString());
                     blockbuilder = new StringBuilder();
                 }
+
                 blockbuilder.AppendLine(historyBlockBuilder.ToString());
             }
-            
-            if(!string.IsNullOrWhiteSpace(blockbuilder.ToString())) {
+
+            if (!string.IsNullOrWhiteSpace(blockbuilder.ToString())) {
                 pages.Add(blockbuilder.ToString());
             }
 
             return pages;
         }
-        
+
         private void ListTopMembers(EmbedBuilder builder, List<UserCountInfo> countInfos) {
             var historyBlockBuilder = new StringBuilder();
             for (var i = 0; i < countInfos.Count; i++) {
                 var countInfo = countInfos[i];
-                historyBlockBuilder.Append($"{i+1}, ".PadLeft(4));
+                historyBlockBuilder.Append($"{i + 1}, ".PadLeft(4));
                 historyBlockBuilder.Append($"{NicknameById(countInfo.DiscordId)}".PadRight(25));
                 historyBlockBuilder.AppendLine(
                     $": {countInfo.CurrentCount} points".PadRight(13));
@@ -247,14 +248,16 @@ namespace DiscordBot.Modules {
             var user = Context.Guild.GetUser(userId);
             return user?.DisplayName();
         }
-        
+
         [RequireUserPermission(GuildPermission.Administrator, Group = "Permission")]
-        [RequireRole(new ulong[]{784510650260914216, 806544893584343092}, Group = "Permission")]
+        [RequireRole(new ulong[] {784510650260914216, 806544893584343092}, Group = "Permission")]
         [Group("threshold")]
         [RequireContext(ContextType.Guild)]
-        public class CountConfigModule : BaseWaitMessageEmbeddedResponseModule{
+        public class CountConfigModule : BaseWaitMessageEmbeddedResponseModule {
             private readonly ICounterService _counterService;
-            public CountConfigModule(ICounterService counterService,Mapper mapper, ILogService logger, MessageConfiguration messageConfiguration) : base(mapper, logger, messageConfiguration) {
+
+            public CountConfigModule(ICounterService counterService, Mapper mapper, ILogService logger, MessageConfiguration messageConfiguration) :
+                base(mapper, logger, messageConfiguration) {
                 _counterService = counterService;
             }
 
@@ -262,10 +265,10 @@ namespace DiscordBot.Modules {
             [Command("channel")]
             [Summary("Set channel for the outputs")]
             public async Task SetChannel(IChannel channel) {
-                var success = await _counterService.SetChannelForCounts(Context.User .ToGuildUserDto(), channel.ToChannelDto());
+                var success = await _counterService.SetChannelForCounts(Context.User.ToGuildUserDto(), channel.ToChannelDto());
 
                 var verb = success ? "Success" : "Failure";
-                var builder = EmbedBuilderHelper.AddCommonProperties(new EmbedBuilder())
+                var builder = new EmbedBuilder().AddCommonProperties()
                     .WithTitle(verb)
                     .WithDescription($"Set {channel.Name} as output channel")
                     .WithMessageAuthorFooter(Context);
@@ -280,7 +283,7 @@ namespace DiscordBot.Modules {
                 var success = await _counterService.CreateThreshold(Context.User.ToGuildUserDto(), count, name, role.ToRoleDto());
 
                 var verb = success ? "Success" : "Failure";
-                var builder = EmbedBuilderHelper.AddCommonProperties(new EmbedBuilder())
+                var builder = new EmbedBuilder().AddCommonProperties()
                     .WithTitle(verb)
                     .WithDescription($"Added new treshold '{name}' from {count} with role {role.Name}")
                     .WithColor(role.Color)
@@ -288,7 +291,7 @@ namespace DiscordBot.Modules {
 
                 await ModifyWaitMessageAsync(builder.Build());
             }
-            
+
             [Name("Create")]
             [Command("create")]
             [Summary("Create a new treshold without a role")]
@@ -296,21 +299,21 @@ namespace DiscordBot.Modules {
                 var success = await _counterService.CreateThreshold(Context.User.ToGuildUserDto(), count, name);
 
                 var verb = success ? "Success" : "Failure";
-                var builder = EmbedBuilderHelper.AddCommonProperties(new EmbedBuilder())
+                var builder = new EmbedBuilder().AddCommonProperties()
                     .WithTitle(verb)
                     .WithDescription($"Added new treshold '{name}' from {count} without role")
                     .WithMessageAuthorFooter(Context);
 
                 await ModifyWaitMessageAsync(builder.Build());
             }
-            
+
             [Name("List")]
             [Command("list")]
             [Summary("See all tresholds in a list format")]
             public async Task List() {
                 var tresholds = await _counterService.GetThresholds(Context.Guild.Id);
-                
-                var builder = EmbedBuilderHelper.AddCommonProperties(new EmbedBuilder())
+
+                var builder = new EmbedBuilder().AddCommonProperties()
                     .WithTitle("Current tresholds")
                     .WithDescription($"```{ToDescription(tresholds)}```")
                     .WithMessageAuthorFooter(Context);
@@ -319,16 +322,16 @@ namespace DiscordBot.Modules {
             }
 
             private string ToDescription(IEnumerable<CountThreshold> tresholds) {
-                StringBuilder builder = new StringBuilder();
+                var builder = new StringBuilder();
                 var enumerable = tresholds.ToList();
-                
+
                 // format
                 builder.Append("ID".PadLeft(3));
                 builder.Append(", ");
-                builder.Append($"#:".PadLeft(5));
+                builder.Append("#:".PadLeft(5));
                 builder.Append("Name".PadRight(15));
                 builder.Append($", role: role{Environment.NewLine}");
-                
+
                 for (var i = 0; i < enumerable.Count; i++) {
                     var treshold = enumerable[i];
 
@@ -336,7 +339,7 @@ namespace DiscordBot.Modules {
                     builder.Append(", ");
 
                     builder.Append($"{treshold.Threshold}:".PadLeft(5));
-                        
+
                     var name = string.IsNullOrEmpty(treshold.Name) ? "Unnamed" : treshold.Name;
                     builder.Append(name.PadRight(15));
 
@@ -351,7 +354,7 @@ namespace DiscordBot.Modules {
 
                 return builder.ToString();
             }
-            
+
             [Name("Remove")]
             [Command("remove")]
             [Summary("Remove an treshold")]
@@ -359,7 +362,7 @@ namespace DiscordBot.Modules {
                 var success = await _counterService.RemoveCount(Context.Guild.Id, index);
 
                 var verb = success ? "Success" : "Failure";
-                var builder = EmbedBuilderHelper.AddCommonProperties(new EmbedBuilder())
+                var builder = new EmbedBuilder().AddCommonProperties()
                     .WithTitle(verb)
                     .WithDescription($"Removed treshold with index {index}")
                     .WithMessageAuthorFooter(Context);

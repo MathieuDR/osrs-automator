@@ -6,7 +6,6 @@ using Discord.WebSocket;
 using DiscordBot.Common.Models.Data;
 using DiscordBot.Common.Models.Enums;
 using DiscordBot.Data.Interfaces;
-using DiscordBot.Data.Repository;
 using DiscordBot.Services.interfaces;
 using DiscordBot.Services.Interfaces;
 using Serilog.Events;
@@ -32,9 +31,9 @@ namespace DiscordBot.Jobs {
             var achievements = (await achievementsTask).OrderBy(a => a.AchievedAt).ToList();
 
             // Lookup when last time was printed!
-            int startIndex = 0;
+            var startIndex = 0;
             if (jobState == null) {
-                jobState = new AutomatedJobState() {
+                jobState = new AutomatedJobState {
                     GuildId = Configuration.GuildId,
                     LastPrintedAchievement = new Achievement()
                 };
@@ -45,11 +44,11 @@ namespace DiscordBot.Jobs {
             }
 
 
-            _ = LogService.Log($"Printing achievements", LogEventLevel.Information);
+            _ = LogService.Log("Printing achievements", LogEventLevel.Information);
 
             int i;
             for (i = startIndex; i < achievements.Count; i++) {
-                Achievement achievement = achievements[i];
+                var achievement = achievements[i];
 
                 var builder = new EmbedBuilder();
                 builder = Mapper.Map(achievement, builder);

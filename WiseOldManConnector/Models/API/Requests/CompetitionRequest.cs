@@ -12,30 +12,27 @@ namespace WiseOldManConnector.Models.API.Requests {
 
         [JsonIgnore]
         public MetricType Metric { get; set; }
+
         [JsonProperty("groupVerificationCode")]
         public string VerificationCode { get; set; }
+
         [JsonProperty("groupId")]
         public int GroupId { get; set; }
 
         [JsonIgnore]
         public DateTime StartTime { get; set; }
+
         [JsonIgnore]
-        public DateTime EndTime{ get; set; }
+        public DateTime EndTime { get; set; }
 
         [JsonProperty("startsAt")]
-        public string StartTimeUtc {
-            get {
-                return StartTime.ToUniversalTime()
-                    .ToString("yyyy'-'MM'-'dd'T'HH':'mm':'ss'.'fff'Z'");
-            }
-        }
+        public string StartTimeUtc =>
+            StartTime.ToUniversalTime()
+                .ToString("yyyy'-'MM'-'dd'T'HH':'mm':'ss'.'fff'Z'");
 
         [JsonProperty("endsAt")]
-        public string EndTimeUtc {
-            get {
-                return EndTime.ToUniversalTime()
-                    .ToString("yyyy'-'MM'-'dd'T'HH':'mm':'ss'.'fff'Z'");
-            }
-        }
+        public string EndTimeUtc =>
+            EndTime.ToUniversalTime()
+                .ToString("yyyy'-'MM'-'dd'T'HH':'mm':'ss'.'fff'Z'");
     }
 }

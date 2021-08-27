@@ -6,8 +6,7 @@ using WiseOldManConnector.Models.Output;
 using WiseOldManConnector.Models.WiseOldMan.Enums;
 using WiseOldManConnector.Transformers.Resolvers;
 using WiseOldManConnector.Transformers.TypeConverters;
-using Metric = WiseOldManConnector.Models.Output.Metric;
-
+using Metric = WiseOldManConnector.Models.API.Responses.Metric;
 
 namespace WiseOldManConnector.Transformers {
     internal static class Configuration {
@@ -20,17 +19,17 @@ namespace WiseOldManConnector.Transformers {
 
                 //cfg.CreateMap<string, MetricType>().ConvertUsing<StringToMetricTypeConverter>();
                 cfg.CreateMap<PlayerResponse, Player>();
-                cfg.CreateMap<Models.API.Responses.Metric, Metric>();
+                cfg.CreateMap<Metric, Models.Output.Metric>();
 
                 cfg.CreateMap<WOMSnapshot, Snapshot>()
                     .ForMember(dest => dest.AllMetrics, opt => opt.MapFrom<MetricToDictionaryResolver>());
-                
-                cfg.CreateMap<Models.API.Responses.Metric, Metric>()
+
+                cfg.CreateMap<Metric, Models.Output.Metric>()
                     .ForMember(dest => dest.EffectiveHours,
                         opt => opt.MapFrom(src => src.EffectiveHoursBossing ?? src.EffectiveHoursPlaying))
                     .ForMember(dest => dest.Value,
                         opt => opt.MapFrom(src => src.Experience ?? src.Score ?? src.Kills ?? src.Value));
-                    
+
 
                 cfg.CreateMap<WOMCompetition, Competition>()
                     .ForMember(dest => dest.StartDate, opt => opt.MapFrom(src => src.StartsAt))
@@ -117,9 +116,9 @@ namespace WiseOldManConnector.Transformers {
                     .ForMember(dest => dest.Members, opt => opt.MapFrom(src => src));
 
                 cfg.CreateMap<LeaderboardMember, Player>();
-                cfg.CreateMap<LeaderboardMember, Metric>()
-                        .ForMember(dest => dest.Value,
-                        opt => opt.MapFrom(src =>src.Experience ?? src.Score ?? src.Kills ?? src.Value));
+                cfg.CreateMap<LeaderboardMember, Models.Output.Metric>()
+                    .ForMember(dest => dest.Value,
+                        opt => opt.MapFrom(src => src.Experience ?? src.Score ?? src.Kills ?? src.Value));
 
                 cfg.CreateMap<IEnumerable<LeaderboardMember>, HighscoreLeaderboard>()
                     .ForMember(dest => dest.Members, opt => opt.MapFrom(src => src));
@@ -127,7 +126,7 @@ namespace WiseOldManConnector.Transformers {
                 cfg.CreateMap<LeaderboardMember, HighscoreMember>()
                     .ForMember(dest => dest.Player, opt => opt.MapFrom(src => src.Player))
                     .ForMember(dest => dest.Metric, opt => opt.MapFrom(src => src));
-              
+
                 cfg.CreateMap<IEnumerable<LeaderboardMember>, RecordLeaderboard>()
                     .ForMember(dest => dest.Members, opt => opt.MapFrom(src => src));
 
@@ -135,12 +134,12 @@ namespace WiseOldManConnector.Transformers {
                     .ForMember(dest => dest.Player, opt => opt.MapFrom(src => src.Player))
                     .ForMember(dest => dest.UpdateDateTime, opt => opt.MapFrom(src => src.Player.UpdatedAt));
 
-               cfg.CreateMap<StatisticsResponse, Statistics>()
+                cfg.CreateMap<StatisticsResponse, Statistics>()
                     .ForMember(dest => dest.Maxed200MExpPlayers, opt => opt.MapFrom(src => src.Maxed200MsCount))
                     .ForMember(dest => dest.MaxedCombatPlayers, opt => opt.MapFrom(src => src.MaxedCombatCount))
                     .ForMember(dest => dest.MaxedTotalPlayers, opt => opt.MapFrom(src => src.MaxedTotalCount));
 
-               cfg.CreateMap<NameChangeResponse, NameChange>();
+                cfg.CreateMap<NameChangeResponse, NameChange>();
             });
 
             return new Mapper(config);

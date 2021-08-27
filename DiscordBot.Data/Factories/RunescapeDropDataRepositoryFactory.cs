@@ -1,3 +1,4 @@
+using System;
 using DiscordBot.Data.Interfaces;
 using DiscordBot.Data.Repository;
 using Microsoft.Extensions.Logging;
@@ -9,7 +10,7 @@ namespace DiscordBot.Data.Factories {
         public override bool RequiresGuildId => false;
 
         public override IRuneScapeDropDataRepository Create(ulong guildId) {
-            throw new System.NotImplementedException();
+            throw new NotImplementedException();
         }
 
         public override IRepository Create() {

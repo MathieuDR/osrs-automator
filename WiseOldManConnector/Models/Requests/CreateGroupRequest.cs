@@ -12,7 +12,7 @@ namespace WiseOldManConnector.Models.Requests {
 
         public CreateGroupRequest(string name, string clanChat, IEnumerable<MemberRequest> members) {
             if (string.IsNullOrWhiteSpace(name)) {
-                throw new ArgumentException($"name cannot be null or empty");
+                throw new ArgumentException("name cannot be null or empty");
             }
 
             Name = name;

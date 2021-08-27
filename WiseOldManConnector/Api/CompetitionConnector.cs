@@ -11,11 +11,13 @@ using WiseOldManConnector.Models.Requests;
 using WiseOldManConnector.Models.WiseOldMan.Enums;
 
 namespace WiseOldManConnector.Api {
-    internal class CompetitionConnector : BaseConnecter,  IWiseOldManCompetitionApi{
+    internal class CompetitionConnector : BaseConnecter, IWiseOldManCompetitionApi {
         public CompetitionConnector(IServiceProvider provider) : base(provider) {
             Area = "competitions";
         }
+
         protected override string Area { get; }
+
         public Task<ConnectorCollectionResponse<Competition>> SearchCompetition(CompetitionRequest request) {
             throw new NotImplementedException();
         }
@@ -40,7 +42,8 @@ namespace WiseOldManConnector.Api {
             throw new NotImplementedException();
         }
 
-        public Task<ConnectorCollectionResponse<Competition>> Search(string title, MetricType metric, CompetitionStatus status, int limit, int offset) {
+        public Task<ConnectorCollectionResponse<Competition>>
+            Search(string title, MetricType metric, CompetitionStatus status, int limit, int offset) {
             throw new NotImplementedException();
         }
 
@@ -59,7 +62,7 @@ namespace WiseOldManConnector.Api {
             var result = await ExecuteRequest<WOMCompetition>(request);
             return GetResponse<Competition>(result);
         }
-        
+
         public async Task<ConnectorResponse<Competition>> View(int id, MetricType metric) {
             var request = GetNewRestRequest("{id}");
             request.AddParameter("id", id, ParameterType.UrlSegment);
@@ -69,11 +72,13 @@ namespace WiseOldManConnector.Api {
             return GetResponse<Competition>(result);
         }
 
-        public Task<ConnectorResponse<Competition>> Create(string title, MetricType metric, DateTimeOffset startsAt, DateTimeOffset endsAt, IEnumerable<string> participants) {
+        public Task<ConnectorResponse<Competition>> Create(string title, MetricType metric, DateTimeOffset startsAt, DateTimeOffset endsAt,
+            IEnumerable<string> participants) {
             throw new NotImplementedException();
         }
 
-        public Task<ConnectorResponse<Competition>> Create(string title, MetricType metric, DateTimeOffset startsAt, DateTimeOffset endsAt, int groupId,
+        public Task<ConnectorResponse<Competition>> Create(string title, MetricType metric, DateTimeOffset startsAt, DateTimeOffset endsAt,
+            int groupId,
             string groupVerificationCode) {
             throw new NotImplementedException();
         }

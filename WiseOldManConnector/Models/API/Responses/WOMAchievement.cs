@@ -19,10 +19,9 @@ namespace WiseOldManConnector.Models.API.Responses {
         public DateTime? CreatedAt { get; set; }
 
         [JsonProperty("missing")]
-        public Boolean Missing { get; set; }
+        public bool Missing { get; set; }
 
         [JsonProperty("player")]
         public PlayerResponse Player { get; set; }
-
     }
 }

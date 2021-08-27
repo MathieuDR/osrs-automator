@@ -42,42 +42,39 @@ namespace DiscordBot.Configuration {
 
         private static IServiceCollectionQuartzConfigurator ConfigureJobs(
             this IServiceCollectionQuartzConfigurator quartzServices) {
-
-
-
             var timeZone = TimeZoneInfo.Local;
             if (TimeZoneInfo.GetSystemTimeZones().Any(x => x.Id == "Europe/Berlin")) {
                 timeZone = TimeZoneInfo.FindSystemTimeZoneById("Europe/Berlin");
             }
-            
+
             quartzServices.ScheduleJob<AutoUpdateGroupJob>(trigger =>
-                trigger.WithIdentity(JobType.GroupUpdate+"-evening", "wom")
+                trigger.WithIdentity(JobType.GroupUpdate + "-evening", "wom")
                     .WithSchedule(CronScheduleBuilder.DailyAtHourAndMinute(22, 00)
                         .InTimeZone(timeZone)
                         .WithMisfireHandlingInstructionFireAndProceed())
                     .WithDescription("Updating in the evening")
             );
-            
+
             quartzServices.ScheduleJob<AutoUpdateGroupJob>(trigger =>
-                trigger.WithIdentity(JobType.GroupUpdate+"-morning", "wom")
+                trigger.WithIdentity(JobType.GroupUpdate + "-morning", "wom")
                     .WithSchedule(CronScheduleBuilder.DailyAtHourAndMinute(01, 00)
                         .InTimeZone(timeZone)
                         .WithMisfireHandlingInstructionFireAndProceed())
                     .WithDescription("Updating in the morning")
             );
-            
+
             quartzServices.ScheduleJob<TopLeaderBoardJob>(trigger =>
                 trigger.WithIdentity(JobType.MonthlyTop.ToString(), "wom")
-                    .WithSchedule(CronScheduleBuilder.MonthlyOnDayAndHourAndMinute(01, 00,30)
+                    .WithSchedule(CronScheduleBuilder.MonthlyOnDayAndHourAndMinute(01, 00, 30)
                         .InTimeZone(timeZone)
                         .WithMisfireHandlingInstructionFireAndProceed())
                     .StartAt(DateBuilder.EvenSecondDate(DateTimeOffset.UtcNow.AddSeconds(10)))
                     .WithDescription("Showing top hiscores for all the servers!")
             );
-            
+
             quartzServices.ScheduleJob<MonthlyTopDeltasJob>(trigger =>
                 trigger.WithIdentity(JobType.MonthlyTopGains.ToString(), "wom")
-                    .WithSchedule(CronScheduleBuilder.MonthlyOnDayAndHourAndMinute(01, 00,5)
+                    .WithSchedule(CronScheduleBuilder.MonthlyOnDayAndHourAndMinute(01, 00, 5)
                         .InTimeZone(timeZone)
                         .WithMisfireHandlingInstructionFireAndProceed())
                     .StartAt(DateBuilder.EvenSecondDate(DateTimeOffset.UtcNow.AddSeconds(10)))
@@ -88,4 +85,3 @@ namespace DiscordBot.Configuration {
         }
     }
 }
-

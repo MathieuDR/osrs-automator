@@ -2,21 +2,19 @@
 using WiseOldManConnector.Models.WiseOldMan.Enums;
 
 namespace WiseOldManConnector.Models.Output {
-    public abstract class Leaderboard: IBaseConnectorOutput{
-        
+    public abstract class Leaderboard : IBaseConnectorOutput {
         /// <summary>
-        /// Offset
+        ///     Offset
         /// </summary>
         public int Page { get; set; } = 0;
 
         /// <summary>
-        /// Limit
+        ///     Limit
         /// </summary>
         public int PageSize { get; set; } = 20;
-
     }
 
-    public abstract class Leaderboard<T> : Leaderboard{
+    public abstract class Leaderboard<T> : Leaderboard {
         protected Leaderboard() { }
 
         protected Leaderboard(List<T> items) {
@@ -25,10 +23,9 @@ namespace WiseOldManConnector.Models.Output {
         }
 
         /// <summary>
-        /// Response
+        ///     Response
         /// </summary>
         public List<T> Members { get; set; }
-
     }
 
     public abstract class MetricTypeLeaderboard<T> : Leaderboard<T> {
@@ -43,7 +40,7 @@ namespace WiseOldManConnector.Models.Output {
         }
 
         /// <summary>
-        ///  From Request
+        ///     From Request
         /// </summary>
         public MetricType MetricType { get; set; }
     }
@@ -62,7 +59,7 @@ namespace WiseOldManConnector.Models.Output {
         }
 
         /// <summary>
-        /// From Request
+        ///     From Request
         /// </summary>
         public Period Period { get; set; }
     }

@@ -3,19 +3,18 @@ using System.Net;
 using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
 using WiseOldManConnector.Interfaces;
-using WiseOldManConnector.Models.Output;
 using WiseOldManConnector.Models.Output.Exceptions;
 using WiseOldManConnector.Models.WiseOldMan.Enums;
 using WiseOldManConnectorTests.Fixtures;
 using Xunit;
 
 namespace WiseOldManConnectorTests.Connectors {
-    public class CompetitionConnectorTests : ConnectorTests{
+    public class CompetitionConnectorTests : ConnectorTests {
+        private readonly IWiseOldManCompetitionApi _competitionApi;
+
         public CompetitionConnectorTests(ApiFixture fixture) : base(fixture) {
             _competitionApi = fixture.ServiceProvider.GetRequiredService<IWiseOldManCompetitionApi>();
         }
-
-        private readonly IWiseOldManCompetitionApi _competitionApi;
 
         [Fact]
         public async Task ViewCompetitionHasCompetitionForValidId() {
@@ -37,8 +36,8 @@ namespace WiseOldManConnectorTests.Connectors {
             Assert.Equal(competitionId, competition.Id);
             Assert.True(competition.ParticipantCount > 0);
             Assert.Equal("Chaos altar rush", competition.Title);
-            Assert.Equal(new DateTimeOffset(2021,01,14,18,30,0, new TimeSpan(1,0,0)), competition.StartDate);
-            Assert.Equal(new DateTimeOffset(2021,01,14,22,00,0, new TimeSpan(1,0,0)), competition.EndDate);
+            Assert.Equal(new DateTimeOffset(2021, 01, 14, 18, 30, 0, new TimeSpan(1, 0, 0)), competition.StartDate);
+            Assert.Equal(new DateTimeOffset(2021, 01, 14, 22, 00, 0, new TimeSpan(1, 0, 0)), competition.EndDate);
             Assert.Equal("3 hours, 30 minutes", competition.Duration);
             Assert.Equal(MetricType.Prayer, competition.Metric);
             Assert.Equal(51, competition.GroupId);
@@ -57,13 +56,13 @@ namespace WiseOldManConnectorTests.Connectors {
             Assert.NotEmpty(participants);
             Assert.Equal(response.Data.ParticipantCount, participants.Count);
             for (var i = 0; i < participants.Count; i++) {
-                CompetitionParticipant competitionParticipant = participants[i];
+                var competitionParticipant = participants[i];
 
                 Assert.NotNull(competitionParticipant.Player);
                 Assert.NotNull(competitionParticipant.CompetitionDelta);
                 Assert.NotNull(competitionParticipant.History);
 
-                
+
                 // Delta
                 if (competitionParticipant.CompetitionDelta.End > 0) {
                     Assert.True(competitionParticipant.CompetitionDelta.End >= competitionParticipant.CompetitionDelta.Start);
@@ -93,7 +92,10 @@ namespace WiseOldManConnectorTests.Connectors {
             var competitionId = int.MaxValue;
 
 
-            Task Act() => _competitionApi.View(competitionId);
+            Task Act() {
+                return _competitionApi.View(competitionId);
+            }
+
             await Assert.ThrowsAsync<BadRequestException>(Act);
         }
 
@@ -102,7 +104,10 @@ namespace WiseOldManConnectorTests.Connectors {
             var competitionId = int.MaxValue;
 
 
-            Task Act() => _competitionApi.View(competitionId);
+            Task Act() {
+                return _competitionApi.View(competitionId);
+            }
+
             await Assert.ThrowsAsync<BadRequestException>(Act);
         }
 
@@ -111,21 +116,28 @@ namespace WiseOldManConnectorTests.Connectors {
             var competitionId = int.MaxValue;
 
 
-            Task Act() => _competitionApi.View(competitionId);
+            Task Act() {
+                return _competitionApi.View(competitionId);
+            }
+
             var exception = await Assert.ThrowsAsync<BadRequestException>(Act);
 
             Assert.NotEmpty(exception.Message);
-            Assert.Equal("Competition not found.",exception.Message);
+            Assert.Equal("Competition not found.", exception.Message);
         }
+
         [Fact]
         public async Task ViewCompetitionForInvalidIdGivesValidNotFoundStatusCode() {
             var competitionId = int.MaxValue;
 
 
-            Task Act() => _competitionApi.View(competitionId);
+            Task Act() {
+                return _competitionApi.View(competitionId);
+            }
+
             var exception = await Assert.ThrowsAsync<BadRequestException>(Act);
 
-            Assert.Equal(HttpStatusCode.NotFound,exception.StatusCode);
+            Assert.Equal(HttpStatusCode.NotFound, exception.StatusCode);
         }
     }
 }

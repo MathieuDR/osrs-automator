@@ -23,7 +23,6 @@ namespace DiscordBot.Configuration {
     public static class Bootstrapper {
         private static IServiceCollection AddDataConnection(this IServiceCollection serviceCollection,
             IConfiguration configuration) {
-
             serviceCollection
                 .AddSingleton<MigrationManager>()
                 .AddSingleton<LiteDbManager>()
@@ -40,9 +39,10 @@ namespace DiscordBot.Configuration {
                         x.GetRequiredService<AutomatedJobStateLiteDbRepositoryFactory>(),
                         x.GetRequiredService<RunescapeDropDataRepositoryFactory>()
                     }))
-                .AddOptions<LiteDbOptions>().Configure<IConfiguration>(((options, configuration1) => configuration.GetSection(LiteDbOptions.SectionName).Bind(options)));
-                // .AddTransient<IDiscordBotRepository>(x => new LiteDbRepository(x.GetService<ILogger>(),
-                //     config.DatabaseFile, x.GetService<MigrationManager>()));
+                .AddOptions<LiteDbOptions>()
+                .Configure<IConfiguration>((options, configuration1) => configuration.GetSection(LiteDbOptions.SectionName).Bind(options));
+            // .AddTransient<IDiscordBotRepository>(x => new LiteDbRepository(x.GetService<ILogger>(),
+            //     config.DatabaseFile, x.GetService<MigrationManager>()));
 
 
             return serviceCollection;

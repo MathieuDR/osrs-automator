@@ -1,7 +1,6 @@
 ﻿using System.Collections.Generic;
 using DiscordBot.Common.Models.Data;
 using OsrsPlayer = WiseOldManConnector.Models.Output.Player;
-using Player = DiscordBot.Common.Models.Data.Player;
 
 namespace DiscordBot.Data.Interfaces {
     public interface IDiscordBotRepository {
@@ -21,7 +20,7 @@ namespace DiscordBot.Data.Interfaces {
         AutomatedJobState CreateOrUpdateAutomatedJobState(ulong guildId, AutomatedJobState jobState);
 
         UserCountInfo GetCountInfoByUserId(ulong guildId, ulong userId);
-        
+
         UserCountInfo UpdateOrInsertUserCountInfoForGuid(ulong guildId, UserCountInfo countInfo);
         IEnumerable<UserCountInfo> GetAllUserCountInfos(ulong guildId);
     }

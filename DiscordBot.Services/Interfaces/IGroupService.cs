@@ -17,6 +17,5 @@ namespace DiscordBot.Services.Interfaces {
         Task<ItemDecorator<Leaderboard>> GetGroupLeaderboard(GuildUser guildUser);
         Task<ItemDecorator<Leaderboard>> GetGroupLeaderboard(GuildUser guildUser, MetricType metric, Period period);
         Task QueueJob(JobType jobType);
-      
     }
 }

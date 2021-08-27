@@ -12,9 +12,9 @@ namespace DiscordBot.Services.Services {
     public class WiseOldManConnectorService : IOsrsHighscoreService {
         private readonly IWiseOldManCompetitionApi _competitionApi;
         private readonly IWiseOldManGroupApi _groupApi;
-        private readonly IWiseOldManPlayerApi _playerApi;
         private readonly IWiseOldManNameApi _nameApi;
-        
+        private readonly IWiseOldManPlayerApi _playerApi;
+
         public WiseOldManConnectorService(IWiseOldManPlayerApi playerApi, IWiseOldManGroupApi groupApi,
             IWiseOldManCompetitionApi competitionApi, IWiseOldManNameApi nameApi) {
             _playerApi = playerApi;
@@ -27,7 +27,7 @@ namespace DiscordBot.Services.Services {
             var response = await _playerApi.Search(username);
 
             var queried = response.Data.Where(x => x.Username.ToLowerInvariant() == username.ToLowerInvariant()).ToList();
-            
+
             if (queried.Count() == 1) {
                 return queried.FirstOrDefault();
             }
@@ -52,7 +52,7 @@ namespace DiscordBot.Services.Services {
 
         public Task AddOsrsAccountToToGroup(int groupId, string verificationCode, IEnumerable<string> osrsAccounts) {
             return _groupApi.AddMembers(groupId, verificationCode,
-                osrsAccounts.Distinct().Select(s => new MemberRequest() {Name = s, Role = GroupRole.Member}));
+                osrsAccounts.Distinct().Select(s => new MemberRequest {Name = s, Role = GroupRole.Member}));
         }
 
         public async Task<Competition> GetCompetition(int competitionId) {
@@ -85,7 +85,7 @@ namespace DiscordBot.Services.Services {
         }
 
         public async Task<Player> GetPlayerById(int playerId) {
-            var response = (await _playerApi.View(playerId));
+            var response = await _playerApi.View(playerId);
             return response.Data;
         }
 

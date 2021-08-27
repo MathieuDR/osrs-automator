@@ -17,29 +17,31 @@ namespace Dashboard.Controllers.V1 {
     [ApiVersion("1.0")]
     [Route("api/v{version:apiVersion}/[controller]")]
     public class AutomatedDropperController : Controller {
+        private readonly IAutomatedDropperService _dropperService;
         private readonly ILogger<AutomatedDropperController> _logger;
         private readonly IMapper<Embed, RunescapeDrop> _mapper;
-        private readonly IAutomatedDropperService _dropperService;
 
-        public AutomatedDropperController(ILogger<AutomatedDropperController> logger, IMapper<Embed, RunescapeDrop> mapper, IAutomatedDropperService dropperService) {
+        public AutomatedDropperController(ILogger<AutomatedDropperController> logger, IMapper<Embed, RunescapeDrop> mapper,
+            IAutomatedDropperService dropperService) {
             _logger = logger;
             _mapper = mapper;
             _dropperService = dropperService;
         }
 
         [HttpPost("dropper/{endpoint:guid}")]
-        public async Task<IActionResult> Get([FromBody]EmbedCollection bodyEmbeds, 
-            [ModelBinder(BinderType = typeof(JsonModelBinder))]EmbedCollection formEmbeds, 
+        public async Task<IActionResult> Get([FromBody] EmbedCollection bodyEmbeds,
+            [ModelBinder(BinderType = typeof(JsonModelBinder))]
+            EmbedCollection formEmbeds,
             [FromForm] IFormFile file, [FromRoute] Guid endpoint) {
             _logger.LogInformation("Received drop");
             var dropResult = GetDrop(bodyEmbeds, formEmbeds);
             if (dropResult.IsFailed) {
                 BadRequest(dropResult.Errors.FirstOrDefault());
             }
-            
+
             var image = await ToBase64String(file);
             _ = _dropperService.HandleDropRequest(endpoint, dropResult.Value, image);
-            
+
             return Ok();
         }
 

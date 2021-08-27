@@ -1,5 +1,4 @@
 using System.Threading.Tasks;
-using DiscordBot.Common.Models.Data;
 using FluentResults;
 using Microsoft.Extensions.Logging;
 using Quartz;
@@ -9,6 +8,7 @@ namespace DiscordBot.Services.Jobs {
         public BaseJob(ILogger logger) {
             Logger = logger;
         }
+
         public ILogger Logger { get; }
         protected IJobExecutionContext Context { get; private set; }
 

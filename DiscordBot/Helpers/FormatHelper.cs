@@ -29,25 +29,25 @@ namespace DiscordBot.Helpers {
         }
 
         public static string FormattedRank(this Metric metric) {
-            return FormatNumber((double)metric.Rank);
+            return FormatNumber((double) metric.Rank);
         }
 
         // public static string FormatNumber(this double number, bool zeroAsStripe = false) {
         //     return FormatNumber((long) number, zeroAsStripe);
         // }
-        
+
         public static string FormatNumber(this double number, bool zeroAsStripe = false) {
-            if (number>=1) {
+            if (number >= 1) {
                 return FormatNumber((long) number);
             }
 
             return number.ToString("N");
         }
-        
+
         public static string FormatHours(this double number) {
-            return $"{number- (number - (int) number)}:{TimeSpan.FromHours(number-(int)number).ToString(@"mm")}";
+            return $"{number - (number - (int) number)}:{TimeSpan.FromHours(number - (int) number).ToString(@"mm")}";
         }
-        
+
         // public static string FormatConditionally(this int number, bool zeroAsStripe = false) {
         //     return FormatConditionally((long) number);
         // }
@@ -125,8 +125,8 @@ namespace DiscordBot.Helpers {
         public static int ToExperience(this double level) {
             return ToExperience((int) level);
         }
-        
-        
+
+
         public static int ToExperience(this int level) {
             var index = level;
 

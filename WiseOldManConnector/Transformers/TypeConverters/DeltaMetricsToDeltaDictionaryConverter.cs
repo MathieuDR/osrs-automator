@@ -8,8 +8,7 @@ namespace WiseOldManConnector.Transformers.TypeConverters {
     internal class
         DeltaMetricsToDeltaDictionaryConverter : ITypeConverter<DeltaMetrics, Dictionary<MetricType, DeltaMetric>> {
         public Dictionary<MetricType, DeltaMetric> Convert(DeltaMetrics source,
-            Dictionary<MetricType, DeltaMetric> destination, ResolutionContext context) {  
-            
+            Dictionary<MetricType, DeltaMetric> destination, ResolutionContext context) {
             destination ??= new Dictionary<MetricType, DeltaMetric>();
             foreach (var kvp in source.Metrics) {
                 destination.Add(kvp.Key, context.Mapper.Map<DeltaMetric>(kvp.Value));

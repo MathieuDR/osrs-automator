@@ -112,8 +112,6 @@ namespace DiscordBot.Services.Services {
 
             var repo = GetRepository<IPlayerRepository>(user.GuildId);
             repo.UpdateOrInsert(player);
-
-            return;
         }
 
         public Task<string> SetDefaultAccount(GuildUser user, Player player) {
