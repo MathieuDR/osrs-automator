@@ -35,8 +35,10 @@ namespace DiscordBot.Services {
         }
 
         public async Task<Result> PrintRunescapeDataDrop(RunescapeDropData data, ulong guildId, ulong channelId) {
-            var imagesArr = data.Images.ToArray();
+            var imagesArr = data.Drops.Where(x => !string.IsNullOrEmpty(x.Image)).Select(x=>x.Image).ToArray();
+            
             var channel = _client.GetGuild(guildId).GetTextChannel(channelId);
+            
             await channel.SendMessageAsync(
                 $"New automated drop handled. Drops: {data.Drops.Count()} ({Math.Max(data.TotalValue, data.TotalHaValue)}), images: {imagesArr.Count()}");
 

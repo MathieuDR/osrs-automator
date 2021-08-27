@@ -1,6 +1,6 @@
 namespace DiscordBot.Common.Dtos.Runescape {
-    public abstract class RunescapeBaseDto {
-        public string Name { get; set; }
-        public string Url { get; set; }
+    public abstract record RunescapeBaseDto {
+        public string Name { get; init; }
+        public string Url { get; init; }
     }
 }

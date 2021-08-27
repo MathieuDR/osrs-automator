@@ -29,20 +29,15 @@ namespace Dashboard.Transformers {
             }
 
             if (source.Description.ToLowerInvariant() == "just got a pet.") {
-                destination.IsPet = true;
+                destination = destination with {IsPet = true};
                 return Result.Ok(destination);
             }
 
-            var rarityResult = SetRarity(source, destination);
-
+            var rarityResult = SetRarity(source, recipientResult.Value);
             if (rarityResult.IsFailed) {
                 return rarityResult;
             }
-
-            if (source.Thumbnail is not null) {
-                destination.Item.Thumbnail = source.Thumbnail.Url;
-            }
-
+            
             var patterns = new {
                 Quantity = @"Just got (\d+)x",
                 Brackets = @"\[([^\]^\n]+)\]",
@@ -54,52 +49,47 @@ namespace Dashboard.Transformers {
             if (brackets.Count != 2) {
                 return Result.Fail($"Unexpected matches for brackets: {brackets.Count}");
             }
-
-            destination.Item.Name = brackets[0].Groups[1].Value;
-            destination.Source.Name = brackets[1].Groups[1].Value;
-
+            
             var urls = Regex.Matches(source.Description, patterns.Urls);
             if (urls.Count != 2) {
                 return Result.Fail($"Unexpected matches for urls: {urls.Count}");
             }
+            
+            var lvl = Regex.Match(source.Description, patterns.Lvl);
+            
+            var item = destination.Item with {Name = brackets[0].Groups[1].Value, Url = urls[0].Groups[1].Value, Thumbnail = source.Thumbnail?.Url};
+            var dropSource = destination.Source with {Name = brackets[1].Groups[1].Value, Url = urls[1].Groups[1].Value, Level = lvl.Success ? int.Parse(lvl.Groups[1].Value) : null};
 
-            destination.Item.Url = urls[0].Groups[1].Value;
-            destination.Source.Url = urls[1].Groups[1].Value;
+            destination = rarityResult.Value with {Item = item, Source = dropSource};
 
             var quantity = Regex.Match(source.Description, patterns.Quantity);
             destination.Amount = quantity.Success ? int.Parse(quantity.Groups[1].Value) : 1;
 
-            var lvl = Regex.Match(source.Description, patterns.Lvl);
-            destination.Source.Level = lvl.Success ? int.Parse(lvl.Groups[1].Value) : null;
-
             // Needs to be done after amount.
             var valueResult = SetValues(source, destination);
-            if (valueResult.IsFailed) {
-                return valueResult;
-            }
-
-            return Result.Ok(destination);
+            return valueResult;
         }
 
-        private static Result SetRecipient(Embed source, RunescapeDrop destination) {
+        private static Result<RunescapeDrop> SetRecipient(Embed source, RunescapeDrop destination) {
             if (source.Author is null) {
                 return Result.Fail("Author is empty");
             }
 
-            destination.Recipient.Username = source.Author.Name;
-            destination.Recipient.IconUrl = source.Author.Icon;
-            destination.Recipient.PlayerType = source.Author.Icon switch {
+           
+            
+            var type = source.Author.Icon switch {
                 string a when a.ToLower().Contains("hardcore") => PlayerType.HardcoreIronMan,
                 string a when a.ToLower().Contains("ultimate") => PlayerType.UltimateIronMan,
                 string a when a.ToLower().Contains("ironman") => PlayerType.IronMan,
                 null => PlayerType.Regular,
                 _ => PlayerType.Unknown
             };
-
-            return Result.Ok();
+            var recipient = destination.Recipient with {Username = source.Author.Name, IconUrl = source.Author.Icon, PlayerType = type};
+           
+            return Result.Ok(destination with {Recipient = recipient});
         }
 
-        private static Result SetRarity(Embed source, RunescapeDrop destination) {
+        private static Result<RunescapeDrop> SetRarity(Embed source, RunescapeDrop destination) {
             var rarityField = source.Fields.FirstOrDefault(x => x.Name.ToLowerInvariant() == "rarity");
             if (rarityField is null) {
                 return Result.Fail("No rarity field present");
@@ -110,11 +100,10 @@ namespace Dashboard.Transformers {
                 return Result.Fail("Rarity is not a float");
             }
 
-            destination.Rarity = rarity;
-            return Result.Ok();
+            return Result.Ok(destination with {Rarity = rarity});
         }
 
-        private static Result SetValues(Embed source, RunescapeDrop destination) {
+        private static Result<RunescapeDrop> SetValues(Embed source, RunescapeDrop destination) {
             var valueField = source.Fields.FirstOrDefault(x => x.Name.ToLowerInvariant() == "ge value");
             if (valueField is null) {
                 return Result.Fail("No value field present");
@@ -128,10 +117,8 @@ namespace Dashboard.Transformers {
             var value = int.Parse(Regex.Match(valueField.Value, @"(\d+)").Captures[0].Value);
             var haValue = int.Parse(Regex.Match(haValueField.Value, @"(\d+)").Captures[0].Value);
 
-            destination.Item.Value = value / destination.Amount;
-            destination.Item.HaValue = haValue / destination.Amount;
-
-            return Result.Ok();
+            var item = destination.Item with {Value = value / destination.Amount, HaValue = haValue / destination.Amount};
+            return Result.Ok(destination with {Item = item});
         }
     }
 }

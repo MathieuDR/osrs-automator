@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using DiscordBot.Common.Dtos.Runescape;
@@ -10,7 +11,6 @@ using DiscordBot.Services.Jobs;
 using FluentResults;
 using Microsoft.Extensions.Logging;
 using Quartz;
-using Quartz.Util;
 
 namespace DiscordBot.Services.Services {
     internal class AutomatedDropperService : RepositoryService, IAutomatedDropperService {
@@ -22,6 +22,10 @@ namespace DiscordBot.Services.Services {
         }
 
         public async Task<Result> HandleDropRequest(Guid endpoint, RunescapeDrop drop, string base64Image) {
+            if (drop is null && string.IsNullOrEmpty(base64Image)) {
+                return Result.Fail("No new information");
+            }
+            
             //Check user Id
             var allowedCheckResult = IsValidEndpoint(endpoint);
             if (allowedCheckResult.IsFailed) {
@@ -38,7 +42,7 @@ namespace DiscordBot.Services.Services {
             }
 
             //Schedule job
-            var schedulingResult = await ScheduleJob(endpoint, drop);
+            var schedulingResult = await ScheduleJob(endpoint, saveInformationResult.Value);
             if (schedulingResult.IsFailed) {
                 Logger.LogWarning("Could not schedule job with id {endpoint}", endpoint);
                 return schedulingResult;
@@ -47,31 +51,62 @@ namespace DiscordBot.Services.Services {
             return Result.Ok();
         }
 
-        private Result SaveDropData(Guid endpoint, RunescapeDrop drop, string base64Image) {
-            var repo = GetRepository<IRuneScapeDropDataRepository>();
+        private Result<RunescapeDrop> SaveDropData(Guid endpoint, RunescapeDrop drop, string base64Image) {
+            var repo = RepositoryStrategy.CreateRepository<IRuneScapeDropDataRepository>();
 
             var activeRecordResult = repo.GetActive(endpoint);
-            var data = activeRecordResult.ValueOrDefault ?? new RunescapeDropData();
+            var data = activeRecordResult.ValueOrDefault ?? new RunescapeDropData(){ Endpoint = endpoint};
 
-            // Update
-            var dropList = data.Drops.ToList();
-            var imageList = data.Images.ToList();
-            data = data with {Endpoint = endpoint, Drops = dropList, Images = imageList};
-
+            // Update list reference
+            List<RunescapeDrop> dropList = data.Drops.ToList();
+            data = data with { Drops = dropList};
+            
             if (drop is not null) {
-                data = data with {
-                    RecipientUsername = drop.Recipient.Username, RecipientPlayerType = drop.Recipient.PlayerType, Endpoint = endpoint,
-                    Drops = dropList, Images = imageList
-                };
+                // update recipient
+                if (data.RecipientUsername is null) {
+                    data = data with {
+                        RecipientUsername = drop.Recipient.Username, RecipientPlayerType = drop.Recipient.PlayerType
+                    };
+                }
+
+                var lastDrop = dropList.LastOrDefault();
+                if (lastDrop is not null && !string.IsNullOrEmpty(lastDrop.Image) && lastDrop.Item is null) {
+                    drop = drop with {Image = lastDrop.Image};
+                    dropList.Remove(lastDrop);
+                }
+                
                 dropList.Add(drop);
             }
 
-            if (!base64Image.IsNullOrWhiteSpace()) {
-                imageList.Add(base64Image);
+            if (!string.IsNullOrEmpty(base64Image)) {
+                var imageResult = AddImage(dropList, base64Image);
+                if (imageResult.IsFailed) {
+                    return imageResult;
+                }
+
+                drop = imageResult.Value;
             }
 
             repo.UpdateOrInsert(data);
-            return Result.Ok();
+            return Result.Ok(drop);
+        }
+
+        private Result<RunescapeDrop> AddImage(List<RunescapeDrop> drops, string image) {
+            RunescapeDrop toUpdate;
+            
+            var lastDrop = drops.LastOrDefault();
+            if (lastDrop is null) {
+                toUpdate = new RunescapeDrop(image);
+                drops.Add(toUpdate);
+                return Result.Ok(toUpdate);
+            }
+
+
+            toUpdate = lastDrop with {Image = image};
+            drops.Remove(lastDrop);
+            drops.Add(toUpdate);
+
+            return Result.Ok(toUpdate);
         }
 
         private Result IsValidEndpoint(Guid userId) {
@@ -131,7 +166,7 @@ namespace DiscordBot.Services.Services {
         }
 
         private ITrigger CreateTriggerByDrop(RunescapeDrop drop) {
-            var waitTimeInSeconds = drop is not null && drop.Source.Name.ToLowerInvariant().Contains("clue") ? 60 : 2;
+            var waitTimeInSeconds = drop?.Item?.Name is not null && drop.Source.Name.ToLowerInvariant().Contains("clue") ? 60 : 10;
 
             var trigger = TriggerBuilder.Create()
                 .WithIdentity(Guid.NewGuid().ToString())
@@ -144,16 +179,5 @@ namespace DiscordBot.Services.Services {
         private JobKey CreateJobKeyByEndpoint(Guid endpoint) {
             return new(endpoint.ToString(), "automated-dropper");
         }
-
-        // Job
-        // Gather all of username
-        // Filter
-        // -- Filtered keywords
-        // --- Total value/HA
-        // --- Check for collection log item
-        // if exceeds for a post?
-        // --create post
-        // --send post to all discord guilds where that username is registered (atm all)
-        // remove from db, end Job
     }
 }

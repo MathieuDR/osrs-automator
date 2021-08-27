@@ -1,7 +1,7 @@
 namespace DiscordBot.Common.Dtos.Runescape {
-    public class RunescapeItem : RunescapeBaseDto {
-        public int Value { get; set; }
-        public int HaValue { get; set; }
-        public string Thumbnail { get; set; }
+    public record RunescapeItem : RunescapeBaseDto {
+        public int Value { get; init; }
+        public int HaValue { get; init; }
+        public string Thumbnail { get; init; }
     }
 }
