@@ -23,4 +23,8 @@ namespace DiscordBot.Data.Interfaces {
         public Result UpdateOrInsert(T entity);
         public Result Delete(T toDelete);
     }
+
+    public interface ISingleRecordRepository<T> : IRecordRepository<T> where T : BaseRecord, new() {
+        public Result<T> GetSingle();
+    }
 }

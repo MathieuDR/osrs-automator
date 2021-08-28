@@ -35,7 +35,7 @@ namespace DiscordBot.Services {
         }
 
         public async Task<Result> PrintRunescapeDataDrop(RunescapeDropData data, ulong guildId, ulong channelId) {
-            var imagesArr = data.Drops.Where(x => !string.IsNullOrEmpty(x.Image)).Select(x=>x.Image).ToArray();
+            var imagesArr = data.DistinctImages.ToArray();
             
             var channel = _client.GetGuild(guildId).GetTextChannel(channelId);
             

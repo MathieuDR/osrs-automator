@@ -8,4 +8,16 @@
 
         public ulong GuildId { get; set; }
     }
+    
+    public record BaseGuildRecord: BaseRecord {
+        public BaseGuildRecord() { }
+
+        public BaseGuildRecord(ulong guildId, ulong discordId) : base() {
+            GuildId = guildId;
+            CreatedById = discordId;
+        }
+
+        public ulong GuildId { get; init; }
+        public ulong CreatedById { get; init; }
+    }
 }

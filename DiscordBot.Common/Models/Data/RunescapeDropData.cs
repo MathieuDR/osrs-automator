@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using DiscordBot.Common.Dtos.Runescape;
+using LiteDB;
 using WiseOldManConnector.Models.WiseOldMan.Enums;
 
 namespace DiscordBot.Common.Models.Data {
@@ -11,7 +12,11 @@ namespace DiscordBot.Common.Models.Data {
         public bool IsHandled { get; init; }
         public int TotalValue => Drops.Sum(x => x.TotalValue);
         public int TotalHaValue => Drops.Sum(x => x.TotalHaValue);
+
+        [BsonIgnore]
+        public IEnumerable<string> DistinctImages => Drops.Select(x => x.Image).Distinct();
         public PlayerType RecipientPlayerType { get; init; }
         public string RecipientUsername { get; init; }
+        public IEnumerable<ulong> GuildsMessaged { get; set; }
     }
 }
