@@ -62,7 +62,8 @@ namespace DiscordBot.Configuration {
                     return client;
                 })
                 .AddSingleton<CommandService>()
-                .AddSingleton<CommandHandlingService>();
+                .AddSingleton<CommandHandlingService>()
+                .AddSingleton<InteractiveCommandHandlerService>();
                 // .AddSingleton<InteractiveService>();
 
             return serviceCollection;

@@ -1,56 +1,50 @@
 using System;
+using System.Text;
 using System.Threading.Tasks;
+using Common.Extensions;
+using Discord;
 using DiscordBot.Commands.Interactive.Contexts;
+using DiscordBot.Helpers;
 using FluentResults;
 using Microsoft.Extensions.Logging;
 
 namespace DiscordBot.Commands.Interactive {
-    public class PingApplicationCommand : IApplicationCommand {
-        private readonly ILogger _logger;
+    public class PingApplicationCommand : ApplicationCommand {
 
-        public PingApplicationCommand(ILogger<PingApplicationCommand> logger) {
-            _logger = logger;
-        }
+        public PingApplicationCommand(ILogger<PingApplicationCommand> logger) : base("ping", "Lets see if the bot is awake", logger) { }
         
-        // public async Task<Result> HandleCommand(SocketSlashCommand command) {
-        //     _logger.LogInformation("Received command!");
-        //     
-        //     var guildUser = (SocketGuildUser) command.User;
-        //     var extraInfo = (string)command.Data.Options?.FirstOrDefault(x => x.Name == "info")?.Value;
-        //
-        //     var printTime = (bool?)command.Data.Options?.FirstOrDefault(x => x.Name == "time")?.Value ?? false;
-        //
-        //     var builder = new StringBuilder();
-        //     builder.AppendLine($"Hello {guildUser.DisplayName()}.");
-        //     if (!string.IsNullOrWhiteSpace(extraInfo)) {
-        //         builder.AppendLine(extraInfo);
-        //     }
-        //
-        //     if (printTime) {
-        //         var timeDifference = DateTimeOffset.Now - command.CreatedAt;
-        //         builder.AppendLine($"Difference is: {timeDifference.TotalMilliseconds}ms");
-        //     }
-        //
-        //     await command.RespondAsync(builder.ToString());
-        //     return Result.Ok();
-        // }
+        protected override Task<SlashCommandBuilder> ExtendSlashCommandBuilder(SlashCommandBuilder builder) {
+            builder.AddOption("info", ApplicationCommandOptionType.String, "Some extra information", false);
+            builder.AddOption("time", ApplicationCommandOptionType.Boolean, "Print the ping time in ms", false);
+            return Task.FromResult(builder);
+        }
 
-        public string Name { get; }
-        public string Description { get; }
-        public Task<Result> GetCommandBuilder(IServiceProvider provider) {
+        public override async Task<Result> HandleCommandAsync(ApplicationCommandContext context) {
+            Logger.LogInformation("Received command!");
+
+            var guildUser = context.GuildUser;
+            var extraInfo = context.Options["name"].As<string>();
+            var printTime = (bool) context.Options["time"];
+            
+            var builder = new StringBuilder();
+            builder.AppendLine($"Hello {guildUser.DisplayName()}.");
+            if (!string.IsNullOrWhiteSpace(extraInfo)) {
+                builder.AppendLine(extraInfo);
+            }
+            
+            if (printTime) {
+                var timeDifference = DateTimeOffset.Now - context.InnerContext.CreatedAt;
+                builder.AppendLine($"Difference is: {timeDifference.TotalMilliseconds}ms");
+            }
+
+            await context.RespondAsync(builder.ToString());
+            return Result.Ok();
+        }
+
+        public override Task<Result> HandleComponentAsync(MessageComponentContext context) {
             throw new NotImplementedException();
         }
 
-        public Task<Result> GetCommandBuilder(IServiceProvider provider, ulong guildId) {
-            throw new NotImplementedException();
-        }
-
-        public Task<Result> HandleCommandAsync(ApplicationCommandContext context) {
-            throw new NotImplementedException();
-        }
-
-        public Task<Result> HandleComponentAsync(MessageComponentContext context) {
-            throw new NotImplementedException();
-        }
+        public override bool GlobalRegister => false;
     }
 }

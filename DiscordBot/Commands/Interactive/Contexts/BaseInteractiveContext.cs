@@ -12,23 +12,23 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace DiscordBot.Commands.Interactive.Contexts {
     public abstract class BaseInteractiveContext<T> where T : SocketInteraction {
-        public T Backing { get; }
+        public T InnerContext { get; }
         public IServiceProvider Services { get; }
         public DiscordSocketClient Client { get; }
         
-        public SocketGuild Guild => Client.GetGuild(Backing.Channel.Cast<IGuildChannel>().GuildId);
+        public SocketGuild Guild => Client.GetGuild(InnerContext.Channel.Cast<IGuildChannel>().GuildId);
         public bool InGuild => Guild != null;
-        public SocketUser User => Backing.User;
-        public SocketGuildUser GuildUser => Backing.User.Cast<SocketGuildUser>();
+        public SocketUser User => InnerContext.User;
+        public SocketGuildUser GuildUser => InnerContext.User.Cast<SocketGuildUser>();
         public SocketTextChannel TextChannel => Channel.Cast<SocketTextChannel>();
         public SocketDMChannel DmChannel => Channel.Cast<SocketDMChannel>();
-        public ISocketMessageChannel Channel => Backing.Channel;
+        public ISocketMessageChannel Channel => InnerContext.Channel;
         
         public InteractionReplyBuilder<T> CreateReplyBuilder(bool ephemeral = false) 
             => new InteractionReplyBuilder<T>(this).WithEphemeral(ephemeral);
         
         public Task DeferAsync(bool ephemeral = false, RequestOptions options = null)
-            => Backing.DeferAsync(ephemeral, options);
+            => InnerContext.DeferAsync(ephemeral, options);
         
         public Task RespondAsync(
             string text = null,
@@ -38,7 +38,7 @@ namespace DiscordBot.Commands.Interactive.Contexts {
             AllowedMentions allowedMentions = null,
             RequestOptions options = null,
             MessageComponent component = null)
-            => Backing.RespondAsync(text, embeds?.ToArray(), isTts, ephemeral, allowedMentions, options, component);
+            => InnerContext.RespondAsync(text, embeds?.ToArray(), isTts, ephemeral, allowedMentions, options, component);
         
         public Task<RestFollowupMessage> FollowupAsync(
             string text = null,
@@ -48,7 +48,7 @@ namespace DiscordBot.Commands.Interactive.Contexts {
             AllowedMentions allowedMentions = null,
             RequestOptions options = null,
             MessageComponent component = null)
-            => Backing.FollowupAsync(text, embeds?.ToArray(), isTts, ephemeral, allowedMentions, options, component);
+            => InnerContext.FollowupAsync(text, embeds?.ToArray(), isTts, ephemeral, allowedMentions, options, component);
         
         public EmbedBuilder CreateEmbedBuilder(string content = null)
             => new EmbedBuilder()
@@ -56,9 +56,9 @@ namespace DiscordBot.Commands.Interactive.Contexts {
                 .WithDescription(content ?? string.Empty);
         
         
-        protected BaseInteractiveContext(T backing, IServiceProvider provider)
+        protected BaseInteractiveContext(T innerContext, IServiceProvider provider)
         {
-            Backing = backing;
+            InnerContext = innerContext;
             Services = provider;
             Client = provider.GetRequiredService<DiscordSocketClient>();
         }

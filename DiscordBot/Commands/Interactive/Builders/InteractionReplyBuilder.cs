@@ -79,7 +79,7 @@ namespace DiscordBot.Commands.Interactive.Builders {
 
         public InteractionReplyBuilder<TInteraction> WithComponentMessageUpdate(Action<MessageProperties> modifier) {
             if (_context is MessageComponentContext mctx) {
-                _updateTask = mctx.Backing.Message.ModifyAsync(modifier);
+                _updateTask = mctx.InnerContext.Message.ModifyAsync(modifier);
             }
 
             return this;

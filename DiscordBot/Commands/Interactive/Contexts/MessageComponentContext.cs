@@ -6,13 +6,13 @@ using Discord.WebSocket;
 namespace DiscordBot.Commands.Interactive.Contexts {
     public class MessageComponentContext : BaseInteractiveContext<SocketMessageComponent>
     {
-        public MessageComponentContext(SocketMessageComponent backing, IServiceProvider provider)
-            : base(backing, provider) { }
+        public MessageComponentContext(SocketMessageComponent innerContext, IServiceProvider provider)
+            : base(innerContext, provider) { }
 
-        public string CustomId => Backing.Data.CustomId;
+        public string CustomId => InnerContext.Data.CustomId;
         public string[] CustomIdParts => CustomId.Split(':');
 
         public IEnumerable<string> SelectedMenuOptions
-            => Backing.Data.Values?.ToHashSet() ?? new HashSet<string>();
+            => InnerContext.Data.Values?.ToHashSet() ?? new HashSet<string>();
     }
 }

@@ -1,6 +1,6 @@
 using System;
 using System.Threading.Tasks;
-using Discord.WebSocket;
+using Discord;
 using DiscordBot.Commands.Interactive.Contexts;
 using FluentResults;
 
@@ -8,9 +8,10 @@ namespace DiscordBot.Commands.Interactive {
     public interface IApplicationCommand {
         public string Name { get; }
         public string Description { get; }
-        Task<Result> GetCommandBuilder(IServiceProvider provider);
-        Task<Result> GetCommandBuilder(IServiceProvider provider, ulong guildId);
+        public bool GlobalRegister { get; }
+        Task<SlashCommandBuilder> GetCommandBuilder();
         Task<Result> HandleCommandAsync(ApplicationCommandContext context);
         Task<Result> HandleComponentAsync(MessageComponentContext context);
+        public bool CanHandle(ApplicationCommandContext context);
     }
 }
