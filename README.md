@@ -87,8 +87,7 @@ A discord bot made for OSRS clans to automate menial tasks, outputs & other tool
 ### Built With
 
 * [Wise old man](https://github.com/wise-old-man/wise-old-man)
-* [Discord.Net](https://github.com/discord-net/Discord.Net)
-* [Discord addons interactive](https://github.com/foxbot/Discord.Addons.Interactive)
+* [Discord.Net-Labs](https://github.com/Discord-Net-Labs/Discord.Net-Labs)
 
 
 
@@ -148,9 +147,8 @@ Project Link: [https://github.com/MathieuDR/orsr-discord-automator](https://gith
 ## Acknowledgements
 
 * [Wise old man](https://github.com/wise-old-man/wise-old-man)
-* [Discord.Net](https://github.com/discord-net/Discord.Net)
-* [Discord addons interactive](https://github.com/foxbot/Discord.Addons.Interactive)
-
+* [Discord.Net-Labs](https://github.com/Discord-Net-Labs/Discord.Net-Labs)
+* [Volte](https://github.com/Ultz/Volte)
 
 
 
