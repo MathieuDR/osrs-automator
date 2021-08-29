@@ -1,7 +1,7 @@
 using Discord;
-using Discord.Addons.Interactive;
 using Discord.Commands;
 using Discord.WebSocket;
+using DiscordBot.Commands.Interactive;
 using DiscordBot.Common.Configuration;
 using DiscordBot.Data;
 using DiscordBot.Data.Configuration;
@@ -62,8 +62,8 @@ namespace DiscordBot.Configuration {
                     return client;
                 })
                 .AddSingleton<CommandService>()
-                .AddSingleton<CommandHandlingService>()
-                .AddSingleton<InteractiveService>();
+                .AddSingleton<CommandHandlingService>();
+                // .AddSingleton<InteractiveService>();
 
             return serviceCollection;
         }
@@ -81,6 +81,11 @@ namespace DiscordBot.Configuration {
             serviceCollection
                 .AddTransient<IDiscordService, DiscordService>();
 
+            return serviceCollection;
+        }
+
+        private static IServiceCollection AddSlashCommandHandlers(this IServiceCollection serviceCollection) {
+            serviceCollection.AddTransient<PingApplicationCommand>();
             return serviceCollection;
         }
 
@@ -112,7 +117,8 @@ namespace DiscordBot.Configuration {
                 .AddConfiguration(configuration)
                 .ConfigureQuartz(configuration)
                 .AddWiseOldManApi()
-                .ConfigureAutoMapper();
+                .ConfigureAutoMapper()
+                .AddSlashCommandHandlers();
 
             return serviceCollection;
         }

@@ -3,6 +3,8 @@ using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 using Serilog;
 
 namespace DiscordBot {
@@ -13,7 +15,7 @@ namespace DiscordBot {
             //var schedulerTask = CreateQuartzScheduler();
 
             try {
-                var bot = new DiscordBot(config, services);
+                var bot = new DiscordBot(config, services, services.GetRequiredService<ILogger<DiscordBot>>());
                 await bot.Run(new CancellationToken());
                 await Task.Delay(-1);
             } catch (Exception e) {

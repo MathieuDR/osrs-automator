@@ -5,10 +5,10 @@ using System.Threading;
 using System.Threading.Tasks;
 using Discord;
 using Discord.Commands;
+using DiscordBot.Commands.Modules.DiscordCommandArguments;
 using DiscordBot.Helpers;
-using DiscordBot.Modules.DiscordCommandArguments;
 
-namespace DiscordBot.TypeReaders {
+namespace DiscordBot.Commands.TypeReaders {
     public class UserListWithImageArgumentsTypeReader : TypeReader {
         public override async Task<TypeReaderResult> ReadAsync(ICommandContext context, string input, IServiceProvider services) {
             var parameters = input.ToCollectionOfParameters().ToList();

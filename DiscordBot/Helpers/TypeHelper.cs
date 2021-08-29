@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Text;
 using Discord;
-using DiscordBot.Modules.DiscordCommandArguments;
+using DiscordBot.Commands.Modules.DiscordCommandArguments;
 using WiseOldManConnector.Models.WiseOldMan.Enums;
 
 namespace DiscordBot.Helpers {

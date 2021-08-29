@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Discord;
 using Discord.Commands;
+using Discord.WebSocket;
 using DiscordBot.Models;
 
 namespace DiscordBot.Helpers {
@@ -67,7 +68,13 @@ namespace DiscordBot.Helpers {
 
             return user.Nickname ?? user.Username;
         }
+        
+        public static SocketRole GetHighestRole(this SocketGuildUser member, bool requireColor = true)
+            => member?.Roles?.Where(x => !requireColor || x.HasColor())?
+                .OrderByDescending(x => x.Position)?.FirstOrDefault();
 
+        public static bool HasColor(this IRole role)
+            => role.Color.RawValue != 0;
 
         /// <summary>
         ///     Gets a list of discord users that have been mentioned at the start of the array.
@@ -103,15 +110,15 @@ namespace DiscordBot.Helpers {
             return result;
         }
 
-        public static CustomPaginatedMessage AddPagingToFooter(this CustomPaginatedMessage message) {
-            message.EmbedWrapper.Footer ??= new EmbedFooterBuilder();
-            var whitespace = " ";
-            if (string.IsNullOrWhiteSpace(message.EmbedWrapper.Footer.Text)) {
-                whitespace = "";
-            }
-
-            message.EmbedWrapper.Footer.Text += $"{whitespace}{{0}}/{{1}} Pages.";
-            return message;
-        }
+        // public static CustomPaginatedMessage AddPagingToFooter(this CustomPaginatedMessage message) {
+        //     message.EmbedWrapper.Footer ??= new EmbedFooterBuilder();
+        //     var whitespace = " ";
+        //     if (string.IsNullOrWhiteSpace(message.EmbedWrapper.Footer.Text)) {
+        //         whitespace = "";
+        //     }
+        //
+        //     message.EmbedWrapper.Footer.Text += $"{whitespace}{{0}}/{{1}} Pages.";
+        //     return message;
+        // }
     }
 }

@@ -1,7 +1,7 @@
 ﻿using System;
 using Discord.WebSocket;
 
-namespace DiscordBot.Exceptions {
+namespace DiscordBot.Models.Exceptions {
     public class ResponseException : Exception {
         // ReSharper disable once NotAccessedField.Local
         private readonly SocketMessage _discordMessage;

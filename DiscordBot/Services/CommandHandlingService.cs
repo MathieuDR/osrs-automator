@@ -7,13 +7,13 @@ using System.Threading.Tasks;
 using Discord;
 using Discord.Commands;
 using Discord.WebSocket;
+using DiscordBot.Commands.Modules;
+using DiscordBot.Commands.Modules.DiscordCommandArguments;
+using DiscordBot.Commands.TypeReaders;
 using DiscordBot.Common.Configuration;
 using DiscordBot.Helpers;
 using DiscordBot.Models;
-using DiscordBot.Modules;
-using DiscordBot.Modules.DiscordCommandArguments;
 using DiscordBot.Services.interfaces;
-using DiscordBot.TypeReaders;
 using Serilog.Context;
 using Serilog.Events;
 
@@ -49,9 +49,10 @@ namespace DiscordBot.Services {
             _commands.AddTypeReader<BaseArguments>(new BaseArgumentsTypeReader());
 
             var t = _commands.AddModulesAsync(Assembly.GetEntryAssembly(), _provider);
-            await _commands.AddModuleAsync<PlayerModule>(provider);
-            await _commands.AddModuleAsync<AdminModule>(provider);
-            await _commands.AddModuleAsync<CountModule>(provider);
+            await _commands.AddModuleAsync<TestModule>(provider);
+            // await _commands.AddModuleAsync<PlayerModule>(provider);
+            // await _commands.AddModuleAsync<AdminModule>(provider);
+            // await _commands.AddModuleAsync<CountModule>(provider);
             await t;
         }
 
@@ -126,6 +127,8 @@ namespace DiscordBot.Services {
                 await logTask;
             }
         }
+        
+        
 
         private EmbedBuilder CreateErrorEmbedBuilder(ICommandContext context, IResult result) {
             var builder = new EmbedBuilder().AddCommonProperties().WithMessageAuthorFooter(context);
@@ -135,9 +138,9 @@ namespace DiscordBot.Services {
             Debug.Assert(result.Error != null, "result.Error != null");
             builder.AddField(result.Error.Value.ToString(), result.ErrorReason);
 
-            if (result.Error == CommandError.BadArgCount || result.Error == CommandError.ParseFailed) {
-                HelpModule.AddStandardParameterInfo(builder, _configuration.CustomPrefix);
-            }
+            // if (result.Error == CommandError.BadArgCount || result.Error == CommandError.ParseFailed) {
+            //     HelpModule.AddStandardParameterInfo(builder, _configuration.CustomPrefix);
+            // }
 
             builder.AddField("Get more help", $"Please use `{_configuration.CustomPrefix} help` for this bot's usage");
             return builder;

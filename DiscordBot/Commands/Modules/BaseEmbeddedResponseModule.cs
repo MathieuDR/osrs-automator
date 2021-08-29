@@ -14,7 +14,7 @@ using DiscordBot.Services.interfaces;
 
 namespace DiscordBot.Modules {
     [DontAutoLoad]
-    public abstract class BaseEmbeddedResponseModule : InteractiveBase<SocketCommandContext> {
+    public abstract class BaseEmbeddedResponseModule : InteractivityService<SocketCommandContext> {
         protected BaseEmbeddedResponseModule(Mapper mapper, ILogService logger) {
             Mapper = mapper;
             Logger = logger;
