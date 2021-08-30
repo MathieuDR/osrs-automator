@@ -2,10 +2,16 @@
 using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
+using DiscordBot.Configuration;
+using DiscordBot.Data.Configuration;
+using DiscordBot.Services.Configuration;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Serilog;
+using Serilog.Events;
+using Serilog.Formatting.Json;
+using WiseOldManConnector.Configuration;
 
 namespace DiscordBot {
     internal class Program {
@@ -30,8 +36,27 @@ namespace DiscordBot {
             new Program().EntryPointAsync().GetAwaiter().GetResult();
         }
 
+        private void ConfigureSerilogger() {
+            Log.Logger = new LoggerConfiguration()
+                .Enrich.FromLogContext()
+                .MinimumLevel
+                .Debug()
+                .WriteTo.RollingFile(new JsonFormatter(), "logs/osrs_bot.log")
+                .WriteTo.Console(restrictedToMinimumLevel: LogEventLevel.Information)
+                .CreateLogger();
+        }
+
         private IServiceProvider ConfigureServices(IConfiguration config) {
-            throw new NotImplementedException("Currently only supported through dashboard");
+            var serviceCollection = new ServiceCollection();
+
+            serviceCollection
+                .AddDiscordBot(config)
+                .UseLiteDbRepositories(config)
+                .AddWiseOldManApi()
+                .AddDiscordBotServices()
+                .ConfigureQuartz(config);
+
+            return serviceCollection.BuildServiceProvider();
         }
 
         private IConfiguration BuildConfig() {

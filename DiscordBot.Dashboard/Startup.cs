@@ -5,6 +5,8 @@ using Dashboard.Models.ApiRequests.DiscordEmbed;
 using Dashboard.Transformers;
 using DiscordBot.Common.Dtos.Runescape;
 using DiscordBot.Configuration;
+using DiscordBot.Data.Configuration;
+using DiscordBot.Services.Configuration;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
@@ -18,6 +20,7 @@ using Serilog;
 using Serilog.Events;
 using Serilog.Formatting.Json;
 using Swashbuckle.AspNetCore.SwaggerGen;
+using WiseOldManConnector.Configuration;
 
 namespace Dashboard {
     public class Startup {
@@ -59,7 +62,12 @@ namespace Dashboard {
                 options.SwaggerDoc(ApiOptions.Version, new OpenApiInfo {Title = ApiOptions.Description, Version = ApiOptions.Version});
             });
 
-            services.AddDiscordBot(Configuration);
+            services
+                .AddDiscordBot(Configuration)
+                .UseLiteDbRepositories(Configuration)
+                .AddWiseOldManApi()
+                .AddDiscordBotServices()
+                .ConfigureQuartz(Configuration);
 
             services.AddTransient<IMapper<Embed, RunescapeDrop>, EmbedToRunescapeDropMapper>();
         }

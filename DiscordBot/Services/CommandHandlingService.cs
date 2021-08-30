@@ -10,6 +10,7 @@ using Discord.WebSocket;
 using DiscordBot.Commands.Modules;
 using DiscordBot.Commands.Modules.DiscordCommandArguments;
 using DiscordBot.Common.Configuration;
+using DiscordBot.Configuration;
 using DiscordBot.Helpers;
 using DiscordBot.Helpers.Builders;
 using DiscordBot.Models;

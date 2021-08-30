@@ -90,10 +90,10 @@ namespace DiscordBot.Services.Services {
             }
 
             var setting = config.AutomatedMessagesConfig.ChannelJobs[jobType];
-            setting.Activated = !setting.Activated;
+            setting.IsEnabled = !setting.IsEnabled;
             var repo = GetRepository<GuildConfigRepository>(guild.Id);
             repo.UpdateOrInsert(config);
-            return Task.FromResult(setting.Activated);
+            return Task.FromResult(setting.IsEnabled);
         }
 
         public Task SetActivationAutomationJob(JobType jobType, bool activated) {

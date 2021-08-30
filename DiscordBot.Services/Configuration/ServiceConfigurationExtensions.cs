@@ -2,16 +2,19 @@ using System;
 using DiscordBot.Services.ExternalServices;
 using DiscordBot.Services.Interfaces;
 using DiscordBot.Services.Services;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Refit;
 
 namespace DiscordBot.Services.Configuration {
-    public static class ServiceConfigurationExtensions {
+    public static partial class ServiceConfigurationExtensions {
         public static IServiceCollection AddDiscordBotServices(this IServiceCollection serviceCollection) {
             return serviceCollection
                 .AddServices()
                 .AddExternalServices();
         }
+        
+      
 
         private static IServiceCollection AddExternalServices(this IServiceCollection serviceCollection) {
             serviceCollection

@@ -5,6 +5,7 @@ using Discord;
 using Discord.WebSocket;
 using DiscordBot.Commands.Interactive;
 using DiscordBot.Common.Configuration;
+using DiscordBot.Configuration;
 using DiscordBot.Services;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;

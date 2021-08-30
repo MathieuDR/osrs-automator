@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
@@ -8,6 +9,7 @@ using DiscordBot.Common.Models.DiscordDtos;
 using DiscordBot.Services.Interfaces;
 using FluentResults;
 using Microsoft.Extensions.Logging;
+using WiseOldManConnector.Models.Output;
 
 namespace DiscordBot.Services {
     public class DiscordService : IDiscordService {
@@ -52,6 +54,42 @@ namespace DiscordBot.Services {
             }
 
             return Result.Ok();
+        }
+
+        public Task<Result<IEnumerable<Guild>>> GetAllGuilds() {
+            throw new NotImplementedException();
+        }
+
+        public Task<Result> SendFailedEmbed(ulong channelId, string message, Guid traceId) {
+            throw new NotImplementedException();
+        }
+
+        public Task<Result> SendWomGroupSuccessEmbed(ulong channelId, string message, int groupId, string groupName) {
+            throw new NotImplementedException();
+        }
+
+        public Task<Result> MessageLeaderboards(ulong channelId, IEnumerable<Leaderboard> leaderboards) {
+            throw new NotImplementedException();
+        }
+
+        public Task<Result> MessageLeaderboards<T>(ulong channelId, IEnumerable<MetricTypeLeaderboard<T>> leaderboards) {
+            throw new NotImplementedException();
+        }
+
+        public Task<Result> MessageLeaderboards<T>(ulong channelId, IEnumerable<MetricTypeAndPeriodLeaderboard<T>> leaderboards) {
+            throw new NotImplementedException();
+        }
+
+        public Task<Result> MessageLeaderboard(ulong channelId, Leaderboard leaderboard) {
+            throw new NotImplementedException();
+        }
+
+        public Task<Result> MessageLeaderboard<T>(ulong channelId, MetricTypeLeaderboard<T> leaderboard) {
+            throw new NotImplementedException();
+        }
+
+        public Task<Result> MessageLeaderboard<T>(ulong channelId, MetricTypeAndPeriodLeaderboard<T> leaderboard) {
+            throw new NotImplementedException();
         }
 
         private static Stream ToStream(string image) {

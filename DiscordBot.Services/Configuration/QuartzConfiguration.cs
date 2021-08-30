@@ -6,13 +6,13 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Quartz;
 
-namespace DiscordBot.Configuration {
-    public static class QuartzConfiguration {
+namespace DiscordBot.Services.Configuration {
+    public static partial class ServiceConfigurationExtensions {
         public static IServiceCollection ConfigureQuartz(this IServiceCollection services, IConfiguration config) {
             // https://www.quartz-scheduler.net/documentation/quartz-3.x/packages/microsoft-di-integration.html#di-aware-job-factories
 
             return services
-                .Configure<QuartzOptions>(config.GetSection("Quartz"))
+                .Configure<QuartzOptions>(options => config.GetSection("Quarts").Bind(options))
                 .AddQuartz(q => {
                     // handy when part of cluster or you want to otherwise identify multiple schedulers
                     q.SchedulerId = "Scheduler-Core";

@@ -14,13 +14,13 @@ namespace DiscordBot.Common.Models.Data {
 
         public ChannelJobConfiguration(ulong guildId, ulong channelId) : this(guildId, channelId, false) { }
 
-        public ChannelJobConfiguration(ulong guildId, ulong channelId, bool activated) {
+        public ChannelJobConfiguration(ulong guildId, ulong channelId, bool isEnabled) {
             GuildId = guildId;
             ChannelId = channelId;
-            Activated = activated;
+            IsEnabled = isEnabled;
         }
 
-        public bool Activated { get; set; }
+        public bool IsEnabled { get; set; }
         public ulong ChannelId { get; set; }
         public ulong GuildId { get; set; }
     }

@@ -19,35 +19,8 @@ using WiseOldManConnector.Configuration;
 using WiseOldManConnector.Interfaces;
 
 namespace DiscordBot.Configuration {
-    public static class Bootstrapper {
-        private static IServiceCollection AddDataConnection(this IServiceCollection serviceCollection,
-            IConfiguration configuration) {
-            serviceCollection
-                .AddSingleton<MigrationManager>()
-                .AddSingleton<LiteDbManager>()
-                .AddTransient<GuildConfigLiteDbRepositoryFactory>()
-                .AddTransient<PlayerLiteDbRepositoryFactory>()
-                .AddTransient<UserCountInfoLiteDbRepositoryFactory>()
-                .AddTransient<AutomatedJobStateLiteDbRepositoryFactory>()
-                .AddTransient<RunescapeDropDataRepositoryFactory>()
-                .AddSingleton<IRepositoryStrategy>(x =>
-                    new RepositoryStrategy(new IRepositoryFactory[] {
-                        x.GetRequiredService<PlayerLiteDbRepositoryFactory>(),
-                        x.GetRequiredService<GuildConfigLiteDbRepositoryFactory>(),
-                        x.GetRequiredService<UserCountInfoLiteDbRepositoryFactory>(),
-                        x.GetRequiredService<AutomatedJobStateLiteDbRepositoryFactory>(),
-                        x.GetRequiredService<RunescapeDropDataRepositoryFactory>()
-                    }))
-                .AddOptions<LiteDbOptions>()
-                .Configure<IConfiguration>((options, configuration1) => configuration.GetSection(LiteDbOptions.SectionName).Bind(options));
-            // .AddTransient<IDiscordBotRepository>(x => new LiteDbRepository(x.GetService<ILogger>(),
-            //     config.DatabaseFile, x.GetService<MigrationManager>()));
-
-
-            return serviceCollection;
-        }
-
-        private static IServiceCollection AddDiscord(this IServiceCollection serviceCollection) {
+    public static class ConfigurationExtensions {
+        private static IServiceCollection AddDiscordClient(this IServiceCollection serviceCollection) {
             serviceCollection
                 .AddSingleton(_ => {
                     var config = new DiscordSocketConfig {
@@ -62,13 +35,13 @@ namespace DiscordBot.Configuration {
                 })
                 .AddSingleton<CommandService>()
                 .AddSingleton<CommandHandlingService>()
-                .AddSingleton<InteractiveCommandHandlerService>();
-                // .AddSingleton<InteractiveService>();
+                .AddSingleton<InteractiveCommandHandlerService>()
+                .AddDiscordCommands();
 
             return serviceCollection;
         }
 
-        private static IServiceCollection AddLogging(this IServiceCollection serviceCollection) {
+        private static IServiceCollection AddLoggingInformation(this IServiceCollection serviceCollection) {
             serviceCollection.AddSingleton(_ => Log.Logger)
                 .AddSingleton<ILogService, SerilogService>()
                 .AddLogging(loginBuilder => loginBuilder.AddSerilog(dispose: true))
@@ -77,14 +50,14 @@ namespace DiscordBot.Configuration {
             return serviceCollection;
         }
 
-        private static IServiceCollection AddBotServices(this IServiceCollection serviceCollection) {
+        private static IServiceCollection AddExternalServices(this IServiceCollection serviceCollection) {
             serviceCollection
                 .AddTransient<IDiscordService, DiscordService>();
 
             return serviceCollection;
         }
 
-        private static IServiceCollection AddSlashCommandHandlers(this IServiceCollection serviceCollection) {
+        private static IServiceCollection AddDiscordCommands(this IServiceCollection serviceCollection) {
             serviceCollection.AddTransient<PingApplicationCommand>();
             return serviceCollection;
         }
@@ -92,7 +65,6 @@ namespace DiscordBot.Configuration {
         private static IServiceCollection AddConfiguration(this IServiceCollection serviceCollection,
             IConfiguration configuration) {
             var botConfiguration = configuration.GetSection("Bot").Get<BotConfiguration>();
-            // WiseOldManConfiguration manConfiguration = config.GetSection("WiseOldMan").Get<WiseOldManConfiguration>();
             var metricSynonymsConfiguration =
                 configuration.GetSection("MetricSynonyms").Get<MetricSynonymsConfiguration>();
 
@@ -109,17 +81,12 @@ namespace DiscordBot.Configuration {
         public static IServiceCollection AddDiscordBot(this IServiceCollection serviceCollection,
             IConfiguration configuration) {
             serviceCollection
-                .AddDiscordBotServices()
-                .AddLogging()
-                .AddDataConnection(configuration)
-                .AddDiscord()
-                .AddBotServices()
+                .AddLoggingInformation()
+                .AddDiscordClient()
+                .AddExternalServices()
                 .AddConfiguration(configuration)
-                .ConfigureQuartz(configuration)
-                .AddWiseOldManApi()
-                .ConfigureAutoMapper()
-                .AddSlashCommandHandlers();
-
+                .ConfigureAutoMapper();
+        
             return serviceCollection;
         }
     }
