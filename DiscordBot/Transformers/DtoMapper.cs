@@ -1,6 +1,7 @@
 using Discord;
 using DiscordBot.Common.Models.DiscordDtos;
 using DiscordBot.Helpers;
+using DiscordBot.Helpers.Extensions;
 
 namespace DiscordBot.Transformers {
     public static class DiscordMapper {

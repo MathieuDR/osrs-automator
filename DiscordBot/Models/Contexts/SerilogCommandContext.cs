@@ -1,6 +1,6 @@
 ﻿using Discord.Commands;
 
-namespace DiscordBot.Models {
+namespace DiscordBot.Models.Contexts {
     public class SerilogCommandContext {
         public SerilogCommandContext(SocketCommandContext context) {
             Message = context.Message.Content;

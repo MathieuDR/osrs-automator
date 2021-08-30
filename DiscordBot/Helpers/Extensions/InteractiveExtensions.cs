@@ -4,10 +4,9 @@ using System.Linq;
 using Common.Extensions;
 using Discord;
 using Discord.WebSocket;
-using DiscordBot.Helpers;
 
-namespace DiscordBot.Commands.Interactive.Extensions {
-    public static class Extensions {
+namespace DiscordBot.Helpers.Extensions {
+    public static class InteractiveExtensions {
         public static SelectMenuBuilder AddOptions(this SelectMenuBuilder menu,
             IEnumerable<SelectMenuOptionBuilder> options)
         {

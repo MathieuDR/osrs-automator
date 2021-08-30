@@ -7,10 +7,10 @@ using Common.Extensions;
 using Discord;
 using Discord.Rest;
 using Discord.WebSocket;
-using DiscordBot.Commands.Interactive.Contexts;
-using DiscordBot.Commands.Interactive.Extensions;
+using DiscordBot.Helpers.Extensions;
+using DiscordBot.Models.Contexts;
 
-namespace DiscordBot.Commands.Interactive.Builders {
+namespace DiscordBot.Helpers.Builders {
     public class InteractionReplyBuilder<TInteraction> where TInteraction : SocketInteraction {
         private readonly BaseInteractiveContext<TInteraction> _context;
         private Task _updateTask;

@@ -4,7 +4,7 @@ using System.Threading.Tasks;
 using Discord;
 using Discord.Commands;
 using Discord.WebSocket;
-using DiscordBot.Services.interfaces;
+using DiscordBot.Services.Interfaces;
 using Microsoft.Extensions.Logging;
 using Serilog.Events;
 

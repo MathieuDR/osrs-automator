@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 using Discord.Commands;
 using Discord.WebSocket;
 
-namespace DiscordBot.Commands.Preconditions {
+namespace DiscordBot.Preconditions {
     public class RequireRoleAttribute : PreconditionAttribute {
         private readonly List<ulong> _ids = new();
 

@@ -7,7 +7,7 @@ using Discord.WebSocket;
 using DiscordBot.Common.Models.Data;
 using DiscordBot.Common.Models.Enums;
 using DiscordBot.Data.Interfaces;
-using DiscordBot.Services.interfaces;
+using DiscordBot.Services.Interfaces;
 using Quartz;
 using Serilog.Events;
 

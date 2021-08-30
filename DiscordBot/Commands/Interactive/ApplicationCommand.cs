@@ -2,7 +2,7 @@ using System;
 using System.Threading.Tasks;
 using Discord;
 using Discord.WebSocket;
-using DiscordBot.Commands.Interactive.Contexts;
+using DiscordBot.Models.Contexts;
 using FluentResults;
 using Microsoft.Extensions.Logging;
 

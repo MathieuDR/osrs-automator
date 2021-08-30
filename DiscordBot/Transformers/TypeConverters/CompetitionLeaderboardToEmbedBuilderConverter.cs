@@ -3,6 +3,7 @@ using System.Text;
 using AutoMapper;
 using Discord;
 using DiscordBot.Helpers;
+using DiscordBot.Helpers.Extensions;
 using WiseOldManConnector.Models.Output;
 
 namespace DiscordBot.Transformers.TypeConverters {

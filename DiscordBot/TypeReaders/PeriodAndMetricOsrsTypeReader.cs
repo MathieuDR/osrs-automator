@@ -6,9 +6,10 @@ using Discord.Commands;
 using DiscordBot.Commands.Modules.DiscordCommandArguments;
 using DiscordBot.Common.Configuration;
 using DiscordBot.Helpers;
+using DiscordBot.Helpers.Extensions;
 using WiseOldManConnector.Models.WiseOldMan.Enums;
 
-namespace DiscordBot.Commands.TypeReaders {
+namespace DiscordBot.TypeReaders {
     public class PeriodAndMetricOsrsTypeReader : TypeReader {
         private readonly MetricSynonymsConfiguration _config;
 

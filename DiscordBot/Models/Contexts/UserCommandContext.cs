@@ -2,7 +2,7 @@ using System;
 using Common.Extensions;
 using Discord.WebSocket;
 
-namespace DiscordBot.Commands.Interactive.Contexts {
+namespace DiscordBot.Models.Contexts {
     public class UserCommandContext : BaseInteractiveContext<SocketUserCommand>
     {
         public UserCommandContext(SocketUserCommand innerContext, IServiceProvider provider)

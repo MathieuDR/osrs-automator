@@ -7,7 +7,7 @@ using Discord.Net;
 using Discord.Rest;
 using Discord.WebSocket;
 using DiscordBot.Commands.Interactive;
-using DiscordBot.Commands.Interactive.Contexts;
+using DiscordBot.Models.Contexts;
 using Microsoft.Extensions.Logging;
 
 namespace DiscordBot.Services {

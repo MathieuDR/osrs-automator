@@ -1,6 +1,7 @@
 using System;
 using System.Text;
 using DiscordBot.Helpers;
+using DiscordBot.Helpers.Extensions;
 using WiseOldManConnector.Helpers;
 using WiseOldManConnector.Models.Output;
 using WiseOldManConnector.Models.WiseOldMan.Enums;

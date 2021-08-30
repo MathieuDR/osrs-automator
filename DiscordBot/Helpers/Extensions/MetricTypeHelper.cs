@@ -3,7 +3,7 @@ using System.Linq;
 using DiscordBot.Common.Configuration;
 using WiseOldManConnector.Models.WiseOldMan.Enums;
 
-namespace DiscordBot.Helpers {
+namespace DiscordBot.Helpers.Extensions {
     public static class MetricTypeHelper {
         public static bool TryParseToMetricType(this string metricType, MetricSynonymsConfiguration configuration,
             out object value) {

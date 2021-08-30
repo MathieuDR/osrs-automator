@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Discord.WebSocket;
 
-namespace DiscordBot.Commands.Interactive.Contexts {
+namespace DiscordBot.Models.Contexts {
     public class ApplicationCommandContext : BaseInteractiveContext<SocketSlashCommand>
     {
         public ApplicationCommandContext(SocketSlashCommand command, IServiceProvider provider) : base(command, provider) { }

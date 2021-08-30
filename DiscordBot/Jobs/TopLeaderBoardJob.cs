@@ -7,7 +7,6 @@ using Discord;
 using Discord.WebSocket;
 using DiscordBot.Common.Models.Enums;
 using DiscordBot.Data.Interfaces;
-using DiscordBot.Services.interfaces;
 using DiscordBot.Services.Interfaces;
 using DiscordBot.Transformers;
 using Serilog.Events;

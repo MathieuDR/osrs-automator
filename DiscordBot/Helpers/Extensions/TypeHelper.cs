@@ -6,7 +6,7 @@ using Discord;
 using DiscordBot.Commands.Modules.DiscordCommandArguments;
 using WiseOldManConnector.Models.WiseOldMan.Enums;
 
-namespace DiscordBot.Helpers {
+namespace DiscordBot.Helpers.Extensions {
     public static class TypeHelper {
         public static List<Type> WhiteListedTypesToOutput() {
             return new() {

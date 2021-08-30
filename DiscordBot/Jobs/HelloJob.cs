@@ -2,7 +2,7 @@
 using System.Threading.Tasks;
 using Discord;
 using Discord.WebSocket;
-using DiscordBot.Services.interfaces;
+using DiscordBot.Services.Interfaces;
 using Quartz;
 using Serilog.Events;
 

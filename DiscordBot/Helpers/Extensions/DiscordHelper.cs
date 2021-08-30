@@ -4,9 +4,8 @@ using System.Linq;
 using Discord;
 using Discord.Commands;
 using Discord.WebSocket;
-using DiscordBot.Models;
 
-namespace DiscordBot.Helpers {
+namespace DiscordBot.Helpers.Extensions {
     public static class DiscordHelper {
         public static void AddEmptyField(this EmbedBuilder builder, bool inline = false) {
             builder.AddField("\u200B", "\u200B", inline);

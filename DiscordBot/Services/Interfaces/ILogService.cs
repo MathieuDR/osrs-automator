@@ -4,7 +4,7 @@ using System.Threading.Tasks;
 using Discord;
 using Serilog.Events;
 
-namespace DiscordBot.Services.interfaces {
+namespace DiscordBot.Services.Interfaces {
     public interface ILogService {
         Task Log(LogMessage message);
         Task LogDiscordClient(LogMessage message);

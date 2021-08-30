@@ -7,8 +7,9 @@ using Discord;
 using Discord.Commands;
 using DiscordBot.Commands.Modules.DiscordCommandArguments;
 using DiscordBot.Helpers;
+using DiscordBot.Helpers.Extensions;
 
-namespace DiscordBot.Commands.TypeReaders {
+namespace DiscordBot.TypeReaders {
     public class UserListWithImageArgumentsTypeReader : TypeReader {
         public override async Task<TypeReaderResult> ReadAsync(ICommandContext context, string input, IServiceProvider services) {
             var parameters = input.ToCollectionOfParameters().ToList();

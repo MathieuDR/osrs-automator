@@ -4,7 +4,7 @@ using Discord;
 using Discord.Commands;
 using DiscordBot.Common.Models.Decorators;
 
-namespace DiscordBot.Helpers {
+namespace DiscordBot.Helpers.Builders {
     public static class EmbedBuilderHelper {
         public static EmbedBuilder AddWiseOldMan(this EmbedBuilder builder, string title = "Wiseoldman.net",
             string url = "http://www.wiseoldman.net") {

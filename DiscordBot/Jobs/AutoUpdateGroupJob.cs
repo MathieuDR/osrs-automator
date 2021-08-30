@@ -6,8 +6,8 @@ using Discord.WebSocket;
 using DiscordBot.Common.Models.Enums;
 using DiscordBot.Data.Interfaces;
 using DiscordBot.Helpers;
+using DiscordBot.Helpers.Builders;
 using DiscordBot.Services.Helpers;
-using DiscordBot.Services.interfaces;
 using DiscordBot.Services.Interfaces;
 
 namespace DiscordBot.Jobs {

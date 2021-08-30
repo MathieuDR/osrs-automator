@@ -10,7 +10,6 @@ using DiscordBot.Data.Repository.Migrations;
 using DiscordBot.Data.Strategies;
 using DiscordBot.Services;
 using DiscordBot.Services.Configuration;
-using DiscordBot.Services.interfaces;
 using DiscordBot.Services.Interfaces;
 using DiscordBot.Services.Services;
 using Microsoft.Extensions.Configuration;

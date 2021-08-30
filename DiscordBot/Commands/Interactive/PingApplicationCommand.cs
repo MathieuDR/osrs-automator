@@ -3,8 +3,9 @@ using System.Text;
 using System.Threading.Tasks;
 using Common.Extensions;
 using Discord;
-using DiscordBot.Commands.Interactive.Contexts;
 using DiscordBot.Helpers;
+using DiscordBot.Helpers.Extensions;
+using DiscordBot.Models.Contexts;
 using FluentResults;
 using Microsoft.Extensions.Logging;
 

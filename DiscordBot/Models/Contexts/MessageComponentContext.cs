@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Discord.WebSocket;
 
-namespace DiscordBot.Commands.Interactive.Contexts {
+namespace DiscordBot.Models.Contexts {
     public class MessageComponentContext : BaseInteractiveContext<SocketMessageComponent>
     {
         public MessageComponentContext(SocketMessageComponent innerContext, IServiceProvider provider)

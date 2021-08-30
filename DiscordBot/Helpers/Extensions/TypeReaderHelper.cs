@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace DiscordBot.Helpers {
+namespace DiscordBot.Helpers.Extensions {
     public static class TypeReaderHelper {
         //https://stackoverflow.com/questions/298830/split-string-containing-command-line-parameters-into-string-in-c-sharp
         public static IEnumerable<string> ToCollectionOfParameters(this string input) {

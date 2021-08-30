@@ -6,11 +6,12 @@ using Common.Extensions;
 using Discord;
 using Discord.Rest;
 using Discord.WebSocket;
-using DiscordBot.Commands.Interactive.Builders;
 using DiscordBot.Helpers;
+using DiscordBot.Helpers.Builders;
+using DiscordBot.Helpers.Extensions;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace DiscordBot.Commands.Interactive.Contexts {
+namespace DiscordBot.Models.Contexts {
     public abstract class BaseInteractiveContext<T> where T : SocketInteraction {
         public T InnerContext { get; }
         public IServiceProvider Services { get; }
