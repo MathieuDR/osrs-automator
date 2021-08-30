@@ -51,12 +51,11 @@ namespace DiscordBot.Services {
             _commands.AddTypeReader<MetricArguments>(new MetricOsrsTypeReader(_metricSynonymsConfiguration));
             _commands.AddTypeReader<BaseArguments>(new BaseArgumentsTypeReader());
 
-            var t = _commands.AddModulesAsync(Assembly.GetEntryAssembly(), _provider);
+            //var t = _commands.AddModulesAsync(Assembly.GetEntryAssembly(), _provider);
             await _commands.AddModuleAsync<TestModule>(provider);
             // await _commands.AddModuleAsync<PlayerModule>(provider);
             // await _commands.AddModuleAsync<AdminModule>(provider);
             // await _commands.AddModuleAsync<CountModule>(provider);
-            await t;
         }
 
         public async Task OnCommandExecutedAsync(Optional<CommandInfo> command, ICommandContext context, IResult result) {

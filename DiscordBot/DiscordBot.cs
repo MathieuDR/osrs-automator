@@ -4,8 +4,8 @@ using System.Threading.Tasks;
 using Discord;
 using Discord.WebSocket;
 using DiscordBot.Commands.Interactive;
-using DiscordBot.Common.Configuration;
 using DiscordBot.Configuration;
+using DiscordBot.Models.Contexts;
 using DiscordBot.Services;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -61,7 +61,7 @@ namespace DiscordBot {
                 switch (command.Data.Name) {
                     case "ping":
                         var handler = _services.GetRequiredService<PingApplicationCommand>();
-                        await handler.HandleCommandAsync(null);
+                        await handler.HandleCommandAsync(new ApplicationCommandContext(command, _services));
                         break;
                 }
             }

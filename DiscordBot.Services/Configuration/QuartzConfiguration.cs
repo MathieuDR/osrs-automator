@@ -1,4 +1,5 @@
-﻿using System;
+﻿
+using System;
 using System.Linq;
 using DiscordBot.Common.Models.Enums;
 using DiscordBot.Jobs;
@@ -10,9 +11,18 @@ namespace DiscordBot.Services.Configuration {
     public static partial class ServiceConfigurationExtensions {
         public static IServiceCollection ConfigureQuartz(this IServiceCollection services, IConfiguration config) {
             // https://www.quartz-scheduler.net/documentation/quartz-3.x/packages/microsoft-di-integration.html#di-aware-job-factories
+            
+            // base configuration for DI, read from appSettings.json
+            services.Configure<QuartzOptions>(config.GetSection("Quartz"));
 
+            // if you are using persistent job store, you might want to alter some options
+            services.Configure<QuartzOptions>(options =>
+            {
+                options.Scheduling.IgnoreDuplicates = true; // default: false
+                options.Scheduling.OverWriteExistingData = true; // default: true
+            });
+            
             return services
-                .Configure<QuartzOptions>(options => config.GetSection("Quarts").Bind(options))
                 .AddQuartz(q => {
                     // handy when part of cluster or you want to otherwise identify multiple schedulers
                     q.SchedulerId = "Scheduler-Core";
@@ -30,14 +40,17 @@ namespace DiscordBot.Services.Configuration {
                         // to configure via default constructor
                         options.AllowDefaultConstructor = true;
                     });
-
-                    // or for scoped service support like EF Core DbContext
-                    // q.UseMicrosoftDependencyInjectionScopedJobFactory();
+                    
+                    q.UseDefaultThreadPool(tp =>
+                    {
+                        tp.MaxConcurrency = 10;
+                    });
 
                     // these are the defaults
                     q.UseSimpleTypeLoader();
                     q.UseInMemoryStore();
                 });
+            
         }
 
         private static IServiceCollectionQuartzConfigurator ConfigureJobs(

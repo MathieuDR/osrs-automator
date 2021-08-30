@@ -49,6 +49,8 @@ namespace DiscordBot {
         private IServiceProvider ConfigureServices(IConfiguration config) {
             var serviceCollection = new ServiceCollection();
 
+            ConfigureSerilogger();
+
             serviceCollection
                 .AddDiscordBot(config)
                 .UseLiteDbRepositories(config)

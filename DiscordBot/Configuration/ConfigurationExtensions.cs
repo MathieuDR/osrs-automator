@@ -3,19 +3,13 @@ using Discord.Commands;
 using Discord.WebSocket;
 using DiscordBot.Commands.Interactive;
 using DiscordBot.Common.Configuration;
-using DiscordBot.Data;
-using DiscordBot.Data.Configuration;
-using DiscordBot.Data.Factories;
-using DiscordBot.Data.Repository.Migrations;
-using DiscordBot.Data.Strategies;
 using DiscordBot.Services;
-using DiscordBot.Services.Configuration;
 using DiscordBot.Services.Interfaces;
 using DiscordBot.Services.Services;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Quartz;
 using Serilog;
-using WiseOldManConnector.Configuration;
 using WiseOldManConnector.Interfaces;
 
 namespace DiscordBot.Configuration {
@@ -67,7 +61,7 @@ namespace DiscordBot.Configuration {
             var botConfiguration = configuration.GetSection("Bot").Get<BotConfiguration>();
             var metricSynonymsConfiguration =
                 configuration.GetSection("MetricSynonyms").Get<MetricSynonymsConfiguration>();
-
+            
             serviceCollection
                 .AddSingleton(configuration)
                 .AddSingleton(botConfiguration)

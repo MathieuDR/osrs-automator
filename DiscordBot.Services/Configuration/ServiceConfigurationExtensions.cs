@@ -14,8 +14,6 @@ namespace DiscordBot.Services.Configuration {
                 .AddExternalServices();
         }
         
-      
-
         private static IServiceCollection AddExternalServices(this IServiceCollection serviceCollection) {
             serviceCollection
                 .AddRefitClient<IOsrsWikiApi>()
