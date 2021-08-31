@@ -14,7 +14,7 @@ namespace WiseOldManConnector.Models.Output {
         public int PageSize { get; set; } = 20;
     }
 
-    public abstract class Leaderboard<T> : Leaderboard {
+    public abstract class Leaderboard<T> : Leaderboard where T : ILeaderboardMember {
         protected Leaderboard() { }
 
         protected Leaderboard(List<T> items) {
@@ -28,7 +28,7 @@ namespace WiseOldManConnector.Models.Output {
         public List<T> Members { get; set; }
     }
 
-    public abstract class MetricTypeLeaderboard<T> : Leaderboard<T> {
+    public abstract class MetricTypeLeaderboard<T> : Leaderboard<T> where T : ILeaderboardMember {
         protected MetricTypeLeaderboard() { }
 
         protected MetricTypeLeaderboard(MetricType metricType) {
@@ -46,7 +46,7 @@ namespace WiseOldManConnector.Models.Output {
     }
 
     // Should we use interfaces? probably..
-    public abstract class MetricTypeAndPeriodLeaderboard<T> : MetricTypeLeaderboard<T> {
+    public abstract class MetricTypeAndPeriodLeaderboard<T> : MetricTypeLeaderboard<T> where T : ILeaderboardMember {
         protected MetricTypeAndPeriodLeaderboard() { }
 
 

@@ -2,7 +2,7 @@
 using WiseOldManConnector.Models.WiseOldMan.Enums;
 
 namespace WiseOldManConnector.Models.Output {
-    public class Record : IBaseConnectorOutput {
+    public class Record : IBaseConnectorOutput, ILeaderboardMember {
         public double Value { get; set; }
         public MetricType MetricType { get; set; }
         public Period Period { get; set; }
