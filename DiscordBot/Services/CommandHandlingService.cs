@@ -45,11 +45,11 @@ namespace DiscordBot.Services {
 
         public async Task InitializeAsync(IServiceProvider provider) {
             _provider = provider;
-            _commands.AddTypeReader<PeriodAndMetricArguments>(new PeriodAndMetricOsrsTypeReader(_metricSynonymsConfiguration));
-            _commands.AddTypeReader<PeriodArguments>(new PeriodOsrsTypeReader());
-            _commands.AddTypeReader<UserListWithImageArguments>(new UserListWithImageArgumentsTypeReader());
-            _commands.AddTypeReader<MetricArguments>(new MetricOsrsTypeReader(_metricSynonymsConfiguration));
-            _commands.AddTypeReader<BaseArguments>(new BaseArgumentsTypeReader());
+            // _commands.AddTypeReader<PeriodAndMetricArguments>(new PeriodAndMetricOsrsTypeReader(_metricSynonymsConfiguration));
+            // _commands.AddTypeReader<PeriodArguments>(new PeriodOsrsTypeReader());
+            // _commands.AddTypeReader<UserListWithImageArguments>(new UserListWithImageArgumentsTypeReader());
+            // _commands.AddTypeReader<MetricArguments>(new MetricOsrsTypeReader(_metricSynonymsConfiguration));
+            // _commands.AddTypeReader<BaseArguments>(new BaseArgumentsTypeReader());
 
             //var t = _commands.AddModulesAsync(Assembly.GetEntryAssembly(), _provider);
             await _commands.AddModuleAsync<TestModule>(provider);
