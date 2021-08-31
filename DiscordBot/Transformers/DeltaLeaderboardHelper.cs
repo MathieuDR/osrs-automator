@@ -13,7 +13,7 @@ namespace DiscordBot.Transformers {
         private static readonly int NameSpace = 15;
         private static readonly int NumberSpace = 6;
 
-       public static string MembersToString<T>(this MetricTypeAndPeriodLeaderboard<T> source, int maxMembers = 20) where T : ILeaderboardMember {
+       public static string MembersToString<T>(this MetricTypeLeaderboard<T> source, int maxMembers = 20) where T : ILeaderboardMember {
             var description = new StringBuilder();
             description.Append("#".PadLeft(IdHash).PadRight(IdSpace));
             description.Append("Name".PadRight(NameSpace));

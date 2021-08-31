@@ -14,7 +14,5 @@ namespace DiscordBot.Services.Interfaces {
         Task<Result> SendFailedEmbed(ulong channelId, string message, Guid traceId);
         Task<Result> SendWomGroupSuccessEmbed(ulong channelId, string message, int groupId, string groupName);
         Task<Result> MessageLeaderboards<T>(ulong channelId, IEnumerable<MetricTypeLeaderboard<T>> leaderboards) where T : ILeaderboardMember;
-        Task<Result> MessageLeaderboards<T>(ulong channelId, IEnumerable<MetricTypeAndPeriodLeaderboard<T>> leaderboards) where T : ILeaderboardMember;
-   
     }
 }

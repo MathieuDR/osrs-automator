@@ -71,8 +71,9 @@ namespace DiscordBot.Services {
         public Task<Result> SendWomGroupSuccessEmbed(ulong channelId, string message, int groupId, string groupName) {
             throw new NotImplementedException();
         }
+       
 
-        public async Task<Result> MessageLeaderboards<T>(ulong channelId, IEnumerable<MetricTypeAndPeriodLeaderboard<T>> leaderboards) where T : ILeaderboardMember {
+        public async Task<Result> MessageLeaderboards<T>(ulong channelId, IEnumerable<MetricTypeLeaderboard<T>> leaderboards) where T : ILeaderboardMember {
             var channelTask = _client.GetChannelAsync(channelId);
             var metricMessages = leaderboards.Select(leaderboard => GetMessageForLeaderboard(leaderboard)).ToList();
 
@@ -90,11 +91,18 @@ namespace DiscordBot.Services {
         }
 
 
-        private string GetMessageForLeaderboard<T>(MetricTypeAndPeriodLeaderboard<T> leaderboard) where T : ILeaderboardMember {
-            var message = $"**{leaderboard.MetricType.FriendlyName(true)}** - top gains for {leaderboard.Period}{Environment.NewLine}```";
-            message += leaderboard.MembersToString(3);
-            message += $"```{Environment.NewLine}";
-            return message;
+        private string GetMessageForLeaderboard<T>(MetricTypeLeaderboard<T> leaderboard) where T : ILeaderboardMember {
+            StringBuilder builder = new StringBuilder();
+            builder.Append($"**{leaderboard.MetricType.FriendlyName(true)}** - Leaderboard");
+
+            if (leaderboard is MetricTypeAndPeriodLeaderboard<T> periodLeaderboard) {
+                builder.Append($" for {periodLeaderboard.Period}");
+            }
+
+            builder.Append($"{Environment.NewLine}```");
+            builder.Append(leaderboard.MembersToString(3));
+            builder.Append($"```{Environment.NewLine}");
+            return builder.ToString();
         }
 
         private Result<IEnumerable<string>> CreateCompoundedMessagesForMultipleMessages(IEnumerable<string> messages) {
