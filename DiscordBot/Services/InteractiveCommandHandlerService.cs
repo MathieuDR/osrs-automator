@@ -26,13 +26,31 @@ namespace DiscordBot.Services {
             _strategy = strategy;
             _provider = provider;
 
-            client.Ready += DiscordReady;
             client.InteractionCreated += OnInteraction;
         }
 
+        public async Task SetupAsync() {
+            if (_client.ConnectionState != ConnectionState.Connected) {
+                _client.Connected += ClientOnConnected;
+                return;
+            }
+
+            await Initialize();
+        }
+
+        private async Task ClientOnConnected() {
+            _client.Connected -= ClientOnConnected;
+            await Initialize();
+        }
+
+        public async Task Initialize() {
+            await InitializeCommands();
+        }
+
+
         private async Task OnInteraction(SocketInteraction arg) {
             if (arg is not SocketSlashCommand socketSlashCommand) {
-                throw new NotImplementedException();
+                return;
             }
 
             var ctx = new ApplicationCommandContext(socketSlashCommand, _provider);
@@ -42,7 +60,7 @@ namespace DiscordBot.Services {
             }
         }
 
-        private async Task DiscordReady() {
+        private async Task InitializeCommands() {
             var builders = await _strategy.GetCommandBuilders(false);
             var commands = await _client.Rest.GetGuildApplicationCommands(403539795944538122);
 

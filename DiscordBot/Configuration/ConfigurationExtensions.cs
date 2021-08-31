@@ -8,7 +8,6 @@ using DiscordBot.Services.Interfaces;
 using DiscordBot.Services.Services;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Quartz;
 using Serilog;
 using WiseOldManConnector.Interfaces;
 
@@ -52,7 +51,10 @@ namespace DiscordBot.Configuration {
         }
 
         private static IServiceCollection AddDiscordCommands(this IServiceCollection serviceCollection) {
-            serviceCollection.AddTransient<PingApplicationCommand>();
+            serviceCollection.AddSingleton<PingApplicationCommand>();
+            serviceCollection.AddSingleton<ICommandStrategy>(x => new CommandStrategy(new Commands.Interactive.IApplicationCommand[] {
+                    x.GetRequiredService<PingApplicationCommand>(),
+                }));
             return serviceCollection;
         }
 

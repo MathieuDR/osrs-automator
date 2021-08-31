@@ -46,11 +46,14 @@ namespace DiscordBot {
             _client = _services.GetRequiredService<DiscordSocketClient>();
             await ((CommandHandlingService) _services.GetRequiredService(typeof(CommandHandlingService)))
                 .InitializeAsync(_services);
+            
+            await ((InteractiveCommandHandlerService) _services.GetRequiredService(typeof(InteractiveCommandHandlerService)))
+                .SetupAsync();
 
             var botConfig = _config.GetSection("Bot").Get<BotConfiguration>();
 
 
-            _client.InteractionCreated += ClientOnInteractionCreated;
+            //_client.InteractionCreated += ClientOnInteractionCreated;
             await _client.LoginAsync(TokenType.Bot, botConfig.Token);
             await _client.StartAsync();
         }
