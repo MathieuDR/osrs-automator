@@ -1,8 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Net.Sockets;
 using Discord;
 using Discord.Commands;
+using Discord.WebSocket;
 using DiscordBot.Common.Models.Decorators;
+using DiscordBot.Helpers.Extensions;
+using DiscordBot.Models.Contexts;
 
 namespace DiscordBot.Helpers.Builders {
     public static class EmbedBuilderHelper {
@@ -53,13 +57,25 @@ namespace DiscordBot.Helpers.Builders {
 
         public static EmbedBuilder WithMessageAuthorFooter(this EmbedBuilder builder, ICommandContext context,
             string appendToFooter = "") {
-            var footerText = $"Requested by {context.User.Username}.";
+            return WithMessageAuthorFooter(builder, context.User, appendToFooter);
+        }
+
+        
+        public static EmbedBuilder WithMessageAuthorFooter(this EmbedBuilder builder, IUser user,
+            string appendToFooter = "") {
+
+            var userName = user.Username;
+            if (user is IGuildUser guildUser) {
+                userName = guildUser.DisplayName();
+            }
+            
+            var footerText = $"Requested by {userName}.";
             if (!string.IsNullOrWhiteSpace(appendToFooter)) {
                 footerText += $", {appendToFooter}";
             }
 
             builder.Footer = new EmbedFooterBuilder {
-                IconUrl = context.User.GetAvatarUrl(),
+                IconUrl = user.GetAvatarUrl(),
                 Text = footerText
             };
 

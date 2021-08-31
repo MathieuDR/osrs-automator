@@ -10,6 +10,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Serilog;
 using WiseOldManConnector.Interfaces;
+using IApplicationCommand = DiscordBot.Commands.Interactive.IApplicationCommand;
 
 namespace DiscordBot.Configuration {
     public static class ConfigurationExtensions {
@@ -51,11 +52,12 @@ namespace DiscordBot.Configuration {
         }
 
         private static IServiceCollection AddDiscordCommands(this IServiceCollection serviceCollection) {
-            serviceCollection.AddSingleton<PingApplicationCommand>();
-            serviceCollection.AddSingleton<ICommandStrategy>(x => new CommandStrategy(new Commands.Interactive.IApplicationCommand[] {
+            return serviceCollection.AddSingleton<PingApplicationCommand>()
+                .AddSingleton<ManageCommandsApplicationCommand>()
+                .AddSingleton<ICommandStrategy>(x => new CommandStrategy(new IApplicationCommand[] {
                     x.GetRequiredService<PingApplicationCommand>(),
+                    x.GetRequiredService<ManageCommandsApplicationCommand>()
                 }));
-            return serviceCollection;
         }
 
         private static IServiceCollection AddConfiguration(this IServiceCollection serviceCollection,
@@ -63,7 +65,7 @@ namespace DiscordBot.Configuration {
             var botConfiguration = configuration.GetSection("Bot").Get<BotConfiguration>();
             var metricSynonymsConfiguration =
                 configuration.GetSection("MetricSynonyms").Get<MetricSynonymsConfiguration>();
-            
+
             serviceCollection
                 .AddSingleton(configuration)
                 .AddSingleton(botConfiguration)
@@ -82,7 +84,7 @@ namespace DiscordBot.Configuration {
                 .AddExternalServices()
                 .AddConfiguration(configuration)
                 .ConfigureAutoMapper();
-        
+
             return serviceCollection;
         }
     }

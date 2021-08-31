@@ -10,7 +10,12 @@ namespace DiscordBot.Commands.Interactive {
     public interface ICommandStrategy {
         public Task<Result> HandleApplicationCommand(ApplicationCommandContext context);
         public Task<SlashCommandBuilder[]> GetCommandBuilders(bool allBuilders);
-        public Task<SlashCommandBuilder> GetCommandBuilder(string aplicationCommandName);
+        public Task<SlashCommandBuilder> GetCommandBuilder(string applicationCommandName);
+        /// <summary>
+        /// Get the names and descriptions of the commands
+        /// </summary>
+        /// <returns>Name, Description of commands</returns>
+        public IEnumerable<(string Name, string Description)> GetCommandDescriptions();
     }
 
     public class CommandStrategy : ICommandStrategy {
@@ -30,6 +35,11 @@ namespace DiscordBot.Commands.Interactive {
             return await command.HandleCommandAsync(context);
         }
 
+        /// <summary>
+        /// Get all the command builders
+        /// </summary>
+        /// <param name="allBuilders">Retrieve all commands, even if they're not set to 'global'</param>
+        /// <returns>Commandbuilders in the strategy</returns>
         public async Task<SlashCommandBuilder[]> GetCommandBuilders(bool allBuilders = false) {
             var commandsToRetrieve = _commands.Where(c => c.GlobalRegister || allBuilders).ToList();
             
@@ -51,6 +61,10 @@ namespace DiscordBot.Commands.Interactive {
             }
             
             return await command.GetCommandBuilder();
+        }
+
+        public IEnumerable<(string Name, string Description)> GetCommandDescriptions() {
+            return _commands.Select(c => (c.Name, c.Description));
         }
     }
 }
