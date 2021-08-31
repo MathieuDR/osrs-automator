@@ -1,9 +1,11 @@
 using System;
+using System.Text;
+using System.Text.Json;
 using System.Threading.Tasks;
 using Discord;
-using Discord.WebSocket;
 using DiscordBot.Models.Contexts;
 using FluentResults;
+using HashDepot;
 using Microsoft.Extensions.Logging;
 
 namespace DiscordBot.Commands.Interactive {
@@ -14,10 +16,11 @@ namespace DiscordBot.Commands.Interactive {
             Logger = logger;
         }
 
+        public ILogger Logger { get; }
+
         public string Name { get; }
         public string Description { get; }
         public virtual bool GlobalRegister => true;
-        public ILogger Logger { get; }
 
         public async Task<SlashCommandBuilder> GetCommandBuilder() {
             Logger.LogInformation("Creating SlashCommandBuilder for {command}: {description}", Name, Description);
@@ -30,17 +33,26 @@ namespace DiscordBot.Commands.Interactive {
             return builder;
         }
 
+        public abstract Task<Result> HandleCommandAsync(ApplicationCommandContext context);
+
+        public abstract Task<Result> HandleComponentAsync(MessageComponentContext context);
+
+        public virtual bool CanHandle(ApplicationCommandContext context) {
+            return string.Equals(context.InnerContext.Data.Name, Name, StringComparison.InvariantCultureIgnoreCase);
+        }
+
         /// <summary>
-        /// Extend the builder. The Name and description is already set
+        ///     Extend the builder. The Name and description is already set
         /// </summary>
         /// <param name="builder">Builder with name and description set</param>
         /// <returns>Fully build slash command builder</returns>
         protected abstract Task<SlashCommandBuilder> ExtendSlashCommandBuilder(SlashCommandBuilder builder);
 
-        public abstract Task<Result> HandleCommandAsync(ApplicationCommandContext context);
-
-        public abstract Task<Result> HandleComponentAsync(MessageComponentContext context);
-
-        public virtual bool CanHandle(ApplicationCommandContext context) => string.Equals(context.InnerContext.Data.Name, Name, StringComparison.InvariantCultureIgnoreCase);
+        public async Task<uint> GetCommandBuilderHash() {
+            var command = await GetCommandBuilder();
+            var json = JsonSerializer.Serialize(command);
+            var stream = Encoding.ASCII.GetBytes(json);
+            return XXHash.Hash32(stream);
+        }
     }
 }

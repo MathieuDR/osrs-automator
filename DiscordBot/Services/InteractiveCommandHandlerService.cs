@@ -52,7 +52,7 @@ namespace DiscordBot.Services {
             if (arg is not SocketSlashCommand socketSlashCommand) {
                 return;
             }
-
+    
             var ctx = new ApplicationCommandContext(socketSlashCommand, _provider);
             var result = await _strategy.HandleApplicationCommand(ctx);
             if (result.IsFailed) {

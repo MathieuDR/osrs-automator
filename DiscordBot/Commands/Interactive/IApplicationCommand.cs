@@ -13,5 +13,6 @@ namespace DiscordBot.Commands.Interactive {
         Task<Result> HandleCommandAsync(ApplicationCommandContext context);
         Task<Result> HandleComponentAsync(MessageComponentContext context);
         public bool CanHandle(ApplicationCommandContext context);
+        Task<uint> GetCommandBuilderHash();
     }
 }

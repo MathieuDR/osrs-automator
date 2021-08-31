@@ -1,9 +1,7 @@
 using System;
 using System.Text;
 using System.Threading.Tasks;
-using Common.Extensions;
 using Discord;
-using DiscordBot.Helpers;
 using DiscordBot.Helpers.Extensions;
 using DiscordBot.Models.Contexts;
 using FluentResults;
@@ -17,6 +15,7 @@ namespace DiscordBot.Commands.Interactive {
         protected override Task<SlashCommandBuilder> ExtendSlashCommandBuilder(SlashCommandBuilder builder) {
             builder.AddOption("info", ApplicationCommandOptionType.String, "Some extra information", false);
             builder.AddOption("time", ApplicationCommandOptionType.Boolean, "Print the ping time in ms", false);
+            builder.AddOption("hash", ApplicationCommandOptionType.Boolean, "Show the hash of this command", false);
             return Task.FromResult(builder);
         }
 
@@ -26,13 +25,19 @@ namespace DiscordBot.Commands.Interactive {
             var guildUser = context.GuildUser;
             var extraInfo = context.GetOptionValue<string>("info");
             var printTime = context.GetOptionValue<bool>("time");
+            var printHash = context.GetOptionValue<bool>("hash");
 
             var builder = new StringBuilder();
             builder.AppendLine($"Hello {guildUser.DisplayName()}.");
             if (!string.IsNullOrWhiteSpace(extraInfo)) {
                 builder.AppendLine(extraInfo);
             }
-            
+
+            if (printHash) {
+                var hash = await GetCommandBuilderHash();
+                builder.AppendLine($"My hash is: {hash}");
+            }
+
             if (printTime) {
                 var timeDifference = DateTimeOffset.Now - context.InnerContext.CreatedAt;
                 builder.AppendLine($"Difference is: {timeDifference.TotalMilliseconds}ms");
@@ -46,6 +51,6 @@ namespace DiscordBot.Commands.Interactive {
             throw new NotImplementedException();
         }
 
-        public override bool GlobalRegister => false;
+        public override bool GlobalRegister => true;
     }
 }
