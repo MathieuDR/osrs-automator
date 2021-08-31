@@ -24,9 +24,9 @@ namespace DiscordBot.Commands.Interactive {
             Logger.LogInformation("Received command!");
 
             var guildUser = context.GuildUser;
-            var extraInfo = context.ValueOptions["name"].As<string>();
-            var printTime = (bool)(context.ValueOptions["time"] ?? false);
-            
+            var extraInfo = context.GetOptionValue<string>("info");
+            var printTime = context.GetOptionValue<bool>("time");
+
             var builder = new StringBuilder();
             builder.AppendLine($"Hello {guildUser.DisplayName()}.");
             if (!string.IsNullOrWhiteSpace(extraInfo)) {
