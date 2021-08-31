@@ -1,4 +1,5 @@
-﻿using WiseOldManConnector.Models.Output;
+﻿using DiscordBot.Common.Models.Data.Base;
+using WiseOldManConnector.Models.Output;
 
 namespace DiscordBot.Common.Models.Data {
     public class GuildConfig : BaseGuildModel {

@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using DiscordBot.Common.Dtos.Runescape;
+using DiscordBot.Common.Models.Data.Base;
 using LiteDB;
 using WiseOldManConnector.Models.WiseOldMan.Enums;
 

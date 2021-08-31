@@ -1,19 +1,18 @@
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using DiscordBot.Common.Dtos.Discord;
 using DiscordBot.Common.Models.Data;
-using DiscordBot.Common.Models.DiscordDtos;
 using DiscordBot.Common.Models.Enums;
 using DiscordBot.Data.Strategies;
 using DiscordBot.Services.Interfaces;
-using DiscordBot.Services.Jobs;
 using FluentResults;
 using Microsoft.Extensions.Logging;
 using WiseOldManConnector.Helpers;
 using WiseOldManConnector.Models.Output;
 using WiseOldManConnector.Models.WiseOldMan.Enums;
 
-namespace DiscordBot.Jobs {
+namespace DiscordBot.Services.Jobs {
     public class MonthlyTopDeltasJob : ConfigurableGuildJob {
         private readonly IOsrsHighscoreService _osrsHighscoreService;
 

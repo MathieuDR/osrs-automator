@@ -1,8 +1,8 @@
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using DiscordBot.Common.Dtos.Discord;
 using DiscordBot.Common.Models.Data;
-using DiscordBot.Common.Models.DiscordDtos;
 using FluentResults;
 using WiseOldManConnector.Models.Output;
 

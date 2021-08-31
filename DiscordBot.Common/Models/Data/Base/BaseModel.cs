@@ -4,7 +4,7 @@ using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using LiteDB;
 
-namespace DiscordBot.Common.Models.Data {
+namespace DiscordBot.Common.Models.Data.Base {
     public record BaseRecord {
         [BsonId]
         public ObjectId Id { get; init; }

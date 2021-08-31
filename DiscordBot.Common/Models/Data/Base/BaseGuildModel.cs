@@ -1,4 +1,4 @@
-﻿namespace DiscordBot.Common.Models.Data {
+﻿namespace DiscordBot.Common.Models.Data.Base {
     public class BaseGuildModel : BaseModel {
         public BaseGuildModel() { }
 

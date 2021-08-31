@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using DiscordBot.Common.Models.Data.Base;
 
 namespace DiscordBot.Common.Models.Data {
     public class Player : BaseGuildModel {

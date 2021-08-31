@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using DiscordBot.Common.Models.Data;
+using DiscordBot.Common.Models.Data.Base;
 using DiscordBot.Data.Interfaces;
 using FluentResults;
 using LiteDB;

@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
+using DiscordBot.Common.Dtos.Discord;
 using DiscordBot.Common.Models.Decorators;
-using DiscordBot.Common.Models.DiscordDtos;
 using DiscordBot.Common.Models.Enums;
 using WiseOldManConnector.Models.Output;
 using WiseOldManConnector.Models.WiseOldMan.Enums;
