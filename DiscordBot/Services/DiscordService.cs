@@ -2,13 +2,17 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Text;
 using System.Threading.Tasks;
+using Common.Extensions;
 using Discord.WebSocket;
 using DiscordBot.Common.Models.Data;
 using DiscordBot.Common.Models.DiscordDtos;
 using DiscordBot.Services.Interfaces;
+using DiscordBot.Transformers;
 using FluentResults;
 using Microsoft.Extensions.Logging;
+using WiseOldManConnector.Helpers;
 using WiseOldManConnector.Models.Output;
 
 namespace DiscordBot.Services {
@@ -68,28 +72,53 @@ namespace DiscordBot.Services {
             throw new NotImplementedException();
         }
 
-        public Task<Result> MessageLeaderboards(ulong channelId, IEnumerable<Leaderboard> leaderboards) {
-            throw new NotImplementedException();
+        public async Task<Result> MessageLeaderboards<T>(ulong channelId, IEnumerable<MetricTypeAndPeriodLeaderboard<T>> leaderboards) where T : ILeaderboardMember {
+            var channelTask = _client.GetChannelAsync(channelId);
+            var metricMessages = leaderboards.Select(leaderboard => GetMessageForLeaderboard(leaderboard)).ToList();
+
+            var toSendResult = CreateCompoundedMessagesForMultipleMessages(metricMessages);
+            if (toSendResult.IsFailed) {
+                return toSendResult;
+            }
+            
+            var channel = (await channelTask).As<ISocketMessageChannel>();
+            foreach (var message in toSendResult.Value) {
+                await channel.SendMessageAsync(message);
+            }
+
+            return Result.Ok();
         }
 
-        public Task<Result> MessageLeaderboards<T>(ulong channelId, IEnumerable<MetricTypeLeaderboard<T>> leaderboards) {
-            throw new NotImplementedException();
+
+        private string GetMessageForLeaderboard<T>(MetricTypeAndPeriodLeaderboard<T> leaderboard) where T : ILeaderboardMember {
+            var message = $"**{leaderboard.MetricType.FriendlyName(true)}** - top gains for {leaderboard.Period}{Environment.NewLine}```";
+            message += leaderboard.MembersToString(3);
+            message += $"```{Environment.NewLine}";
+            return message;
         }
 
-        public Task<Result> MessageLeaderboards<T>(ulong channelId, IEnumerable<MetricTypeAndPeriodLeaderboard<T>> leaderboards) {
-            throw new NotImplementedException();
-        }
+        private Result<IEnumerable<string>> CreateCompoundedMessagesForMultipleMessages(IEnumerable<string> messages) {
+            var compoundedMessages = new List<string>();
+            var maxSize = 1990;
+            var builder = new StringBuilder();
+            foreach (var message in messages) {
+                if (builder.Length + message.Length >= maxSize) {
+                    if (builder.Length > 0) {
+                        compoundedMessages.Add(builder.ToString());
+                    }
 
-        public Task<Result> MessageLeaderboard(ulong channelId, Leaderboard leaderboard) {
-            throw new NotImplementedException();
-        }
+                    builder = new StringBuilder();
+                }
 
-        public Task<Result> MessageLeaderboard<T>(ulong channelId, MetricTypeLeaderboard<T> leaderboard) {
-            throw new NotImplementedException();
-        }
+                builder.Append(message);
+            }
+            
+            // Last message
+            if (builder.Length > 0) {
+                compoundedMessages.Add(builder.ToString());
+            }
 
-        public Task<Result> MessageLeaderboard<T>(ulong channelId, MetricTypeAndPeriodLeaderboard<T> leaderboard) {
-            throw new NotImplementedException();
+            return Result.Ok((IEnumerable<string>) compoundedMessages);
         }
 
         private static Stream ToStream(string image) {

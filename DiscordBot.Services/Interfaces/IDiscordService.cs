@@ -13,12 +13,8 @@ namespace DiscordBot.Services.Interfaces {
         Task<Result<IEnumerable<Guild>>> GetAllGuilds();
         Task<Result> SendFailedEmbed(ulong channelId, string message, Guid traceId);
         Task<Result> SendWomGroupSuccessEmbed(ulong channelId, string message, int groupId, string groupName);
-        Task<Result> MessageLeaderboards(ulong channelId, IEnumerable<Leaderboard> leaderboards);
-        Task<Result> MessageLeaderboards<T>(ulong channelId, IEnumerable<MetricTypeLeaderboard<T>> leaderboards);
-        Task<Result> MessageLeaderboards<T>(ulong channelId, IEnumerable<MetricTypeAndPeriodLeaderboard<T>> leaderboards);
-        
-        Task<Result> MessageLeaderboard(ulong channelId, Leaderboard leaderboard);
-        Task<Result> MessageLeaderboard<T>(ulong channelId, MetricTypeLeaderboard<T> leaderboard);
-        Task<Result> MessageLeaderboard<T>(ulong channelId, MetricTypeAndPeriodLeaderboard<T> leaderboard);
+        Task<Result> MessageLeaderboards<T>(ulong channelId, IEnumerable<MetricTypeLeaderboard<T>> leaderboards) where T : ILeaderboardMember;
+        Task<Result> MessageLeaderboards<T>(ulong channelId, IEnumerable<MetricTypeAndPeriodLeaderboard<T>> leaderboards) where T : ILeaderboardMember;
+   
     }
 }
