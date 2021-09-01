@@ -12,7 +12,9 @@ using DiscordBot.Helpers.Extensions;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace DiscordBot.Models.Contexts {
-    public abstract class BaseInteractiveContext<T> where T : SocketInteraction {
+
+    public abstract class BaseInteractiveContext { }
+    public abstract class BaseInteractiveContext<T> : BaseInteractiveContext where T : SocketInteraction {
         public T InnerContext { get; }
         public IServiceProvider Services { get; }
         public DiscordSocketClient Client { get; }

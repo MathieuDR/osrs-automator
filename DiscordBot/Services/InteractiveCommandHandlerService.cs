@@ -8,6 +8,7 @@ using Discord.Rest;
 using Discord.WebSocket;
 using DiscordBot.Commands.Interactive;
 using DiscordBot.Models.Contexts;
+using FluentResults;
 using Microsoft.Extensions.Logging;
 
 namespace DiscordBot.Services {
@@ -47,16 +48,16 @@ namespace DiscordBot.Services {
             await InitializeCommands();
         }
 
-
         private async Task OnInteraction(SocketInteraction arg) {
-            if (arg is not SocketSlashCommand socketSlashCommand) {
-                return;
-            }
-    
-            var ctx = new ApplicationCommandContext(socketSlashCommand, _provider);
-            var result = await _strategy.HandleApplicationCommand(ctx);
+            BaseInteractiveContext ctx = arg switch {
+                SocketSlashCommand socketSlashCommand => new ApplicationCommandContext(socketSlashCommand, _provider),
+                SocketMessageComponent socketMessageComponent => new MessageComponentContext(socketMessageComponent, _provider),
+                _ => null
+            };
+
+            var result = await _strategy.HandleInteractiveCommand(ctx);
             if (result.IsFailed) {
-                await ctx.RespondAsync(string.Join(", ", result.Errors));
+                await arg.RespondAsync(string.Join(", ", result.Errors));
             }
         }
 

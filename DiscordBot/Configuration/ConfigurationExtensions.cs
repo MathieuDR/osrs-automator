@@ -22,7 +22,8 @@ namespace DiscordBot.Configuration {
                         MessageCacheSize = 100,
                         GatewayIntents = GatewayIntents.GuildMembers | GatewayIntents.GuildMessages |
                                          GatewayIntents.GuildMessageReactions | GatewayIntents.GuildMembers |
-                                         GatewayIntents.Guilds
+                                         GatewayIntents.Guilds,
+                        AlwaysAcknowledgeInteractions = false,
                     };
                     var client = new DiscordSocketClient(config);
                     return client;

@@ -42,7 +42,7 @@ namespace DiscordBot.Commands.Interactive {
                 var timeDifference = DateTimeOffset.Now - context.InnerContext.CreatedAt;
                 builder.AppendLine($"Difference is: {timeDifference.TotalMilliseconds}ms");
             }
-
+            
             await context.RespondAsync(builder.ToString());
             return Result.Ok();
         }
@@ -51,6 +51,7 @@ namespace DiscordBot.Commands.Interactive {
             throw new NotImplementedException();
         }
 
+        public override Guid Id => Guid.Parse("912DFB5E-4837-40C5-8E66-CDA3779FE823");
         public override bool GlobalRegister => true;
     }
 }

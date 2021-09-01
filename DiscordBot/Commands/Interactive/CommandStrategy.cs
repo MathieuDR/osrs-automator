@@ -9,8 +9,10 @@ using FluentResults;
 namespace DiscordBot.Commands.Interactive {
     public interface ICommandStrategy {
         public Task<Result> HandleApplicationCommand(ApplicationCommandContext context);
+        public Task<Result> HandleComponentCommand(MessageComponentContext context);
         public Task<SlashCommandBuilder[]> GetCommandBuilders(bool allBuilders);
         public Task<SlashCommandBuilder> GetCommandBuilder(string applicationCommandName);
+        public Task<Result> HandleInteractiveCommand(BaseInteractiveContext context);
         /// <summary>
         /// Get the names and descriptions of the commands
         /// </summary>
@@ -22,9 +24,17 @@ namespace DiscordBot.Commands.Interactive {
         public CommandStrategy(IApplicationCommand[] commands) {
             _commands = commands ?? throw new ArgumentNullException(nameof(commands));
         }
-
-
+        
         private readonly IApplicationCommand[] _commands;
+        
+        public Task<Result> HandleInteractiveCommand(BaseInteractiveContext context) {
+            return context switch {
+                MessageComponentContext messageComponentContext => HandleComponentCommand(messageComponentContext),
+                ApplicationCommandContext applicationCommandContext => HandleApplicationCommand(applicationCommandContext),
+                _ => Task.FromResult<Result>(Result.Fail("Could not find context type"))
+            };
+        }
+
         public async Task<Result> HandleApplicationCommand(ApplicationCommandContext context) {
             var command = _commands.FirstOrDefault(c => c.CanHandle(context));
 
@@ -33,6 +43,16 @@ namespace DiscordBot.Commands.Interactive {
             }
 
             return await command.HandleCommandAsync(context);
+        }
+
+        public async Task<Result> HandleComponentCommand(MessageComponentContext context) {
+            var command = _commands.FirstOrDefault(c => c.CanHandle(context));
+
+            if (command is null) {
+                return Result.Fail("Could not find proper command handler"); 
+            }
+
+            return await command.HandleComponentAsync(context);
         }
 
         /// <summary>

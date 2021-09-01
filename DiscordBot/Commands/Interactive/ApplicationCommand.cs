@@ -1,4 +1,5 @@
 using System;
+using System.Linq;
 using System.Text;
 using System.Text.Json;
 using System.Threading.Tasks;
@@ -18,6 +19,7 @@ namespace DiscordBot.Commands.Interactive {
 
         public ILogger Logger { get; }
 
+        public abstract Guid Id { get; }
         public string Name { get; }
         public string Description { get; }
         public virtual bool GlobalRegister => true;
@@ -33,12 +35,29 @@ namespace DiscordBot.Commands.Interactive {
             return builder;
         }
 
+        protected string SubCommand(params string[] ids) {
+            var stringsToJoin = new string[ids.Length + 1];
+            stringsToJoin[0] = Name;
+            Array.Copy(ids, 0, stringsToJoin, 1, ids.Length);
+
+            return string.Join(".", stringsToJoin);
+        }
+
         public abstract Task<Result> HandleCommandAsync(ApplicationCommandContext context);
 
         public abstract Task<Result> HandleComponentAsync(MessageComponentContext context);
 
+        public virtual Task RemoveComponent(MessageComponentContext context) {
+            return Task.CompletedTask;
+            //context.
+        }
+
         public virtual bool CanHandle(ApplicationCommandContext context) {
             return string.Equals(context.InnerContext.Data.Name, Name, StringComparison.InvariantCultureIgnoreCase);
+        }
+
+        public bool CanHandle(MessageComponentContext context) {
+            return string.Equals(context.CustomIdParts.FirstOrDefault() ?? "", Name, StringComparison.InvariantCultureIgnoreCase);
         }
 
         /// <summary>
