@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.Linq;
 using System.Threading.Tasks;
 using Discord;
@@ -16,6 +17,8 @@ namespace DiscordBot.Models.Contexts {
 
         public IEnumerable<string> SelectedMenuOptions
             => InnerContext.Data.Values?.ToHashSet() ?? new HashSet<string>();
+
+        public IReadOnlyCollection<EmbedField> EmbedFields => this.InnerContext.Message.Embeds.FirstOrDefault()?.Fields ?? new ImmutableArray<EmbedField>();
 
         public Task UpdateAsync(
             Optional<string> content = new(),

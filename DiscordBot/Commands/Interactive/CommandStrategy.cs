@@ -12,6 +12,7 @@ namespace DiscordBot.Commands.Interactive {
         public Task<Result> HandleComponentCommand(MessageComponentContext context);
         public Task<SlashCommandBuilder[]> GetCommandBuilders(bool allBuilders);
         public Task<SlashCommandBuilder> GetCommandBuilder(string applicationCommandName);
+        public Task<uint> GetCommandHash(string applicationCommandName);
         public Task<Result> HandleInteractiveCommand(BaseInteractiveContext context);
         /// <summary>
         /// Get the names and descriptions of the commands
@@ -26,7 +27,7 @@ namespace DiscordBot.Commands.Interactive {
         }
         
         private readonly IApplicationCommand[] _commands;
-        
+
         public Task<Result> HandleInteractiveCommand(BaseInteractiveContext context) {
             return context switch {
                 MessageComponentContext messageComponentContext => HandleComponentCommand(messageComponentContext),
@@ -81,6 +82,16 @@ namespace DiscordBot.Commands.Interactive {
             }
             
             return await command.GetCommandBuilder();
+        }
+        
+        public Task<uint> GetCommandHash(string applicationCommandName) {
+            var command = _commands.FirstOrDefault(c => string.Equals(c.Name, applicationCommandName, StringComparison.InvariantCultureIgnoreCase));
+   
+            if (command is null) {
+                return null;
+            }
+
+            return command.GetCommandBuilderHash();
         }
 
         public IEnumerable<(string Name, string Description)> GetCommandDescriptions() {

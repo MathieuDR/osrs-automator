@@ -1,4 +1,5 @@
 using System;
+using DiscordBot.Common.Models.Data;
 using DiscordBot.Data.Interfaces;
 using DiscordBot.Data.Repository;
 using Microsoft.Extensions.Logging;

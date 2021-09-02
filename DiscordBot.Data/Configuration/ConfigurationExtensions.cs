@@ -17,13 +17,15 @@ namespace DiscordBot.Data.Configuration {
                 .AddTransient<UserCountInfoLiteDbRepositoryFactory>()
                 .AddTransient<AutomatedJobStateLiteDbRepositoryFactory>()
                 .AddTransient<RunescapeDropDataRepositoryFactory>()
+                .AddTransient<CommandInfoRepositoryFactory>()
                 .AddSingleton<IRepositoryStrategy>(x =>
                     new RepositoryStrategy(new IRepositoryFactory[] {
                         x.GetRequiredService<PlayerLiteDbRepositoryFactory>(),
                         x.GetRequiredService<GuildConfigLiteDbRepositoryFactory>(),
                         x.GetRequiredService<UserCountInfoLiteDbRepositoryFactory>(),
                         x.GetRequiredService<AutomatedJobStateLiteDbRepositoryFactory>(),
-                        x.GetRequiredService<RunescapeDropDataRepositoryFactory>()
+                        x.GetRequiredService<RunescapeDropDataRepositoryFactory>(),
+                        x.GetRequiredService<CommandInfoRepositoryFactory>()
                     }))
                 .AddOptions<LiteDbOptions>()
                 .Configure<IConfiguration>((options, configuration1) => configuration.GetSection(LiteDbOptions.SectionName).Bind(options));

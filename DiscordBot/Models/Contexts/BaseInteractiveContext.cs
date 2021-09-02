@@ -56,7 +56,9 @@ namespace DiscordBot.Models.Contexts {
         public EmbedBuilder CreateEmbedBuilder(string content = null)
             => new EmbedBuilder()
                 .WithColor(GuildUser.GetHighestRole()?.Color ?? 0x7000FB)
+                .WithMessageAuthorFooter(User)
                 .WithDescription(content ?? string.Empty);
+        
         
         
         protected BaseInteractiveContext(T innerContext, IServiceProvider provider)
