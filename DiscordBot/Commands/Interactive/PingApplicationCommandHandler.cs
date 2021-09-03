@@ -8,9 +8,9 @@ using FluentResults;
 using Microsoft.Extensions.Logging;
 
 namespace DiscordBot.Commands.Interactive {
-    public class PingApplicationCommand : ApplicationCommand {
+    public class PingApplicationCommandHandler : ApplicationCommandHandler {
 
-        public PingApplicationCommand(ILogger<PingApplicationCommand> logger) : base("ping", "Lets see if the bot is awake", logger) { }
+        public PingApplicationCommandHandler(ILogger<PingApplicationCommandHandler> logger) : base("ping", "Lets see if the bot is awake, with a new description!", logger) { }
         
         protected override Task<SlashCommandBuilder> ExtendSlashCommandBuilder(SlashCommandBuilder builder) {
             builder.AddOption("info", ApplicationCommandOptionType.String, "Some extra information", false);

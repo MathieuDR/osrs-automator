@@ -7,8 +7,11 @@ using Discord.Net;
 using Discord.Rest;
 using Discord.WebSocket;
 using DiscordBot.Commands.Interactive;
+using DiscordBot.Data.Interfaces;
 using DiscordBot.Models.Contexts;
+using DiscordBot.Services.Interfaces;
 using FluentResults;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 
 namespace DiscordBot.Services {
@@ -16,16 +19,23 @@ namespace DiscordBot.Services {
         private readonly DiscordSocketClient _client;
         private readonly ILogger<InteractiveCommandHandlerService> _logger;
         private readonly IServiceProvider _provider;
+        private readonly IApplicationCommandInfoRepository _commandInfoRepository;
+        private readonly ICommandRegistrationService _registrationService;
         private readonly ICommandStrategy _strategy;
+        private const ulong OwnerGuildId = 403539795944538122;
 
         public InteractiveCommandHandlerService(ILogger<InteractiveCommandHandlerService> logger,
             DiscordSocketClient client,
             ICommandStrategy strategy,
-            IServiceProvider provider) {
+            IServiceProvider provider, 
+            IApplicationCommandInfoRepository commandInfoRepository,
+            ICommandRegistrationService registrationService) {
             _logger = logger;
             _client = client;
             _strategy = strategy;
             _provider = provider;
+            _commandInfoRepository = commandInfoRepository;
+            _registrationService = registrationService;
 
             client.InteractionCreated += OnInteraction;
         }
@@ -62,24 +72,26 @@ namespace DiscordBot.Services {
         }
 
         private async Task InitializeCommands() {
-            var builders = await _strategy.GetCommandBuilders(false);
-            var commands = await _client.Rest.GetGuildApplicationCommands(403539795944538122);
+            var manageCommand = _provider.GetRequiredService<ManageCommandsApplicationCommandHandler>();
+            await RegisterCommandForOwnersGuild(manageCommand);
 
-            foreach (var builder in builders) {
-                await RegisterCommand(builder.Build(), commands);
-            }
+            var commandInfos = _commandInfoRepository.GetAll().Value;
+            await _registrationService.UpdateAllCommands(commandInfos);
         }
 
-        private async Task RegisterCommand(SlashCommandProperties command, IReadOnlyCollection<RestGuildCommand> restGlobalCommands) {
+        private async Task RegisterCommandForOwnersGuild(IApplicationCommandHandler handler) {
+            var propertiesTask = handler.GetCommandProperties();
+            var commands = await _client.GetGuild(OwnerGuildId).GetApplicationCommandsAsync();
+           
             try {
-                var existing = restGlobalCommands.FirstOrDefault(x => x.Name == command.Name.Value);
+                var existing = commands.FirstOrDefault(x => x.Name == handler.Name && x.IsGlobalCommand == false);
                 if (existing is not null) {
                     await existing.DeleteAsync();
                 }
 
-                await _client.Rest.CreateGuildCommand(command, 403539795944538122);
+                await _client.Rest.CreateGuildCommand(await propertiesTask, OwnerGuildId);
             } catch (ApplicationCommandException e) {
-                _logger.LogWarning(e, "Cannot register command {name}", command.Name);
+                _logger.LogWarning(e, "Cannot register command {name} in the owners guild", handler.Name);
             } catch (Exception e) {
                 _logger.LogError(e, "Error when creating command");
             }

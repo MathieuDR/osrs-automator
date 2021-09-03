@@ -10,8 +10,8 @@ using HashDepot;
 using Microsoft.Extensions.Logging;
 
 namespace DiscordBot.Commands.Interactive {
-    public abstract class ApplicationCommand : IApplicationCommand {
-        public ApplicationCommand(string name, string description, ILogger logger) {
+    public abstract class ApplicationCommandHandler : IApplicationCommandHandler {
+        public ApplicationCommandHandler(string name, string description, ILogger logger) {
             Name = name.ToLowerInvariant().Trim().Replace(" ", "-");
             Description = description;
             Logger = logger;
@@ -23,7 +23,7 @@ namespace DiscordBot.Commands.Interactive {
         public string Name { get; }
         public string Description { get; }
         public virtual bool GlobalRegister => true;
-
+        
         public async Task<SlashCommandBuilder> GetCommandBuilder() {
             Logger.LogInformation("Creating SlashCommandBuilder for {command}: {description}", Name, Description);
             var builder = new SlashCommandBuilder()
@@ -33,6 +33,11 @@ namespace DiscordBot.Commands.Interactive {
             builder = await ExtendSlashCommandBuilder(builder);
 
             return builder;
+        }
+
+        public async Task<SlashCommandProperties> GetCommandProperties() {
+            var builder = await GetCommandBuilder();
+            return builder.Build();
         }
 
         protected string SubCommand(params string[] ids) {

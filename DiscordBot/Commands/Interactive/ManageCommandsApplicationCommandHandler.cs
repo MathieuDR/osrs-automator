@@ -3,23 +3,23 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Discord;
-using Discord.Commands;
 using Discord.WebSocket;
 using DiscordBot.Common.Models.Data;
 using DiscordBot.Data.Interfaces;
 using DiscordBot.Data.Strategies;
 using DiscordBot.Helpers.Builders;
 using DiscordBot.Models.Contexts;
+using DiscordBot.Services.Interfaces;
 using FluentResults;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 
 namespace DiscordBot.Commands.Interactive {
-    public class ManageCommandsApplicationCommand : ApplicationCommand {
+    public class ManageCommandsApplicationCommandHandler : ApplicationCommandHandler {
         private readonly IServiceProvider _serviceProvider;
         private readonly IApplicationCommandInfoRepository _applicationCommandInfoRepository;
 
-        public ManageCommandsApplicationCommand(ILogger<ManageCommandsApplicationCommand> logger, IServiceProvider serviceProvider, IRepositoryStrategy repositoryStrategy) : base("commands",
+        public ManageCommandsApplicationCommandHandler(ILogger<ManageCommandsApplicationCommandHandler> logger, IServiceProvider serviceProvider, IRepositoryStrategy repositoryStrategy) : base("commands",
             "Manage commands", logger) {
             _serviceProvider = serviceProvider;
             _applicationCommandInfoRepository = repositoryStrategy.CreateRepository<IApplicationCommandInfoRepository>();
@@ -29,13 +29,9 @@ namespace DiscordBot.Commands.Interactive {
         public override bool GlobalRegister => true;
 
         public override async Task<Result> HandleCommandAsync(ApplicationCommandContext context) {
-            var strategy = _serviceProvider.GetRequiredService<ICommandStrategy>();
             var embed = context.CreateEmbedBuilder().WithTitle("Select a command.");
+            var commandMenu = GetCommandsSelectMenu().WithButton("Cancel", SubCommand("cancel"), ButtonStyle.Danger);
 
-            var commandMenu = GetCommandsSelectMenu(strategy.GetCommandDescriptions()).WithButton("Cancel", SubCommand("cancel"), ButtonStyle.Danger);
-
-
-            //await context.DeferAsync();
             await context.RespondAsync(embeds: new[] { embed.Build() }, component: commandMenu.Build(), ephemeral: true);
             return Result.Ok();
         }
@@ -59,6 +55,11 @@ namespace DiscordBot.Commands.Interactive {
             return result;
         }
 
+        /// <summary>
+        /// Creates a guild command
+        /// </summary>
+        /// <param name="context"></param>
+        /// <returns></returns>
         private async Task<Result> HandleGuildSubCommand(MessageComponentContext context) {
             var guildId = ulong.Parse(context.SelectedMenuOptions.First());
             var command = context.EmbedFields.First(x => x.Name == "Command").Value;
@@ -83,14 +84,21 @@ namespace DiscordBot.Commands.Interactive {
             }
 
             commandInfo = commandInfo with { RegisteredGuilds = list };
+            var registrationService = _serviceProvider.GetRequiredService<ICommandRegistrationService>();
+            await registrationService.UpdateCommand(commandInfo);
             _applicationCommandInfoRepository.UpdateOrInsert(commandInfo);
-            
+
             var embed = context.CreateEmbedBuilder().WithTitle("Success!").WithDescription(embedDescription);
 
             await context.UpdateAsync(embed: embed.Build(), component: null, content: null);
             return Result.Ok();
         }
 
+        /// <summary>
+        /// Creates a global command
+        /// </summary>
+        /// <param name="context"></param>
+        /// <returns></returns>
         private async Task<Result> HandleGlobalSubCommand(MessageComponentContext context) {
             var command = context.EmbedFields.First(x => x.Name == "Command").Value;
             
@@ -104,6 +112,8 @@ namespace DiscordBot.Commands.Interactive {
 
             commandInfo = commandInfo with { IsGlobal = !commandInfo.IsGlobal };
             _applicationCommandInfoRepository.UpdateOrInsert(commandInfo);
+            var registrationService = _serviceProvider.GetRequiredService<ICommandRegistrationService>();
+            await registrationService.UpdateCommand(commandInfo);
             
             var embed = context.CreateEmbedBuilder().WithTitle("Success!").WithDescription($"Creating global command: {command}");
 
@@ -111,6 +121,11 @@ namespace DiscordBot.Commands.Interactive {
             return Result.Ok();
         }
 
+        /// <summary>
+        /// Creates a guild select menu and buttons to register globally
+        /// </summary>
+        /// <param name="context"></param>
+        /// <returns></returns>
         private async Task<Result> HandleCommandSubCommand(MessageComponentContext context) {
             var command = context.SelectedMenuOptions.First();
             var commandInfo = (await _applicationCommandInfoRepository.GetByCommandName(command)).Value ?? new ApplicationCommandInfo(command);
@@ -133,23 +148,39 @@ namespace DiscordBot.Commands.Interactive {
             return Result.Ok();
         }
 
+        
+        /// <summary>
+        /// Resets the command to the start
+        /// </summary>
+        /// <param name="context"></param>
+        /// <returns></returns>
         private async Task<Result> HandleReset(MessageComponentContext context) {
-            var strategy = _serviceProvider.GetRequiredService<ICommandStrategy>();
             var s2 = context.CreateEmbedBuilder().WithTitle("Select a command.")
                 .WithMessageAuthorFooter(context.User);
-            var commandMenu = GetCommandsSelectMenu(strategy.GetCommandDescriptions())
+            var commandMenu = GetCommandsSelectMenu()
                 .WithButton("Cancel", SubCommand("cancel"), ButtonStyle.Danger);
             await context.UpdateAsync(embeds: new[] { s2.Build() }, component: commandMenu.Build());
 
             return Result.Ok();
         }
 
+        /// <summary>
+        /// Cancels the command
+        /// </summary>
+        /// <param name="context"></param>
+        /// <returns></returns>
         private async Task<Result> HandleCancellation(MessageComponentContext context) {
             await context.UpdateAsync("Command cancelled", null, null, null, null);
             return Result.Ok();
         }
 
-        private ComponentBuilder GetCommandsSelectMenu(IEnumerable<(string Name, string Description)> commands) {
+        /// <summary>
+        /// Put the commands in a select list
+        /// </summary>
+        /// <returns></returns>
+        private ComponentBuilder GetCommandsSelectMenu() {
+            var strategy = _serviceProvider.GetRequiredService<ICommandStrategy>();
+            var commands = strategy.GetCommandDescriptions();
             return new ComponentBuilder()
                 .WithSelectMenu(new SelectMenuBuilder()
                     .WithCustomId(SubCommand("command"))
@@ -159,6 +190,11 @@ namespace DiscordBot.Commands.Interactive {
                     .WithPlaceholder("Choose a command"));
         }
 
+        /// <summary>
+        /// Gets the select menu for the guilds
+        /// </summary>
+        /// <param name="registeredCommands">Guildids where the command has been registered</param>
+        /// <returns></returns>
         private ComponentBuilder GetGuildsSelectMenu(IEnumerable<ulong> registeredCommands) {
             registeredCommands ??= Array.Empty<ulong>();
             var guilds = _serviceProvider.GetRequiredService<DiscordSocketClient>().Guilds
@@ -180,20 +216,6 @@ namespace DiscordBot.Commands.Interactive {
         }
 
         protected override Task<SlashCommandBuilder> ExtendSlashCommandBuilder(SlashCommandBuilder builder) {
-            // var commands = _strategy.GetCommandDescriptions();
-            // var guilds = _client.Guilds.Select(g => (g.Name, g.Id));
-
-            // builder.AddOption(new SlashCommandOptionBuilder()
-            //     .WithName("register")
-            //     .WithDescription("Register a command")
-            //     .WithType(ApplicationCommandOptionType.SubCommand)
-            // )
-            //     .AddOption(new SlashCommandOptionBuilder()
-            //         .WithName("manage")
-            //         .WithDescription("manage a command")
-            //         .WithType(ApplicationCommandOptionType.SubCommand)
-            //     );
-
             return Task.FromResult(builder);
         }
     }

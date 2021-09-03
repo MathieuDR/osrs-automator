@@ -14,7 +14,7 @@ namespace DiscordBot.Data.Factories {
             throw new NotImplementedException();
         }
 
-        public override IRepository Create() {
+        public override IRuneScapeDropDataRepository Create() {
             return new RuneScapeDropDataRepository(GetLogger(), LiteDbManager.GetCommonDatabase());
         }
     }

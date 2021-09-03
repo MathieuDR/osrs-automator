@@ -5,12 +5,12 @@ using DiscordBot.Models.Contexts;
 using FluentResults;
 
 namespace DiscordBot.Commands.Interactive {
-    public interface IApplicationCommand {
+    public interface IApplicationCommandHandler {
         public Guid Id { get; }
         public string Name { get; }
         public string Description { get; }
         public bool GlobalRegister { get; }
-        Task<SlashCommandBuilder> GetCommandBuilder();
+        Task<SlashCommandProperties> GetCommandProperties();
         Task<Result> HandleCommandAsync(ApplicationCommandContext context);
         Task<Result> HandleComponentAsync(MessageComponentContext context);
         public bool CanHandle(ApplicationCommandContext context);

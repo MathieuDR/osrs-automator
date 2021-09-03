@@ -63,7 +63,7 @@ namespace DiscordBot {
                 // Let's add a switch statement for the command name so we can handle multiple commands in one event.
                 switch (command.Data.Name) {
                     case "ping":
-                        var handler = _services.GetRequiredService<PingApplicationCommand>();
+                        var handler = _services.GetRequiredService<PingApplicationCommandHandler>();
                         await handler.HandleCommandAsync(new ApplicationCommandContext(command, _services));
                         break;
                 }

@@ -10,10 +10,11 @@ namespace DiscordBot.Commands.Interactive {
     public interface ICommandStrategy {
         public Task<Result> HandleApplicationCommand(ApplicationCommandContext context);
         public Task<Result> HandleComponentCommand(MessageComponentContext context);
-        public Task<SlashCommandBuilder[]> GetCommandBuilders(bool allBuilders);
-        public Task<SlashCommandBuilder> GetCommandBuilder(string applicationCommandName);
+        public Task<SlashCommandProperties[]> GetCommandPropertiesCollection(bool allBuilders);
+        public Task<SlashCommandProperties> GetCommandProperties(string applicationCommandName);
         public Task<uint> GetCommandHash(string applicationCommandName);
         public Task<Result> HandleInteractiveCommand(BaseInteractiveContext context);
+        public Task<IApplicationCommandHandler> GetHandler(string applicationCommandName);
         /// <summary>
         /// Get the names and descriptions of the commands
         /// </summary>
@@ -22,11 +23,11 @@ namespace DiscordBot.Commands.Interactive {
     }
 
     public class CommandStrategy : ICommandStrategy {
-        public CommandStrategy(IApplicationCommand[] commands) {
+        public CommandStrategy(IApplicationCommandHandler[] commands) {
             _commands = commands ?? throw new ArgumentNullException(nameof(commands));
         }
         
-        private readonly IApplicationCommand[] _commands;
+        private readonly IApplicationCommandHandler[] _commands;
 
         public Task<Result> HandleInteractiveCommand(BaseInteractiveContext context) {
             return context switch {
@@ -34,6 +35,10 @@ namespace DiscordBot.Commands.Interactive {
                 ApplicationCommandContext applicationCommandContext => HandleApplicationCommand(applicationCommandContext),
                 _ => Task.FromResult<Result>(Result.Fail("Could not find context type"))
             };
+        }
+
+        public Task<IApplicationCommandHandler> GetHandler(string applicationCommandName) {
+           return Task.FromResult(_commands.FirstOrDefault(c => string.Equals(c.Name, applicationCommandName, StringComparison.InvariantCultureIgnoreCase)));
         }
 
         public async Task<Result> HandleApplicationCommand(ApplicationCommandContext context) {
@@ -60,28 +65,28 @@ namespace DiscordBot.Commands.Interactive {
         /// Get all the command builders
         /// </summary>
         /// <param name="allBuilders">Retrieve all commands, even if they're not set to 'global'</param>
-        /// <returns>Commandbuilders in the strategy</returns>
-        public async Task<SlashCommandBuilder[]> GetCommandBuilders(bool allBuilders = false) {
+        /// <returns>SlashCommandProperties in the strategy</returns>
+        public async Task<SlashCommandProperties[]> GetCommandPropertiesCollection(bool allBuilders = false) {
             var commandsToRetrieve = _commands.Where(c => c.GlobalRegister || allBuilders).ToList();
             
-            var tasks = new Task<SlashCommandBuilder>[commandsToRetrieve.Count];
+            var tasks = new Task<SlashCommandProperties>[commandsToRetrieve.Count];
             for (var i = 0; i < commandsToRetrieve.Count; i++) {
                 var command = commandsToRetrieve[i];
-                var builderTask = command.GetCommandBuilder();
+                var builderTask = command.GetCommandProperties();
                 tasks[i] = builderTask;
             }
 
             return await Task.WhenAll(tasks);
         }
 
-        public async Task<SlashCommandBuilder> GetCommandBuilder(string applicationCommandName) {
-            var command = _commands.FirstOrDefault(c => string.Equals(c.Name, applicationCommandName, StringComparison.InvariantCultureIgnoreCase));
+        public async Task<SlashCommandProperties> GetCommandProperties(string applicationCommandName) {
+            var command = await GetHandler(applicationCommandName);
    
             if (command is null) {
                 return null;
             }
             
-            return await command.GetCommandBuilder();
+            return await command.GetCommandProperties();
         }
         
         public Task<uint> GetCommandHash(string applicationCommandName) {

@@ -10,7 +10,6 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Serilog;
 using WiseOldManConnector.Interfaces;
-using IApplicationCommand = DiscordBot.Commands.Interactive.IApplicationCommand;
 
 namespace DiscordBot.Configuration {
     public static class ConfigurationExtensions {
@@ -31,6 +30,7 @@ namespace DiscordBot.Configuration {
                 .AddSingleton<CommandService>()
                 .AddSingleton<CommandHandlingService>()
                 .AddSingleton<InteractiveCommandHandlerService>()
+                .AddTransient<ICommandRegistrationService,CommandRegistrationService>()
                 .AddDiscordCommands();
 
             return serviceCollection;
@@ -53,11 +53,11 @@ namespace DiscordBot.Configuration {
         }
 
         private static IServiceCollection AddDiscordCommands(this IServiceCollection serviceCollection) {
-            return serviceCollection.AddSingleton<PingApplicationCommand>()
-                .AddSingleton<ManageCommandsApplicationCommand>()
-                .AddSingleton<ICommandStrategy>(x => new CommandStrategy(new IApplicationCommand[] {
-                    x.GetRequiredService<PingApplicationCommand>(),
-                    x.GetRequiredService<ManageCommandsApplicationCommand>()
+            return serviceCollection.AddSingleton<PingApplicationCommandHandler>()
+                .AddSingleton<ManageCommandsApplicationCommandHandler>()
+                .AddSingleton<ICommandStrategy>(x => new CommandStrategy(new IApplicationCommandHandler[] {
+                    x.GetRequiredService<PingApplicationCommandHandler>(),
+                    x.GetRequiredService<ManageCommandsApplicationCommandHandler>()
                 }));
         }
 
