@@ -27,18 +27,11 @@ namespace DiscordBot.Commands.Interactive {
         private const string HistorySubCommandName = "history";
         private const string TopSubCommandName = "top";
         private const string AddSubCommandName = "add";
-        private const string ConfigurationSubCommandGroupName = "configuration";
         private const string ValueOption = "value";
         private const string UserOption = "user";
         private const string ReasonOption = "reason";
         private const string UsersOption = "users";
-        private const string SetChannelSubCommandName = "set-channel";
-        private const string ChannelOption = "channel";
-        private const string ViewSubCommandName = "view";
-        private const string AddThresholdSubCommandName = "add-threshold";
-        private const string ThresholdOption = "threshold";
-        private const string NameOption = "name";
-        private const string RoleOption = "role";
+
         
         
 
@@ -51,7 +44,6 @@ namespace DiscordBot.Commands.Interactive {
                 HistorySubCommandName => await HistoryHandler(context),
                 TopSubCommandName => await TopHandler(context),
                 AddSubCommandName => await AddHandler(context),
-                ConfigurationSubCommandGroupName => await ConfigurationHandler(context),
                 _ => Result.Fail("Did not find a correct handler")
             };
 
@@ -59,26 +51,12 @@ namespace DiscordBot.Commands.Interactive {
             return result;
         }
 
-        #region Configuration
-        
-        private  Task<Result> ConfigurationHandler(ApplicationCommandContext context) {
-            var groupOptions =
-                context.Options.GetOptionValue<NullValueDictionary<string, SocketSlashCommandDataOption>>(ConfigurationSubCommandGroupName);
-            var subCommand = groupOptions.First().Key;
-
-            context.RespondAsync(subCommand);
-            return Task.FromResult(Result.Ok());
-        }
-
-        #endregion
-
         #region add
         private async Task<Result> AddHandler(ApplicationCommandContext context) {
-            var subCommandOptions = context.Options.GetOption(AddSubCommandName).Options.ToNullValueDictionary();
-  
-            var additive = (int)subCommandOptions.GetOptionValue<long>(ValueOption);
-            var usersString = subCommandOptions.GetOptionValue<string>(UsersOption);
-            var reason = subCommandOptions.GetOptionValue<string>(ReasonOption);
+          
+            var additive = (int)context.SubCommandOptions.GetOptionValue<long>(ValueOption);
+            var usersString = context.SubCommandOptions.GetOptionValue<string>(UsersOption);
+            var reason = context.SubCommandOptions.GetOptionValue<string>(ReasonOption);
 
             
             var users = (await usersString.ToCollectionOfParameters()
@@ -182,8 +160,7 @@ namespace DiscordBot.Commands.Interactive {
 
         #region history
         private async Task<Result> HistoryHandler(ApplicationCommandContext context) {
-            var subCommandOptions = context.Options.GetOption(HistorySubCommandName).Options.ToNullValueDictionary();
-            var toSearchUser = subCommandOptions.GetOptionValue<IGuildUser>(UserOption) ?? context.GuildUser;
+            var toSearchUser = context.SubCommandOptions.GetOptionValue<IGuildUser>(UserOption) ?? context.GuildUser;
             await CountHistory(context, toSearchUser);
             return Result.Ok();
         }
@@ -267,30 +244,6 @@ namespace DiscordBot.Commands.Interactive {
                     .WithName(TopSubCommandName)
                     .WithDescription("Check the top counts of this server")
                     .WithType(ApplicationCommandOptionType.SubCommand)
-                )
-                .AddOption(new SlashCommandOptionBuilder()
-                    .WithName(ConfigurationSubCommandGroupName)
-                    .WithDescription("View or set the count configuration of this server")
-                    .WithType(ApplicationCommandOptionType.SubCommandGroup)
-                    .AddOption(new SlashCommandOptionBuilder()
-                        .WithName(SetChannelSubCommandName)
-                        .WithDescription("Set the channel for threshold messages")
-                        .WithType(ApplicationCommandOptionType.SubCommand)
-                        .AddOption(ChannelOption, ApplicationCommandOptionType.Channel, "The channel to use")
-                    )
-                    .AddOption(new SlashCommandOptionBuilder()
-                        .WithName(ViewSubCommandName)
-                        .WithDescription("View the set channel and all thresholds")
-                        .WithType(ApplicationCommandOptionType.SubCommand)
-                    )
-                    .AddOption(new SlashCommandOptionBuilder()
-                        .WithName(AddThresholdSubCommandName)
-                        .WithDescription("Adds a new threshold")
-                        .WithType(ApplicationCommandOptionType.SubCommand)
-                        .AddOption(ThresholdOption, ApplicationCommandOptionType.Integer, "The value that triggers the threshold, inclusive")
-                        .AddOption(NameOption, ApplicationCommandOptionType.String, "The name of the threshold")
-                        .AddOption(RoleOption, ApplicationCommandOptionType.Role, "Optional role to give the players", false)
-                    )
                 );
 
             return Task.FromResult(builder);
