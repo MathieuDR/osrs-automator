@@ -19,13 +19,13 @@ namespace DiscordBot.Models.Contexts {
     public abstract class BaseInteractiveContext<T> : BaseInteractiveContext where T : SocketInteraction {
         protected BaseInteractiveContext(T innerContext, IServiceProvider provider) {
             InnerContext = innerContext;
-            Services = provider;
+            ServiceProvider = provider;
             InteractiveService = provider.GetRequiredService<InteractiveService>();
             Client = provider.GetRequiredService<DiscordSocketClient>();
         }
 
         public T InnerContext { get; }
-        public IServiceProvider Services { get; }
+        public IServiceProvider ServiceProvider { get; }
         public DiscordSocketClient Client { get; }
 
         public SocketGuild Guild => Client.GetGuild(InnerContext.Channel.Cast<IGuildChannel>().GuildId);

@@ -13,19 +13,16 @@ using DiscordBot.Models.Contexts;
 using DiscordBot.Services.Interfaces;
 using DiscordBot.Transformers;
 using Fergun.Interactive;
-using Fergun.Interactive.Pagination;
 using FluentResults;
 using Microsoft.Extensions.Logging;
 
 namespace DiscordBot.Commands.Interactive {
     public class CountApplicationCommandHandler : ApplicationCommandHandler {
         private readonly ICounterService _counterService;
-        private readonly InteractiveService _interactiveService;
 
-        public CountApplicationCommandHandler(ILogger<CountApplicationCommandHandler> logger, ICounterService counterService, InteractiveService InteractiveService) : base("count",
+        public CountApplicationCommandHandler(ILogger<CountApplicationCommandHandler> logger, ICounterService counterService) : base("count",
             "Everything about point counting!", logger) {
             _counterService = counterService;
-            _interactiveService = InteractiveService;
         }
 
         public override Guid Id => Guid.Parse("A6B2840F-DCCE-4432-A610-10954BBEE15D");
@@ -46,10 +43,84 @@ namespace DiscordBot.Commands.Interactive {
             return result;
         }
 
+        #region add
         private async Task<Result> AddHandler(ApplicationCommandContext context) {
-            throw new NotImplementedException();
-        }
+            //await context.DeferAsync();
+            var additive = (int)context.GetSubCommandOptionValue<long>("value");
+            var usersString = context.GetSubCommandOptionValue<string>("users");
+            var reason = context.GetSubCommandOptionValue<string>("reason");
 
+            
+            var users = (await usersString.ToCollectionOfParameters()
+                .ToArray().GetDiscordsUsersListFromStrings(context)).Distinct().ToList();
+
+            if (additive == 0) {
+                Result.Fail("Additive cannot be 0");
+            }
+
+            if (!users.Any()) {
+                Result.Fail("No users found");
+            }
+            
+            var userString = users.Count() == 1 ? "user" : "users";
+          
+     
+
+            var descriptionBuilder = new StringBuilder();
+            var tasks = new List<Task>();
+            foreach (var user in users) {
+                var guildUser = user as IGuildUser ?? throw new ArgumentException("Cannot find user");
+                var totalCount = _counterService.Count(guildUser.ToGuildUserDto(), context.User.ToGuildUserDto(), additive, reason);
+
+                var tresholdTask = HandleNewCount(context, totalCount - additive, totalCount, (IGuildUser) user);
+                tasks.Add(tresholdTask);
+
+                descriptionBuilder.AppendLine($"{guildUser.DisplayName()} new total: {totalCount}");
+            }
+            
+            var embed = context.CreateEmbedBuilder(descriptionBuilder.ToString()).WithTitle($"Adding {additive} points for {users.Count()} {userString}");
+            await Task.WhenAll(tasks);
+
+            await context.RespondAsync(embeds: new []{embed.Build()}, ephemeral:false);
+
+            return Result.Ok();
+        }
+        
+        private async Task HandleNewCount(ApplicationCommandContext context, int startCount, int newCount, IGuildUser user) {
+            try {
+                var thresholds = await _counterService.GetThresholds(user.GuildId);
+                var channelId = await _counterService.GetChannelForGuild(user.GuildId);
+
+                if (!(context.Guild.GetChannel(channelId) is ISocketMessageChannel channel)) {
+                    return;
+                }
+
+                foreach (var threshold in thresholds) {
+                    var thresholdThreshold = threshold.Threshold;
+
+                    if (startCount < thresholdThreshold && newCount >= thresholdThreshold) {
+                        // Hit it
+                        await channel.SendMessageAsync($"{threshold.Name} hit for <@{user.Id}>!");
+                        if (threshold.GivenRoleId.HasValue && context.Guild.GetRole(threshold.GivenRoleId.Value) is IRole role) {
+                            await user.AddRoleAsync(role);
+                        }
+                    }
+
+                    if (startCount >= thresholdThreshold && newCount < thresholdThreshold) {
+                        // Remove it
+                        await channel.SendMessageAsync($"<@{user.Id}> has not sufficient points anymore for {threshold.Name}");
+
+                        if (threshold.GivenRoleId.HasValue && context.Guild.GetRole(threshold.GivenRoleId.Value) is IRole role) {
+                            await user.RemoveRoleAsync(role);
+                        }
+                    }
+                }
+            } catch (Exception) {
+                // ignored
+            }
+        }
+        #endregion
+        
         #region Top
         private Task<Result> TopHandler(ApplicationCommandContext context) {
             var topMembers = _counterService.TopCounts(context.Guild.ToGuildDto(), 20);

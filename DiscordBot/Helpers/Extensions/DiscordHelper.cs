@@ -1,9 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using Discord;
 using Discord.Commands;
 using Discord.WebSocket;
+using DiscordBot.Models.Contexts;
 
 namespace DiscordBot.Helpers.Extensions {
     public static class DiscordHelper {
@@ -106,6 +108,32 @@ namespace DiscordBot.Helpers.Extensions {
             }
 
             remainingArgs = remainingArgs.Where(x => !string.IsNullOrEmpty(x)).ToArray();
+            return result;
+        }
+        
+        /// <summary>
+        ///     Gets a list of discord users that have been mentioned at the start of the array.
+        ///     When a user can't be found, it will skip the string
+        /// </summary>
+        /// <param name="args">Arguments</param>
+        /// <param name="context"></param>
+        /// <param name="serviceProvider">To create a user type reader</param>
+        /// <returns></returns>
+        public static async Task<IEnumerable<IUser>> GetDiscordsUsersListFromStrings<T>(this string[] args, BaseInteractiveContext<T> context) where T : SocketInteraction {
+            var result = new List<IUser>();
+
+            foreach (var arg in args) {
+                var parseResult = await context.ReadUserAsync<IUser, T>(arg); //parser.ReadAsync(context, arg, serviceProvider).GetAwaiter().GetResult();
+                if (!parseResult.IsSuccess) {
+                    continue;
+                }
+            
+                var readerValue = parseResult.Values.FirstOrDefault();
+                if (readerValue.Score >= 0.60f) {
+                    result.Add(readerValue.Value as IUser);
+                }
+            }
+            
             return result;
         }
 
