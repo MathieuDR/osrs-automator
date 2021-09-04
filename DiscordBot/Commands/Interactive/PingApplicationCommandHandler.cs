@@ -23,9 +23,9 @@ namespace DiscordBot.Commands.Interactive {
             Logger.LogInformation("Received command!");
 
             var guildUser = context.GuildUser;
-            var extraInfo = context.GetOptionValue<string>("info");
-            var printTime = context.GetOptionValue<bool>("time");
-            var printHash = context.GetOptionValue<bool>("hash");
+            var extraInfo = context.Options.GetOptionValue<string>("info");
+            var printTime = context.Options.GetOptionValue<bool>("time");
+            var printHash = context.Options.GetOptionValue<bool>("hash");
 
             var builder = new StringBuilder();
             builder.AppendLine($"Hello {guildUser.DisplayName()}.");

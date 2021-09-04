@@ -3,11 +3,10 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using Common.Extensions;
+using Common;
 using Discord;
 using Discord.WebSocket;
 using DiscordBot.Common.Models.Data;
-using DiscordBot.Helpers.Builders;
 using DiscordBot.Helpers.Extensions;
 using DiscordBot.Models.Contexts;
 using DiscordBot.Services.Interfaces;
@@ -25,17 +24,34 @@ namespace DiscordBot.Commands.Interactive {
             _counterService = counterService;
         }
 
+        private const string HistorySubCommandName = "history";
+        private const string TopSubCommandName = "top";
+        private const string AddSubCommandName = "add";
+        private const string ConfigurationSubCommandGroupName = "configuration";
+        private const string ValueOption = "value";
+        private const string UserOption = "user";
+        private const string ReasonOption = "reason";
+        private const string UsersOption = "users";
+        private const string SetChannelSubCommandName = "set-channel";
+        private const string ChannelOption = "channel";
+        private const string ViewSubCommandName = "view";
+        private const string AddThresholdSubCommandName = "add-threshold";
+        private const string ThresholdOption = "threshold";
+        private const string NameOption = "name";
+        private const string RoleOption = "role";
+        
+        
+
         public override Guid Id => Guid.Parse("A6B2840F-DCCE-4432-A610-10954BBEE15D");
 
         public override async Task<Result> HandleCommandAsync(ApplicationCommandContext context) {
             var subCommand = context.Options.First().Key;
             
             var result = subCommand switch {
-                "history" => await HistoryHandler(context),
-                "check" => await HistoryHandler(context),
-                "total" => await HistoryHandler(context),
-                "top" => await TopHandler(context),
-                "add" => await AddHandler(context),
+                HistorySubCommandName => await HistoryHandler(context),
+                TopSubCommandName => await TopHandler(context),
+                AddSubCommandName => await AddHandler(context),
+                ConfigurationSubCommandGroupName => await ConfigurationHandler(context),
                 _ => Result.Fail("Did not find a correct handler")
             };
 
@@ -43,12 +59,26 @@ namespace DiscordBot.Commands.Interactive {
             return result;
         }
 
+        #region Configuration
+        
+        private  Task<Result> ConfigurationHandler(ApplicationCommandContext context) {
+            var groupOptions =
+                context.Options.GetOptionValue<NullValueDictionary<string, SocketSlashCommandDataOption>>(ConfigurationSubCommandGroupName);
+            var subCommand = groupOptions.First().Key;
+
+            context.RespondAsync(subCommand);
+            return Task.FromResult(Result.Ok());
+        }
+
+        #endregion
+
         #region add
         private async Task<Result> AddHandler(ApplicationCommandContext context) {
-            //await context.DeferAsync();
-            var additive = (int)context.GetSubCommandOptionValue<long>("value");
-            var usersString = context.GetSubCommandOptionValue<string>("users");
-            var reason = context.GetSubCommandOptionValue<string>("reason");
+            var subCommandOptions = context.Options.GetOption(AddSubCommandName).Options.ToNullValueDictionary();
+  
+            var additive = (int)subCommandOptions.GetOptionValue<long>(ValueOption);
+            var usersString = subCommandOptions.GetOptionValue<string>(UsersOption);
+            var reason = subCommandOptions.GetOptionValue<string>(ReasonOption);
 
             
             var users = (await usersString.ToCollectionOfParameters()
@@ -63,8 +93,7 @@ namespace DiscordBot.Commands.Interactive {
             }
             
             var userString = users.Count() == 1 ? "user" : "users";
-          
-     
+
 
             var descriptionBuilder = new StringBuilder();
             var tasks = new List<Task>();
@@ -153,7 +182,8 @@ namespace DiscordBot.Commands.Interactive {
 
         #region history
         private async Task<Result> HistoryHandler(ApplicationCommandContext context) {
-            var toSearchUser = context.GetSubCommandOptionValue<IGuildUser>("user") ?? context.GuildUser;
+            var subCommandOptions = context.Options.GetOption(HistorySubCommandName).Options.ToNullValueDictionary();
+            var toSearchUser = subCommandOptions.GetOptionValue<IGuildUser>(UserOption) ?? context.GuildUser;
             await CountHistory(context, toSearchUser);
             return Result.Ok();
         }
@@ -220,51 +250,48 @@ namespace DiscordBot.Commands.Interactive {
         protected override Task<SlashCommandBuilder> ExtendSlashCommandBuilder(SlashCommandBuilder builder) {
             builder
                 .AddOption(new SlashCommandOptionBuilder()
-                    .WithName("history")
+                    .WithName(HistorySubCommandName)
                     .WithDescription("Check the count history of yourself or another user in the server")
                     .WithType(ApplicationCommandOptionType.SubCommand)
-                    .AddOption("user", ApplicationCommandOptionType.User, "The user that you want to see, leave blank for yourself", false)
+                    .AddOption(UserOption, ApplicationCommandOptionType.User, "The user that you want to see, leave blank for yourself", false)
                 )
-                // .AddOption(new SlashCommandOptionBuilder()
-                //     .WithName("total")
-                //     .WithDescription("Check the count history of yourself or another user in the server")
-                //     .WithType(ApplicationCommandOptionType.SubCommand)
-                //     .AddOption("user", ApplicationCommandOptionType.User, "The user that you want to see, leave blank for yourself", false)
-                // )
-                // .AddOption(new SlashCommandOptionBuilder()
-                //     .WithName("check")
-                //     .WithDescription("Check the count history of yourself or another user in the server")
-                //     .WithType(ApplicationCommandOptionType.SubCommand)
-                //     .AddOption("user", ApplicationCommandOptionType.User, "The user that you want to see, leave blank for yourself", false)
-                // )
                 .AddOption(new SlashCommandOptionBuilder()
-                    .WithName("top")
+                    .WithName(AddSubCommandName)
+                    .WithDescription("Add a count to one or multiple users")
+                    .WithType(ApplicationCommandOptionType.SubCommand)
+                    .AddOption(ValueOption, ApplicationCommandOptionType.Integer, "The amount of points to count, can be negative to subtract")
+                    .AddOption(UsersOption, ApplicationCommandOptionType.String, "The users to be tagged")
+                    .AddOption(ReasonOption, ApplicationCommandOptionType.String, "The reason of the addition or subtraction", false)
+                )
+                .AddOption(new SlashCommandOptionBuilder()
+                    .WithName(TopSubCommandName)
                     .WithDescription("Check the top counts of this server")
                     .WithType(ApplicationCommandOptionType.SubCommand)
                 )
                 .AddOption(new SlashCommandOptionBuilder()
-                    .WithName("add")
-                    .WithDescription("Add a count to one or multiple users")
-                    .WithType(ApplicationCommandOptionType.SubCommand)
-                    .AddOption("value", ApplicationCommandOptionType.Integer, "The amount of points to count, can be negative to subtract")
-                    .AddOption("users", ApplicationCommandOptionType.String, "The users to be tagged")
-                    .AddOption("reason", ApplicationCommandOptionType.String, "The reason of the addition or subtraction", false)
+                    .WithName(ConfigurationSubCommandGroupName)
+                    .WithDescription("View or set the count configuration of this server")
+                    .WithType(ApplicationCommandOptionType.SubCommandGroup)
+                    .AddOption(new SlashCommandOptionBuilder()
+                        .WithName(SetChannelSubCommandName)
+                        .WithDescription("Set the channel for threshold messages")
+                        .WithType(ApplicationCommandOptionType.SubCommand)
+                        .AddOption(ChannelOption, ApplicationCommandOptionType.Channel, "The channel to use")
+                    )
+                    .AddOption(new SlashCommandOptionBuilder()
+                        .WithName(ViewSubCommandName)
+                        .WithDescription("View the set channel and all thresholds")
+                        .WithType(ApplicationCommandOptionType.SubCommand)
+                    )
+                    .AddOption(new SlashCommandOptionBuilder()
+                        .WithName(AddThresholdSubCommandName)
+                        .WithDescription("Adds a new threshold")
+                        .WithType(ApplicationCommandOptionType.SubCommand)
+                        .AddOption(ThresholdOption, ApplicationCommandOptionType.Integer, "The value that triggers the threshold, inclusive")
+                        .AddOption(NameOption, ApplicationCommandOptionType.String, "The name of the threshold")
+                        .AddOption(RoleOption, ApplicationCommandOptionType.Role, "Optional role to give the players", false)
+                    )
                 );
-                // .AddOption(new SlashCommandOptionBuilder()
-                //     .WithName("configuration")
-                //     .WithDescription("View or set the count configuration of this server")
-                //     .WithType(ApplicationCommandOptionType.SubCommandGroup)
-                //     .AddOption(new SlashCommandOptionBuilder()
-                //         .WithName("setting-1")
-                //         .WithDescription("Ooh settings")
-                //         .WithType(ApplicationCommandOptionType.SubCommand)
-                //     )
-                //     .AddOption(new SlashCommandOptionBuilder()
-                //         .WithName("setting-2")
-                //         .WithDescription("Ooh settings")
-                //         .WithType(ApplicationCommandOptionType.SubCommand)
-                //     )
-                // );
 
             return Task.FromResult(builder);
         }
