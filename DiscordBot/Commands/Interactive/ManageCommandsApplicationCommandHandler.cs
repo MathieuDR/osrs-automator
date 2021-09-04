@@ -115,7 +115,8 @@ namespace DiscordBot.Commands.Interactive {
             var registrationService = _serviceProvider.GetRequiredService<ICommandRegistrationService>();
             await registrationService.UpdateCommand(commandInfo);
             
-            var embed = context.CreateEmbedBuilder().WithTitle("Success!").WithDescription($"Creating global command: {command}");
+            var embed = context.CreateEmbedBuilder()
+                .WithTitle("Success!").WithDescription($"Creating global command: {command}");
 
             await context.UpdateAsync(embed: embed.Build(), component: null, content: null);
             return Result.Ok();

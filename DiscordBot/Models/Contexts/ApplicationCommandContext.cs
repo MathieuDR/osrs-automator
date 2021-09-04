@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using Common;
+using Common.Extensions;
 using Discord.WebSocket;
 
 namespace DiscordBot.Models.Contexts {
@@ -31,6 +32,23 @@ namespace DiscordBot.Models.Contexts {
         /// <returns>Value or default if not set</returns>
         public T GetOptionValue<T>(string key) {
             return (T) (ValueOptions[key] ?? default(T));
+        }
+        
+        /// <summary>
+        ///     Retrieves an value of an option from the slash command options.
+        ///     Use <see cref="ValueOptions" /> to determine if the option is set.
+        /// </summary>
+        /// <param name="key">Key of the option</param>
+        /// <typeparam name="T">Return type</typeparam>
+        /// <returns>Value or default if not set</returns>
+        public T GetSubCommandOptionValue<T>(string key) {
+            var subCommandOptions = Options.First().Value;
+            if (subCommandOptions is null || subCommandOptions.Options is null || !subCommandOptions.Options.Any()) {
+                return default;
+            }
+            var value = subCommandOptions.Options.FirstOrDefault(x => x.Name == key)?.Value;
+            return (T)value ?? default(T);
+
         }
     }
 }

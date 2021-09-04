@@ -1,0 +1,201 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using Common.Extensions;
+using Discord;
+using Discord.WebSocket;
+using DiscordBot.Common.Models.Data;
+using DiscordBot.Helpers.Builders;
+using DiscordBot.Helpers.Extensions;
+using DiscordBot.Models.Contexts;
+using DiscordBot.Services.Interfaces;
+using DiscordBot.Transformers;
+using Fergun.Interactive;
+using Fergun.Interactive.Pagination;
+using FluentResults;
+using Microsoft.Extensions.Logging;
+
+namespace DiscordBot.Commands.Interactive {
+    public class CountApplicationCommandHandler : ApplicationCommandHandler {
+        private readonly ICounterService _counterService;
+        private readonly InteractiveService _interactiveService;
+
+        public CountApplicationCommandHandler(ILogger<CountApplicationCommandHandler> logger, ICounterService counterService, InteractiveService InteractiveService) : base("count",
+            "Everything about point counting!", logger) {
+            _counterService = counterService;
+            _interactiveService = InteractiveService;
+        }
+
+        public override Guid Id => Guid.Parse("A6B2840F-DCCE-4432-A610-10954BBEE15D");
+
+        public override async Task<Result> HandleCommandAsync(ApplicationCommandContext context) {
+            var subCommand = context.Options.First().Key;
+            
+            var result = subCommand switch {
+                "history" => await HistoryHandler(context),
+                "check" => await HistoryHandler(context),
+                "total" => await HistoryHandler(context),
+                "top" => await TopHandler(context),
+                "add" => await AddHandler(context),
+                _ => Result.Fail("Did not find a correct handler")
+            };
+
+            //await context.RespondAsync($"The selected command was: {first} - {second}");
+            return result;
+        }
+
+        private async Task<Result> AddHandler(ApplicationCommandContext context) {
+            throw new NotImplementedException();
+        }
+
+        #region Top
+        private Task<Result> TopHandler(ApplicationCommandContext context) {
+            var topMembers = _counterService.TopCounts(context.Guild.ToGuildDto(), 20);
+            
+            var builder = context.CreateEmbedBuilder()
+                .WithTitle($"Top counts for {context.Guild.Name}");
+
+            ListTopMembers(context, builder, topMembers);
+            context.RespondAsync(embeds: new[] { builder.Build() }, ephemeral: false);
+            return Task.FromResult(Result.Ok());
+        }
+        
+        private void ListTopMembers(ApplicationCommandContext context, EmbedBuilder builder, List<UserCountInfo> countInfos) {
+            var historyBlockBuilder = new StringBuilder();
+            for (var i = 0; i < countInfos.Count; i++) {
+                var countInfo = countInfos[i];
+                historyBlockBuilder.Append($"{i + 1}, ".PadLeft(4));
+                historyBlockBuilder.Append($"{context.GetDisplayNameById(countInfo.DiscordId)}".PadRight(25));
+                historyBlockBuilder.AppendLine($": {countInfo.CurrentCount} points".PadRight(13));
+            }
+
+            if (historyBlockBuilder.Length > 0 ) {
+                builder.WithDescription($"```{historyBlockBuilder}```");
+                return;
+            }
+
+            builder.WithDescription($"Nobody has any points in this server");
+        }
+        #endregion
+
+        #region history
+        private async Task<Result> HistoryHandler(ApplicationCommandContext context) {
+            var toSearchUser = context.GetSubCommandOptionValue<IGuildUser>("user") ?? context.GuildUser;
+            await CountHistory(context, toSearchUser);
+            return Result.Ok();
+        }
+
+        private Task CountHistory(ApplicationCommandContext context, IGuildUser user) {
+            var countInfo = _counterService.GetCountInfo(user.ToGuildUserDto());
+
+            var historyPagesInformation = CountHistoryToString(countInfo);
+            var pages = new List<PageBuilder>();
+            foreach (var page in historyPagesInformation) {
+                var descriptionBuilder = new StringBuilder();
+                descriptionBuilder.AppendLine("```diff");
+                descriptionBuilder.Append(page);
+                descriptionBuilder.AppendLine("```");
+
+                var builder = context.CreatePageBuilder(descriptionBuilder.ToString())
+                    .WithTitle($"Total count for {user.DisplayName()}: {countInfo.CurrentCount}.");
+                
+                pages.Add(builder);
+            }
+
+            var paginator = context.GetBaseStaticPaginatorBuilder(pages);
+            _ = context.SendPaginator(paginator.Build());
+            return Task.CompletedTask;
+        }
+        
+        private List<string> CountHistoryToString(UserCountInfo countInfo) {
+            var pages = new List<string>();
+            var max = 1000;
+            var blockbuilder = new StringBuilder();
+          
+            var list = countInfo.CountHistory.OrderByDescending(x => x.RequestedOn).ToList();
+
+            foreach (var count in list) {
+                var historyBlockBuilder = new StringBuilder();
+                historyBlockBuilder.Append(count.Additive > 0 ? "+ " : "- ");
+                historyBlockBuilder.Append($"{Math.Abs(count.Additive)}".PadLeft(4));
+                historyBlockBuilder.Append(string.IsNullOrEmpty(count.Reason) ? "".PadRight(25) : $", {count.Reason}".PadRight(25));
+                historyBlockBuilder.Append($"| By {count.RequestedDiscordTag} on {count.RequestedOn.ToString("d")}");
+
+                if (blockbuilder.ToString().Length + historyBlockBuilder.ToString().Length >= max) {
+                    pages.Add(blockbuilder.ToString());
+                    blockbuilder = new StringBuilder();
+                }
+
+                blockbuilder.AppendLine(historyBlockBuilder.ToString());
+            }
+
+            if (!string.IsNullOrWhiteSpace(blockbuilder.ToString())) {
+                pages.Add(blockbuilder.ToString());
+            }
+
+            if (!pages.Any()) {
+                pages.Add("No history");
+            }
+
+            return pages;
+        }
+        
+        
+        #endregion
+        public override Task<Result> HandleComponentAsync(MessageComponentContext context) => throw new NotImplementedException();
+
+        protected override Task<SlashCommandBuilder> ExtendSlashCommandBuilder(SlashCommandBuilder builder) {
+            builder
+                .AddOption(new SlashCommandOptionBuilder()
+                    .WithName("history")
+                    .WithDescription("Check the count history of yourself or another user in the server")
+                    .WithType(ApplicationCommandOptionType.SubCommand)
+                    .AddOption("user", ApplicationCommandOptionType.User, "The user that you want to see, leave blank for yourself", false)
+                )
+                // .AddOption(new SlashCommandOptionBuilder()
+                //     .WithName("total")
+                //     .WithDescription("Check the count history of yourself or another user in the server")
+                //     .WithType(ApplicationCommandOptionType.SubCommand)
+                //     .AddOption("user", ApplicationCommandOptionType.User, "The user that you want to see, leave blank for yourself", false)
+                // )
+                // .AddOption(new SlashCommandOptionBuilder()
+                //     .WithName("check")
+                //     .WithDescription("Check the count history of yourself or another user in the server")
+                //     .WithType(ApplicationCommandOptionType.SubCommand)
+                //     .AddOption("user", ApplicationCommandOptionType.User, "The user that you want to see, leave blank for yourself", false)
+                // )
+                .AddOption(new SlashCommandOptionBuilder()
+                    .WithName("top")
+                    .WithDescription("Check the top counts of this server")
+                    .WithType(ApplicationCommandOptionType.SubCommand)
+                )
+                .AddOption(new SlashCommandOptionBuilder()
+                    .WithName("add")
+                    .WithDescription("Add a count to one or multiple users")
+                    .WithType(ApplicationCommandOptionType.SubCommand)
+                    .AddOption("value", ApplicationCommandOptionType.Integer, "The amount of points to count, can be negative to subtract")
+                    .AddOption("users", ApplicationCommandOptionType.String, "The users to be tagged")
+                    .AddOption("reason", ApplicationCommandOptionType.String, "The reason of the addition or subtraction", false)
+                );
+                // .AddOption(new SlashCommandOptionBuilder()
+                //     .WithName("configuration")
+                //     .WithDescription("View or set the count configuration of this server")
+                //     .WithType(ApplicationCommandOptionType.SubCommandGroup)
+                //     .AddOption(new SlashCommandOptionBuilder()
+                //         .WithName("setting-1")
+                //         .WithDescription("Ooh settings")
+                //         .WithType(ApplicationCommandOptionType.SubCommand)
+                //     )
+                //     .AddOption(new SlashCommandOptionBuilder()
+                //         .WithName("setting-2")
+                //         .WithDescription("Ooh settings")
+                //         .WithType(ApplicationCommandOptionType.SubCommand)
+                //     )
+                // );
+
+            return Task.FromResult(builder);
+        }
+    }
+}

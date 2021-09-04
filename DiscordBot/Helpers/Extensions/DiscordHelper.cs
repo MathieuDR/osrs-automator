@@ -62,7 +62,7 @@ namespace DiscordBot.Helpers.Extensions {
 
         public static string DisplayName(this IGuildUser user) {
             if (user == null) {
-                return "no - user";
+                return "unknown user";
             }
 
             return user.Nickname ?? user.Username;

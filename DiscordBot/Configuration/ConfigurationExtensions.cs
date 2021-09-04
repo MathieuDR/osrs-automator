@@ -6,6 +6,7 @@ using DiscordBot.Common.Configuration;
 using DiscordBot.Services;
 using DiscordBot.Services.Interfaces;
 using DiscordBot.Services.Services;
+using Fergun.Interactive;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Serilog;
@@ -31,6 +32,7 @@ namespace DiscordBot.Configuration {
                 .AddSingleton<CommandHandlingService>()
                 .AddSingleton<InteractiveCommandHandlerService>()
                 .AddTransient<ICommandRegistrationService,CommandRegistrationService>()
+                .AddSingleton<InteractiveService>()
                 .AddDiscordCommands();
 
             return serviceCollection;
@@ -53,11 +55,14 @@ namespace DiscordBot.Configuration {
         }
 
         private static IServiceCollection AddDiscordCommands(this IServiceCollection serviceCollection) {
-            return serviceCollection.AddSingleton<PingApplicationCommandHandler>()
+            return serviceCollection
+                .AddSingleton<PingApplicationCommandHandler>()
                 .AddSingleton<ManageCommandsApplicationCommandHandler>()
+                .AddSingleton<CountApplicationCommandHandler>()
                 .AddSingleton<ICommandStrategy>(x => new CommandStrategy(new IApplicationCommandHandler[] {
                     x.GetRequiredService<PingApplicationCommandHandler>(),
-                    x.GetRequiredService<ManageCommandsApplicationCommandHandler>()
+                    x.GetRequiredService<ManageCommandsApplicationCommandHandler>(),
+                    x.GetRequiredService<CountApplicationCommandHandler>()
                 }));
         }
 

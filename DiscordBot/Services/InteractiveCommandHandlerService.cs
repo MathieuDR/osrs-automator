@@ -65,9 +65,9 @@ namespace DiscordBot.Services {
                 _ => null
             };
 
-            var result = await _strategy.HandleInteractiveCommand(ctx);
+            var result = await _strategy.HandleInteractiveCommand(ctx).ConfigureAwait(false);
             if (result.IsFailed) {
-                await arg.RespondAsync(string.Join(", ", result.Errors));
+                //await arg.RespondAsync(string.Join(", ", result.Errors));
             }
         }
 
