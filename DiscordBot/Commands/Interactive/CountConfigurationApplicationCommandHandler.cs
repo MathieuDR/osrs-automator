@@ -1,9 +1,12 @@
 using System;
+using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 using System.Threading.Tasks;
 using Common.Extensions;
 using Discord;
 using Discord.WebSocket;
+using DiscordBot.Common.Models.Data;
 using DiscordBot.Helpers.Extensions;
 using DiscordBot.Models.Contexts;
 using DiscordBot.Services.Interfaces;
@@ -62,7 +65,65 @@ namespace DiscordBot.Commands.Interactive {
         }
 
         private async Task<Result> ViewHandler(ApplicationCommandContext context) {
-            throw new NotImplementedException();
+            IReadOnlyList<CountThreshold> thresholds;
+            ulong channelId;
+            
+            try {
+                thresholds = await _counterService.GetThresholds(context.Guild.Id);
+                channelId = await _counterService.GetChannelForGuild(context.Guild.Id);
+            } catch (Exception e) {
+                return Result.Fail(new ExceptionalError(e));
+            }
+            
+            var thresholdList = ThresholdsToDescription(context, thresholds);
+            
+            var descriptionBuilder = new StringBuilder();
+            descriptionBuilder.AppendLine($"Channel: <#{channelId}>");
+            descriptionBuilder.AppendLine();
+            descriptionBuilder.AppendLine("```");
+            descriptionBuilder.AppendLine(thresholdList);
+            descriptionBuilder.AppendLine("```");
+            
+            await context
+                .CreateReplyBuilder(true)
+                .WithEmbedFrom($"Count settings for {context.Guild.Name}", descriptionBuilder.ToString())
+
+                .RespondAsync();
+            return Result.Ok();
+        }
+        
+        private string ThresholdsToDescription(ApplicationCommandContext context, IEnumerable<CountThreshold> thresholds) {
+            var builder = new StringBuilder();
+            var enumerable = thresholds.ToList();
+
+            // format
+            builder.Append("ID".PadLeft(3));
+            builder.Append(", ");
+            builder.Append("#:".PadLeft(5));
+            builder.Append("Name".PadRight(15));
+            builder.Append($", role: role{Environment.NewLine}");
+
+            for (var i = 0; i < enumerable.Count; i++) {
+                var threshold = enumerable[i];
+
+                builder.Append(i.ToString().PadLeft(3));
+                builder.Append(", ");
+
+                builder.Append($"{threshold.Threshold}:".PadLeft(5));
+
+                var name = string.IsNullOrEmpty(threshold.Name) ? "Unnamed" : threshold.Name;
+                builder.Append(name.PadRight(15));
+
+
+                var role = "none";
+                if (threshold.GivenRoleId.HasValue) {
+                    role = context.Guild.GetRole(threshold.GivenRoleId.Value)?.Name ?? "Invalid role";
+                }
+
+                builder.Append($", role: {role}{Environment.NewLine}");
+            }
+
+            return builder.ToString();
         }
 
         private async Task<Result> SetChannelHandler(ApplicationCommandContext context) {
