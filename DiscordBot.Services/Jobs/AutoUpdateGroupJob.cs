@@ -14,7 +14,7 @@ namespace DiscordBot.Services.Jobs {
     public class AutoUpdateGroupJob : ConfigurableGuildJob {
         private readonly IOsrsHighscoreService _osrsHighscoreService;
 
-        public AutoUpdateGroupJob(ILogger logger, IDiscordService discordService, IRepositoryStrategy repositoryStrategy, IOsrsHighscoreService osrsHighscoreService) : base(logger, discordService, JobType.GroupUpdate, repositoryStrategy) {
+        public AutoUpdateGroupJob(ILogger<AutoUpdateGroupJob> logger, IDiscordService discordService, IRepositoryStrategy repositoryStrategy, IOsrsHighscoreService osrsHighscoreService) : base(logger, discordService, JobType.GroupUpdate, repositoryStrategy) {
             _osrsHighscoreService = osrsHighscoreService;
         }
         protected override async Task<Result> DoWorkForGuildWithContext(Guild guild, GuildConfig guildConfig, ChannelJobConfiguration configuration) {
