@@ -7,7 +7,6 @@ using Common.Extensions;
 using Discord;
 using Discord.WebSocket;
 using DiscordBot.Common.Models.Data;
-using DiscordBot.Helpers.Builders;
 using DiscordBot.Helpers.Extensions;
 using DiscordBot.Models.Contexts;
 using DiscordBot.Services.Interfaces;
@@ -25,7 +24,7 @@ namespace DiscordBot.Commands.Interactive {
         private const string NameOption = "name";
         private const string RoleOption = "role";
         private const string ThresholdRemoveOption = ThresholdOption;
-        private const string RemoveOption= "remove";
+        private const string RemoveOption = "remove";
         private readonly ICounterService _counterService;
 
         public CountConfigurationApplicationCommandHandler(ILogger<CountConfigurationApplicationCommandHandler> logger,
@@ -45,6 +44,12 @@ namespace DiscordBot.Commands.Interactive {
                 return builder.ToString();
             }
         }
+
+        private ButtonBuilder GetRemoveButton => new ButtonBuilder()
+            .WithCustomId(SubCommand(RemoveOption))
+            .WithLabel("Delete")
+            .WithStyle(ButtonStyle.Danger)
+            .WithEmote(new Emoji("🗑️"));
 
         public override async Task<Result> HandleCommandAsync(ApplicationCommandContext context) {
             var subCommand = context.Options.First().Key;
@@ -104,24 +109,22 @@ namespace DiscordBot.Commands.Interactive {
 
             descriptionBuilder.AppendLine("```");
 
-            await context
-                .CreateReplyBuilder(true)
-                .WithEmbedFrom($"Count settings for {context.Guild.Name}", descriptionBuilder.ToString())
-                .WithSelectMenu(GetThresholdSelectMenu(thresholdInfo))
-                .WithButtons(GetRemoveButton.WithDisabled(true))                
-                .RespondAsync();
+            var response = context
+                    .CreateReplyBuilder(true)
+                    .WithEmbedFrom($"Count settings for {context.Guild.Name}", descriptionBuilder.ToString());
+
+            if (thresholdInfo.Any()) {
+                response.WithSelectMenu(GetThresholdSelectMenu(thresholdInfo))
+                    .WithButtons(GetRemoveButton.WithDisabled(true));
+            }
+
+            await response.RespondAsync();
             return Result.Ok();
         }
-        
-        private ButtonBuilder GetRemoveButton => new ButtonBuilder()
-            .WithCustomId(SubCommand(RemoveOption))
-            .WithLabel("Delete")
-            .WithStyle(ButtonStyle.Danger)
-            .WithEmote(new Emoji("🗑️"));
 
 
-        private SelectMenuBuilder GetThresholdSelectMenu(IEnumerable<(string Id, string Label)> thresholdInfo) =>
-            new SelectMenuBuilder()
+        private SelectMenuBuilder GetThresholdSelectMenu(IEnumerable<(string Id, string Label)> thresholdInfo) {
+            return new SelectMenuBuilder()
                 .WithCustomId(SubCommand(ThresholdRemoveOption))
                 .WithOptions(
                     thresholdInfo.Select(i =>
@@ -129,6 +132,7 @@ namespace DiscordBot.Commands.Interactive {
                                 .WithLabel(i.Label)
                                 .WithValue(i.Id))
                         .ToList());
+        }
 
         private string ThresholdToString(ApplicationCommandContext context, CountThreshold threshold) {
             var builder = new StringBuilder();
