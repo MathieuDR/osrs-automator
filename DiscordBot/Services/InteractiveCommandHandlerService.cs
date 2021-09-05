@@ -67,7 +67,8 @@ namespace DiscordBot.Services {
 
             var result = await _strategy.HandleInteractiveCommand(ctx).ConfigureAwait(false);
             if (result.IsFailed) {
-                //await arg.RespondAsync(string.Join(", ", result.Errors));
+                await arg.RespondAsync(string.Join(", ", 
+                    result.Errors.Where(x=>!x.HasMetadata("404", o=> (bool)(o ?? false))).Select(x=>x.Message)));
             }
         }
 

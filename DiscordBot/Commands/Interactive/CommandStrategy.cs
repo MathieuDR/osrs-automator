@@ -33,7 +33,7 @@ namespace DiscordBot.Commands.Interactive {
             return context switch {
                 MessageComponentContext messageComponentContext => HandleComponentCommand(messageComponentContext),
                 ApplicationCommandContext applicationCommandContext => HandleApplicationCommand(applicationCommandContext),
-                _ => Task.FromResult<Result>(Result.Fail("Could not find context type"))
+                _ => Task.FromResult(Result.Fail("Could not find context type"))
             };
         }
 
@@ -45,7 +45,7 @@ namespace DiscordBot.Commands.Interactive {
             var command = _commands.FirstOrDefault(c => c.CanHandle(context));
 
             if (command is null) {
-                return Result.Fail("Could not find proper command handler"); 
+                return Result.Fail(new Error("Could not find proper command handler").WithMetadata("404", true)); 
             }
 
             return await command.HandleCommandAsync(context);
@@ -55,7 +55,7 @@ namespace DiscordBot.Commands.Interactive {
             var command = _commands.FirstOrDefault(c => c.CanHandle(context));
 
             if (command is null) {
-                return Result.Fail("Could not find proper command handler"); 
+                return Result.Fail(new Error("Could not find proper component handler").WithMetadata("404", true));
             }
 
             return await command.HandleComponentAsync(context);
