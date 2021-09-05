@@ -60,11 +60,13 @@ namespace DiscordBot.Configuration {
                 .AddSingleton<ManageCommandsApplicationCommandHandler>()
                 .AddSingleton<CountApplicationCommandHandler>()
                 .AddSingleton<CountConfigurationApplicationCommandHandler>()
+                .AddSingleton<ConfigurationApplicationCommandHandler>()
                 .AddSingleton<ICommandStrategy>(x => new CommandStrategy(new IApplicationCommandHandler[] {
                     x.GetRequiredService<PingApplicationCommandHandler>(),
                     x.GetRequiredService<ManageCommandsApplicationCommandHandler>(),
                     x.GetRequiredService<CountApplicationCommandHandler>(),
-                    x.GetRequiredService<CountConfigurationApplicationCommandHandler>()
+                    x.GetRequiredService<CountConfigurationApplicationCommandHandler>(),
+                    x.GetRequiredService<ConfigurationApplicationCommandHandler>()
                 }));
         }
 

@@ -61,6 +61,13 @@ namespace DiscordBot.Helpers.Builders {
             Embeds.Add(_context.CreateEmbedBuilder(title, content).Build());
             return this;
         }
+        
+        public InteractionReplyBuilder<TInteraction> WithEmbedFrom(string title, string content, Action<EmbedBuilder> embedBuilder) {
+            var builder = _context.CreateEmbedBuilder(title, content);
+            embedBuilder(builder);
+            Embeds.Add(builder.Build());
+            return this;
+        }
 
         public InteractionReplyBuilder<TInteraction> WithTts(bool tts) {
             IsTts = tts;
