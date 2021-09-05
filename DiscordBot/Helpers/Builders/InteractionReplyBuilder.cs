@@ -53,12 +53,12 @@ namespace DiscordBot.Helpers.Builders {
             return this;
         }
 
-        public InteractionReplyBuilder<TInteraction> WithEmbedFrom(StringBuilder content) {
-            return WithEmbedFrom(content.ToString());
+        public InteractionReplyBuilder<TInteraction> WithEmbedFrom(StringBuilder title, StringBuilder content) {
+            return WithEmbedFrom(title.ToString() ,content.ToString());
         }
 
-        public InteractionReplyBuilder<TInteraction> WithEmbedFrom(string content) {
-            Embeds.Add(_context.CreateEmbedBuilder(content).Build());
+        public InteractionReplyBuilder<TInteraction> WithEmbedFrom(string title, string content) {
+            Embeds.Add(_context.CreateEmbedBuilder(title, content).Build());
             return this;
         }
 

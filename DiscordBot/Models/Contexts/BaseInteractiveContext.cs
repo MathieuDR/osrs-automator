@@ -103,7 +103,7 @@ namespace DiscordBot.Models.Contexts {
             return InnerContext.FollowupAsync(text, embeds?.ToArray(), isTts, ephemeral, allowedMentions, options, component);
         }
 
-        public EmbedBuilder CreateEmbedBuilder(string content = null) {
+        public EmbedBuilder CreateEmbedBuilder(string title = null, string content = null) {
             return new EmbedBuilder()
                 .WithColor(GuildUser.GetHighestRole()?.Color ?? 0x7000FB)
                 .WithMessageAuthorFooter(User)

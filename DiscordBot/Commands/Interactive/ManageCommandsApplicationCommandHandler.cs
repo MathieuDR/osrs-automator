@@ -29,7 +29,7 @@ namespace DiscordBot.Commands.Interactive {
         public override bool GlobalRegister => true;
 
         public override async Task<Result> HandleCommandAsync(ApplicationCommandContext context) {
-            var embed = context.CreateEmbedBuilder().WithTitle("Select a command.");
+            var embed = context.CreateEmbedBuilder("Select a command.");
             var commandMenu = GetCommandsSelectMenu().WithButton("Cancel", SubCommand("cancel"), ButtonStyle.Danger);
 
             await context.RespondAsync(embeds: new[] { embed.Build() }, component: commandMenu.Build(), ephemeral: true);
@@ -88,7 +88,7 @@ namespace DiscordBot.Commands.Interactive {
             await registrationService.UpdateCommand(commandInfo);
             _applicationCommandInfoRepository.UpdateOrInsert(commandInfo);
 
-            var embed = context.CreateEmbedBuilder().WithTitle("Success!").WithDescription(embedDescription);
+            var embed = context.CreateEmbedBuilder("Success!", embedDescription);
 
             await context.UpdateAsync(embed: embed.Build(), component: null, content: null);
             return Result.Ok();
@@ -115,8 +115,7 @@ namespace DiscordBot.Commands.Interactive {
             var registrationService = _serviceProvider.GetRequiredService<ICommandRegistrationService>();
             await registrationService.UpdateCommand(commandInfo);
             
-            var embed = context.CreateEmbedBuilder()
-                .WithTitle("Success!").WithDescription($"Creating global command: {command}");
+            var embed = context.CreateEmbedBuilder("Success!", $"Creating global command: {command}");
 
             await context.UpdateAsync(embed: embed.Build(), component: null, content: null);
             return Result.Ok();
@@ -141,7 +140,8 @@ namespace DiscordBot.Commands.Interactive {
                 guildSelector.WithButton("Register globally", SubCommand("global"));
             }
 
-            var embed = context.CreateEmbedBuilder().WithTitle("Select a guild to register or unregister.")
+            var embed = context
+                .CreateEmbedBuilder("Select a guild to register or unregister.")
                 .AddField("Command", command)
                 .WithMessageAuthorFooter(context.User);
             await context.UpdateAsync(embeds: new[] { embed.Build() }, component: guildSelector.Build());
@@ -156,8 +156,10 @@ namespace DiscordBot.Commands.Interactive {
         /// <param name="context"></param>
         /// <returns></returns>
         private async Task<Result> HandleReset(MessageComponentContext context) {
-            var s2 = context.CreateEmbedBuilder().WithTitle("Select a command.")
+            var s2 = context
+                .CreateEmbedBuilder("Select a command.")
                 .WithMessageAuthorFooter(context.User);
+            
             var commandMenu = GetCommandsSelectMenu()
                 .WithButton("Cancel", SubCommand("cancel"), ButtonStyle.Danger);
             await context.UpdateAsync(embeds: new[] { s2.Build() }, component: commandMenu.Build());

@@ -85,7 +85,8 @@ namespace DiscordBot.Commands.Interactive {
                 descriptionBuilder.AppendLine($"{guildUser.DisplayName()} new total: {totalCount}");
             }
             
-            var embed = context.CreateEmbedBuilder(descriptionBuilder.ToString()).WithTitle($"Adding {additive} points for {users.Count()} {userString}");
+            var embed = context.CreateEmbedBuilder($"Adding {additive} points for {users.Count()} {userString}",
+                descriptionBuilder.ToString());
             await Task.WhenAll(tasks);
 
             await context.RespondAsync(embeds: new []{embed.Build()}, ephemeral:false);
@@ -131,9 +132,8 @@ namespace DiscordBot.Commands.Interactive {
         #region Top
         private Task<Result> TopHandler(ApplicationCommandContext context) {
             var topMembers = _counterService.TopCounts(context.Guild.ToGuildDto(), 20);
-            
-            var builder = context.CreateEmbedBuilder()
-                .WithTitle($"Top counts for {context.Guild.Name}");
+
+            var builder = context.CreateEmbedBuilder($"Top counts for {context.Guild.Name}");
 
             ListTopMembers(context, builder, topMembers);
             context.RespondAsync(embeds: new[] { builder.Build() }, ephemeral: false);
