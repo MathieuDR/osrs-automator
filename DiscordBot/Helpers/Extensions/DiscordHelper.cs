@@ -137,6 +137,18 @@ namespace DiscordBot.Helpers.Extensions {
             return result;
         }
 
+        public static string ToChannel(this ulong id) {
+            return $"<#{id}>";
+        }
+        
+        public static string ToRole(this ulong id) {
+            return $"<@&{id}>";
+        }
+        
+        public static string ToUser(this ulong id) {
+            return $"<@{id}>";
+        }
+
         // public static CustomPaginatedMessage AddPagingToFooter(this CustomPaginatedMessage message) {
         //     message.EmbedWrapper.Footer ??= new EmbedFooterBuilder();
         //     var whitespace = " ";

@@ -38,9 +38,9 @@ namespace DiscordBot.Commands.Interactive {
         private static string ThresholdFormat {
             get {
                 var builder = new StringBuilder();
-                builder.Append("#:".PadLeft(5));
-                builder.Append("Name".PadRight(15));
-                builder.Append($", role: role{Environment.NewLine}");
+                builder.Append("#:");
+                builder.Append("Name");
+                builder.Append($", role");
                 return builder.ToString();
             }
         }
@@ -99,15 +99,13 @@ namespace DiscordBot.Commands.Interactive {
 
 
             var descriptionBuilder = new StringBuilder();
-            descriptionBuilder.AppendLine($"Channel: <#{channelId}>");
+            descriptionBuilder.AppendLine($"**Output channel:** <#{channelId}>");
             descriptionBuilder.AppendLine();
-            descriptionBuilder.AppendLine("```");
-            descriptionBuilder.AppendLine(ThresholdFormat);
+            descriptionBuilder.AppendLine("**Thresholds:**");
+            //descriptionBuilder.AppendLine(ThresholdFormat);
             foreach (var info in thresholdInfo) {
-                descriptionBuilder.AppendLine(info.Label);
+                descriptionBuilder.AppendLine(info.Label.WithMention);
             }
-
-            descriptionBuilder.AppendLine("```");
 
             var response = context
                     .CreateReplyBuilder(true)
@@ -123,37 +121,39 @@ namespace DiscordBot.Commands.Interactive {
         }
 
 
-        private SelectMenuBuilder GetThresholdSelectMenu(IEnumerable<(string Id, string Label)> thresholdInfo) {
+        private SelectMenuBuilder GetThresholdSelectMenu(IEnumerable<(string Id, (string WithMention, string NoMention) Label)> thresholdInfo) {
             return new SelectMenuBuilder()
+                .WithPlaceholder("Select threshold to delete")
                 .WithCustomId(SubCommand(ThresholdRemoveOption))
                 .WithOptions(
                     thresholdInfo.Select(i =>
                             new SelectMenuOptionBuilder()
-                                .WithLabel(i.Label)
+                                .WithLabel(i.Label.NoMention)
                                 .WithValue(i.Id))
                         .ToList());
         }
 
-        private string ThresholdToString(ApplicationCommandContext context, CountThreshold threshold) {
-            var builder = new StringBuilder();
-            builder.Append($"{threshold.Threshold}:".PadLeft(5));
+        private (string WithMention, string NoMention) ThresholdToString(ApplicationCommandContext context, CountThreshold threshold) {
+            var noMentionBuilder = new StringBuilder();
+         
+            noMentionBuilder.Append($"{threshold.Threshold}: ");
+            var name = string.IsNullOrEmpty(threshold.Name) ? "-" : threshold.Name;
+            noMentionBuilder.Append(name);
 
-            var name = string.IsNullOrEmpty(threshold.Name) ? "Unnamed" : threshold.Name;
-            builder.Append(name.PadRight(15));
-
-
-            var role = "none";
-            if (threshold.GivenRoleId.HasValue) {
-                role = context.Guild.GetRole(threshold.GivenRoleId.Value)?.Name ?? "Invalid role";
+            if (!threshold.GivenRoleId.HasValue) {
+                return (noMentionBuilder.ToString(), noMentionBuilder.ToString());
             }
 
-            builder.Append($", role: {role}{Environment.NewLine}");
-            return builder.ToString();
-        }
+            noMentionBuilder.Append($", ");
+            var mentionBuilder = new StringBuilder(noMentionBuilder.ToString());
+            
+            var roleTemp = context.Guild.GetRole(threshold.GivenRoleId.Value)?.Name ?? "deleted role";
+            noMentionBuilder.Append(roleTemp);
+            
+            roleTemp = threshold.GivenRoleId.Value.ToRole();
+            mentionBuilder.Append(roleTemp);
 
-        private IEnumerable<string> ThresholdSToString(ApplicationCommandContext context, IEnumerable<CountThreshold> thresholds) {
-            var enumerable = thresholds.ToList();
-            return enumerable.Select(threshold => ThresholdToString(context, threshold)).ToList();
+            return (mentionBuilder.ToString(), noMentionBuilder.ToString());
         }
 
         private async Task<Result> SetChannelHandler(ApplicationCommandContext context) {
