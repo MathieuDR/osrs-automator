@@ -65,7 +65,7 @@ namespace DiscordBot.Commands.Interactive {
             var name = context.SubCommandOptions.GetOptionValue<string>(NameOption);
 
             try {
-                if (await _counterService.CreateThreshold(context.GuildUser.ToGuildUserDto(), value, name, role?.ToRoleDto())) {
+                if (!await _counterService.CreateThreshold(context.GuildUser.ToGuildUserDto(), value, name, role?.ToRoleDto())) {
                     return Result.Fail("Could not set the channel");
                 }
             } catch (Exception e) {
