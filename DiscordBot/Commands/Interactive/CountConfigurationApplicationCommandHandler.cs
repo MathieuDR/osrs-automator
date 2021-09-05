@@ -7,6 +7,7 @@ using Common.Extensions;
 using Discord;
 using Discord.WebSocket;
 using DiscordBot.Common.Models.Data;
+using DiscordBot.Helpers.Builders;
 using DiscordBot.Helpers.Extensions;
 using DiscordBot.Models.Contexts;
 using DiscordBot.Services.Interfaces;
@@ -40,7 +41,7 @@ namespace DiscordBot.Commands.Interactive {
                 var builder = new StringBuilder();
                 builder.Append("#:");
                 builder.Append("Name");
-                builder.Append($", role");
+                builder.Append(", role");
                 return builder.ToString();
             }
         }
@@ -97,7 +98,6 @@ namespace DiscordBot.Commands.Interactive {
 
             var thresholdInfo = thresholds.Select(x => (Id: $"{x.Name};{x.Threshold}", Label: ThresholdToString(context, x))).ToList();
 
-
             var descriptionBuilder = new StringBuilder();
             descriptionBuilder.AppendLine($"**Output channel:** <#{channelId}>");
             descriptionBuilder.AppendLine();
@@ -108,8 +108,8 @@ namespace DiscordBot.Commands.Interactive {
             }
 
             var response = context
-                    .CreateReplyBuilder(true)
-                    .WithEmbedFrom($"Count settings for {context.Guild.Name}", descriptionBuilder.ToString());
+                .CreateReplyBuilder(true)
+                .WithEmbedFrom($"Count settings for {context.Guild.Name}", descriptionBuilder.ToString());
 
             if (thresholdInfo.Any()) {
                 response.WithSelectMenu(GetThresholdSelectMenu(thresholdInfo))
@@ -135,7 +135,7 @@ namespace DiscordBot.Commands.Interactive {
 
         private (string WithMention, string NoMention) ThresholdToString(ApplicationCommandContext context, CountThreshold threshold) {
             var noMentionBuilder = new StringBuilder();
-         
+
             noMentionBuilder.Append($"{threshold.Threshold}: ");
             var name = string.IsNullOrEmpty(threshold.Name) ? "-" : threshold.Name;
             noMentionBuilder.Append(name);
@@ -144,12 +144,12 @@ namespace DiscordBot.Commands.Interactive {
                 return (noMentionBuilder.ToString(), noMentionBuilder.ToString());
             }
 
-            noMentionBuilder.Append($", ");
+            noMentionBuilder.Append(", ");
             var mentionBuilder = new StringBuilder(noMentionBuilder.ToString());
-            
+
             var roleTemp = context.Guild.GetRole(threshold.GivenRoleId.Value)?.Name ?? "deleted role";
             noMentionBuilder.Append(roleTemp);
-            
+
             roleTemp = threshold.GivenRoleId.Value.ToRole();
             mentionBuilder.Append(roleTemp);
 
@@ -178,7 +178,36 @@ namespace DiscordBot.Commands.Interactive {
             return Result.Ok();
         }
 
-        public override Task<Result> HandleComponentAsync(MessageComponentContext context) {
+        public override async Task<Result> HandleComponentAsync(MessageComponentContext context) {
+            var subCommand = context.CustomSubCommandId;
+            var result = subCommand switch {
+                RemoveOption => await HandleDelete(context),
+                ThresholdRemoveOption => await HandleThresholdSelected(context),
+                _ => Result.Fail("Could not find subcommand handler")
+            };
+
+            if (result.IsFailed) {
+                // Empty message
+                await context.UpdateAsync(null, null, null, null, null);
+            }
+
+            return result;
+        }
+
+        private async Task<Result> HandleThresholdSelected(MessageComponentContext context) {
+            var originalMenu = (SelectMenu)context.InnerContext.Message.Components.First().Components.First();
+            var selected = context.SelectedMenuOptions.First();
+
+            var components = new ComponentBuilder()
+                .WithOriginalMenu(originalMenu, selected)
+                .WithButton(GetRemoveButton);
+
+            await context.UpdateAsync(component: components.Build());
+
+            return Result.Ok();
+        }
+
+        private async Task<Result> HandleDelete(MessageComponentContext context) {
             throw new NotImplementedException();
         }
 
