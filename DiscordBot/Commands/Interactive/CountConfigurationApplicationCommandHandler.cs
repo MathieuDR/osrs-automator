@@ -96,7 +96,7 @@ namespace DiscordBot.Commands.Interactive {
                 return Result.Fail(new ExceptionalError(e));
             }
 
-            var thresholdInfo = thresholds.Select(x => (Id: $"{x.Name};{x.Threshold}", Label: ThresholdToString(context, x))).ToList();
+            var thresholdInfo = thresholds.Select((x, i) => (Id: i.ToString(), Label: ThresholdToString(context, x))).ToList();
 
             var descriptionBuilder = new StringBuilder();
             descriptionBuilder.AppendLine($"**Output channel:** <#{channelId}>");
@@ -133,7 +133,7 @@ namespace DiscordBot.Commands.Interactive {
                         .ToList());
         }
 
-        private (string WithMention, string NoMention) ThresholdToString(ApplicationCommandContext context, CountThreshold threshold) {
+        private (string WithMention, string NoMention) ThresholdToString<T>(BaseInteractiveContext<T> context, CountThreshold threshold) where T : SocketInteraction {
             var noMentionBuilder = new StringBuilder();
 
             noMentionBuilder.Append($"{threshold.Threshold}: ");
@@ -208,7 +208,25 @@ namespace DiscordBot.Commands.Interactive {
         }
 
         private async Task<Result> HandleDelete(MessageComponentContext context) {
-            throw new NotImplementedException();
+            IReadOnlyList<CountThreshold> thresholds;
+            var selected = ((SelectMenu)context.InnerContext.Message.Components.First().Components.First()).Options.First(x=>x.Default == true).Value;
+
+            try {
+                await _counterService.RemoveThreshold(context.Guild.Id, int.Parse(selected));
+                thresholds = await _counterService.GetThresholds(context.Guild.Id);
+            } catch (Exception e) {
+                return Result.Fail(new ExceptionalError(e));
+            }
+
+            var thresholdInfo = thresholds.Select((x, i) => (Id: i.ToString(), Label: ThresholdToString(context, x))).ToList();
+            
+            var components = new ComponentBuilder()
+                .WithSelectMenu(GetThresholdSelectMenu(thresholdInfo))
+                .WithButton(GetRemoveButton);
+
+            await context.UpdateAsync(component: components.Build());
+
+            return Result.Ok();
         }
 
         protected override Task<SlashCommandBuilder> ExtendSlashCommandBuilder(SlashCommandBuilder builder) {
