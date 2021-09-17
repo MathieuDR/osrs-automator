@@ -36,7 +36,7 @@ namespace WiseOldManConnector.Api {
 
 
         private void LogResponse(IRestResponse response) {
-            Logger?.Log(LogLevel.Information, null, "Response received from Wise Old Man API. [{Resource}, {@Content:j}]", response.Content,
+            Logger?.Log(LogLevel.Information, null, "Response received from Wise Old Man API. [{Resource}, {Content:j}]", response.Content,
                 response.Request.Resource);
         }
 
