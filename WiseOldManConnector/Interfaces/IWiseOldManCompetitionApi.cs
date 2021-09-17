@@ -20,11 +20,7 @@ namespace WiseOldManConnector.Interfaces {
         Task<ConnectorResponse<Competition>> View(int id);
         Task<ConnectorResponse<Competition>> View(int id, MetricType metric);
 
-        Task<ConnectorResponse<Competition>> Create(string title, MetricType metric, DateTimeOffset startsAt, DateTimeOffset endsAt,
-            IEnumerable<string> participants);
-
-        Task<ConnectorResponse<Competition>> Create(string title, MetricType metric, DateTimeOffset startsAt, DateTimeOffset endsAt, int groupId,
-            string groupVerificationCode);
+        Task<ConnectorResponse<Competition>> Create(CreateCompetitionRequest request);
 
         Task<ConnectorResponse<Competition>> Edit(int id, string verificationCode, CompetitionRequest request);
         Task<ConnectorResponse<MessageResponse>> AddParticipants(int id, string verificationCode, IEnumerable<string> participants);

@@ -72,15 +72,13 @@ namespace WiseOldManConnector.Api {
             return GetResponse<Competition>(result);
         }
 
-        public Task<ConnectorResponse<Competition>> Create(string title, MetricType metric, DateTimeOffset startsAt, DateTimeOffset endsAt,
-            IEnumerable<string> participants) {
-            throw new NotImplementedException();
-        }
+        public async Task<ConnectorResponse<Competition>> Create(CreateCompetitionRequest request) {
+            var webRequest = GetNewRestRequest();
+            webRequest.Method = Method.POST;
+            webRequest.AddJsonBody(request);
 
-        public Task<ConnectorResponse<Competition>> Create(string title, MetricType metric, DateTimeOffset startsAt, DateTimeOffset endsAt,
-            int groupId,
-            string groupVerificationCode) {
-            throw new NotImplementedException();
+            var result = await ExecuteRequest<WOMCompetition>(webRequest);
+            return GetResponse<Competition>(result);
         }
 
         public Task<ConnectorResponse<Competition>> Edit(int id, string verificationCode, CompetitionRequest request) {

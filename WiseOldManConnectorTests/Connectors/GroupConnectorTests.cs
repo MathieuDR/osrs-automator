@@ -378,6 +378,8 @@ namespace WiseOldManConnectorTests.Connectors {
             var response = await _groupApi.GetMembers(id);
             var player = response.Data.FirstOrDefault();
 
+            var flags = response.Data.Select(x=> x.Country).Distinct();
+
             Assert.NotEmpty(player.DisplayName);
             Assert.NotEmpty(player.Username);
             Assert.True(player.Id > 0);
@@ -385,6 +387,7 @@ namespace WiseOldManConnectorTests.Connectors {
             Assert.NotNull(player.Role);
             Assert.True(player.UpdatedAt < DateTimeOffset.Now);
             Assert.True(player.RegisteredAt < DateTimeOffset.Now);
+            Assert.True(flags.Count() >= 3);
         }
 
         [Fact]

@@ -15,7 +15,9 @@ namespace WiseOldManConnector.Transformers.TypeConverters {
             if (source.Participants != null) {
                 foreach (var sourceParticipant in source.Participants) {
                     var destinationParticipant = context.Mapper.Map<CompetitionParticipant>(sourceParticipant);
-                    destinationParticipant.CompetitionDelta.DeltaType = deltaType;
+                    if( destinationParticipant.CompetitionDelta is not null) {
+                        destinationParticipant.CompetitionDelta.DeltaType = deltaType;
+                    }
                     result.Add(destinationParticipant);
                 }
             }
