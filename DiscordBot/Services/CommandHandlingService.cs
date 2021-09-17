@@ -2,21 +2,16 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
-using System.Reflection;
 using System.Threading.Tasks;
 using Discord;
 using Discord.Commands;
 using Discord.WebSocket;
 using DiscordBot.Commands.Modules;
-using DiscordBot.Commands.Modules.DiscordCommandArguments;
 using DiscordBot.Common.Configuration;
 using DiscordBot.Configuration;
-using DiscordBot.Helpers;
 using DiscordBot.Helpers.Builders;
-using DiscordBot.Models;
 using DiscordBot.Models.Contexts;
 using DiscordBot.Services.Interfaces;
-using DiscordBot.TypeReaders;
 using Serilog.Context;
 using Serilog.Events;
 
@@ -26,16 +21,14 @@ namespace DiscordBot.Services {
         private readonly BotConfiguration _configuration;
         private readonly DiscordSocketClient _discord;
         private readonly ILogService _logger;
-        private readonly MetricSynonymsConfiguration _metricSynonymsConfiguration;
         private IServiceProvider _provider;
 
         public CommandHandlingService(IServiceProvider provider, DiscordSocketClient discord, CommandService commands,
-            BotConfiguration configuration, MetricSynonymsConfiguration metricSynonymsConfiguration, ILogService logger) {
+            BotConfiguration configuration, ILogService logger) {
             _discord = discord;
             _commands = commands;
             _provider = provider;
             _configuration = configuration;
-            _metricSynonymsConfiguration = metricSynonymsConfiguration;
             _logger = logger;
 
             _discord.MessageReceived += HandleCommandAsync;
@@ -45,17 +38,8 @@ namespace DiscordBot.Services {
 
         public async Task InitializeAsync(IServiceProvider provider) {
             _provider = provider;
-            // _commands.AddTypeReader<PeriodAndMetricArguments>(new PeriodAndMetricOsrsTypeReader(_metricSynonymsConfiguration));
-            // _commands.AddTypeReader<PeriodArguments>(new PeriodOsrsTypeReader());
-            // _commands.AddTypeReader<UserListWithImageArguments>(new UserListWithImageArgumentsTypeReader());
-            // _commands.AddTypeReader<MetricArguments>(new MetricOsrsTypeReader(_metricSynonymsConfiguration));
-            // _commands.AddTypeReader<BaseArguments>(new BaseArgumentsTypeReader());
 
-            //var t = _commands.AddModulesAsync(Assembly.GetEntryAssembly(), _provider);
             await _commands.AddModuleAsync<TestModule>(provider);
-            // await _commands.AddModuleAsync<PlayerModule>(provider);
-            // await _commands.AddModuleAsync<AdminModule>(provider);
-            // await _commands.AddModuleAsync<CountModule>(provider);
         }
 
         public async Task OnCommandExecutedAsync(Optional<CommandInfo> command, ICommandContext context, IResult result) {
@@ -139,10 +123,6 @@ namespace DiscordBot.Services {
 
             Debug.Assert(result.Error != null, "result.Error != null");
             builder.AddField(result.Error.Value.ToString(), result.ErrorReason);
-
-            // if (result.Error == CommandError.BadArgCount || result.Error == CommandError.ParseFailed) {
-            //     HelpModule.AddStandardParameterInfo(builder, _configuration.CustomPrefix);
-            // }
 
             builder.AddField("Get more help", $"Please use `{_configuration.CustomPrefix} help` for this bot's usage");
             return builder;
