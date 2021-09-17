@@ -10,9 +10,9 @@ namespace DiscordBot.Models.Contexts {
     public class ApplicationCommandContext : BaseInteractiveContext<SocketSlashCommand> {
         public ApplicationCommandContext(SocketSlashCommand command, IServiceProvider provider) : base(command, provider) { }
 
-        public NullValueDictionary<string, SocketSlashCommandDataOption> Options => InnerContext.Data.Options.ToNullValueDictionary();
+        public DefaultDictionary<string, SocketSlashCommandDataOption> Options => InnerContext.Data.Options.ToDefaultDictionary();
 
-        public NullValueDictionary<string, SocketSlashCommandDataOption> SubCommandOptions => Options.FirstOrDefault().Value?.Options.ToNullValueDictionary() ?? new NullValueDictionary<string, SocketSlashCommandDataOption>();
+        public DefaultDictionary<string, SocketSlashCommandDataOption> SubCommandOptions => Options.FirstOrDefault().Value?.Options.ToDefaultDictionary() ?? new DefaultDictionary<string, SocketSlashCommandDataOption>();
 
         public SocketSlashCommandDataOption GetOption(string name) {
             return InnerContext.Data.Options?.FirstOrDefault(x => string.Equals(x.Name, name, StringComparison.InvariantCultureIgnoreCase));
