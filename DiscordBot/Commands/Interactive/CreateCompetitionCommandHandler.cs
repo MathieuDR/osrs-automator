@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using Common.Parsers;
 using Discord;
 using DiscordBot.Helpers.Extensions;
 using DiscordBot.Models;
@@ -8,12 +9,17 @@ using DiscordBot.Models.Contexts;
 using DiscordBot.Models.Enums;
 using FluentResults;
 using Microsoft.Extensions.Logging;
+using WiseOldManConnector.Helpers;
 using WiseOldManConnector.Models.WiseOldMan.Enums;
 
 namespace DiscordBot.Commands.Interactive {
     public class CreateCompetitionCommandHandler : ApplicationCommandHandler {
-        public CreateCompetitionCommandHandler(ILogger<CreateCompetitionCommandHandler> logger) 
-            : base("competition", "Create a WOM competition", logger) { }
+        private readonly MetricTypeParser _metricTypeParser;
+
+        public CreateCompetitionCommandHandler(ILogger<CreateCompetitionCommandHandler> logger, MetricTypeParser metricTypeParser) 
+            : base("competition", "Create a WOM competition", logger) {
+            _metricTypeParser = metricTypeParser;
+        }
         public override Guid Id => Guid.Parse("B6D60A7A-68F5-42AB-8745-269D575EEFE4");
 
         private readonly Dictionary<ulong, CreateCompetition> _createCompetitionDictionary =
@@ -21,11 +27,35 @@ namespace DiscordBot.Commands.Interactive {
         public async override Task<Result> HandleCommandAsync(ApplicationCommandContext context) {
             var startString = context.Options.GetOptionValue<string>(StartDateOption);
             var endString = context.Options.GetOptionValue<string>(EndDateOption);
-            var category = context.Options.GetOptionValue<MetricTypeCategory>(MetricOption);
-            var compType = context.Options.GetOptionValue<CompetitionType>(TeamOption);
+            var metricString = context.Options.GetOptionValue<string>(MetricOption);
+            var compType = (CompetitionType)context.Options.GetOptionValue<long>(TeamOption);
+
+            var start = startString.ToFutureDate();
+            var end = endString.ToFutureDate();
+            var canParse = _metricTypeParser.TryParseToMetricType(metricString, out MetricType metric);
+
+            if (start.IsFailed) {
+                return Result.Merge(Result.Fail("Please enter a correct start date"), start);
+            }
             
-            var model = new CreateCompetition();
-            
+            if (end.IsFailed) {
+                return Result.Merge(Result.Fail("Please enter a correct end date"), end);
+            }
+
+            if (start.Value >= end.Value) {
+                return Result.Fail("Start date needs to be before end date");
+            }
+
+            if (!canParse) {
+                return Result.Fail("I do not recognize this metric!");
+            }
+
+            await context
+                .CreateReplyBuilder(true)
+                .WithEmbedFrom("Success",
+                    $"Creating a competition from {start.Value:g} to {end.Value:g} in {metric.GetEnumValueNameOrDefault()} with type {compType.GetEnumValueNameOrDefault()}")
+                .RespondAsync();
+
             return Result.Ok();
         }
 
