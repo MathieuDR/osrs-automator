@@ -3,6 +3,7 @@ using Discord.Commands;
 using Discord.WebSocket;
 using DiscordBot.Commands.Interactive;
 using DiscordBot.Common.Configuration;
+using DiscordBot.Helpers.Extensions;
 using DiscordBot.Services;
 using DiscordBot.Services.Interfaces;
 using DiscordBot.Services.Services;
@@ -53,6 +54,13 @@ namespace DiscordBot.Configuration {
 
             return serviceCollection;
         }
+        
+        private static IServiceCollection AddHelpers(this IServiceCollection serviceCollection) {
+            serviceCollection
+                .AddTransient<MetricTypeParser>();
+
+            return serviceCollection;
+        }
 
         private static IServiceCollection AddDiscordCommands(this IServiceCollection serviceCollection) {
             return serviceCollection
@@ -75,14 +83,14 @@ namespace DiscordBot.Configuration {
         private static IServiceCollection AddConfiguration(this IServiceCollection serviceCollection,
             IConfiguration configuration) {
             var botConfiguration = configuration.GetSection("Bot").Get<BotConfiguration>();
-            var metricSynonymsConfiguration =
-                configuration.GetSection("MetricSynonyms").Get<MetricSynonymsConfiguration>();
 
             serviceCollection
-                .AddSingleton(configuration)
+                .AddOptions<MetricSynonymsConfiguration>()
+                .Bind(configuration.GetSection("MetricSynonyms"));
+
+            serviceCollection.AddSingleton(configuration)
                 .AddSingleton(botConfiguration)
-                .AddSingleton(botConfiguration.Messages)
-                .AddSingleton(metricSynonymsConfiguration);
+                .AddSingleton(botConfiguration.Messages);
 
             return serviceCollection;
         }
@@ -95,6 +103,7 @@ namespace DiscordBot.Configuration {
                 .AddDiscordClient()
                 .AddExternalServices()
                 .AddConfiguration(configuration)
+                .AddHelpers()
                 .ConfigureAutoMapper();
 
             return serviceCollection;
