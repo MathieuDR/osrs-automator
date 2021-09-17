@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 using System.Threading.Tasks;
 using DiscordBot.Common.Dtos.Discord;
 using DiscordBot.Common.Models.Data;
@@ -11,24 +12,36 @@ using DiscordBot.Data.Repository;
 using DiscordBot.Data.Strategies;
 using DiscordBot.Services.Helpers;
 using DiscordBot.Services.Interfaces;
+using DiscordBot.Services.Models.Enums;
+using FluentResults;
 using Microsoft.Extensions.Logging;
 using Quartz;
+using WiseOldManConnector.Helpers;
+using WiseOldManConnector.Interfaces;
 using WiseOldManConnector.Models.Output;
+using WiseOldManConnector.Models.Requests;
 using WiseOldManConnector.Models.WiseOldMan.Enums;
 
 namespace DiscordBot.Services.Services {
     internal class GroupService : RepositoryService, IGroupService {
+        private readonly IWiseOldManCompetitionApi _competitionApi;
         private readonly ISchedulerFactory _factory;
+        private readonly IWiseOldManGroupApi _groupApi;
         private readonly IOsrsHighscoreService _highscoreService;
 
-        public GroupService(ILogger<GroupService> logger, IRepositoryStrategy repositoryStrategy, IOsrsHighscoreService highscoreService,
+        public GroupService(ILogger<GroupService> logger, IRepositoryStrategy repositoryStrategy,
+            IOsrsHighscoreService highscoreService,
+            IWiseOldManCompetitionApi competitionApi, IWiseOldManGroupApi groupApi,
             ISchedulerFactory factory) :
             base(logger, repositoryStrategy) {
             _highscoreService = highscoreService;
+            _competitionApi = competitionApi;
+            _groupApi = groupApi;
             _factory = factory;
         }
 
-        public async Task<ItemDecorator<Group>> SetGroupForGuild(GuildUser guildUser, int womGroupId, string verificationCode) {
+        public async Task<ItemDecorator<Group>> SetGroupForGuild(GuildUser guildUser, int womGroupId,
+            string verificationCode) {
             var group = await _highscoreService.GetGroupById(womGroupId);
             if (group == null) {
                 throw new Exception("Group does not exist.");
@@ -154,9 +167,62 @@ namespace DiscordBot.Services.Services {
                 .WithIdentity(Guid.NewGuid().ToString())
                 .Build();
 
-            var trigger = TriggerBuilder.Create().StartAt(DateBuilder.EvenSecondDate(DateTimeOffset.Now.AddSeconds(5))).Build();
+            var trigger = TriggerBuilder.Create().StartAt(DateBuilder.EvenSecondDate(DateTimeOffset.Now.AddSeconds(5)))
+                .Build();
 
             await scheduler.ScheduleJob(job, trigger);
+        }
+
+        public async Task<Result<ItemDecorator<Competition>>> CreateCompetition(Guild guild, DateTimeOffset start,
+            DateTimeOffset end, MetricType metric, CompetitionType competitionType) {
+            GuildConfig womConfig = null;
+            try {
+                womConfig = GetGroupConfig(guild.Id);
+            } catch (Exception e) {
+                return Result.Fail(new ExceptionalError("Could not retrieve configuration", e));
+            }
+
+            CreateCompetitionRequest request;
+
+            var title = new StringBuilder();
+            title.Append(womConfig.WomGroup.Name);
+            title.Append(" - ");
+            title.Append(metric.GetEnumValueNameOrDefault());
+
+            if (competitionType == CompetitionType.Normal) {
+                request = new CreateCompetitionRequest(title.ToString(), metric, start.DateTime, end.DateTime,
+                    womConfig.WomGroupId, womConfig.WomVerificationCode);
+            } else {
+                var groupMembers = (await _groupApi.GetMembers(womConfig.WomGroupId)).Data.ToList();
+                womConfig.WomGroup.Members = groupMembers;
+
+                var repo = RepositoryStrategy.CreateRepository<GuildConfigRepository>(guild.Id);
+                var updateResult = repo.Update(womConfig);
+
+
+                IEnumerable<CreateCompetitionRequest.Team> teams = new[] {
+                    new CreateCompetitionRequest.Team("Placeholder", new[] {groupMembers.FirstOrDefault()?.Username})
+                };
+
+                if (competitionType == CompetitionType.CountryTeams) {
+                    groupMembers.ForEach(x => x.Country ??= "non affiliated");
+
+                    teams = groupMembers.GroupBy(x => x.Country, x => x.Username)
+                        .ToDictionary(g => g.Key, g => g.Select(u => u))
+                        .Select(x => new CreateCompetitionRequest.Team(x));
+                }
+
+                request = new CreateCompetitionRequest(title.ToString(), metric, start.DateTime, end.DateTime,
+                    womConfig.WomGroupId, womConfig.WomVerificationCode, teams);
+            }
+
+            try {
+                var comp = await _competitionApi.Create(request);
+                return Result.Ok(comp.Data.Decorate());
+            } catch (Exception e) {
+                Logger.LogWarning(e, "Could not create competition");
+                return Result.Fail(new ExceptionalError("Could not create competition", e));
+            }
         }
 
         private GuildConfig GetGroupConfig(ulong guildId, bool validate = true) {

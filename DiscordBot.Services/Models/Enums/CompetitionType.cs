@@ -1,6 +1,6 @@
 using System.Runtime.Serialization;
 
-namespace DiscordBot.Models.Enums {
+namespace DiscordBot.Services.Models.Enums {
     public enum CompetitionType {
         Normal,
         Teams,
