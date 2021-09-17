@@ -2,17 +2,13 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
+using Common.Parsers;
 using FluentAssertions;
-using Microsoft.Recognizers.Text;
-using Microsoft.Recognizers.Text.DateTime;
 using Xunit;
 
 namespace DiscordBot.ServicesTests.Parser {
     public class HumanizerTests {
-        private DateTime Reference = new(2021, 12, 1, 4, 10, 0);
-
         [Theory]
-        //[InlineData("8:30h", "2021-12-01 08:30:00")]
         [InlineData("8:30", "2021-12-01 08:30:00")]
         [InlineData("8h30m", "2021-12-01 08:30:00")]
         [InlineData("8h30", "2021-12-01 08:30:00")]
@@ -35,53 +31,10 @@ namespace DiscordBot.ServicesTests.Parser {
         [InlineData("I'll go back 8pm today", "2021-12-01 20:00:00")]
         [InlineData("14/12/2021 18:00", "2021-12-14 18:00:00")]
         public void CanParseDates(string dateString, string parseAbleDate) {
-            var recognized = DateTimeRecognizer.RecognizeDateTime(dateString, Culture.English, refTime: Reference);
+            var result = dateString.ToFutureDate(referenceDate: new(2021, 12, 1, 4, 10, 0));
 
-            DateTime? baseDate = null;
-            string durationString = null;
-            foreach (var modelResult in recognized) {
-                var values = modelResult.Resolution["values"] as List<Dictionary<string, string>> ??
-                             new List<Dictionary<string, string>>();
-
-                foreach (var dict in values) {
-                    var type = dict["type"];
-
-                    switch (type) {
-                        case "time":
-                            baseDate ??= Reference.Date.Add(TimeSpan.Parse(dict["value"]));
-                            break;
-                        case "datetime":
-                        case "date":
-                            baseDate = DateTime.Parse(dict["value"]);
-                            break;
-                        case "datetimerange":
-                        case "daterange":
-                        case "timerange":
-                            baseDate = DateTime.Parse(dict["start"]);
-                            break;
-                        case "duration":
-                            durationString = dict["value"];
-                            break;
-                    }
-                }
-            }
-            
-            if (!string.IsNullOrEmpty(durationString)) {
-                baseDate ??= Reference.Date;
-                baseDate =  baseDate.Value.Add(TimeSpan.FromSeconds(long.Parse(durationString)));
-            }
-            
-            if (!baseDate.HasValue) {
-                throw new InvalidOperationException("No base string");
-            }
-
-            var result = baseDate.Value;
-            if (result <= Reference) {
-                result = result.AddYears(1);
-            }
-
-            recognized.Should().HaveCountGreaterOrEqualTo(1);
-            result.Should().Be(DateTime.Parse(parseAbleDate));
+            result.IsSuccess.Should().BeTrue();
+            result.Value.Should().Be(DateTime.Parse(parseAbleDate));
         }
     }
 }
