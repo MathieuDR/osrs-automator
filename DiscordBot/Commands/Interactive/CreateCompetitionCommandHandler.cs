@@ -1,12 +1,13 @@
 using System;
-using System.Collections.Generic;
 using System.Threading.Tasks;
 using Common.Parsers;
 using Discord;
+using DiscordBot.Helpers.Builders;
 using DiscordBot.Helpers.Extensions;
-using DiscordBot.Models;
 using DiscordBot.Models.Contexts;
-using DiscordBot.Models.Enums;
+using DiscordBot.Services.Interfaces;
+using DiscordBot.Services.Models.Enums;
+using DiscordBot.Transformers;
 using FluentResults;
 using Microsoft.Extensions.Logging;
 using WiseOldManConnector.Helpers;
@@ -15,15 +16,15 @@ using WiseOldManConnector.Models.WiseOldMan.Enums;
 namespace DiscordBot.Commands.Interactive {
     public class CreateCompetitionCommandHandler : ApplicationCommandHandler {
         private readonly MetricTypeParser _metricTypeParser;
+        private readonly IGroupService _groupService;
 
-        public CreateCompetitionCommandHandler(ILogger<CreateCompetitionCommandHandler> logger, MetricTypeParser metricTypeParser) 
+        public CreateCompetitionCommandHandler(ILogger<CreateCompetitionCommandHandler> logger, MetricTypeParser metricTypeParser, IGroupService groupService) 
             : base("competition", "Create a WOM competition", logger) {
             _metricTypeParser = metricTypeParser;
+            _groupService = groupService;
         }
         public override Guid Id => Guid.Parse("B6D60A7A-68F5-42AB-8745-269D575EEFE4");
-
-        private readonly Dictionary<ulong, CreateCompetition> _createCompetitionDictionary =
-            new();
+  
         public async override Task<Result> HandleCommandAsync(ApplicationCommandContext context) {
             var startString = context.Options.GetOptionValue<string>(StartDateOption);
             var endString = context.Options.GetOptionValue<string>(EndDateOption);
@@ -50,10 +51,18 @@ namespace DiscordBot.Commands.Interactive {
                 return Result.Fail("I do not recognize this metric!");
             }
 
+            var createRequest = await _groupService.CreateCompetition(context.Guild.ToGuildDto(),
+                new DateTimeOffset(start.Value),
+                new DateTimeOffset(end.Value), metric, compType);
+
+            if (createRequest.IsFailed) {
+                return createRequest;
+            }
+
             await context
                 .CreateReplyBuilder(true)
-                .WithEmbedFrom("Success",
-                    $"Creating a competition from {start.Value:g} to {end.Value:g} in {metric.GetEnumValueNameOrDefault()} with type {compType.GetEnumValueNameOrDefault()}")
+                .WithEmbed(builder => 
+                    builder.AddWiseOldMan(createRequest.Value))
                 .RespondAsync();
 
             return Result.Ok();
