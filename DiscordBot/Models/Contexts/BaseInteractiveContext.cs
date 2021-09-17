@@ -107,6 +107,7 @@ namespace DiscordBot.Models.Contexts {
             return new EmbedBuilder()
                 .WithColor(GuildUser.GetHighestRole()?.Color ?? 0x7000FB)
                 .WithMessageAuthorFooter(User)
+                .WithTitle(title)
                 .WithDescription(content ?? string.Empty)
                 .WithCurrentTimestamp();
         }
