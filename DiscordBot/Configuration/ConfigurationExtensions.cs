@@ -24,7 +24,6 @@ namespace DiscordBot.Configuration {
                         GatewayIntents = GatewayIntents.GuildMembers | GatewayIntents.GuildMessages |
                                          GatewayIntents.GuildMessageReactions | GatewayIntents.GuildMembers |
                                          GatewayIntents.Guilds,
-                        AlwaysAcknowledgeInteractions = false,
                     };
                     var client = new DiscordSocketClient(config);
                     return client;
