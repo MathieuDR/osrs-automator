@@ -57,10 +57,12 @@ namespace DiscordBot.Commands.Interactive {
             var additive = (int)context.SubCommandOptions.GetOptionValue<long>(ValueOption);
             var usersString = context.SubCommandOptions.GetOptionValue<string>(UsersOption);
             var reason = context.SubCommandOptions.GetOptionValue<string>(ReasonOption);
-
             
-            var users = (await usersString.ToCollectionOfParameters()
-                .ToArray().GetDiscordsUsersListFromStrings(context)).Distinct().ToList();
+            var stringParams = usersString.ToCollectionOfParameters()
+                .ToArray();
+
+            var (usersEnumerable, remainingArgs) = (await stringParams.GetUsersListFromStringWithRoles(context));
+            var users = usersEnumerable.ToList();
 
             if (additive == 0) {
                 Result.Fail("Additive cannot be 0");
@@ -79,8 +81,8 @@ namespace DiscordBot.Commands.Interactive {
                 var guildUser = user as IGuildUser ?? throw new ArgumentException("Cannot find user");
                 var totalCount = _counterService.Count(guildUser.ToGuildUserDto(), context.User.ToGuildUserDto(), additive, reason);
 
-                var tresholdTask = HandleNewCount(context, totalCount - additive, totalCount, (IGuildUser) user);
-                tasks.Add(tresholdTask);
+                var thresholdTask = HandleNewCount(context, totalCount - additive, totalCount, (IGuildUser) user);
+                tasks.Add(thresholdTask);
 
                 descriptionBuilder.AppendLine($"{guildUser.DisplayName()} new total: {totalCount}");
             }
