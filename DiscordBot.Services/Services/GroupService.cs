@@ -174,7 +174,7 @@ namespace DiscordBot.Services.Services {
         }
 
         public async Task<Result<ItemDecorator<Competition>>> CreateCompetition(Guild guild, DateTimeOffset start,
-            DateTimeOffset end, MetricType metric, CompetitionType competitionType) {
+            DateTimeOffset end, MetricType metric, CompetitionType competitionType, string name) {
             GuildConfig womConfig = null;
             try {
                 womConfig = GetGroupConfig(guild.Id);
@@ -185,9 +185,13 @@ namespace DiscordBot.Services.Services {
             CreateCompetitionRequest request;
 
             var title = new StringBuilder();
-            title.Append(womConfig.WomGroup.Name);
-            title.Append(" - ");
-            title.Append(metric.GetEnumValueNameOrDefault());
+            if(string.IsNullOrWhiteSpace(name)) {
+                title.Append(womConfig.WomGroup.Name);
+                title.Append(" - ");
+                title.Append(metric.GetEnumValueNameOrDefault());
+            }else {
+                title.Append(name);
+            }
 
             if (competitionType == CompetitionType.Normal) {
                 request = new CreateCompetitionRequest(title.ToString(), metric, start.DateTime, end.DateTime,
