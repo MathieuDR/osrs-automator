@@ -14,7 +14,9 @@ using Fergun.Interactive.Pagination;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace DiscordBot.Models.Contexts {
-    public abstract class BaseInteractiveContext { }
+    public abstract class BaseInteractiveContext {
+        public abstract bool IsDeferred { get; }
+    }
 
     public abstract class BaseInteractiveContext<T> : BaseInteractiveContext where T : SocketInteraction {
         protected BaseInteractiveContext(T innerContext, IServiceProvider provider) {
@@ -83,7 +85,15 @@ namespace DiscordBot.Models.Contexts {
             return new InteractionReplyBuilder<T>(this).WithEphemeral(ephemeral);
         }
 
+        /// <summary>
+        /// Is only accurate if the inner context is not used by itself
+        /// </summary>
+        public override bool IsDeferred => _isDeferred;
+
+        private bool _isDeferred = false;
+
         public Task DeferAsync(bool ephemeral = false, RequestOptions options = null) {
+            _isDeferred = true;
             return InnerContext.DeferAsync(ephemeral, options);
         }
 
@@ -95,6 +105,7 @@ namespace DiscordBot.Models.Contexts {
             AllowedMentions allowedMentions = null,
             RequestOptions options = null,
             MessageComponent component = null) {
+            _isDeferred = true;
             return InnerContext.RespondAsync(text, embeds?.ToArray(), isTts, ephemeral, allowedMentions, options, component);
         }
 

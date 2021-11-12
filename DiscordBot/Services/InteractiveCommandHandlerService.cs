@@ -69,7 +69,12 @@ namespace DiscordBot.Services {
                 var msg = string.Join(", ",
                     result.Errors.Where(x => !x.HasMetadata("404", o => (bool)(o ?? false))).Select(x => x.Message));
                 _logger.LogWarning("[{ctx}] failed: {msg}", ctx, msg);
-                await arg.RespondAsync(msg);
+
+                if (ctx is null || ctx.IsDeferred) {
+                    await arg.FollowupAsync(msg);
+                } else {
+                    await arg.RespondAsync(msg);
+                }
             }
 
             _logger.LogInformation("[{ctx}] done");
