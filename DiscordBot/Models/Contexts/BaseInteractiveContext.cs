@@ -36,7 +36,10 @@ namespace DiscordBot.Models.Contexts {
         public SocketDMChannel DmChannel => Channel.Cast<SocketDMChannel>();
         public ISocketMessageChannel Channel => InnerContext.Channel;
         public InteractiveService InteractiveService { get; }
-        
+
+        public abstract string Message { get; }
+        public string MessageLocation => InGuild ? $"{Channel} ({Guild})" : "Direct Message";
+
         public PageBuilder CreatePageBuilder(string description = null) {
             return new PageBuilder()
                 .WithColor(GuildUser.GetHighestRole()?.Color ?? 0x7000FB)
@@ -52,25 +55,28 @@ namespace DiscordBot.Models.Contexts {
             return GetDisplayNameById(user.Id);
         }
 
-        
+
         public StaticPaginatorBuilder GetBaseStaticPaginatorBuilder(IEnumerable<PageBuilder> pageBuilders) {
             var builder = new StaticPaginatorBuilder()
-                    .WithFooter(PaginatorFooter.Users | PaginatorFooter.PageNumber)
-                    .WithActionOnCancellation(ActionOnStop.DeleteInput)
-                    .AddUser(InnerContext.User)
-                    .WithPages(pageBuilders)
-                    .AddOption(new Emoji("⏪"), PaginatorAction.SkipToStart)
-                    .AddOption(new Emoji("◀"), PaginatorAction.Backward)
-                    .AddOption(new Emoji("🛑"), PaginatorAction.Exit)
-                    .AddOption(new Emoji("▶"), PaginatorAction.Forward)
-                    .AddOption(new Emoji("⏩"), PaginatorAction.SkipToEnd);
-                
-                return builder;
-            }
-        
-        public Task<InteractiveMessageResult> SendPaginator(Paginator paginator, TimeSpan? timeout = null, InteractionResponseType responseType = InteractionResponseType.ChannelMessageWithSource,
-            bool ephemeral = false, Action<IUserMessage> messageAction = null, bool resetTimeoutOnInput = false, CancellationToken cancellationToken = default){
-            return InteractiveService.SendPaginatorAsync(paginator, InnerContext, timeout, responseType, ephemeral, messageAction, resetTimeoutOnInput, cancellationToken);
+                .WithFooter(PaginatorFooter.Users | PaginatorFooter.PageNumber)
+                .WithActionOnCancellation(ActionOnStop.DeleteInput)
+                .AddUser(InnerContext.User)
+                .WithPages(pageBuilders)
+                .AddOption(new Emoji("⏪"), PaginatorAction.SkipToStart)
+                .AddOption(new Emoji("◀"), PaginatorAction.Backward)
+                .AddOption(new Emoji("🛑"), PaginatorAction.Exit)
+                .AddOption(new Emoji("▶"), PaginatorAction.Forward)
+                .AddOption(new Emoji("⏩"), PaginatorAction.SkipToEnd);
+
+            return builder;
+        }
+
+        public Task<InteractiveMessageResult> SendPaginator(Paginator paginator, TimeSpan? timeout = null,
+            InteractionResponseType responseType = InteractionResponseType.ChannelMessageWithSource,
+            bool ephemeral = false, Action<IUserMessage> messageAction = null, bool resetTimeoutOnInput = false,
+            CancellationToken cancellationToken = default) {
+            return InteractiveService.SendPaginatorAsync(paginator, InnerContext, timeout, responseType, ephemeral, messageAction,
+                resetTimeoutOnInput, cancellationToken);
         }
 
         public InteractionReplyBuilder<T> CreateReplyBuilder(bool ephemeral = false) {
@@ -110,6 +116,10 @@ namespace DiscordBot.Models.Contexts {
                 .WithTitle(title)
                 .WithDescription(content ?? string.Empty)
                 .WithCurrentTimestamp();
+        }
+
+        public override string ToString() {
+            return $"{User} in {MessageLocation}: \"{Message}\"";
         }
     }
 }

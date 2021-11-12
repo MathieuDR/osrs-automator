@@ -9,5 +9,7 @@ namespace DiscordBot.Models.Contexts {
             : base(innerContext, provider) { }
 
         public SocketGuildUser TargetedGuildUser => InnerContext.Data.Member.Cast<SocketGuildUser>();
+        
+        public override string Message => InnerContext.CommandName;
     }
 }

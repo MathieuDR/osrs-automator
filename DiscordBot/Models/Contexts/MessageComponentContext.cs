@@ -38,5 +38,7 @@ namespace DiscordBot.Models.Contexts {
                 props.Flags = flags;
             }, options);
         }
+        
+        public override string Message => InnerContext.Message.Content;
     }
 }
