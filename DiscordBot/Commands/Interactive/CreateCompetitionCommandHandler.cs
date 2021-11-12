@@ -26,6 +26,8 @@ namespace DiscordBot.Commands.Interactive {
         public override Guid Id => Guid.Parse("B6D60A7A-68F5-42AB-8745-269D575EEFE4");
   
         public async override Task<Result> HandleCommandAsync(ApplicationCommandContext context) {
+            _ = context.DeferAsync();
+            
             var startString = context.Options.GetOptionValue<string>(StartDateOption);
             var endString = context.Options.GetOptionValue<string>(EndDateOption);
             var metricString = context.Options.GetOptionValue<string>(MetricOption);
@@ -63,7 +65,7 @@ namespace DiscordBot.Commands.Interactive {
                 .CreateReplyBuilder(true)
                 .WithEmbed(builder => 
                     builder.AddWiseOldMan(createRequest.Value))
-                .RespondAsync();
+                .FollowupAsync();
 
             return Result.Ok();
         }
