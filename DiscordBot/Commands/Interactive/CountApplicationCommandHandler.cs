@@ -53,14 +53,8 @@ namespace DiscordBot.Commands.Interactive {
 
         #region add
         private async Task<Result> AddHandler(ApplicationCommandContext context) {
-          
-            var additive = (int)context.SubCommandOptions.GetOptionValue<long>(ValueOption);
-            var usersString = context.SubCommandOptions.GetOptionValue<string>(UsersOption);
-            var reason = context.SubCommandOptions.GetOptionValue<string>(ReasonOption);
-
-            
-            var users = (await usersString.ToCollectionOfParameters()
-                .ToArray().GetDiscordsUsersListFromStrings(context)).Distinct().ToList();
+            var (additive, usersString, reason) = GetAddParameters(context);
+            var users = await GetUsers(context, usersString);
 
             if (additive == 0) {
                 Result.Fail("Additive cannot be 0");
@@ -70,30 +64,54 @@ namespace DiscordBot.Commands.Interactive {
                 Result.Fail("No users found");
             }
             
-            var userString = users.Count() == 1 ? "user" : "users";
-
-
             var descriptionBuilder = new StringBuilder();
+            var tasks = HandleUsers(context, users, additive, reason, descriptionBuilder);
+            var embed = CreateAddEmbed(context, users, additive, descriptionBuilder);
+            
+            await Task.WhenAll(tasks);
+            await context.RespondAsync(embeds: new []{embed.Build()}, ephemeral:false);
+
+            return Result.Ok();
+        }
+
+        private static EmbedBuilder CreateAddEmbed(ApplicationCommandContext context, List<IUser> users, int additive, StringBuilder descriptionBuilder) {
+            var userString = users.Count() == 1 ? "user" : "users";
+            var embed = context.CreateEmbedBuilder($"Adding {additive} points for {users.Count()} {userString}",
+                descriptionBuilder.ToString());
+            return embed;
+        }
+
+        private List<Task> HandleUsers(ApplicationCommandContext context, List<IUser> users, int additive, string reason, StringBuilder descriptionBuilder) {
             var tasks = new List<Task>();
             foreach (var user in users) {
                 var guildUser = user as IGuildUser ?? throw new ArgumentException("Cannot find user");
                 var totalCount = _counterService.Count(guildUser.ToGuildUserDto(), context.User.ToGuildUserDto(), additive, reason);
 
-                var tresholdTask = HandleNewCount(context, totalCount - additive, totalCount, (IGuildUser) user);
-                tasks.Add(tresholdTask);
+                var thresholdTask = HandleNewCount(context, totalCount - additive, totalCount, (IGuildUser)user);
+                tasks.Add(thresholdTask);
 
                 descriptionBuilder.AppendLine($"{guildUser.DisplayName()} new total: {totalCount}");
             }
-            
-            var embed = context.CreateEmbedBuilder($"Adding {additive} points for {users.Count()} {userString}",
-                descriptionBuilder.ToString());
-            await Task.WhenAll(tasks);
 
-            await context.RespondAsync(embeds: new []{embed.Build()}, ephemeral:false);
-
-            return Result.Ok();
+            return tasks;
         }
-        
+
+        private static (int additive, string usersString, string reason) GetAddParameters(ApplicationCommandContext context) {
+            var additive = (int)context.SubCommandOptions.GetOptionValue<long>(ValueOption);
+            var usersString = context.SubCommandOptions.GetOptionValue<string>(UsersOption);
+            var reason = context.SubCommandOptions.GetOptionValue<string>(ReasonOption);
+            return (additive, usersString, reason);
+        }
+
+        private static async Task<List<IUser>> GetUsers(ApplicationCommandContext context, string usersString) {
+            var stringParams = usersString.ToCollectionOfParameters()
+                .ToArray();
+
+            var (usersEnumerable, remainingArgs) = (await stringParams.GetUsersListFromStringWithRoles(context));
+            var users = usersEnumerable.ToList();
+            return users;
+        }
+
         private async Task HandleNewCount(ApplicationCommandContext context, int startCount, int newCount, IGuildUser user) {
             try {
                 var thresholds = await _counterService.GetThresholds(user.GuildId);

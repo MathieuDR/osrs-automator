@@ -10,6 +10,7 @@ namespace WiseOldManConnector.Models.Output {
         public PlayerType Type { get; set; }
         public PlayerBuild Build { get; set; }
         public bool Flagged { get; set; }
+        public string Country { get; set; }
         public DateTimeOffset? LastImportedAt { get; set; }
         public DateTimeOffset RegisteredAt { get; set; }
         public DateTimeOffset UpdatedAt { get; set; }

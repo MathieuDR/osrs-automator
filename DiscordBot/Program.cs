@@ -41,7 +41,7 @@ namespace DiscordBot {
                 .Enrich.FromLogContext()
                 .MinimumLevel
                 .Debug()
-                .WriteTo.RollingFile(new JsonFormatter(), "logs/osrs_bot.log")
+                .WriteTo.File(new JsonFormatter(), "logs/osrs_bot.log", rollingInterval: RollingInterval.Day)
                 .WriteTo.Console(restrictedToMinimumLevel: LogEventLevel.Information)
                 .CreateLogger();
         }

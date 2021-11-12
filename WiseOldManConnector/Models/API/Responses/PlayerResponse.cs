@@ -20,6 +20,9 @@ namespace WiseOldManConnector.Models.API.Responses {
 
         [JsonProperty("flagged")]
         public bool Flagged { get; set; }
+        
+        [JsonProperty("country")]
+        public string Country { get; set; }
 
         [JsonProperty("ehp")]
         public double EffectiveHoursPlayed { get; set; }

@@ -1,33 +1,30 @@
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Discord;
 using Discord.Net;
-using Discord.Rest;
 using Discord.WebSocket;
 using DiscordBot.Commands.Interactive;
 using DiscordBot.Data.Interfaces;
 using DiscordBot.Models.Contexts;
 using DiscordBot.Services.Interfaces;
-using FluentResults;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 
 namespace DiscordBot.Services {
     public class InteractiveCommandHandlerService {
+        private const ulong OwnerGuildId = 403539795944538122;
         private readonly DiscordSocketClient _client;
+        private readonly IApplicationCommandInfoRepository _commandInfoRepository;
         private readonly ILogger<InteractiveCommandHandlerService> _logger;
         private readonly IServiceProvider _provider;
-        private readonly IApplicationCommandInfoRepository _commandInfoRepository;
         private readonly ICommandRegistrationService _registrationService;
         private readonly ICommandStrategy _strategy;
-        private const ulong OwnerGuildId = 403539795944538122;
 
         public InteractiveCommandHandlerService(ILogger<InteractiveCommandHandlerService> logger,
             DiscordSocketClient client,
             ICommandStrategy strategy,
-            IServiceProvider provider, 
+            IServiceProvider provider,
             IApplicationCommandInfoRepository commandInfoRepository,
             ICommandRegistrationService registrationService) {
             _logger = logger;
@@ -65,11 +62,17 @@ namespace DiscordBot.Services {
                 _ => null
             };
 
+            _logger.LogInformation("[{ctx}] Command created", ctx);
             var result = await _strategy.HandleInteractiveCommand(ctx).ConfigureAwait(false);
+
             if (result.IsFailed) {
-                await arg.RespondAsync(string.Join(", ", 
-                    result.Errors.Where(x=>!x.HasMetadata("404", o=> (bool)(o ?? false))).Select(x=>x.Message)));
+                var msg = string.Join(", ",
+                    result.Errors.Where(x => !x.HasMetadata("404", o => (bool)(o ?? false))).Select(x => x.Message));
+                _logger.LogWarning("[{ctx}] failed: {msg}", ctx, msg);
+                await arg.RespondAsync(msg);
             }
+
+            _logger.LogInformation("[{ctx}] done");
         }
 
         private async Task InitializeCommands() {
@@ -83,7 +86,7 @@ namespace DiscordBot.Services {
         private async Task RegisterCommandForOwnersGuild(IApplicationCommandHandler handler) {
             var propertiesTask = handler.GetCommandProperties();
             var commands = await _client.GetGuild(OwnerGuildId).GetApplicationCommandsAsync();
-           
+
             try {
                 var existing = commands.FirstOrDefault(x => x.Name == handler.Name && x.IsGlobalCommand == false);
                 if (existing is not null) {

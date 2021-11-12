@@ -30,7 +30,7 @@ namespace WiseOldManConnector.Api {
         protected abstract string Area { get; }
 
         private void LogRequest(RestRequest request) {
-            Logger?.Log(LogLevel.Information, null, "Request sent to Wise old man API. [{Resource}, {Parameters:j}]", request.Resource,
+            Logger?.Log(LogLevel.Information, null, "Request sent to Wise old man API. [{Resource}, {@Parameters:j}]", request.Resource,
                 request.Parameters);
         }
 

@@ -3,6 +3,7 @@ using Discord.Commands;
 using Discord.WebSocket;
 using DiscordBot.Commands.Interactive;
 using DiscordBot.Common.Configuration;
+using DiscordBot.Helpers.Extensions;
 using DiscordBot.Services;
 using DiscordBot.Services.Interfaces;
 using DiscordBot.Services.Services;
@@ -23,7 +24,6 @@ namespace DiscordBot.Configuration {
                         GatewayIntents = GatewayIntents.GuildMembers | GatewayIntents.GuildMessages |
                                          GatewayIntents.GuildMessageReactions | GatewayIntents.GuildMembers |
                                          GatewayIntents.Guilds,
-                        AlwaysAcknowledgeInteractions = false,
                     };
                     var client = new DiscordSocketClient(config);
                     return client;
@@ -53,6 +53,13 @@ namespace DiscordBot.Configuration {
 
             return serviceCollection;
         }
+        
+        private static IServiceCollection AddHelpers(this IServiceCollection serviceCollection) {
+            serviceCollection
+                .AddTransient<MetricTypeParser>();
+
+            return serviceCollection;
+        }
 
         private static IServiceCollection AddDiscordCommands(this IServiceCollection serviceCollection) {
             return serviceCollection
@@ -61,26 +68,28 @@ namespace DiscordBot.Configuration {
                 .AddSingleton<CountApplicationCommandHandler>()
                 .AddSingleton<CountConfigurationApplicationCommandHandler>()
                 .AddSingleton<ConfigurationApplicationCommandHandler>()
+                .AddSingleton<CreateCompetitionCommandHandler>()
                 .AddSingleton<ICommandStrategy>(x => new CommandStrategy(new IApplicationCommandHandler[] {
                     x.GetRequiredService<PingApplicationCommandHandler>(),
                     x.GetRequiredService<ManageCommandsApplicationCommandHandler>(),
                     x.GetRequiredService<CountApplicationCommandHandler>(),
                     x.GetRequiredService<CountConfigurationApplicationCommandHandler>(),
-                    x.GetRequiredService<ConfigurationApplicationCommandHandler>()
+                    x.GetRequiredService<ConfigurationApplicationCommandHandler>(),
+                    x.GetRequiredService<CreateCompetitionCommandHandler>()
                 }));
         }
 
         private static IServiceCollection AddConfiguration(this IServiceCollection serviceCollection,
             IConfiguration configuration) {
             var botConfiguration = configuration.GetSection("Bot").Get<BotConfiguration>();
-            var metricSynonymsConfiguration =
-                configuration.GetSection("MetricSynonyms").Get<MetricSynonymsConfiguration>();
 
             serviceCollection
-                .AddSingleton(configuration)
+                .AddOptions<MetricSynonymsConfiguration>()
+                .Bind(configuration.GetSection("MetricSynonyms"));
+
+            serviceCollection.AddSingleton(configuration)
                 .AddSingleton(botConfiguration)
-                .AddSingleton(botConfiguration.Messages)
-                .AddSingleton(metricSynonymsConfiguration);
+                .AddSingleton(botConfiguration.Messages);
 
             return serviceCollection;
         }
@@ -93,6 +102,7 @@ namespace DiscordBot.Configuration {
                 .AddDiscordClient()
                 .AddExternalServices()
                 .AddConfiguration(configuration)
+                .AddHelpers()
                 .ConfigureAutoMapper();
 
             return serviceCollection;

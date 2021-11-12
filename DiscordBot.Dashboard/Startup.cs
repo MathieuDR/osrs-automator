@@ -78,7 +78,7 @@ namespace Dashboard {
                 .Enrich.FromLogContext()
                 .MinimumLevel
                 .Debug()
-                .WriteTo.RollingFile(new JsonFormatter(), "logs/web.log")
+                .WriteTo.File(new JsonFormatter(), "logs/web.log", rollingInterval: RollingInterval.Day)
                 .WriteTo.Console(LogEventLevel.Information)
                 .CreateLogger();
         }

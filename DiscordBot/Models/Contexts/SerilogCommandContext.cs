@@ -1,4 +1,6 @@
-﻿using Discord.Commands;
+﻿using System;
+using Discord.Commands;
+using Discord.WebSocket;
 
 namespace DiscordBot.Models.Contexts {
     public class SerilogCommandContext {
@@ -12,7 +14,6 @@ namespace DiscordBot.Models.Contexts {
                 Channel = context.Channel.Name;
             }
         }
-
 
         public string Message { get; set; }
         public string User => $"{UserName}#{Discriminator}";
