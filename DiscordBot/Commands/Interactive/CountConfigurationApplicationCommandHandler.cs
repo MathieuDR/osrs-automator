@@ -195,7 +195,7 @@ namespace DiscordBot.Commands.Interactive {
         }
 
         private async Task<Result> HandleThresholdSelected(MessageComponentContext context) {
-            var originalMenu = (SelectMenu)context.InnerContext.Message.Components.First().Components.First();
+            var originalMenu = (SelectMenuComponent)context.InnerContext.Message.Components.First().Components.First();
             var selected = context.SelectedMenuOptions.First();
 
             var components = new ComponentBuilder()
@@ -209,7 +209,7 @@ namespace DiscordBot.Commands.Interactive {
 
         private async Task<Result> HandleDelete(MessageComponentContext context) {
             IReadOnlyList<CountThreshold> thresholds;
-            var selected = ((SelectMenu)context.InnerContext.Message.Components.First().Components.First()).Options.First(x=>x.Default == true).Value;
+            var selected = ((SelectMenuComponent)context.InnerContext.Message.Components.First().Components.First()).Options.First(x=>x.Default == true).Value;
 
             try {
                 await _counterService.RemoveThreshold(context.Guild.Id, int.Parse(selected));
@@ -235,7 +235,7 @@ namespace DiscordBot.Commands.Interactive {
                     .WithName(SetChannelSubCommandName)
                     .WithDescription("Set the channel for threshold messages")
                     .WithType(ApplicationCommandOptionType.SubCommand)
-                    .AddOption(ChannelOption, ApplicationCommandOptionType.Channel, "The channel to use, it must be a text channel")
+                    .AddOption(ChannelOption, ApplicationCommandOptionType.Channel, "The channel to use, it must be a text channel", true)
                 )
                 .AddOption(new SlashCommandOptionBuilder()
                     .WithName(ViewSubCommandName)
@@ -246,8 +246,8 @@ namespace DiscordBot.Commands.Interactive {
                     .WithName(AddThresholdSubCommandName)
                     .WithDescription("Adds a new threshold")
                     .WithType(ApplicationCommandOptionType.SubCommand)
-                    .AddOption(ThresholdOption, ApplicationCommandOptionType.Integer, "The value that triggers the threshold, inclusive")
-                    .AddOption(NameOption, ApplicationCommandOptionType.String, "The name of the threshold")
+                    .AddOption(ThresholdOption, ApplicationCommandOptionType.Integer, "The value that triggers the threshold, inclusive", true)
+                    .AddOption(NameOption, ApplicationCommandOptionType.String, "The name of the threshold", true)
                     .AddOption(RoleOption, ApplicationCommandOptionType.Role, "Optional role to give the players", false)
                 );
 

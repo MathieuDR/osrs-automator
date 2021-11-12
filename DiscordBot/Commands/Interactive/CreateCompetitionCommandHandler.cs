@@ -81,10 +81,10 @@ namespace DiscordBot.Commands.Interactive {
 
         protected override Task<SlashCommandBuilder> ExtendSlashCommandBuilder(SlashCommandBuilder builder) {
             builder
-                .AddOption(StartDateOption, ApplicationCommandOptionType.String, "The start date and time")
-                .AddOption(EndDateOption, ApplicationCommandOptionType.String, "The end date and time")
-                .AddOption(MetricOption, ApplicationCommandOptionType.String, "The metric of the competition")
-                .AddEnumOption<CompetitionType>(TeamOption, "Select competition type");
+                .AddOption(StartDateOption, ApplicationCommandOptionType.String, "The start date and time", true)
+                .AddOption(EndDateOption, ApplicationCommandOptionType.String, "The end date and time", true)
+                .AddOption(MetricOption, ApplicationCommandOptionType.String, "The metric of the competition", true)
+                .AddEnumOption<CompetitionType>(TeamOption, "Select competition type", true);
 
             return Task.FromResult(builder);
         }
