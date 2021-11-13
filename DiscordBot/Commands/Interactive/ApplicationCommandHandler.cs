@@ -16,7 +16,7 @@ public abstract class ApplicationCommandHandler : IApplicationCommandHandler {
     public abstract Guid Id { get; }
     public string Name { get; }
     public string Description { get; }
-    public virtual bool GlobalRegister => true;
+    public virtual bool GlobalRegister => false;
         
     public async Task<SlashCommandBuilder> GetCommandBuilder() {
         Logger.LogInformation("Creating SlashCommandBuilder for {command}: {description}", Name, Description);
