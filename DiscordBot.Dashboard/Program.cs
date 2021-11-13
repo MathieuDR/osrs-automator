@@ -19,7 +19,7 @@ try {
     builder.WebHost.UseUrls("http://*:5829");
     
     //Add bot as hosted service
-    //builder.Services.AddHostedService<DiscordBot.DiscordBot>();
+    builder.Services.AddHostedService<DiscordBot.DiscordBot>();
 
     var app = builder.Build();
     StartupHelper.ConfigurePipeline(app, app.Environment, app.Services.GetRequiredService<IApiVersionDescriptionProvider>(), builder.Configuration);
