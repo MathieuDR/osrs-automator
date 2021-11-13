@@ -38,7 +38,7 @@ namespace DiscordBot.Services.Services {
             if (saveInformationResult.IsFailed) {
                 Logger.LogWarning("Could not save drop with endpoint {endpoint}, data: {@drop} and {verb} image", endpoint, drop,
                     string.IsNullOrEmpty(base64Image) ? "without" : "with");
-                return saveInformationResult;
+                return saveInformationResult.ToResult();
             }
 
             //Schedule job

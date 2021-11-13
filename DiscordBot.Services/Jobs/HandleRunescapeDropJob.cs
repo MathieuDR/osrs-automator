@@ -76,7 +76,7 @@ namespace DiscordBot.Services.Jobs {
         }
 
         private async Task<Result<bool>> HandleMessagesForGuilds(Guid endpoint, RunescapeDropData data, List<ulong> guildIds) {
-            var errors = new List<Error>();
+            var errors = new List<IError>();
             bool sentAnyMessages = false;
             
             // Set the handled to a list that we can edit
@@ -104,7 +104,7 @@ namespace DiscordBot.Services.Jobs {
                 messagedGuilds.Add(guildId);
             }
             
-            return Result.FailIf(!errors.Any(),"Some guilds failed").WithErrors(errors).ToResult<bool>(sentAnyMessages);
+            return Result.FailIf(!errors.Any(),"Some guilds failed").WithErrors(errors).ToResult(sentAnyMessages);
         }
 
         private bool SendData(ulong guildId, ulong channelId, RunescapeDropData toSendData) {

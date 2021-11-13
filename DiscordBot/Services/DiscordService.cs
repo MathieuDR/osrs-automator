@@ -79,7 +79,7 @@ namespace DiscordBot.Services {
 
             var toSendResult = CreateCompoundedMessagesForMultipleMessages(metricMessages);
             if (toSendResult.IsFailed) {
-                return toSendResult;
+                return toSendResult.ToResult();
             }
             
             var channel = (await channelTask).As<ISocketMessageChannel>();

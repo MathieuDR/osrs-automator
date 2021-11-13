@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using Common.Parsers;
 using Discord;
@@ -39,11 +40,11 @@ namespace DiscordBot.Commands.Interactive {
             var canParse = _metricTypeParser.TryParseToMetricType(metricString, out MetricType metric);
 
             if (start.IsFailed) {
-                return Result.Merge(Result.Fail("Please enter a correct start date"), start);
+                return Result.Merge(Result.Fail("Please enter a correct start date"), start).ToResult();
             }
             
             if (end.IsFailed) {
-                return Result.Merge(Result.Fail("Please enter a correct end date"), end);
+                return Result.Merge(Result.Fail("Please enter a correct end date"), end).ToResult();;
             }
 
             if (start.Value >= end.Value) {
@@ -59,7 +60,7 @@ namespace DiscordBot.Commands.Interactive {
                 new DateTimeOffset(end.Value), metric, compType, nameString);
 
             if (createRequest.IsFailed) {
-                return createRequest;
+                return createRequest.ToResult();
             }
 
             await context
