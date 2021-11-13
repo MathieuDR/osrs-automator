@@ -2,814 +2,814 @@
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 
-namespace WiseOldManConnector.Models.WiseOldMan.Enums {
-    [JsonConverter(typeof(StringEnumConverter))]
-    public enum GroupRole {
-        [EnumMember(Value = "member")]
-        Member = 0,
+namespace WiseOldManConnector.Models.WiseOldMan.Enums; 
 
-        [EnumMember(Value = "leader")]
-        Leader = 1,
+[JsonConverter(typeof(StringEnumConverter))]
+public enum GroupRole {
+    [EnumMember(Value = "member")]
+    Member = 0,
 
-        [EnumMember(Value = "jagex moderator")]
-        JagexModerator,
+    [EnumMember(Value = "leader")]
+    Leader = 1,
 
-        [EnumMember(Value = @"adamant")]
-        Adamant,
+    [EnumMember(Value = "jagex moderator")]
+    JagexModerator,
 
-        [EnumMember(Value = @"adept")]
-        Adept,
+    [EnumMember(Value = @"adamant")]
+    Adamant,
 
-        [EnumMember(Value = @"administrator")]
-        Administrator,
+    [EnumMember(Value = @"adept")]
+    Adept,
 
-        [EnumMember(Value = @"admiral")]
-        Admiral,
+    [EnumMember(Value = @"administrator")]
+    Administrator,
 
-        [EnumMember(Value = @"adventurer")]
-        Adventurer,
+    [EnumMember(Value = @"admiral")]
+    Admiral,
 
-        [EnumMember(Value = @"air")]
-        Air,
+    [EnumMember(Value = @"adventurer")]
+    Adventurer,
 
-        [EnumMember(Value = @"anchor")]
-        Anchor,
+    [EnumMember(Value = @"air")]
+    Air,
 
-        [EnumMember(Value = @"apothecary")]
-        Apothecary,
+    [EnumMember(Value = @"anchor")]
+    Anchor,
 
-        [EnumMember(Value = @"archer")]
-        Archer,
+    [EnumMember(Value = @"apothecary")]
+    Apothecary,
 
-        [EnumMember(Value = @"armadylean")]
-        Armadylean,
+    [EnumMember(Value = @"archer")]
+    Archer,
 
-        [EnumMember(Value = @"artillery")]
-        Artillery,
+    [EnumMember(Value = @"armadylean")]
+    Armadylean,
 
-        [EnumMember(Value = @"artisan")]
-        Artisan,
+    [EnumMember(Value = @"artillery")]
+    Artillery,
 
-        [EnumMember(Value = @"asgarnian")]
-        Asgarnian,
+    [EnumMember(Value = @"artisan")]
+    Artisan,
 
-        [EnumMember(Value = @"assassin")]
-        Assassin,
+    [EnumMember(Value = @"asgarnian")]
+    Asgarnian,
 
-        [EnumMember(Value = @"assistant")]
-        Assistant,
+    [EnumMember(Value = @"assassin")]
+    Assassin,
 
-        [EnumMember(Value = @"astral")]
-        Astral,
+    [EnumMember(Value = @"assistant")]
+    Assistant,
 
-        [EnumMember(Value = @"athlete")]
-        Athlete,
+    [EnumMember(Value = @"astral")]
+    Astral,
 
-        [EnumMember(Value = @"attacker")]
-        Attacker,
+    [EnumMember(Value = @"athlete")]
+    Athlete,
 
-        [EnumMember(Value = @"bandit")]
-        Bandit,
+    [EnumMember(Value = @"attacker")]
+    Attacker,
 
-        [EnumMember(Value = @"bandosian")]
-        Bandosian,
+    [EnumMember(Value = @"bandit")]
+    Bandit,
 
-        [EnumMember(Value = @"barbarian")]
-        Barbarian,
+    [EnumMember(Value = @"bandosian")]
+    Bandosian,
 
-        [EnumMember(Value = @"battlemage")]
-        Battlemage,
+    [EnumMember(Value = @"barbarian")]
+    Barbarian,
 
-        [EnumMember(Value = @"beast")]
-        Beast,
+    [EnumMember(Value = @"battlemage")]
+    Battlemage,
 
-        [EnumMember(Value = @"berserker")]
-        Berserker,
+    [EnumMember(Value = @"beast")]
+    Beast,
 
-        [EnumMember(Value = @"blisterwood")]
-        Blisterwood,
+    [EnumMember(Value = @"berserker")]
+    Berserker,
 
-        [EnumMember(Value = @"blood")]
-        Blood,
+    [EnumMember(Value = @"blisterwood")]
+    Blisterwood,
 
-        [EnumMember(Value = @"blue")]
-        Blue,
+    [EnumMember(Value = @"blood")]
+    Blood,
 
-        [EnumMember(Value = @"bob")]
-        Bob,
+    [EnumMember(Value = @"blue")]
+    Blue,
 
-        [EnumMember(Value = @"body")]
-        Body,
+    [EnumMember(Value = @"bob")]
+    Bob,
 
-        [EnumMember(Value = @"brassican")]
-        Brassican,
+    [EnumMember(Value = @"body")]
+    Body,
 
-        [EnumMember(Value = @"brawler")]
-        Brawler,
+    [EnumMember(Value = @"brassican")]
+    Brassican,
 
-        [EnumMember(Value = @"brigadier")]
-        Brigadier,
+    [EnumMember(Value = @"brawler")]
+    Brawler,
 
-        [EnumMember(Value = @"brigand")]
-        Brigand,
+    [EnumMember(Value = @"brigadier")]
+    Brigadier,
 
-        [EnumMember(Value = @"bronze")]
-        Bronze,
+    [EnumMember(Value = @"brigand")]
+    Brigand,
 
-        [EnumMember(Value = @"bruiser")]
-        Bruiser,
+    [EnumMember(Value = @"bronze")]
+    Bronze,
 
-        [EnumMember(Value = @"bulwark")]
-        Bulwark,
+    [EnumMember(Value = @"bruiser")]
+    Bruiser,
 
-        [EnumMember(Value = @"burglar")]
-        Burglar,
+    [EnumMember(Value = @"bulwark")]
+    Bulwark,
 
-        [EnumMember(Value = @"burnt")]
-        Burnt,
+    [EnumMember(Value = @"burglar")]
+    Burglar,
 
-        [EnumMember(Value = @"cadet")]
-        Cadet,
+    [EnumMember(Value = @"burnt")]
+    Burnt,
 
-        [EnumMember(Value = @"captain")]
-        Captain,
+    [EnumMember(Value = @"cadet")]
+    Cadet,
 
-        [EnumMember(Value = @"carry")]
-        Carry,
+    [EnumMember(Value = @"captain")]
+    Captain,
 
-        [EnumMember(Value = @"champion")]
-        Champion,
+    [EnumMember(Value = @"carry")]
+    Carry,
 
-        [EnumMember(Value = @"chaos")]
-        Chaos,
+    [EnumMember(Value = @"champion")]
+    Champion,
 
-        [EnumMember(Value = @"cleric")]
-        Cleric,
+    [EnumMember(Value = @"chaos")]
+    Chaos,
 
-        [EnumMember(Value = @"collector")]
-        Collector,
+    [EnumMember(Value = @"cleric")]
+    Cleric,
 
-        [EnumMember(Value = @"colonel")]
-        Colonel,
+    [EnumMember(Value = @"collector")]
+    Collector,
 
-        [EnumMember(Value = @"commander")]
-        Commander,
+    [EnumMember(Value = @"colonel")]
+    Colonel,
 
-        [EnumMember(Value = @"competitor")]
-        Competitor,
+    [EnumMember(Value = @"commander")]
+    Commander,
 
-        [EnumMember(Value = @"completionist")]
-        Completionist,
+    [EnumMember(Value = @"competitor")]
+    Competitor,
 
-        [EnumMember(Value = @"constructor")]
-        Constructor,
+    [EnumMember(Value = @"completionist")]
+    Completionist,
 
-        [EnumMember(Value = @"cook")]
-        Cook,
+    [EnumMember(Value = @"constructor")]
+    Constructor,
 
-        [EnumMember(Value = @"coordinator")]
-        Coordinator,
+    [EnumMember(Value = @"cook")]
+    Cook,
 
-        [EnumMember(Value = @"corporal")]
-        Corporal,
+    [EnumMember(Value = @"coordinator")]
+    Coordinator,
 
-        [EnumMember(Value = @"cosmic")]
-        Cosmic,
+    [EnumMember(Value = @"corporal")]
+    Corporal,
 
-        [EnumMember(Value = @"councillor")]
-        Councillor,
+    [EnumMember(Value = @"cosmic")]
+    Cosmic,
 
-        [EnumMember(Value = @"crafter")]
-        Crafter,
+    [EnumMember(Value = @"councillor")]
+    Councillor,
 
-        [EnumMember(Value = @"crew")]
-        Crew,
+    [EnumMember(Value = @"crafter")]
+    Crafter,
 
-        [EnumMember(Value = @"crusader")]
-        Crusader,
+    [EnumMember(Value = @"crew")]
+    Crew,
 
-        [EnumMember(Value = @"cutpurse")]
-        Cutpurse,
+    [EnumMember(Value = @"crusader")]
+    Crusader,
 
-        [EnumMember(Value = @"death")]
-        Death,
+    [EnumMember(Value = @"cutpurse")]
+    Cutpurse,
 
-        [EnumMember(Value = @"defender")]
-        Defender,
+    [EnumMember(Value = @"death")]
+    Death,
 
-        [EnumMember(Value = @"defiler")]
-        Defiler,
+    [EnumMember(Value = @"defender")]
+    Defender,
 
-        [EnumMember(Value = @"deputy owner")]
-        DeputyOwner,
+    [EnumMember(Value = @"defiler")]
+    Defiler,
 
-        [EnumMember(Value = @"destroyer")]
-        Destroyer,
+    [EnumMember(Value = @"deputy owner")]
+    DeputyOwner,
 
-        [EnumMember(Value = @"diamond")]
-        Diamond,
+    [EnumMember(Value = @"destroyer")]
+    Destroyer,
 
-        [EnumMember(Value = @"diseased")]
-        Diseased,
+    [EnumMember(Value = @"diamond")]
+    Diamond,
 
-        [EnumMember(Value = @"doctor")]
-        Doctor,
+    [EnumMember(Value = @"diseased")]
+    Diseased,
 
-        [EnumMember(Value = @"dogsbody")]
-        Dogsbody,
+    [EnumMember(Value = @"doctor")]
+    Doctor,
 
-        [EnumMember(Value = @"dragon")]
-        Dragon,
+    [EnumMember(Value = @"dogsbody")]
+    Dogsbody,
 
-        [EnumMember(Value = @"dragonstone")]
-        Dragonstone,
+    [EnumMember(Value = @"dragon")]
+    Dragon,
 
-        [EnumMember(Value = @"druid")]
-        Druid,
+    [EnumMember(Value = @"dragonstone")]
+    Dragonstone,
 
-        [EnumMember(Value = @"duellist")]
-        Duellist,
+    [EnumMember(Value = @"druid")]
+    Druid,
 
-        [EnumMember(Value = @"earth")]
-        Earth,
+    [EnumMember(Value = @"duellist")]
+    Duellist,
 
-        [EnumMember(Value = @"elite")]
-        Elite,
+    [EnumMember(Value = @"earth")]
+    Earth,
 
-        [EnumMember(Value = @"emerald")]
-        Emerald,
+    [EnumMember(Value = @"elite")]
+    Elite,
 
-        [EnumMember(Value = @"enforcer")]
-        Enforcer,
+    [EnumMember(Value = @"emerald")]
+    Emerald,
 
-        [EnumMember(Value = @"epic")]
-        Epic,
+    [EnumMember(Value = @"enforcer")]
+    Enforcer,
 
-        [EnumMember(Value = @"executive")]
-        Executive,
+    [EnumMember(Value = @"epic")]
+    Epic,
 
-        [EnumMember(Value = @"expert")]
-        Expert,
+    [EnumMember(Value = @"executive")]
+    Executive,
 
-        [EnumMember(Value = @"explorer")]
-        Explorer,
+    [EnumMember(Value = @"expert")]
+    Expert,
 
-        [EnumMember(Value = @"farmer")]
-        Farmer,
+    [EnumMember(Value = @"explorer")]
+    Explorer,
 
-        [EnumMember(Value = @"feeder")]
-        Feeder,
+    [EnumMember(Value = @"farmer")]
+    Farmer,
 
-        [EnumMember(Value = @"fighter")]
-        Fighter,
+    [EnumMember(Value = @"feeder")]
+    Feeder,
 
-        [EnumMember(Value = @"fire")]
-        Fire,
+    [EnumMember(Value = @"fighter")]
+    Fighter,
 
-        [EnumMember(Value = @"firemaker")]
-        Firemaker,
+    [EnumMember(Value = @"fire")]
+    Fire,
 
-        [EnumMember(Value = @"firestarter")]
-        Firestarter,
+    [EnumMember(Value = @"firemaker")]
+    Firemaker,
 
-        [EnumMember(Value = @"fisher")]
-        Fisher,
+    [EnumMember(Value = @"firestarter")]
+    Firestarter,
 
-        [EnumMember(Value = @"fletcher")]
-        Fletcher,
+    [EnumMember(Value = @"fisher")]
+    Fisher,
 
-        [EnumMember(Value = @"forager")]
-        Forager,
+    [EnumMember(Value = @"fletcher")]
+    Fletcher,
 
-        [EnumMember(Value = @"fremennik")]
-        Fremennik,
+    [EnumMember(Value = @"forager")]
+    Forager,
 
-        [EnumMember(Value = @"gamer")]
-        Gamer,
+    [EnumMember(Value = @"fremennik")]
+    Fremennik,
 
-        [EnumMember(Value = @"gatherer")]
-        Gatherer,
+    [EnumMember(Value = @"gamer")]
+    Gamer,
 
-        [EnumMember(Value = @"general")]
-        General,
+    [EnumMember(Value = @"gatherer")]
+    Gatherer,
 
-        [EnumMember(Value = @"gnome child")]
-        GnomeChild,
+    [EnumMember(Value = @"general")]
+    General,
 
-        [EnumMember(Value = @"gnome elder")]
-        GnomeElder,
+    [EnumMember(Value = @"gnome child")]
+    GnomeChild,
 
-        [EnumMember(Value = @"goblin")]
-        Goblin,
+    [EnumMember(Value = @"gnome elder")]
+    GnomeElder,
 
-        [EnumMember(Value = @"gold")]
-        Gold,
+    [EnumMember(Value = @"goblin")]
+    Goblin,
 
-        [EnumMember(Value = @"goon")]
-        Goon,
+    [EnumMember(Value = @"gold")]
+    Gold,
 
-        [EnumMember(Value = @"green")]
-        Green,
+    [EnumMember(Value = @"goon")]
+    Goon,
 
-        [EnumMember(Value = @"grey")]
-        Grey,
+    [EnumMember(Value = @"green")]
+    Green,
 
-        [EnumMember(Value = @"guardian")]
-        Guardian,
+    [EnumMember(Value = @"grey")]
+    Grey,
 
-        [EnumMember(Value = @"guthixian")]
-        Guthixian,
+    [EnumMember(Value = @"guardian")]
+    Guardian,
 
-        [EnumMember(Value = @"harpoon")]
-        Harpoon,
+    [EnumMember(Value = @"guthixian")]
+    Guthixian,
 
-        [EnumMember(Value = @"healer")]
-        Healer,
+    [EnumMember(Value = @"harpoon")]
+    Harpoon,
 
-        [EnumMember(Value = @"hellcat")]
-        Hellcat,
+    [EnumMember(Value = @"healer")]
+    Healer,
 
-        [EnumMember(Value = @"helper")]
-        Helper,
+    [EnumMember(Value = @"hellcat")]
+    Hellcat,
 
-        [EnumMember(Value = @"herbologist")]
-        Herbologist,
+    [EnumMember(Value = @"helper")]
+    Helper,
 
-        [EnumMember(Value = @"hero")]
-        Hero,
+    [EnumMember(Value = @"herbologist")]
+    Herbologist,
 
-        [EnumMember(Value = @"holy")]
-        Holy,
+    [EnumMember(Value = @"hero")]
+    Hero,
 
-        [EnumMember(Value = @"hoarder")]
-        Hoarder,
+    [EnumMember(Value = @"holy")]
+    Holy,
 
-        [EnumMember(Value = @"hunter")]
-        Hunter,
+    [EnumMember(Value = @"hoarder")]
+    Hoarder,
 
-        [EnumMember(Value = @"ignitor")]
-        Ignitor,
+    [EnumMember(Value = @"hunter")]
+    Hunter,
 
-        [EnumMember(Value = @"illusionist")]
-        Illusionist,
+    [EnumMember(Value = @"ignitor")]
+    Ignitor,
 
-        [EnumMember(Value = @"imp")]
-        Imp,
+    [EnumMember(Value = @"illusionist")]
+    Illusionist,
 
-        [EnumMember(Value = @"infantry")]
-        Infantry,
+    [EnumMember(Value = @"imp")]
+    Imp,
 
-        [EnumMember(Value = @"inquisitor")]
-        Inquisitor,
+    [EnumMember(Value = @"infantry")]
+    Infantry,
 
-        [EnumMember(Value = @"iron")]
-        Iron,
+    [EnumMember(Value = @"inquisitor")]
+    Inquisitor,
 
-        [EnumMember(Value = @"jade")]
-        Jade,
+    [EnumMember(Value = @"iron")]
+    Iron,
 
-        [EnumMember(Value = @"justiciar")]
-        Justiciar,
+    [EnumMember(Value = @"jade")]
+    Jade,
 
-        [EnumMember(Value = @"kandarin")]
-        Kandarin,
+    [EnumMember(Value = @"justiciar")]
+    Justiciar,
 
-        [EnumMember(Value = @"karamjan")]
-        Karamjan,
+    [EnumMember(Value = @"kandarin")]
+    Kandarin,
 
-        [EnumMember(Value = @"kharidian")]
-        Kharidian,
+    [EnumMember(Value = @"karamjan")]
+    Karamjan,
 
-        [EnumMember(Value = @"kitten")]
-        Kitten,
+    [EnumMember(Value = @"kharidian")]
+    Kharidian,
 
-        [EnumMember(Value = @"knight")]
-        Knight,
+    [EnumMember(Value = @"kitten")]
+    Kitten,
 
-        [EnumMember(Value = @"labourer")]
-        Labourer,
+    [EnumMember(Value = @"knight")]
+    Knight,
 
-        [EnumMember(Value = @"law")]
-        Law,
+    [EnumMember(Value = @"labourer")]
+    Labourer,
 
-        [EnumMember(Value = @"learner")]
-        Learner,
+    [EnumMember(Value = @"law")]
+    Law,
 
-        [EnumMember(Value = @"legacy")]
-        Legacy,
+    [EnumMember(Value = @"learner")]
+    Learner,
 
-        [EnumMember(Value = @"legend")]
-        Legend,
+    [EnumMember(Value = @"legacy")]
+    Legacy,
 
-        [EnumMember(Value = @"legionnaire")]
-        Legionnaire,
+    [EnumMember(Value = @"legend")]
+    Legend,
 
-        [EnumMember(Value = @"lieutenant")]
-        Lieutenant,
+    [EnumMember(Value = @"legionnaire")]
+    Legionnaire,
 
-        [EnumMember(Value = @"looter")]
-        Looter,
+    [EnumMember(Value = @"lieutenant")]
+    Lieutenant,
 
-        [EnumMember(Value = @"lumberjack")]
-        Lumberjack,
+    [EnumMember(Value = @"looter")]
+    Looter,
 
-        [EnumMember(Value = @"magic")]
-        Magic,
+    [EnumMember(Value = @"lumberjack")]
+    Lumberjack,
 
-        [EnumMember(Value = @"magician")]
-        Magician,
+    [EnumMember(Value = @"magic")]
+    Magic,
 
-        [EnumMember(Value = @"major")]
-        Major,
+    [EnumMember(Value = @"magician")]
+    Magician,
 
-        [EnumMember(Value = @"maple")]
-        Maple,
+    [EnumMember(Value = @"major")]
+    Major,
 
-        [EnumMember(Value = @"marshal")]
-        Marshal,
+    [EnumMember(Value = @"maple")]
+    Maple,
 
-        [EnumMember(Value = @"master")]
-        Master,
+    [EnumMember(Value = @"marshal")]
+    Marshal,
 
-        [EnumMember(Value = @"maxed")]
-        Maxed,
+    [EnumMember(Value = @"master")]
+    Master,
 
-        [EnumMember(Value = @"mediator")]
-        Mediator,
+    [EnumMember(Value = @"maxed")]
+    Maxed,
 
-        [EnumMember(Value = @"medic")]
-        Medic,
+    [EnumMember(Value = @"mediator")]
+    Mediator,
 
-        [EnumMember(Value = @"mentor")]
-        Mentor,
+    [EnumMember(Value = @"medic")]
+    Medic,
 
-        [EnumMember(Value = @"merchant")]
-        Merchant,
+    [EnumMember(Value = @"mentor")]
+    Mentor,
 
-        [EnumMember(Value = @"mind")]
-        Mind,
+    [EnumMember(Value = @"merchant")]
+    Merchant,
 
-        [EnumMember(Value = @"miner")]
-        Miner,
+    [EnumMember(Value = @"mind")]
+    Mind,
 
-        [EnumMember(Value = @"minion")]
-        Minion,
+    [EnumMember(Value = @"miner")]
+    Miner,
 
-        [EnumMember(Value = @"misthalinian")]
-        Misthalinian,
+    [EnumMember(Value = @"minion")]
+    Minion,
 
-        [EnumMember(Value = @"mithril")]
-        Mithril,
+    [EnumMember(Value = @"misthalinian")]
+    Misthalinian,
 
-        [EnumMember(Value = @"moderator")]
-        Moderator,
+    [EnumMember(Value = @"mithril")]
+    Mithril,
 
-        [EnumMember(Value = @"monarch")]
-        Monarch,
+    [EnumMember(Value = @"moderator")]
+    Moderator,
 
-        [EnumMember(Value = @"morytanian")]
-        Morytanian,
+    [EnumMember(Value = @"monarch")]
+    Monarch,
 
-        [EnumMember(Value = @"mystic")]
-        Mystic,
+    [EnumMember(Value = @"morytanian")]
+    Morytanian,
 
-        [EnumMember(Value = @"myth")]
-        Myth,
+    [EnumMember(Value = @"mystic")]
+    Mystic,
 
-        [EnumMember(Value = @"natural")]
-        Natural,
+    [EnumMember(Value = @"myth")]
+    Myth,
 
-        [EnumMember(Value = @"nature")]
-        Nature,
+    [EnumMember(Value = @"natural")]
+    Natural,
 
-        [EnumMember(Value = @"necromancer")]
-        Necromancer,
+    [EnumMember(Value = @"nature")]
+    Nature,
 
-        [EnumMember(Value = @"ninja")]
-        Ninja,
+    [EnumMember(Value = @"necromancer")]
+    Necromancer,
 
-        [EnumMember(Value = @"noble")]
-        Noble,
+    [EnumMember(Value = @"ninja")]
+    Ninja,
 
-        [EnumMember(Value = @"novice")]
-        Novice,
+    [EnumMember(Value = @"noble")]
+    Noble,
 
-        [EnumMember(Value = @"nurse")]
-        Nurse,
+    [EnumMember(Value = @"novice")]
+    Novice,
 
-        [EnumMember(Value = @"oak")]
-        Oak,
+    [EnumMember(Value = @"nurse")]
+    Nurse,
 
-        [EnumMember(Value = @"officer")]
-        Officer,
+    [EnumMember(Value = @"oak")]
+    Oak,
 
-        [EnumMember(Value = @"onyx")]
-        Onyx,
+    [EnumMember(Value = @"officer")]
+    Officer,
 
-        [EnumMember(Value = @"opal")]
-        Opal,
+    [EnumMember(Value = @"onyx")]
+    Onyx,
 
-        [EnumMember(Value = @"oracle")]
-        Oracle,
+    [EnumMember(Value = @"opal")]
+    Opal,
 
-        [EnumMember(Value = @"orange")]
-        Orange,
+    [EnumMember(Value = @"oracle")]
+    Oracle,
 
-        [EnumMember(Value = @"owner")]
-        Owner,
+    [EnumMember(Value = @"orange")]
+    Orange,
 
-        [EnumMember(Value = @"page")]
-        Page,
+    [EnumMember(Value = @"owner")]
+    Owner,
 
-        [EnumMember(Value = @"paladin")]
-        Paladin,
+    [EnumMember(Value = @"page")]
+    Page,
 
-        [EnumMember(Value = @"pawn")]
-        Pawn,
+    [EnumMember(Value = @"paladin")]
+    Paladin,
 
-        [EnumMember(Value = @"pilgrim")]
-        Pilgrim,
+    [EnumMember(Value = @"pawn")]
+    Pawn,
 
-        [EnumMember(Value = @"pine")]
-        Pine,
+    [EnumMember(Value = @"pilgrim")]
+    Pilgrim,
 
-        [EnumMember(Value = @"pink")]
-        Pink,
+    [EnumMember(Value = @"pine")]
+    Pine,
 
-        [EnumMember(Value = @"prefect")]
-        Prefect,
+    [EnumMember(Value = @"pink")]
+    Pink,
 
-        [EnumMember(Value = @"priest")]
-        Priest,
+    [EnumMember(Value = @"prefect")]
+    Prefect,
 
-        [EnumMember(Value = @"private")]
-        Private,
+    [EnumMember(Value = @"priest")]
+    Priest,
 
-        [EnumMember(Value = @"prodigy")]
-        Prodigy,
+    [EnumMember(Value = @"private")]
+    Private,
 
-        [EnumMember(Value = @"proselyte")]
-        Proselyte,
+    [EnumMember(Value = @"prodigy")]
+    Prodigy,
 
-        [EnumMember(Value = @"prospector")]
-        Prospector,
+    [EnumMember(Value = @"proselyte")]
+    Proselyte,
 
-        [EnumMember(Value = @"protector")]
-        Protector,
+    [EnumMember(Value = @"prospector")]
+    Prospector,
 
-        [EnumMember(Value = @"pure")]
-        Pure,
+    [EnumMember(Value = @"protector")]
+    Protector,
 
-        [EnumMember(Value = @"purple")]
-        Purple,
+    [EnumMember(Value = @"pure")]
+    Pure,
 
-        [EnumMember(Value = @"pyromancer")]
-        Pyromancer,
+    [EnumMember(Value = @"purple")]
+    Purple,
 
-        [EnumMember(Value = @"quester")]
-        Quester,
+    [EnumMember(Value = @"pyromancer")]
+    Pyromancer,
 
-        [EnumMember(Value = @"racer")]
-        Racer,
+    [EnumMember(Value = @"quester")]
+    Quester,
 
-        [EnumMember(Value = @"raider")]
-        Raider,
+    [EnumMember(Value = @"racer")]
+    Racer,
 
-        [EnumMember(Value = @"ranger")]
-        Ranger,
+    [EnumMember(Value = @"raider")]
+    Raider,
 
-        [EnumMember(Value = @"record-chaser")]
-        RecordChaser,
+    [EnumMember(Value = @"ranger")]
+    Ranger,
 
-        [EnumMember(Value = @"recruit")]
-        Recruit,
+    [EnumMember(Value = @"record-chaser")]
+    RecordChaser,
 
-        [EnumMember(Value = @"recruiter")]
-        Recruiter,
+    [EnumMember(Value = @"recruit")]
+    Recruit,
 
-        [EnumMember(Value = @"red topaz")]
-        RedTopaz,
+    [EnumMember(Value = @"recruiter")]
+    Recruiter,
 
-        [EnumMember(Value = @"red")]
-        Red,
+    [EnumMember(Value = @"red topaz")]
+    RedTopaz,
 
-        [EnumMember(Value = @"rogue")]
-        Rogue,
+    [EnumMember(Value = @"red")]
+    Red,
 
-        [EnumMember(Value = @"ruby")]
-        Ruby,
+    [EnumMember(Value = @"rogue")]
+    Rogue,
 
-        [EnumMember(Value = @"rune")]
-        Rune,
+    [EnumMember(Value = @"ruby")]
+    Ruby,
 
-        [EnumMember(Value = @"runecrafter")]
-        Runecrafter,
+    [EnumMember(Value = @"rune")]
+    Rune,
 
-        [EnumMember(Value = @"sage")]
-        Sage,
+    [EnumMember(Value = @"runecrafter")]
+    Runecrafter,
 
-        [EnumMember(Value = @"sapphire")]
-        Sapphire,
+    [EnumMember(Value = @"sage")]
+    Sage,
 
-        [EnumMember(Value = @"saradominist")]
-        Saradominist,
+    [EnumMember(Value = @"sapphire")]
+    Sapphire,
 
-        [EnumMember(Value = @"saviour")]
-        Saviour,
+    [EnumMember(Value = @"saradominist")]
+    Saradominist,
 
-        [EnumMember(Value = @"scavenger")]
-        Scavenger,
+    [EnumMember(Value = @"saviour")]
+    Saviour,
 
-        [EnumMember(Value = @"scholar")]
-        Scholar,
+    [EnumMember(Value = @"scavenger")]
+    Scavenger,
 
-        [EnumMember(Value = @"scourge")]
-        Scourge,
+    [EnumMember(Value = @"scholar")]
+    Scholar,
 
-        [EnumMember(Value = @"scout")]
-        Scout,
+    [EnumMember(Value = @"scourge")]
+    Scourge,
 
-        [EnumMember(Value = @"scribe")]
-        Scribe,
+    [EnumMember(Value = @"scout")]
+    Scout,
 
-        [EnumMember(Value = @"seer")]
-        Seer,
+    [EnumMember(Value = @"scribe")]
+    Scribe,
 
-        [EnumMember(Value = @"senator")]
-        Senator,
+    [EnumMember(Value = @"seer")]
+    Seer,
 
-        [EnumMember(Value = @"sentry")]
-        Sentry,
+    [EnumMember(Value = @"senator")]
+    Senator,
 
-        [EnumMember(Value = @"serenist")]
-        Serenist,
+    [EnumMember(Value = @"sentry")]
+    Sentry,
 
-        [EnumMember(Value = @"sergeant")]
-        Sergeant,
+    [EnumMember(Value = @"serenist")]
+    Serenist,
 
-        [EnumMember(Value = @"shaman")]
-        Shaman,
+    [EnumMember(Value = @"sergeant")]
+    Sergeant,
 
-        [EnumMember(Value = @"sheriff")]
-        Sheriff,
+    [EnumMember(Value = @"shaman")]
+    Shaman,
 
-        [EnumMember(Value = @"short green guy")]
-        ShortGreenGuy,
+    [EnumMember(Value = @"sheriff")]
+    Sheriff,
 
-        [EnumMember(Value = @"skiller")]
-        Skiller,
+    [EnumMember(Value = @"short green guy")]
+    ShortGreenGuy,
 
-        [EnumMember(Value = @"skulled")]
-        Skulled,
+    [EnumMember(Value = @"skiller")]
+    Skiller,
 
-        [EnumMember(Value = @"slayer")]
-        Slayer,
+    [EnumMember(Value = @"skulled")]
+    Skulled,
 
-        [EnumMember(Value = @"smiter")]
-        Smiter,
+    [EnumMember(Value = @"slayer")]
+    Slayer,
 
-        [EnumMember(Value = @"smith")]
-        Smith,
+    [EnumMember(Value = @"smiter")]
+    Smiter,
 
-        [EnumMember(Value = @"smuggler")]
-        Smuggler,
+    [EnumMember(Value = @"smith")]
+    Smith,
 
-        [EnumMember(Value = @"sniper")]
-        Sniper,
+    [EnumMember(Value = @"smuggler")]
+    Smuggler,
 
-        [EnumMember(Value = @"soul")]
-        Soul,
+    [EnumMember(Value = @"sniper")]
+    Sniper,
 
-        [EnumMember(Value = @"specialist")]
-        Specialist,
+    [EnumMember(Value = @"soul")]
+    Soul,
 
-        [EnumMember(Value = @"speed-runner")]
-        SpeedRunner,
+    [EnumMember(Value = @"specialist")]
+    Specialist,
 
-        [EnumMember(Value = @"spellcaster")]
-        Spellcaster,
+    [EnumMember(Value = @"speed-runner")]
+    SpeedRunner,
 
-        [EnumMember(Value = @"squire")]
-        Squire,
+    [EnumMember(Value = @"spellcaster")]
+    Spellcaster,
 
-        [EnumMember(Value = @"staff")]
-        Staff,
+    [EnumMember(Value = @"squire")]
+    Squire,
 
-        [EnumMember(Value = @"steel")]
-        Steel,
+    [EnumMember(Value = @"staff")]
+    Staff,
 
-        [EnumMember(Value = @"strider")]
-        Strider,
+    [EnumMember(Value = @"steel")]
+    Steel,
 
-        [EnumMember(Value = @"striker")]
-        Striker,
+    [EnumMember(Value = @"strider")]
+    Strider,
 
-        [EnumMember(Value = @"summoner")]
-        Summoner,
+    [EnumMember(Value = @"striker")]
+    Striker,
 
-        [EnumMember(Value = @"superior")]
-        Superior,
+    [EnumMember(Value = @"summoner")]
+    Summoner,
 
-        [EnumMember(Value = @"supervisor")]
-        Supervisor,
+    [EnumMember(Value = @"superior")]
+    Superior,
 
-        [EnumMember(Value = @"teacher")]
-        Teacher,
+    [EnumMember(Value = @"supervisor")]
+    Supervisor,
 
-        [EnumMember(Value = @"templar")]
-        Templar,
+    [EnumMember(Value = @"teacher")]
+    Teacher,
 
-        [EnumMember(Value = @"therapist")]
-        Therapist,
+    [EnumMember(Value = @"templar")]
+    Templar,
 
-        [EnumMember(Value = @"thief")]
-        Thief,
+    [EnumMember(Value = @"therapist")]
+    Therapist,
 
-        [EnumMember(Value = @"tirannian")]
-        Tirannian,
+    [EnumMember(Value = @"thief")]
+    Thief,
 
-        [EnumMember(Value = @"trialist")]
-        Trialist,
+    [EnumMember(Value = @"tirannian")]
+    Tirannian,
 
-        [EnumMember(Value = @"trickster")]
-        Trickster,
+    [EnumMember(Value = @"trialist")]
+    Trialist,
 
-        [EnumMember(Value = @"tzkal")]
-        Tzkal,
+    [EnumMember(Value = @"trickster")]
+    Trickster,
 
-        [EnumMember(Value = @"tztok")]
-        Tztok,
+    [EnumMember(Value = @"tzkal")]
+    Tzkal,
 
-        [EnumMember(Value = @"unholy")]
-        Unholy,
+    [EnumMember(Value = @"tztok")]
+    Tztok,
 
-        [EnumMember(Value = @"vagrant")]
-        Vagrant,
+    [EnumMember(Value = @"unholy")]
+    Unholy,
 
-        [EnumMember(Value = @"vanguard")]
-        Vanguard,
+    [EnumMember(Value = @"vagrant")]
+    Vagrant,
 
-        [EnumMember(Value = @"walker")]
-        Walker,
+    [EnumMember(Value = @"vanguard")]
+    Vanguard,
 
-        [EnumMember(Value = @"wanderer")]
-        Wanderer,
+    [EnumMember(Value = @"walker")]
+    Walker,
 
-        [EnumMember(Value = @"warden")]
-        Warden,
+    [EnumMember(Value = @"wanderer")]
+    Wanderer,
 
-        [EnumMember(Value = @"warlock")]
-        Warlock,
+    [EnumMember(Value = @"warden")]
+    Warden,
 
-        [EnumMember(Value = @"warrior")]
-        Warrior,
+    [EnumMember(Value = @"warlock")]
+    Warlock,
 
-        [EnumMember(Value = @"water")]
-        Water,
+    [EnumMember(Value = @"warrior")]
+    Warrior,
 
-        [EnumMember(Value = @"wild")]
-        Wild,
+    [EnumMember(Value = @"water")]
+    Water,
 
-        [EnumMember(Value = @"willow")]
-        Willow,
+    [EnumMember(Value = @"wild")]
+    Wild,
 
-        [EnumMember(Value = @"wily")]
-        Wily,
+    [EnumMember(Value = @"willow")]
+    Willow,
 
-        [EnumMember(Value = @"wintumber")]
-        Wintumber,
+    [EnumMember(Value = @"wily")]
+    Wily,
 
-        [EnumMember(Value = @"witch")]
-        Witch,
+    [EnumMember(Value = @"wintumber")]
+    Wintumber,
 
-        [EnumMember(Value = @"wizard")]
-        Wizard,
+    [EnumMember(Value = @"witch")]
+    Witch,
 
-        [EnumMember(Value = @"worker")]
-        Worker,
+    [EnumMember(Value = @"wizard")]
+    Wizard,
 
-        [EnumMember(Value = @"wrath")]
-        Wrath,
+    [EnumMember(Value = @"worker")]
+    Worker,
 
-        [EnumMember(Value = @"xerician")]
-        Xerician,
+    [EnumMember(Value = @"wrath")]
+    Wrath,
 
-        [EnumMember(Value = @"yellow")]
-        Yellow,
+    [EnumMember(Value = @"xerician")]
+    Xerician,
 
-        [EnumMember(Value = @"yew")]
-        Yew,
+    [EnumMember(Value = @"yellow")]
+    Yellow,
 
-        [EnumMember(Value = @"zamorakian")]
-        Zamorakian,
+    [EnumMember(Value = @"yew")]
+    Yew,
 
-        [EnumMember(Value = @"zarosian")]
-        Zarosian,
+    [EnumMember(Value = @"zamorakian")]
+    Zamorakian,
 
-        [EnumMember(Value = @"zealot")]
-        Zealot,
+    [EnumMember(Value = @"zarosian")]
+    Zarosian,
 
-        [EnumMember(Value = @"zenyte")]
-        Zenyte
-    }
+    [EnumMember(Value = @"zealot")]
+    Zealot,
+
+    [EnumMember(Value = @"zenyte")]
+    Zenyte
 }

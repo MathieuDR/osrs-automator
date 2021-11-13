@@ -8,70 +8,70 @@ using WiseOldManConnectorTests.Fixtures;
 using Xunit;
 using Record = WiseOldManConnector.Models.Output.Record;
 
-namespace WiseOldManConnectorTests.Connectors {
-    public class RecordConnectorTests : ConnectorTests {
-        private readonly IWiseOldManRecordApi _recordApi;
+namespace WiseOldManConnectorTests.Connectors; 
 
-        public RecordConnectorTests(ApiFixture fixture) : base(fixture) {
-            _recordApi = fixture.ServiceProvider.GetService<IWiseOldManRecordApi>();
+public class RecordConnectorTests : ConnectorTests {
+    private readonly IWiseOldManRecordApi _recordApi;
+
+    public RecordConnectorTests(ApiFixture fixture) : base(fixture) {
+        _recordApi = fixture.ServiceProvider.GetService<IWiseOldManRecordApi>();
+    }
+
+    [Theory]
+    [InlineData(Period.Week, null)]
+    [InlineData(Period.Week, PlayerType.IronMan)]
+    public async Task RecordsByParametersResultsInCollectionOf20Records(Period period, PlayerType? playerType) {
+        var metric = MetricType.TheCorruptedGauntlet;
+
+        ConnectorCollectionResponse<Record> response = null;
+        if (playerType.HasValue) {
+            response = await _recordApi.View(metric, period, playerType.Value);
+        } else {
+            response = await _recordApi.View(metric, period);
         }
 
-        [Theory]
-        [InlineData(Period.Week, null)]
-        [InlineData(Period.Week, PlayerType.IronMan)]
-        public async Task RecordsByParametersResultsInCollectionOf20Records(Period period, PlayerType? playerType) {
-            var metric = MetricType.TheCorruptedGauntlet;
+        Assert.NotNull(response);
+        Assert.Equal(20, response.Data.Count());
+    }
 
-            ConnectorCollectionResponse<Record> response = null;
-            if (playerType.HasValue) {
-                response = await _recordApi.View(metric, period, playerType.Value);
-            } else {
-                response = await _recordApi.View(metric, period);
-            }
+    [Fact]
+    public async Task RecordByPeriodOnlyResultsOfSaidPeriod() {
+        var metric = MetricType.Overall;
+        var period = Period.Week;
 
-            Assert.NotNull(response);
-            Assert.Equal(20, response.Data.Count());
-        }
+        var response = await _recordApi.View(metric, period);
 
-        [Fact]
-        public async Task RecordByPeriodOnlyResultsOfSaidPeriod() {
-            var metric = MetricType.Overall;
-            var period = Period.Week;
+        Assert.NotNull(response);
+        Assert.NotEmpty(response.Data);
 
-            var response = await _recordApi.View(metric, period);
+        Assert.Empty(response.Data.Where(x => x.Period != period));
+    }
 
-            Assert.NotNull(response);
-            Assert.NotEmpty(response.Data);
+    [Fact]
+    public async Task RecordByPlayerTypeOnlyResultsOfSaidPlayerType() {
+        var metric = MetricType.Agility;
+        var type = PlayerType.HardcoreIronMan;
+        var period = Period.Month;
 
-            Assert.Empty(response.Data.Where(x => x.Period != period));
-        }
+        var response = await _recordApi.View(metric, period, type);
 
-        [Fact]
-        public async Task RecordByPlayerTypeOnlyResultsOfSaidPlayerType() {
-            var metric = MetricType.Agility;
-            var type = PlayerType.HardcoreIronMan;
-            var period = Period.Month;
+        Assert.NotNull(response);
+        Assert.NotEmpty(response.Data);
 
-            var response = await _recordApi.View(metric, period, type);
+        Assert.Empty(response.Data.Where(x => x.Player.Type != type));
+    }
 
-            Assert.NotNull(response);
-            Assert.NotEmpty(response.Data);
+    [Fact]
+    public async Task RecordByParametersResultInRecordsWithDisplayName() {
+        var metric = MetricType.Agility;
+        var type = PlayerType.HardcoreIronMan;
+        var period = Period.Month;
 
-            Assert.Empty(response.Data.Where(x => x.Player.Type != type));
-        }
+        var response = await _recordApi.View(metric, period, type);
 
-        [Fact]
-        public async Task RecordByParametersResultInRecordsWithDisplayName() {
-            var metric = MetricType.Agility;
-            var type = PlayerType.HardcoreIronMan;
-            var period = Period.Month;
+        Assert.NotNull(response);
+        Assert.NotEmpty(response.Data);
 
-            var response = await _recordApi.View(metric, period, type);
-
-            Assert.NotNull(response);
-            Assert.NotEmpty(response.Data);
-
-            Assert.Empty(response.Data.Where(x => string.IsNullOrWhiteSpace(x.Player.DisplayName)));
-        }
+        Assert.Empty(response.Data.Where(x => string.IsNullOrWhiteSpace(x.Player.DisplayName)));
     }
 }

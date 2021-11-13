@@ -2,33 +2,33 @@
 using System.Collections.Generic;
 using Newtonsoft.Json;
 
-namespace WiseOldManConnector.Models.API.Responses {
-    internal class CreateGroupCompetitionResult : BaseResponse {
-        [JsonProperty("id")]
-        public int Id { get; set; }
+namespace WiseOldManConnector.Models.API.Responses; 
 
-        [JsonProperty("title")]
-        public string Title { get; set; }
+internal class CreateGroupCompetitionResult : BaseResponse {
+    [JsonProperty("id")]
+    public int Id { get; set; }
 
-        [JsonProperty("metric")]
-        public string Metric { get; set; }
+    [JsonProperty("title")]
+    public string Title { get; set; }
 
-        [JsonProperty("verificationCode")]
-        public string VerificationCode { get; set; }
+    [JsonProperty("metric")]
+    public string Metric { get; set; }
 
-        [JsonProperty("startsAt")]
-        public DateTime StartsAt { get; set; }
+    [JsonProperty("verificationCode")]
+    public string VerificationCode { get; set; }
 
-        [JsonProperty("endsAt")]
-        public DateTime EndsAt { get; set; }
+    [JsonProperty("startsAt")]
+    public DateTime StartsAt { get; set; }
 
-        [JsonProperty("updatedAt")]
-        public DateTime UpdatedAt { get; set; }
+    [JsonProperty("endsAt")]
+    public DateTime EndsAt { get; set; }
 
-        [JsonProperty("createdAt")]
-        public DateTime CreatedAt { get; set; }
+    [JsonProperty("updatedAt")]
+    public DateTime UpdatedAt { get; set; }
 
-        [JsonProperty("participants")]
-        public IList<Participant> Participants { get; set; }
-    }
+    [JsonProperty("createdAt")]
+    public DateTime CreatedAt { get; set; }
+
+    [JsonProperty("participants")]
+    public IList<Participant> Participants { get; set; }
 }

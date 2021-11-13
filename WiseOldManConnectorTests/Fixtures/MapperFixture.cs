@@ -1,11 +1,11 @@
 ﻿using AutoMapper;
 
-namespace WiseOldManConnectorTests.Fixtures {
-    public class MapperFixture {
-        public MapperFixture() {
-            Mapper = WiseOldManConnector.Transformers.Configuration.GetMapper();
-        }
+namespace WiseOldManConnectorTests.Fixtures; 
 
-        public Mapper Mapper { get; set; }
+public class MapperFixture {
+    public MapperFixture() {
+        Mapper = WiseOldManConnector.Transformers.Configuration.GetMapper();
     }
+
+    public Mapper Mapper { get; set; }
 }

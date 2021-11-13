@@ -2,32 +2,32 @@
 using System.Collections.Generic;
 using Newtonsoft.Json;
 
-namespace WiseOldManConnector.Models.Requests {
-    public class CreateGroupRequest {
-        public CreateGroupRequest(string name) : this(name, null, null) { }
+namespace WiseOldManConnector.Models.Requests; 
 
-        public CreateGroupRequest(string name, string clanChat) : this(name, clanChat, null) { }
+public class CreateGroupRequest {
+    public CreateGroupRequest(string name) : this(name, null, null) { }
 
-        public CreateGroupRequest(string name, IEnumerable<MemberRequest> members) : this(name, null, members) { }
+    public CreateGroupRequest(string name, string clanChat) : this(name, clanChat, null) { }
 
-        public CreateGroupRequest(string name, string clanChat, IEnumerable<MemberRequest> members) {
-            if (string.IsNullOrWhiteSpace(name)) {
-                throw new ArgumentException("name cannot be null or empty");
-            }
+    public CreateGroupRequest(string name, IEnumerable<MemberRequest> members) : this(name, null, members) { }
 
-            Name = name;
-            ClanChat = clanChat;
-            Members = members;
+    public CreateGroupRequest(string name, string clanChat, IEnumerable<MemberRequest> members) {
+        if (string.IsNullOrWhiteSpace(name)) {
+            throw new ArgumentException("name cannot be null or empty");
         }
 
-
-        [JsonProperty("name")]
-        public string Name { get; set; }
-
-        [JsonProperty("clanChat")]
-        public string ClanChat { get; set; }
-
-        [JsonProperty("members")]
-        public IEnumerable<MemberRequest> Members { get; set; }
+        Name = name;
+        ClanChat = clanChat;
+        Members = members;
     }
+
+
+    [JsonProperty("name")]
+    public string Name { get; set; }
+
+    [JsonProperty("clanChat")]
+    public string ClanChat { get; set; }
+
+    [JsonProperty("members")]
+    public IEnumerable<MemberRequest> Members { get; set; }
 }

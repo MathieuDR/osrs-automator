@@ -1,77 +1,70 @@
-using System;
-using System.Threading;
-using System.Threading.Tasks;
-using Discord;
-using Discord.WebSocket;
 using DiscordBot.Commands.Interactive;
 using DiscordBot.Configuration;
-using DiscordBot.Models.Contexts;
 using DiscordBot.Services;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Logging;
 using Quartz;
 
-namespace DiscordBot {
-    public class DiscordBot : BackgroundService {
-        private readonly IConfiguration _config;
-        private readonly ILogger<DiscordBot> _logger;
-        private readonly IServiceProvider _services;
-        private DiscordSocketClient _client;
+namespace DiscordBot; 
 
-        public DiscordBot(IConfiguration config, IServiceProvider services, ILogger<DiscordBot> logger) {
-            _config = config;
-            _services = services;
-            _logger = logger;
-        }
+public class DiscordBot : BackgroundService {
+    private readonly IConfiguration _config;
+    private readonly ILogger<DiscordBot> _logger;
+    private readonly IServiceProvider _services;
+    private DiscordSocketClient _client;
 
-        public async Task Run(CancellationToken stoppingToken) {
-            var discordTask = ConfigureDiscord();
-            var schedulerTask = ConfigureScheduler();
+    public DiscordBot(IConfiguration config, IServiceProvider services, ILogger<DiscordBot> logger) {
+        _config = config;
+        _services = services;
+        _logger = logger;
+    }
 
-            await discordTask;
-            await schedulerTask;
+    public async Task Run(CancellationToken stoppingToken) {
+        var discordTask = ConfigureDiscord();
+        var schedulerTask = ConfigureScheduler();
 
-            await Task.Delay(-1, stoppingToken);
-        }
+        await discordTask;
+        await schedulerTask;
 
-        private async Task ConfigureScheduler() {
-            var factory = _services.GetRequiredService<ISchedulerFactory>();
-            var scheduler = await factory.GetScheduler();
-            await scheduler.Start();
-        }
+        await Task.Delay(-1, stoppingToken);
+    }
 
-        private async Task ConfigureDiscord() {
-            _client = _services.GetRequiredService<DiscordSocketClient>();
-            await ((CommandHandlingService) _services.GetRequiredService(typeof(CommandHandlingService)))
-                .InitializeAsync(_services);
+    private async Task ConfigureScheduler() {
+        var factory = _services.GetRequiredService<ISchedulerFactory>();
+        var scheduler = await factory.GetScheduler();
+        await scheduler.Start();
+    }
+
+    private async Task ConfigureDiscord() {
+        _client = _services.GetRequiredService<DiscordSocketClient>();
+        await ((CommandHandlingService) _services.GetRequiredService(typeof(CommandHandlingService)))
+            .InitializeAsync(_services);
             
-            await ((InteractiveCommandHandlerService) _services.GetRequiredService(typeof(InteractiveCommandHandlerService)))
-                .SetupAsync();
+        await ((InteractiveCommandHandlerService) _services.GetRequiredService(typeof(InteractiveCommandHandlerService)))
+            .SetupAsync();
 
-            var botConfig = _config.GetSection("Bot").Get<BotConfiguration>();
+        var botConfig = _config.GetSection("Bot").Get<BotConfiguration>();
 
 
-            //_client.InteractionCreated += ClientOnInteractionCreated;
-            await _client.LoginAsync(TokenType.Bot, botConfig.Token);
-            await _client.StartAsync();
-        }
+        //_client.InteractionCreated += ClientOnInteractionCreated;
+        await _client.LoginAsync(TokenType.Bot, botConfig.Token);
+        await _client.StartAsync();
+    }
 
-        private async Task ClientOnInteractionCreated(SocketInteraction arg) {
-            if (arg is SocketSlashCommand command) {
-                // Let's add a switch statement for the command name so we can handle multiple commands in one event.
-                switch (command.Data.Name) {
-                    case "ping":
-                        var handler = _services.GetRequiredService<PingApplicationCommandHandler>();
-                        await handler.HandleCommandAsync(new ApplicationCommandContext(command, _services));
-                        break;
-                }
+    private async Task ClientOnInteractionCreated(SocketInteraction arg) {
+        if (arg is SocketSlashCommand command) {
+            // Let's add a switch statement for the command name so we can handle multiple commands in one event.
+            switch (command.Data.Name) {
+                case "ping":
+                    var handler = _services.GetRequiredService<PingApplicationCommandHandler>();
+                    await handler.HandleCommandAsync(new ApplicationCommandContext(command, _services));
+                    break;
             }
         }
+    }
 
-        protected override Task ExecuteAsync(CancellationToken stoppingToken) {
-            return Run(stoppingToken);
-        }
+    protected override Task ExecuteAsync(CancellationToken stoppingToken) {
+        return Run(stoppingToken);
     }
 }

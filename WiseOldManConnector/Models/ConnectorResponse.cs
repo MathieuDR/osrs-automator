@@ -1,11 +1,11 @@
-﻿namespace WiseOldManConnector.Models {
-    public class ConnectorResponse<T> : ConnectorResponseBase {
-        internal ConnectorResponse(T data) : this(data, null) { }
+﻿namespace WiseOldManConnector.Models; 
 
-        internal ConnectorResponse(T data, string message) : base(message) {
-            Data = data;
-        }
+public class ConnectorResponse<T> : ConnectorResponseBase {
+    internal ConnectorResponse(T data) : this(data, null) { }
 
-        public T Data { get; set; }
+    internal ConnectorResponse(T data, string message) : base(message) {
+        Data = data;
     }
+
+    public T Data { get; set; }
 }

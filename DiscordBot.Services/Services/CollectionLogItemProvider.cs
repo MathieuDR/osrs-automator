@@ -8,50 +8,50 @@ using DiscordBot.Services.Parsers;
 using FluentResults;
 using Microsoft.Extensions.Logging;
 
-namespace DiscordBot.Services.Services {
-    internal class CollectionLogItemProvider : BaseService, ICollectionLogItemProvider {
-        private const string PageTitle = "Collection log";
-        private readonly IOsrsWikiApi _wikiApi;
+namespace DiscordBot.Services.Services; 
 
-        private IEnumerable<string> _collectionLogItems;
+internal class CollectionLogItemProvider : BaseService, ICollectionLogItemProvider {
+    private const string PageTitle = "Collection log";
+    private readonly IOsrsWikiApi _wikiApi;
 
-        public CollectionLogItemProvider(ILogger<CollectionLogItemProvider> logger, IOsrsWikiApi wikiApi) : base(logger) {
-            _wikiApi = wikiApi;
-        }
+    private IEnumerable<string> _collectionLogItems;
 
-        public async ValueTask<Result<IEnumerable<string>>> GetCollectionLogItemNames() {
-            if (_collectionLogItems is null) {
-                var wikiResult = await GetItemsFromApi();
-                if (wikiResult.IsFailed) {
-                    return wikiResult;
-                }
+    public CollectionLogItemProvider(ILogger<CollectionLogItemProvider> logger, IOsrsWikiApi wikiApi) : base(logger) {
+        _wikiApi = wikiApi;
+    }
 
-                _collectionLogItems = wikiResult.Value;
+    public async ValueTask<Result<IEnumerable<string>>> GetCollectionLogItemNames() {
+        if (_collectionLogItems is null) {
+            var wikiResult = await GetItemsFromApi();
+            if (wikiResult.IsFailed) {
+                return wikiResult;
             }
 
-            return Result.Ok(_collectionLogItems);
+            _collectionLogItems = wikiResult.Value;
         }
 
-        public Result ResetCache() {
-            _collectionLogItems = null;
-            return Result.Ok();
+        return Result.Ok(_collectionLogItems);
+    }
+
+    public Result ResetCache() {
+        _collectionLogItems = null;
+        return Result.Ok();
+    }
+
+    private async Task<Result<IEnumerable<string>>> GetItemsFromApi() {
+        var queryResult = await _wikiApi.GetPage(PageTitle);
+
+        var page = queryResult.Query.Pages.FirstOrDefault();
+        if (page.Equals(default(KeyValuePair<string, Page>))) {
+            return Result.Fail("No pages in api request");
         }
 
-        private async Task<Result<IEnumerable<string>>> GetItemsFromApi() {
-            var queryResult = await _wikiApi.GetPage(PageTitle);
+        var revision = page.Value.Revisions.FirstOrDefault();
 
-            var page = queryResult.Query.Pages.FirstOrDefault();
-            if (page.Equals(default(KeyValuePair<string, Page>))) {
-                return Result.Fail("No pages in api request");
-            }
-
-            var revision = page.Value.Revisions.FirstOrDefault();
-
-            if (revision is null) {
-                return Result.Fail("No revision in page in api request");
-            }
-
-            return MediaWikiContentToItemsParser.GetItems(revision.Content);
+        if (revision is null) {
+            return Result.Fail("No revision in page in api request");
         }
+
+        return MediaWikiContentToItemsParser.GetItems(revision.Content);
     }
 }

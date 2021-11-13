@@ -1,34 +1,42 @@
-using System;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Hosting;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Hosting;
+using Dashboard;
+using Microsoft.AspNetCore.Components;
+using Microsoft.AspNetCore.Components.Web;
+using Microsoft.AspNetCore.Mvc.ApiExplorer;
 using Serilog;
+using Serilog.Events;
+using Serilog.Formatting.Json;
 
-namespace Dashboard {
-    public class Program {
-        public static async Task Main(string[] args) {
-            Startup.CreateLogger();
-            try {
-                Log.Information("Starting web host");
-                await CreateHostBuilder(args).Build().RunAsync();
-            } catch (Exception e) {
-                Log.Fatal(e, "FATAL ERROR: ");
-            }
-            finally {
-                Log.CloseAndFlush();
-            }
-        }
+// Creates logger
+CreateLogger();
+try {
+    var builder = WebApplication.CreateBuilder(args);
 
-        private static IHostBuilder CreateHostBuilder(string[] args) {
-            return Host.CreateDefaultBuilder(args)
-                    .UseSerilog()
-                    .ConfigureWebHostDefaults(webBuilder => {
-                        webBuilder.UseStartup<Startup>();
-                        webBuilder.UseUrls("http://*:5829");
-                    })
-                    .ConfigureServices((context, collection) => { collection.AddHostedService<DiscordBot.DiscordBot>(); })
-                ;
-        }
-    }
+    // Serilog
+    builder.WebHost.UseSerilog();
+
+    // Add services to the container.
+    StartupHelper.ConfigureServices(builder.Services, builder.Configuration);
+    builder.WebHost.UseUrls("http://*:5829");
+    
+    //Add bot as hosted service
+    builder.Services.AddHostedService<DiscordBot.DiscordBot>();
+
+    var app = builder.Build();
+    StartupHelper.ConfigurePipeline(app, app.Environment, app.Services.GetRequiredService<IApiVersionDescriptionProvider>(), builder.Configuration);
+    
+    app.Run();
+} catch (Exception e) {
+    Log.Fatal(e, "FATAL ERROR: ");
+} finally {
+    Log.CloseAndFlush();
+}
+
+static void CreateLogger() {
+    Log.Logger = new LoggerConfiguration()
+        .Enrich.FromLogContext()
+        .MinimumLevel
+        .Debug()
+        .WriteTo.File(new JsonFormatter(), "logs/web.log", rollingInterval: RollingInterval.Day)
+        .WriteTo.Console(LogEventLevel.Information)
+        .CreateLogger();
 }

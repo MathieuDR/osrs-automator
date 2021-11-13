@@ -1,19 +1,19 @@
 ﻿using System.Runtime.Serialization;
 
-namespace WiseOldManConnector.Models.WiseOldMan.Enums {
-    public enum PlayerType {
-        Unknown = 0,
+namespace WiseOldManConnector.Models.WiseOldMan.Enums; 
 
-        [EnumMember(Value = "regular")]
-        Regular = 1,
+public enum PlayerType {
+    Unknown = 0,
 
-        [EnumMember(Value = "ironman")]
-        IronMan,
+    [EnumMember(Value = "regular")]
+    Regular = 1,
 
-        [EnumMember(Value = "hardcore")]
-        HardcoreIronMan,
+    [EnumMember(Value = "ironman")]
+    IronMan,
 
-        [EnumMember(Value = "ultimate")]
-        UltimateIronMan
-    }
+    [EnumMember(Value = "hardcore")]
+    HardcoreIronMan,
+
+    [EnumMember(Value = "ultimate")]
+    UltimateIronMan
 }

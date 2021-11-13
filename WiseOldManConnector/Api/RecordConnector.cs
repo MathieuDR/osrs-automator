@@ -7,44 +7,44 @@ using WiseOldManConnector.Models.API.Responses;
 using WiseOldManConnector.Models.Output;
 using WiseOldManConnector.Models.WiseOldMan.Enums;
 
-namespace WiseOldManConnector.Api {
-    internal class RecordConnector : BaseConnecter, IWiseOldManRecordApi {
-        public RecordConnector(IServiceProvider provider) : base(provider) {
-            Area = "records";
+namespace WiseOldManConnector.Api; 
+
+internal class RecordConnector : BaseConnecter, IWiseOldManRecordApi {
+    public RecordConnector(IServiceProvider provider) : base(provider) {
+        Area = "records";
+    }
+
+    protected override string Area { get; }
+
+
+    public Task<ConnectorCollectionResponse<Record>> View(MetricType metric, Period period) {
+        return QueryRecords(metric, period);
+    }
+
+    public Task<ConnectorCollectionResponse<Record>> View(MetricType metric, Period period, PlayerType playerType) {
+        return QueryRecords(metric, period, playerType);
+    }
+
+
+    private async Task<ConnectorCollectionResponse<Record>> QueryRecords(MetricType metric, Period period,
+        PlayerType? playerType = null) {
+        var request = GetNewRestRequest("/leaderboard");
+
+        request.AddParameter("metric", metric.GetEnumValueNameOrDefault());
+
+        if (playerType.HasValue) {
+            request.AddParameter("playerType", playerType.Value.GetEnumValueNameOrDefault());
         }
 
-        protected override string Area { get; }
 
+        request.AddParameter("period", period.GetEnumValueNameOrDefault());
+        var queryResponse = await ExecuteCollectionRequest<WOMRecord>(request);
+        var response = GetResponse<WOMRecord, Record>(queryResponse);
 
-        public Task<ConnectorCollectionResponse<Record>> View(MetricType metric, Period period) {
-            return QueryRecords(metric, period);
-        }
+        //foreach (Record record in response.Data) {
+        //    record.Period = period;
+        //}
 
-        public Task<ConnectorCollectionResponse<Record>> View(MetricType metric, Period period, PlayerType playerType) {
-            return QueryRecords(metric, period, playerType);
-        }
-
-
-        private async Task<ConnectorCollectionResponse<Record>> QueryRecords(MetricType metric, Period period,
-            PlayerType? playerType = null) {
-            var request = GetNewRestRequest("/leaderboard");
-
-            request.AddParameter("metric", metric.GetEnumValueNameOrDefault());
-
-            if (playerType.HasValue) {
-                request.AddParameter("playerType", playerType.Value.GetEnumValueNameOrDefault());
-            }
-
-
-            request.AddParameter("period", period.GetEnumValueNameOrDefault());
-            var queryResponse = await ExecuteCollectionRequest<WOMRecord>(request);
-            var response = GetResponse<WOMRecord, Record>(queryResponse);
-
-            //foreach (Record record in response.Data) {
-            //    record.Period = period;
-            //}
-
-            return response;
-        }
+        return response;
     }
 }

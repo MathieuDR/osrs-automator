@@ -1,20 +1,20 @@
 ﻿using System.Runtime.Serialization;
 
-namespace WiseOldManConnector.Models.WiseOldMan.Enums {
-    public enum Period {
-        [EnumMember(Value = "day")]
-        Day,
+namespace WiseOldManConnector.Models.WiseOldMan.Enums; 
 
-        [EnumMember(Value = "week")]
-        Week,
+public enum Period {
+    [EnumMember(Value = "day")]
+    Day,
 
-        [EnumMember(Value = "month")]
-        Month,
+    [EnumMember(Value = "week")]
+    Week,
 
-        [EnumMember(Value = "year")]
-        Year,
+    [EnumMember(Value = "month")]
+    Month,
 
-        [EnumMember(Value = "5min")]
-        FiveMinutes
-    }
+    [EnumMember(Value = "year")]
+    Year,
+
+    [EnumMember(Value = "5min")]
+    FiveMinutes
 }

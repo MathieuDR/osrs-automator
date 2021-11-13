@@ -1,37 +1,34 @@
 ﻿using AutoMapper;
-using Discord;
-using DiscordBot.Models;
 using DiscordBot.Transformers.TypeConverters;
 using Microsoft.Extensions.DependencyInjection;
 using WiseOldManConnector.Configuration;
-using WiseOldManConnector.Models.Output;
 
-namespace DiscordBot.Configuration {
-    public static class AutoMapperConfiguration {
-        public static IServiceCollection ConfigureAutoMapper(this IServiceCollection services) {
-            return services.AddSingleton(GetMapper());
-        }
+namespace DiscordBot.Configuration; 
 
-        private static Mapper GetMapper() {
-            var config = new MapperConfiguration(cfg => {
-                // adding profiles
-                cfg.AddProfile<MetricMappingProfile>();
+public static class AutoMapperConfiguration {
+    public static IServiceCollection ConfigureAutoMapper(this IServiceCollection services) {
+        return services.AddSingleton(GetMapper());
+    }
 
-                // Adding maps
-                cfg.CreateMap<string, Embed>().ConvertUsing<StringToEmbedConverter>();
-                cfg.CreateMap<EmbedResponse, Embed>().ConvertUsing<EmbedResponseToEmbedConverter>();
+    private static Mapper GetMapper() {
+        var config = new MapperConfiguration(cfg => {
+            // adding profiles
+            cfg.AddProfile<MetricMappingProfile>();
 
-                cfg.CreateMap<CompetitionLeaderboard, EmbedBuilder>()
-                    .ConvertUsing<CompetitionLeaderboardToEmbedBuilderConverter>();
+            // Adding maps
+            cfg.CreateMap<string, Embed>().ConvertUsing<StringToEmbedConverter>();
+            cfg.CreateMap<EmbedResponse, Embed>().ConvertUsing<EmbedResponseToEmbedConverter>();
 
-                cfg.CreateMap<DeltaLeaderboard, EmbedBuilder>()
-                    .ConvertUsing<DeltaLeaderboardToEmbedBuilderConverter>();
+            cfg.CreateMap<CompetitionLeaderboard, EmbedBuilder>()
+                .ConvertUsing<CompetitionLeaderboardToEmbedBuilderConverter>();
 
-                cfg.CreateMap<Achievement, EmbedBuilder>()
-                    .ConvertUsing<AchievementToEmbedBuilderConverter>();
-            });
+            cfg.CreateMap<DeltaLeaderboard, EmbedBuilder>()
+                .ConvertUsing<DeltaLeaderboardToEmbedBuilderConverter>();
 
-            return new Mapper(config);
-        }
+            cfg.CreateMap<Achievement, EmbedBuilder>()
+                .ConvertUsing<AchievementToEmbedBuilderConverter>();
+        });
+
+        return new Mapper(config);
     }
 }

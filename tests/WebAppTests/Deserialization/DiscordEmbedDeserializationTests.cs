@@ -6,40 +6,40 @@ using FluentAssertions;
 using WebAppTests.Resources.EmbedJsons;
 using Xunit;
 
-namespace WebAppTests.Deserialization {
-    public class DiscordEmbedDeserializationTests {
-        [Theory]
-        [MemberData(nameof(DiscordEmbedFiles.AllFiles), MemberType = typeof(DiscordEmbedFiles))]
-        public void CanDeserializeIntoDiscordEmbed(string pathToJson) {
-            var json = File.ReadAllText(pathToJson);
+namespace WebAppTests.Deserialization; 
 
-            var discordEmbeds = JsonSerializer.Deserialize<EmbedCollection>(json);
+public class DiscordEmbedDeserializationTests {
+    [Theory]
+    [MemberData(nameof(DiscordEmbedFiles.AllFiles), MemberType = typeof(DiscordEmbedFiles))]
+    public void CanDeserializeIntoDiscordEmbed(string pathToJson) {
+        var json = File.ReadAllText(pathToJson);
 
-            discordEmbeds.Should().NotBeNull();
-            discordEmbeds.Embeds.Should().NotBeNull();
-            discordEmbeds.Embeds.Should().HaveCount(1);
-        }
+        var discordEmbeds = JsonSerializer.Deserialize<EmbedCollection>(json);
 
-        [Fact]
-        public void DeserializeIntoDiscordEmbedHasAuthor() {
-            var json = File.ReadAllText(DiscordEmbedFiles.FirstFile);
+        discordEmbeds.Should().NotBeNull();
+        discordEmbeds.Embeds.Should().NotBeNull();
+        discordEmbeds.Embeds.Should().HaveCount(1);
+    }
 
-            var discordEmbeds = JsonSerializer.Deserialize<EmbedCollection>(json);
-            var discordEmbed = discordEmbeds.Embeds.FirstOrDefault();
+    [Fact]
+    public void DeserializeIntoDiscordEmbedHasAuthor() {
+        var json = File.ReadAllText(DiscordEmbedFiles.FirstFile);
 
-            discordEmbed.Author.Should().NotBeNull();
-            discordEmbed.Author.Name.Should().Be("ErkendRserke");
-            discordEmbed.Author.Icon.Should().BeNullOrEmpty();
-        }
+        var discordEmbeds = JsonSerializer.Deserialize<EmbedCollection>(json);
+        var discordEmbed = discordEmbeds.Embeds.FirstOrDefault();
 
-        [Fact]
-        public void DeserializeJsonWithImIntoDiscordEmbedHasImAuthorIcon() {
-            var json = File.ReadAllText(DiscordEmbedFiles.FirstImFile);
+        discordEmbed.Author.Should().NotBeNull();
+        discordEmbed.Author.Name.Should().Be("ErkendRserke");
+        discordEmbed.Author.Icon.Should().BeNullOrEmpty();
+    }
 
-            var discordEmbeds = JsonSerializer.Deserialize<EmbedCollection>(json);
-            var discordEmbed = discordEmbeds.Embeds.FirstOrDefault();
+    [Fact]
+    public void DeserializeJsonWithImIntoDiscordEmbedHasImAuthorIcon() {
+        var json = File.ReadAllText(DiscordEmbedFiles.FirstImFile);
 
-            discordEmbed.Author.Icon.Should().Be("https://oldschool.runescape.wiki/images/0/09/Ironman_chat_badge.png");
-        }
+        var discordEmbeds = JsonSerializer.Deserialize<EmbedCollection>(json);
+        var discordEmbed = discordEmbeds.Embeds.FirstOrDefault();
+
+        discordEmbed.Author.Icon.Should().Be("https://oldschool.runescape.wiki/images/0/09/Ironman_chat_badge.png");
     }
 }

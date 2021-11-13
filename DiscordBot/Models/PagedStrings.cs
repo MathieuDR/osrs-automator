@@ -1,8 +1,6 @@
-﻿using System.Collections.Generic;
+﻿namespace DiscordBot.Models; 
 
-namespace DiscordBot.Models {
-    public class PagedStrings : IPageableResponse {
-        public string AlternatedDescription { get; set; }
-        public IEnumerable<object> Pages { get; set; }
-    }
+public class PagedStrings : IPageableResponse {
+    public string AlternatedDescription { get; set; }
+    public IEnumerable<object> Pages { get; set; }
 }
