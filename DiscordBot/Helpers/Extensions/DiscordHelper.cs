@@ -163,9 +163,22 @@ namespace DiscordBot.Helpers.Extensions {
             foreach (IRole role in roles) {
                 users.AddRange(role.GetUsersFromRole(context));
             }
-
             return (users.Distinct(), remainingRolesArgs);
         }
+
+        public static string ToChannel(this ulong id) {
+            return $"<#{id}>";
+        }
+        
+        public static string ToRole(this ulong id) {
+            return $"<@&{id}>";
+        }
+        
+        public static string ToUser(this ulong id) {
+            return $"<@{id}>";
+        }
+
+        
         
         /// <summary>
         /// Get all users in role

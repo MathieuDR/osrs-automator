@@ -7,6 +7,7 @@ using Common.Extensions;
 using Discord;
 using Discord.WebSocket;
 using DiscordBot.Common.Models.Data;
+using DiscordBot.Helpers.Builders;
 using DiscordBot.Helpers.Extensions;
 using DiscordBot.Models.Contexts;
 using DiscordBot.Services.Interfaces;
@@ -38,9 +39,9 @@ namespace DiscordBot.Commands.Interactive {
         private static string ThresholdFormat {
             get {
                 var builder = new StringBuilder();
-                builder.Append("#:".PadLeft(5));
-                builder.Append("Name".PadRight(15));
-                builder.Append($", role: role{Environment.NewLine}");
+                builder.Append("#:");
+                builder.Append("Name");
+                builder.Append(", role");
                 return builder.ToString();
             }
         }
@@ -95,23 +96,20 @@ namespace DiscordBot.Commands.Interactive {
                 return Result.Fail(new ExceptionalError(e));
             }
 
-            var thresholdInfo = thresholds.Select(x => (Id: $"{x.Name};{x.Threshold}", Label: ThresholdToString(context, x))).ToList();
-
+            var thresholdInfo = thresholds.Select((x, i) => (Id: i.ToString(), Label: ThresholdToString(context, x))).ToList();
 
             var descriptionBuilder = new StringBuilder();
-            descriptionBuilder.AppendLine($"Channel: <#{channelId}>");
+            descriptionBuilder.AppendLine($"**Output channel:** <#{channelId}>");
             descriptionBuilder.AppendLine();
-            descriptionBuilder.AppendLine("```");
-            descriptionBuilder.AppendLine(ThresholdFormat);
+            descriptionBuilder.AppendLine("**Thresholds:**");
+            //descriptionBuilder.AppendLine(ThresholdFormat);
             foreach (var info in thresholdInfo) {
-                descriptionBuilder.AppendLine(info.Label);
+                descriptionBuilder.AppendLine(info.Label.WithMention);
             }
 
-            descriptionBuilder.AppendLine("```");
-
             var response = context
-                    .CreateReplyBuilder(true)
-                    .WithEmbedFrom($"Count settings for {context.Guild.Name}", descriptionBuilder.ToString());
+                .CreateReplyBuilder(true)
+                .WithEmbedFrom($"Count settings for {context.Guild.Name}", descriptionBuilder.ToString());
 
             if (thresholdInfo.Any()) {
                 response.WithSelectMenu(GetThresholdSelectMenu(thresholdInfo))
@@ -123,37 +121,39 @@ namespace DiscordBot.Commands.Interactive {
         }
 
 
-        private SelectMenuBuilder GetThresholdSelectMenu(IEnumerable<(string Id, string Label)> thresholdInfo) {
+        private SelectMenuBuilder GetThresholdSelectMenu(IEnumerable<(string Id, (string WithMention, string NoMention) Label)> thresholdInfo) {
             return new SelectMenuBuilder()
+                .WithPlaceholder("Select threshold to delete")
                 .WithCustomId(SubCommand(ThresholdRemoveOption))
                 .WithOptions(
                     thresholdInfo.Select(i =>
                             new SelectMenuOptionBuilder()
-                                .WithLabel(i.Label)
+                                .WithLabel(i.Label.NoMention)
                                 .WithValue(i.Id))
                         .ToList());
         }
 
-        private string ThresholdToString(ApplicationCommandContext context, CountThreshold threshold) {
-            var builder = new StringBuilder();
-            builder.Append($"{threshold.Threshold}:".PadLeft(5));
+        private (string WithMention, string NoMention) ThresholdToString<T>(BaseInteractiveContext<T> context, CountThreshold threshold) where T : SocketInteraction {
+            var noMentionBuilder = new StringBuilder();
 
-            var name = string.IsNullOrEmpty(threshold.Name) ? "Unnamed" : threshold.Name;
-            builder.Append(name.PadRight(15));
+            noMentionBuilder.Append($"{threshold.Threshold}: ");
+            var name = string.IsNullOrEmpty(threshold.Name) ? "-" : threshold.Name;
+            noMentionBuilder.Append(name);
 
-
-            var role = "none";
-            if (threshold.GivenRoleId.HasValue) {
-                role = context.Guild.GetRole(threshold.GivenRoleId.Value)?.Name ?? "Invalid role";
+            if (!threshold.GivenRoleId.HasValue) {
+                return (noMentionBuilder.ToString(), noMentionBuilder.ToString());
             }
 
-            builder.Append($", role: {role}{Environment.NewLine}");
-            return builder.ToString();
-        }
+            noMentionBuilder.Append(", ");
+            var mentionBuilder = new StringBuilder(noMentionBuilder.ToString());
 
-        private IEnumerable<string> ThresholdSToString(ApplicationCommandContext context, IEnumerable<CountThreshold> thresholds) {
-            var enumerable = thresholds.ToList();
-            return enumerable.Select(threshold => ThresholdToString(context, threshold)).ToList();
+            var roleTemp = context.Guild.GetRole(threshold.GivenRoleId.Value)?.Name ?? "deleted role";
+            noMentionBuilder.Append(roleTemp);
+
+            roleTemp = threshold.GivenRoleId.Value.ToRole();
+            mentionBuilder.Append(roleTemp);
+
+            return (mentionBuilder.ToString(), noMentionBuilder.ToString());
         }
 
         private async Task<Result> SetChannelHandler(ApplicationCommandContext context) {
@@ -178,8 +178,55 @@ namespace DiscordBot.Commands.Interactive {
             return Result.Ok();
         }
 
-        public override Task<Result> HandleComponentAsync(MessageComponentContext context) {
-            throw new NotImplementedException();
+        public override async Task<Result> HandleComponentAsync(MessageComponentContext context) {
+            var subCommand = context.CustomSubCommandId;
+            var result = subCommand switch {
+                RemoveOption => await HandleDelete(context),
+                ThresholdRemoveOption => await HandleThresholdSelected(context),
+                _ => Result.Fail("Could not find subcommand handler")
+            };
+
+            if (result.IsFailed) {
+                // Empty message
+                await context.UpdateAsync(null, null, null, null, null);
+            }
+
+            return result;
+        }
+
+        private async Task<Result> HandleThresholdSelected(MessageComponentContext context) {
+            var originalMenu = (SelectMenuComponent)context.InnerContext.Message.Components.First().Components.First();
+            var selected = context.SelectedMenuOptions.First();
+
+            var components = new ComponentBuilder()
+                .WithOriginalMenu(originalMenu, selected)
+                .WithButton(GetRemoveButton);
+
+            await context.UpdateAsync(component: components.Build());
+
+            return Result.Ok();
+        }
+
+        private async Task<Result> HandleDelete(MessageComponentContext context) {
+            IReadOnlyList<CountThreshold> thresholds;
+            var selected = ((SelectMenuComponent)context.InnerContext.Message.Components.First().Components.First()).Options.First(x=>x.Default == true).Value;
+
+            try {
+                await _counterService.RemoveThreshold(context.Guild.Id, int.Parse(selected));
+                thresholds = await _counterService.GetThresholds(context.Guild.Id);
+            } catch (Exception e) {
+                return Result.Fail(new ExceptionalError(e));
+            }
+
+            var thresholdInfo = thresholds.Select((x, i) => (Id: i.ToString(), Label: ThresholdToString(context, x))).ToList();
+            
+            var components = new ComponentBuilder()
+                .WithSelectMenu(GetThresholdSelectMenu(thresholdInfo))
+                .WithButton(GetRemoveButton);
+
+            await context.UpdateAsync(component: components.Build());
+
+            return Result.Ok();
         }
 
         protected override Task<SlashCommandBuilder> ExtendSlashCommandBuilder(SlashCommandBuilder builder) {
@@ -188,7 +235,7 @@ namespace DiscordBot.Commands.Interactive {
                     .WithName(SetChannelSubCommandName)
                     .WithDescription("Set the channel for threshold messages")
                     .WithType(ApplicationCommandOptionType.SubCommand)
-                    .AddOption(ChannelOption, ApplicationCommandOptionType.Channel, "The channel to use, it must be a text channel")
+                    .AddOption(ChannelOption, ApplicationCommandOptionType.Channel, "The channel to use, it must be a text channel", true)
                 )
                 .AddOption(new SlashCommandOptionBuilder()
                     .WithName(ViewSubCommandName)
@@ -199,8 +246,8 @@ namespace DiscordBot.Commands.Interactive {
                     .WithName(AddThresholdSubCommandName)
                     .WithDescription("Adds a new threshold")
                     .WithType(ApplicationCommandOptionType.SubCommand)
-                    .AddOption(ThresholdOption, ApplicationCommandOptionType.Integer, "The value that triggers the threshold, inclusive")
-                    .AddOption(NameOption, ApplicationCommandOptionType.String, "The name of the threshold")
+                    .AddOption(ThresholdOption, ApplicationCommandOptionType.Integer, "The value that triggers the threshold, inclusive", true)
+                    .AddOption(NameOption, ApplicationCommandOptionType.String, "The name of the threshold", true)
                     .AddOption(RoleOption, ApplicationCommandOptionType.Role, "Optional role to give the players", false)
                 );
 

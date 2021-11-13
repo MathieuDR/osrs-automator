@@ -69,7 +69,7 @@ namespace DiscordBot.Services.Services {
             return Task.FromResult(result);
         }
 
-        public Task<bool> RemoveCount(ulong guildId, int index) {
+        public Task<bool> RemoveThreshold(ulong guildId, int index) {
             var config = GetGroupConfigWithValidCountConfig(guildId);
             var result = config.CountConfig.RemoveAtIndex(index);
 

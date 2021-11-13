@@ -22,6 +22,6 @@ namespace DiscordBot.Services.Interfaces {
         Task QueueJob(JobType jobType);
 
         Task<Result<ItemDecorator<Competition>>> CreateCompetition(Guild guild, DateTimeOffset start, DateTimeOffset end, MetricType metric,
-            CompetitionType competitionType);
+            CompetitionType competitionType, string name = null);
     }
 }

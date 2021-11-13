@@ -20,7 +20,6 @@ namespace DiscordBot.Commands.Interactive {
         }
         public override Guid Id => Guid.Parse("C94327FC-2FBE-484B-B054-E1F88A02895C");
         
-       // private const string ViewSubCommandName = "view";
         private const string SetWomInfoCommandName = "wiseoldman";
         private const string WomGroupId = "group-id";
         private const string WomVerificationCode = "verification-code";
@@ -72,8 +71,8 @@ namespace DiscordBot.Commands.Interactive {
                     .WithName(SetWomInfoCommandName)
                     .WithDescription("Set the channel for threshold messages")
                     .WithType(ApplicationCommandOptionType.SubCommand)
-                    .AddOption(WomGroupId, ApplicationCommandOptionType.Integer, "The ID of your wise old man group")
-                    .AddOption(WomVerificationCode, ApplicationCommandOptionType.String, "The verification code of your group")
+                    .AddOption(WomGroupId, ApplicationCommandOptionType.Integer, "The ID of your wise old man group", true)
+                    .AddOption(WomVerificationCode, ApplicationCommandOptionType.String, "The verification code of your group", true)
                 );
             return Task.FromResult(builder);
         }

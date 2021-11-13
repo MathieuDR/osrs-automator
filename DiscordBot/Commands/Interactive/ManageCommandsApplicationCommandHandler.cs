@@ -61,9 +61,9 @@ namespace DiscordBot.Commands.Interactive {
         /// <param name="context"></param>
         /// <returns></returns>
         private async Task<Result> HandleGuildSubCommand(MessageComponentContext context) {
-            var guildId = ulong.Parse(context.SelectedMenuOptions.First());
             var command = context.EmbedFields.First(x => x.Name == "Command").Value;
-            
+            var guild = GetGuild(context);
+
             var commandInfo = (await _applicationCommandInfoRepository.GetByCommandName(command)).Value;
             Logger.LogInformation("{@info}", commandInfo);
 
@@ -75,12 +75,12 @@ namespace DiscordBot.Commands.Interactive {
 
             var list = commandInfo.RegisteredGuilds;
             string embedDescription;
-            if(!commandInfo.RegisteredGuilds.Contains(guildId)) {
-                list.Add(guildId);
-                embedDescription = $"Creating command: {command} for guild {guildId}";
+            if(!commandInfo.RegisteredGuilds.Contains(guild.Id)) {
+                list.Add(guild.Id);
+                embedDescription = $"Creating command: {command} for guild {guild.Name} ({guild.Id})";
             } else {
-                list.Remove(guildId);
-                embedDescription = $"Removed command: {command} for guild {guildId}";
+                list.Remove(guild.Id);
+                embedDescription = $"Removed command: {command} for guild {guild.Name} ({guild.Id})";
             }
 
             commandInfo = commandInfo with { RegisteredGuilds = list };
@@ -92,6 +92,23 @@ namespace DiscordBot.Commands.Interactive {
 
             await context.UpdateAsync(embed: embed.Build(), component: null, content: null);
             return Result.Ok();
+        }
+
+        private (string Name, ulong Id) GetGuild(MessageComponentContext context) {
+            var guilds = _serviceProvider.GetRequiredService<DiscordSocketClient>().Guilds
+                .Where(x => x.Id == ulong.Parse(context.SelectedMenuOptions.First()))
+                .Select(x => (x.Name, x.Id)).ToList();
+
+            if (!guilds.Any()) {
+                throw new ArgumentException("Could not find guild");
+            }
+
+            if (guilds.Count() > 1) {
+                throw new ArgumentException("Found multiple guilds");
+            }
+
+            var guild = guilds.First();
+            return guild;
         }
 
         /// <summary>
