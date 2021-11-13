@@ -157,13 +157,7 @@ internal class GroupService : RepositoryService, IGroupService {
         }
 
         var t = typeof(GroupService);
-        // var t = jobType switch {
-        //     JobType.GroupUpdate => typeof(AutoUpdateGroupJob),
-        //     JobType.MonthlyTop => typeof(TopLeaderBoardJob),
-        //     JobType.MonthlyTopGains => typeof(MonthlyTopDeltasJob),
-        //     _ => throw new ArgumentOutOfRangeException(nameof(jobType), jobType, null)
-        // };
-
+        
         var job = JobBuilder.Create(t)
             .WithIdentity(Guid.NewGuid().ToString())
             .Build();
