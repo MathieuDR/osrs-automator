@@ -1,16 +1,4 @@
-using System;
-using System.Linq;
-using System.Threading.Tasks;
-using Discord;
 using DiscordBot.Common.Models.Decorators;
-using DiscordBot.Helpers.Builders;
-using DiscordBot.Helpers.Extensions;
-using DiscordBot.Models.Contexts;
-using DiscordBot.Services.Interfaces;
-using DiscordBot.Transformers;
-using FluentResults;
-using Microsoft.Extensions.Logging;
-using WiseOldManConnector.Models.Output;
 
 namespace DiscordBot.Commands.Interactive; 
 

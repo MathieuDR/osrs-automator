@@ -1,12 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Net.Sockets;
-using Discord;
-using Discord.Commands;
-using Discord.WebSocket;
+﻿using Discord.Commands;
 using DiscordBot.Common.Models.Decorators;
-using DiscordBot.Helpers.Extensions;
-using DiscordBot.Models.Contexts;
 
 namespace DiscordBot.Helpers.Builders; 
 

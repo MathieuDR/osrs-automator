@@ -1,16 +1,9 @@
-using System;
-using System.Threading;
-using System.Threading.Tasks;
-using Discord;
-using Discord.WebSocket;
 using DiscordBot.Commands.Interactive;
 using DiscordBot.Configuration;
-using DiscordBot.Models.Contexts;
 using DiscordBot.Services;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Logging;
 using Quartz;
 
 namespace DiscordBot; 

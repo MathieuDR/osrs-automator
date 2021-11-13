@@ -1,16 +1,7 @@
-using System;
-using System.Linq;
-using System.Threading.Tasks;
-using Discord;
 using Discord.Net;
-using Discord.WebSocket;
 using DiscordBot.Commands.Interactive;
 using DiscordBot.Data.Interfaces;
-using DiscordBot.Models.Contexts;
-using DiscordBot.Services.Interfaces;
-using FluentResults;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Logging;
 
 namespace DiscordBot.Services; 
 

@@ -1,11 +1,3 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Discord;
-using DiscordBot.Models.Contexts;
-using FluentResults;
-
 namespace DiscordBot.Commands.Interactive; 
 
 public interface ICommandStrategy {

@@ -1,6 +1,4 @@
 ﻿using AutoMapper;
-using Discord;
-using WiseOldManConnector.Models.Output;
 
 namespace DiscordBot.Transformers.TypeConverters; 
 

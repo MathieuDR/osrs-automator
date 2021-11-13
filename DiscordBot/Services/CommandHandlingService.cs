@@ -1,17 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Linq;
-using System.Threading.Tasks;
-using Discord;
+﻿using System.Diagnostics;
 using Discord.Commands;
-using Discord.WebSocket;
 using DiscordBot.Commands.Modules;
-using DiscordBot.Common.Configuration;
 using DiscordBot.Configuration;
-using DiscordBot.Helpers.Builders;
-using DiscordBot.Models.Contexts;
-using DiscordBot.Services.Interfaces;
 using Serilog.Context;
 using Serilog.Events;
 

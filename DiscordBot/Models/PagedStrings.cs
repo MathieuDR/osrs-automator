@@ -1,6 +1,4 @@
-﻿using System.Collections.Generic;
-
-namespace DiscordBot.Models; 
+﻿namespace DiscordBot.Models; 
 
 public class PagedStrings : IPageableResponse {
     public string AlternatedDescription { get; set; }

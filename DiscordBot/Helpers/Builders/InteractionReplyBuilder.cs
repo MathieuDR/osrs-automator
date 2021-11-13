@@ -1,14 +1,5 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 using Common.Extensions;
-using Discord;
-using Discord.Rest;
-using Discord.WebSocket;
-using DiscordBot.Helpers.Extensions;
-using DiscordBot.Models.Contexts;
 
 namespace DiscordBot.Helpers.Builders; 
 

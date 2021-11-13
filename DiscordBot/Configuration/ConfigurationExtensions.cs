@@ -1,13 +1,8 @@
-using Discord;
 using Discord.Commands;
-using Discord.WebSocket;
 using DiscordBot.Commands.Interactive;
 using DiscordBot.Common.Configuration;
-using DiscordBot.Helpers.Extensions;
 using DiscordBot.Services;
-using DiscordBot.Services.Interfaces;
 using DiscordBot.Services.Services;
-using Fergun.Interactive;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Serilog;

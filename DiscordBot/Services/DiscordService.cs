@@ -1,19 +1,7 @@
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 using Common.Extensions;
-using Discord.WebSocket;
 using DiscordBot.Common.Dtos.Discord;
-using DiscordBot.Common.Models.Data;
-using DiscordBot.Services.Interfaces;
-using DiscordBot.Transformers;
-using FluentResults;
-using Microsoft.Extensions.Logging;
 using WiseOldManConnector.Helpers;
-using WiseOldManConnector.Models.Output;
 
 namespace DiscordBot.Services; 
 

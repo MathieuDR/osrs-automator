@@ -1,13 +1,6 @@
-using System;
-using System.Linq;
 using System.Text;
 using System.Text.Json;
-using System.Threading.Tasks;
-using Discord;
-using DiscordBot.Models.Contexts;
-using FluentResults;
 using HashDepot;
-using Microsoft.Extensions.Logging;
 
 namespace DiscordBot.Commands.Interactive; 
 

@@ -1,15 +1,4 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
 using Common.Extensions;
-using Discord;
-using Discord.Rest;
-using Discord.WebSocket;
-using DiscordBot.Helpers.Builders;
-using DiscordBot.Helpers.Extensions;
-using Fergun.Interactive;
 using Fergun.Interactive.Pagination;
 using Microsoft.Extensions.DependencyInjection;
 

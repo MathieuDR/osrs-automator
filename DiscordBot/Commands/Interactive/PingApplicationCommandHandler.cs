@@ -1,11 +1,4 @@
-using System;
 using System.Text;
-using System.Threading.Tasks;
-using Discord;
-using DiscordBot.Helpers.Extensions;
-using DiscordBot.Models.Contexts;
-using FluentResults;
-using Microsoft.Extensions.Logging;
 
 namespace DiscordBot.Commands.Interactive; 
 

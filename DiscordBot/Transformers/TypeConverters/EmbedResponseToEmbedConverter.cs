@@ -1,5 +1,4 @@
 ﻿using AutoMapper;
-using Discord;
 using DiscordBot.Models;
 using DiscordBot.Models.Exceptions;
 

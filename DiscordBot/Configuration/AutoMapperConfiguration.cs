@@ -1,10 +1,7 @@
 ﻿using AutoMapper;
-using Discord;
-using DiscordBot.Models;
 using DiscordBot.Transformers.TypeConverters;
 using Microsoft.Extensions.DependencyInjection;
 using WiseOldManConnector.Configuration;
-using WiseOldManConnector.Models.Output;
 
 namespace DiscordBot.Configuration; 
 

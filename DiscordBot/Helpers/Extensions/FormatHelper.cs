@@ -1,7 +1,4 @@
-﻿using System;
-using System.Globalization;
-using System.Linq;
-using WiseOldManConnector.Models.Output;
+﻿using System.Globalization;
 
 namespace DiscordBot.Helpers.Extensions; 
 

@@ -1,8 +1,4 @@
-﻿using System;
-using System.Diagnostics;
-using System.Linq;
-using Common.Extensions;
-using DiscordBot.Common.Configuration;
+﻿using DiscordBot.Common.Configuration;
 using Microsoft.Extensions.Options;
 using WiseOldManConnector.Models.WiseOldMan.Enums;
 

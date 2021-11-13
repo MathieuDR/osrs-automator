@@ -1,9 +1,3 @@
-using System;
-using System.Threading.Tasks;
-using Discord;
-using DiscordBot.Models.Contexts;
-using FluentResults;
-
 namespace DiscordBot.Commands.Interactive; 
 
 public interface IApplicationCommandHandler {

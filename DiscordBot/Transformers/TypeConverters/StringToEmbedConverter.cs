@@ -1,6 +1,4 @@
-﻿using System;
-using AutoMapper;
-using Discord;
+﻿using AutoMapper;
 
 namespace DiscordBot.Transformers.TypeConverters; 
 

@@ -1,6 +1,4 @@
-using System;
 using Common.Extensions;
-using Discord.WebSocket;
 
 namespace DiscordBot.Models.Contexts; 
 

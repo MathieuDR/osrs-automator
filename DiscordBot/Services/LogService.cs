@@ -1,11 +1,5 @@
-﻿using System;
-using System.Diagnostics;
-using System.Threading.Tasks;
-using Discord;
+﻿using System.Diagnostics;
 using Discord.Commands;
-using Discord.WebSocket;
-using DiscordBot.Services.Interfaces;
-using Microsoft.Extensions.Logging;
 using Serilog.Events;
 
 namespace DiscordBot.Services; 
