@@ -1,11 +1,15 @@
 using System.Text;
 
-namespace DiscordBot.Commands.Interactive; 
+namespace DiscordBot.Commands.Interactive;
 
 public class PingApplicationCommandHandler : ApplicationCommandHandler {
+    public PingApplicationCommandHandler(ILogger<PingApplicationCommandHandler> logger) : base("ping",
+        "Lets see if the bot is awake, with a new description!", logger) { }
 
-    public PingApplicationCommandHandler(ILogger<PingApplicationCommandHandler> logger) : base("ping", "Lets see if the bot is awake, with a new description!", logger) { }
-        
+    public override Guid Id => Guid.Parse("912DFB5E-4837-40C5-8E66-CDA3779FE823");
+    public override AuthorizationRoles MinimumAuthorizationRole => AuthorizationRoles.ClanGuest;
+    public override bool GlobalRegister => true;
+
     protected override Task<SlashCommandBuilder> ExtendSlashCommandBuilder(SlashCommandBuilder builder) {
         builder.AddOption("info", ApplicationCommandOptionType.String, "Some extra information", false);
         builder.AddOption("time", ApplicationCommandOptionType.Boolean, "Print the ping time in ms", false);
@@ -36,7 +40,7 @@ public class PingApplicationCommandHandler : ApplicationCommandHandler {
             var timeDifference = DateTimeOffset.Now - context.InnerContext.CreatedAt;
             builder.AppendLine($"Difference is: {timeDifference.TotalMilliseconds}ms");
         }
-            
+
         await context.RespondAsync(builder.ToString());
         return Result.Ok();
     }
@@ -44,7 +48,4 @@ public class PingApplicationCommandHandler : ApplicationCommandHandler {
     public override Task<Result> HandleComponentAsync(MessageComponentContext context) {
         throw new NotImplementedException();
     }
-
-    public override Guid Id => Guid.Parse("912DFB5E-4837-40C5-8E66-CDA3779FE823");
-    public override bool GlobalRegister => true;
 }

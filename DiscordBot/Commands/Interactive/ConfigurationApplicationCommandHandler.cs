@@ -8,7 +8,8 @@ public class ConfigurationApplicationCommandHandler :  ApplicationCommandHandler
         _groupService = groupService;
     }
     public override Guid Id => Guid.Parse("C94327FC-2FBE-484B-B054-E1F88A02895C");
-        
+    public override AuthorizationRoles MinimumAuthorizationRole => AuthorizationRoles.ClanAdmin;
+
     private const string SetWomInfoCommandName = "wiseoldman";
     private const string WomGroupId = "group-id";
     private const string WomVerificationCode = "verification-code";

@@ -19,7 +19,9 @@ public class CountApplicationCommandHandler : ApplicationCommandHandler {
     private const string UsersOption = "users";
 
     public override Guid Id => Guid.Parse("A6B2840F-DCCE-4432-A610-10954BBEE15D");
-
+    public override AuthorizationRoles MinimumAuthorizationRole => AuthorizationRoles.ClanEventHost;
+    
+    
     public override async Task<Result> HandleCommandAsync(ApplicationCommandContext context) {
         var subCommand = context.Options.First().Key;
             
