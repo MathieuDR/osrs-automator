@@ -1,3 +1,4 @@
+
 using Dashboard.Configuration;
 using Dashboard.Configuration.Options;
 using Dashboard.InputFormatters;
@@ -7,18 +8,10 @@ using DiscordBot.Common.Dtos.Runescape;
 using DiscordBot.Configuration;
 using DiscordBot.Data.Configuration;
 using DiscordBot.Services.Configuration;
-using Microsoft.AspNetCore.Builder;
-using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ApiExplorer;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Options;
 using Microsoft.OpenApi.Models;
-using Serilog;
-using Serilog.Events;
-using Serilog.Formatting.Json;
 using Swashbuckle.AspNetCore.SwaggerGen;
 using WiseOldManConnector.Configuration;
 

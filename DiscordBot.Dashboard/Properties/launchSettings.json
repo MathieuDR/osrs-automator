@@ -3,23 +3,23 @@
     "windowsAuthentication": false,
     "anonymousAuthentication": true,
     "iisExpress": {
-      "applicationUrl": "http://localhost:20998",
-      "sslPort": 44330
+      "applicationUrl": "http://localhost:61754",
+      "sslPort": 44359
     }
   },
   "profiles": {
-    "IIS Express": {
-      "commandName": "IISExpress",
+    "DiscordBot.Dashboard": {
+      "commandName": "Project",
+      "dotnetRunMessages": true,
       "launchBrowser": true,
+      "applicationUrl": "https://localhost:7211;http://localhost:5243",
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development"
       }
     },
-    "WebApp": {
-      "commandName": "Project",
-      "dotnetRunMessages": "true",
+    "IIS Express": {
+      "commandName": "IISExpress",
       "launchBrowser": true,
-      "applicationUrl": "http://localhost:5829",
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development"
       }

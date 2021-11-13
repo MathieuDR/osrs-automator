@@ -1,9 +1,7 @@
-using System;
 using Dashboard;
-using Microsoft.AspNetCore.Builder;
-using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Components;
+using Microsoft.AspNetCore.Components.Web;
 using Microsoft.AspNetCore.Mvc.ApiExplorer;
-using Microsoft.Extensions.DependencyInjection;
 using Serilog;
 using Serilog.Events;
 using Serilog.Formatting.Json;
@@ -21,11 +19,10 @@ try {
     builder.WebHost.UseUrls("http://*:5829");
     
     //Add bot as hosted service
-    builder.Services.AddHostedService<DiscordBot.DiscordBot>();
+    //builder.Services.AddHostedService<DiscordBot.DiscordBot>();
 
     var app = builder.Build();
     StartupHelper.ConfigurePipeline(app, app.Environment, app.Services.GetRequiredService<IApiVersionDescriptionProvider>(), builder.Configuration);
-    
     
     app.Run();
 } catch (Exception e) {
@@ -43,3 +40,30 @@ static void CreateLogger() {
         .WriteTo.Console(LogEventLevel.Information)
         .CreateLogger();
 }
+
+// var builder = WebApplication.CreateBuilder(args);
+//
+// // Add services to the container.
+// builder.Services.AddRazorPages();
+// builder.Services.AddServerSideBlazor();
+// builder.Services.AddSingleton<WeatherForecastService>();
+//
+// var app = builder.Build();
+//
+// // Configure the HTTP request pipeline.
+// if (!app.Environment.IsDevelopment()) {
+//     app.UseExceptionHandler("/Error");
+//     // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
+//     app.UseHsts();
+// }
+//
+// app.UseHttpsRedirection();
+//
+// app.UseStaticFiles();
+//
+// app.UseRouting();
+//
+// app.MapBlazorHub();
+// app.MapFallbackToPage("/_Host");
+//
+// app.Run();
