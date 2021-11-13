@@ -1,4 +1,5 @@
 using Common.Parsers;
+using DiscordBot.Common.Models.Enums;
 using DiscordBot.Services.Models.Enums;
 using WiseOldManConnector.Models.WiseOldMan.Enums;
 

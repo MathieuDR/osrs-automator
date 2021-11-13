@@ -1,3 +1,5 @@
+using DiscordBot.Common.Models.Enums;
+
 namespace DiscordBot.Commands.Interactive; 
 
 public interface IApplicationCommandHandler {

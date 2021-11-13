@@ -1,5 +1,6 @@
 using System.Text;
 using System.Text.Json;
+using DiscordBot.Common.Models.Enums;
 using HashDepot;
 
 namespace DiscordBot.Commands.Interactive; 

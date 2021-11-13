@@ -1,4 +1,5 @@
 using DiscordBot.Common.Models.Decorators;
+using DiscordBot.Common.Models.Enums;
 
 namespace DiscordBot.Commands.Interactive; 
 

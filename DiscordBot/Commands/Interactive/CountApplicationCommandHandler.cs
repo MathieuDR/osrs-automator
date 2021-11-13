@@ -1,4 +1,5 @@
 using System.Text;
+using DiscordBot.Common.Models.Enums;
 
 namespace DiscordBot.Commands.Interactive; 
 
