@@ -10,21 +10,6 @@ namespace DiscordBot.Data.Repository;
 public class PlayerRepository : BaseLiteDbRepository<Player>, IPlayerRepository {
     public PlayerRepository(ILogger<PlayerRepository> logger, LiteDatabase database) : base(logger, database) { }
 
-    // public Player CoupleOsrsPlayerToGuild(ulong guildId, ulong discordUserId,
-    //     WiseOldManConnector.Models.Output.Player womPlayer) {
-    //     var player = GetPlayerById(guildId, discordUserId);
-    //     if (player == null) {
-    //         player = new Player(guildId, discordUserId);
-    //         player.CoupledOsrsAccounts.Add(womPlayer);
-    //
-    //
-    //         return InsertPlayerForGuild(guildId, player);
-    //     }
-    //
-    //     player.CoupledOsrsAccounts.Add(womPlayer);
-    //     return UpdateOrInsertPlayerForGuild(guildId, player);
-    // }
-
     public override string CollectionName => "players";
 
     public Result<Player> GetByDiscordId(ulong id) {
