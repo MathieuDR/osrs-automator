@@ -33,7 +33,6 @@ public class CountApplicationCommandHandler : ApplicationCommandHandler {
             _ => Result.Fail("Did not find a correct handler")
         };
 
-        //await context.RespondAsync($"The selected command was: {first} - {second}");
         return result;
     }
 
