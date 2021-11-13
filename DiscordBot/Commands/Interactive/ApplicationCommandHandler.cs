@@ -48,7 +48,6 @@ public abstract class ApplicationCommandHandler : IApplicationCommandHandler {
 
     public virtual Task RemoveComponent(MessageComponentContext context) {
         return Task.CompletedTask;
-        //context.
     }
 
     public virtual bool CanHandle(ApplicationCommandContext context) {
