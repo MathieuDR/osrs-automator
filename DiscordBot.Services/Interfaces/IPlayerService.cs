@@ -4,34 +4,34 @@ using DiscordBot.Common.Dtos.Discord;
 using DiscordBot.Common.Models.Decorators;
 using WiseOldManConnector.Models.Output;
 
-namespace DiscordBot.Services.Interfaces {
-    public interface IPlayerService {
-        /// <summary>
-        ///     Couples a discord user with an osrs user.
-        /// </summary>
-        /// <param name="user">Said discord user</param>
-        /// <param name="proposedOsrsName">Proposed name</param>
-        /// <returns></returns>
-        Task<ItemDecorator<Player>> CoupleDiscordGuildUserToOsrsAccount(GuildUser user, string proposedOsrsName);
+namespace DiscordBot.Services.Interfaces; 
 
-        Task<IEnumerable<ItemDecorator<Player>>> GetAllOsrsAccounts(GuildUser user);
-        Task DeleteCoupledOsrsAccount(GuildUser user, int id);
-        Task<string> SetDefaultAccount(GuildUser user, Player player);
-        Task<string> GetDefaultOsrsDisplayName(GuildUser user);
+public interface IPlayerService {
+    /// <summary>
+    ///     Couples a discord user with an osrs user.
+    /// </summary>
+    /// <param name="user">Said discord user</param>
+    /// <param name="proposedOsrsName">Proposed name</param>
+    /// <returns></returns>
+    Task<ItemDecorator<Player>> CoupleDiscordGuildUserToOsrsAccount(GuildUser user, string proposedOsrsName);
 
-        Task<string> GetUserNickname(GuildUser user, out bool isOsrsAccount);
+    Task<IEnumerable<ItemDecorator<Player>>> GetAllOsrsAccounts(GuildUser user);
+    Task DeleteCoupledOsrsAccount(GuildUser user, int id);
+    Task<string> SetDefaultAccount(GuildUser user, Player player);
+    Task<string> GetDefaultOsrsDisplayName(GuildUser user);
 
-        //Task<bool> HasSetUsername(IGuildUser user);
-        Task<string> SetUserName(GuildUser user, string name);
+    Task<string> GetUserNickname(GuildUser user, out bool isOsrsAccount);
 
-        /// <summary>
-        ///     Preferably use with old username where possible
-        /// </summary>
-        /// <param name="womAccountId">Account Id to query</param>
-        /// <param name="newName">New name</param>
-        /// <returns></returns>
-        Task<NameChange> RequestNameChange(int womAccountId, string newName);
+    //Task<bool> HasSetUsername(IGuildUser user);
+    Task<string> SetUserName(GuildUser user, string name);
 
-        Task<NameChange> RequestNameChange(string oldUsername, string newName);
-    }
+    /// <summary>
+    ///     Preferably use with old username where possible
+    /// </summary>
+    /// <param name="womAccountId">Account Id to query</param>
+    /// <param name="newName">New name</param>
+    /// <returns></returns>
+    Task<NameChange> RequestNameChange(int womAccountId, string newName);
+
+    Task<NameChange> RequestNameChange(string oldUsername, string newName);
 }

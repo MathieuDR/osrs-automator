@@ -2,14 +2,14 @@ using System;
 using Common.Extensions;
 using Discord.WebSocket;
 
-namespace DiscordBot.Models.Contexts {
-    public class MessageCommandContext : BaseInteractiveContext<SocketMessageCommand>
-    {
-        public MessageCommandContext(SocketMessageCommand innerContext, IServiceProvider provider)
-            : base(innerContext, provider) { }
+namespace DiscordBot.Models.Contexts; 
 
-        public SocketUserMessage UserMessage => InnerContext.Data.Message.Cast<SocketUserMessage>();
+public class MessageCommandContext : BaseInteractiveContext<SocketMessageCommand>
+{
+    public MessageCommandContext(SocketMessageCommand innerContext, IServiceProvider provider)
+        : base(innerContext, provider) { }
 
-        public override string Message => InnerContext.CommandName;
-    }
+    public SocketUserMessage UserMessage => InnerContext.Data.Message.Cast<SocketUserMessage>();
+
+    public override string Message => InnerContext.CommandName;
 }

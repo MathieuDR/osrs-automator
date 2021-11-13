@@ -4,18 +4,18 @@ using DiscordBot.Data.Interfaces;
 using DiscordBot.Data.Repository;
 using Microsoft.Extensions.Logging;
 
-namespace DiscordBot.Data.Factories {
-    public class RunescapeDropDataRepositoryFactory : BaseLiteDbRepositoryFactory<IRuneScapeDropDataRepository, RuneScapeDropDataRepository> {
-        public RunescapeDropDataRepositoryFactory(ILoggerFactory loggerFactory, LiteDbManager liteDbManager) : base(loggerFactory, liteDbManager) { }
+namespace DiscordBot.Data.Factories; 
 
-        public override bool RequiresGuildId => false;
+public class RunescapeDropDataRepositoryFactory : BaseLiteDbRepositoryFactory<IRuneScapeDropDataRepository, RuneScapeDropDataRepository> {
+    public RunescapeDropDataRepositoryFactory(ILoggerFactory loggerFactory, LiteDbManager liteDbManager) : base(loggerFactory, liteDbManager) { }
 
-        public override IRuneScapeDropDataRepository Create(ulong guildId) {
-            throw new NotImplementedException();
-        }
+    public override bool RequiresGuildId => false;
 
-        public override IRuneScapeDropDataRepository Create() {
-            return new RuneScapeDropDataRepository(GetLogger(), LiteDbManager.GetCommonDatabase());
-        }
+    public override IRuneScapeDropDataRepository Create(ulong guildId) {
+        throw new NotImplementedException();
+    }
+
+    public override IRuneScapeDropDataRepository Create() {
+        return new RuneScapeDropDataRepository(GetLogger(), LiteDbManager.GetCommonDatabase());
     }
 }

@@ -1,14 +1,14 @@
 ﻿using System.Runtime.Serialization;
 
-namespace WiseOldManConnector.Models.WiseOldMan.Enums {
-    public enum CompetitionStatus {
-        [EnumMember(Value = "upcoming")]
-        Upcoming = 1,
+namespace WiseOldManConnector.Models.WiseOldMan.Enums; 
 
-        [EnumMember(Value = "ongoing")]
-        Ongoing = 2,
+public enum CompetitionStatus {
+    [EnumMember(Value = "upcoming")]
+    Upcoming = 1,
 
-        [EnumMember(Value = "finished")]
-        Finished = 3
-    }
+    [EnumMember(Value = "ongoing")]
+    Ongoing = 2,
+
+    [EnumMember(Value = "finished")]
+    Finished = 3
 }

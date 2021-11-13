@@ -13,61 +13,61 @@ using Serilog.Events;
 using Serilog.Formatting.Json;
 using WiseOldManConnector.Configuration;
 
-namespace DiscordBot {
-    internal class Program {
-        public async Task EntryPointAsync() {
-            var config = BuildConfig();
-            var services = ConfigureServices(config); // No using statement?
-            //var schedulerTask = CreateQuartzScheduler();
+namespace DiscordBot; 
 
-            try {
-                var bot = new DiscordBot(config, services, services.GetRequiredService<ILogger<DiscordBot>>());
-                await bot.Run(new CancellationToken());
-                await Task.Delay(-1);
-            } catch (Exception e) {
-                Log.Fatal(e, "FATAL ERROR: ");
-            }
-            finally {
-                Log.CloseAndFlush();
-            }
+internal class Program {
+    public async Task EntryPointAsync() {
+        var config = BuildConfig();
+        var services = ConfigureServices(config); // No using statement?
+        //var schedulerTask = CreateQuartzScheduler();
+
+        try {
+            var bot = new DiscordBot(config, services, services.GetRequiredService<ILogger<DiscordBot>>());
+            await bot.Run(new CancellationToken());
+            await Task.Delay(-1);
+        } catch (Exception e) {
+            Log.Fatal(e, "FATAL ERROR: ");
         }
-
-        private static void Main() {
-            new Program().EntryPointAsync().GetAwaiter().GetResult();
+        finally {
+            Log.CloseAndFlush();
         }
+    }
 
-        private void ConfigureSerilogger() {
-            Log.Logger = new LoggerConfiguration()
-                .Enrich.FromLogContext()
-                .MinimumLevel
-                .Debug()
-                .WriteTo.File(new JsonFormatter(), "logs/osrs_bot.log", rollingInterval: RollingInterval.Day)
-                .WriteTo.Console(restrictedToMinimumLevel: LogEventLevel.Information)
-                .CreateLogger();
-        }
+    private static void Main() {
+        new Program().EntryPointAsync().GetAwaiter().GetResult();
+    }
 
-        private IServiceProvider ConfigureServices(IConfiguration config) {
-            var serviceCollection = new ServiceCollection();
+    private void ConfigureSerilogger() {
+        Log.Logger = new LoggerConfiguration()
+            .Enrich.FromLogContext()
+            .MinimumLevel
+            .Debug()
+            .WriteTo.File(new JsonFormatter(), "logs/osrs_bot.log", rollingInterval: RollingInterval.Day)
+            .WriteTo.Console(restrictedToMinimumLevel: LogEventLevel.Information)
+            .CreateLogger();
+    }
 
-            ConfigureSerilogger();
+    private IServiceProvider ConfigureServices(IConfiguration config) {
+        var serviceCollection = new ServiceCollection();
 
-            serviceCollection
-                .AddDiscordBot(config)
-                .UseLiteDbRepositories(config)
-                .AddWiseOldManApi()
-                .AddDiscordBotServices()
-                .ConfigureQuartz(config);
+        ConfigureSerilogger();
 
-            return serviceCollection.BuildServiceProvider();
-        }
+        serviceCollection
+            .AddDiscordBot(config)
+            .UseLiteDbRepositories(config)
+            .AddWiseOldManApi()
+            .AddDiscordBotServices()
+            .ConfigureQuartz(config);
 
-        private IConfiguration BuildConfig() {
-            var environmentName = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT");
+        return serviceCollection.BuildServiceProvider();
+    }
 
-            return new ConfigurationBuilder()
-                .SetBasePath(Directory.GetCurrentDirectory())
-                .AddJsonFile("appsettings.json")
-                .AddJsonFile($"appsettings.{environmentName}.json", true).Build();
-        }
+    private IConfiguration BuildConfig() {
+        var environmentName = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT");
+
+        return new ConfigurationBuilder()
+            .SetBasePath(Directory.GetCurrentDirectory())
+            .AddJsonFile("appsettings.json")
+            .AddJsonFile($"appsettings.{environmentName}.json", true).Build();
     }
 }

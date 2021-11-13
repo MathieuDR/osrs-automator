@@ -1,17 +1,17 @@
 ﻿using Newtonsoft.Json;
 
-namespace WiseOldManConnector.Models.API.Responses {
-    internal class StatisticsResponse : BaseResponse {
-        [JsonProperty("maxedCombatCount")]
-        public int MaxedCombatCount { get; set; }
+namespace WiseOldManConnector.Models.API.Responses; 
 
-        [JsonProperty("maxedTotalCount")]
-        public int MaxedTotalCount { get; set; }
+internal class StatisticsResponse : BaseResponse {
+    [JsonProperty("maxedCombatCount")]
+    public int MaxedCombatCount { get; set; }
 
-        [JsonProperty("maxed200msCount")]
-        public int Maxed200MsCount { get; set; }
+    [JsonProperty("maxedTotalCount")]
+    public int MaxedTotalCount { get; set; }
 
-        [JsonProperty("averageStats")]
-        public WOMSnapshot AverageStats { get; set; }
-    }
+    [JsonProperty("maxed200msCount")]
+    public int Maxed200MsCount { get; set; }
+
+    [JsonProperty("averageStats")]
+    public WOMSnapshot AverageStats { get; set; }
 }

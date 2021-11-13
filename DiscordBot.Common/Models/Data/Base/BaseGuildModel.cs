@@ -1,23 +1,23 @@
-﻿namespace DiscordBot.Common.Models.Data.Base {
-    public class BaseGuildModel : BaseModel {
-        public BaseGuildModel() { }
+﻿namespace DiscordBot.Common.Models.Data.Base; 
 
-        public BaseGuildModel(ulong guildId, ulong discordId) : base(discordId) {
-            GuildId = guildId;
-        }
+public class BaseGuildModel : BaseModel {
+    public BaseGuildModel() { }
 
-        public ulong GuildId { get; set; }
+    public BaseGuildModel(ulong guildId, ulong discordId) : base(discordId) {
+        GuildId = guildId;
     }
+
+    public ulong GuildId { get; set; }
+}
     
-    public record BaseGuildRecord: BaseRecord {
-        public BaseGuildRecord() { }
+public record BaseGuildRecord: BaseRecord {
+    public BaseGuildRecord() { }
 
-        public BaseGuildRecord(ulong guildId, ulong discordId) : base() {
-            GuildId = guildId;
-            CreatedById = discordId;
-        }
-
-        public ulong GuildId { get; init; }
-        public ulong CreatedById { get; init; }
+    public BaseGuildRecord(ulong guildId, ulong discordId) : base() {
+        GuildId = guildId;
+        CreatedById = discordId;
     }
+
+    public ulong GuildId { get; init; }
+    public ulong CreatedById { get; init; }
 }

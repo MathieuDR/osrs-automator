@@ -3,15 +3,15 @@ using WiseOldManConnector.Models;
 using WiseOldManConnector.Models.Output;
 using WiseOldManConnector.Models.WiseOldMan.Enums;
 
-namespace WiseOldManConnector.Interfaces {
-    public interface IWiseOldManDeltaApi {
-        #region Deltas
+namespace WiseOldManConnector.Interfaces; 
 
-        Task<ConnectorCollectionResponse<Deltas>> ViewLeaderboard(MetricType metric);
-        Task<ConnectorCollectionResponse<Deltas>> ViewLeaderboard(MetricType metric, Period period);
-        Task<ConnectorCollectionResponse<Deltas>> ViewLeaderboard(MetricType metric, PlayerType playertype);
-        Task<ConnectorCollectionResponse<Deltas>> ViewLeaderboard(MetricType metric, Period period, PlayerType playertype);
+public interface IWiseOldManDeltaApi {
+    #region Deltas
 
-        #endregion
-    }
+    Task<ConnectorCollectionResponse<Deltas>> ViewLeaderboard(MetricType metric);
+    Task<ConnectorCollectionResponse<Deltas>> ViewLeaderboard(MetricType metric, Period period);
+    Task<ConnectorCollectionResponse<Deltas>> ViewLeaderboard(MetricType metric, PlayerType playertype);
+    Task<ConnectorCollectionResponse<Deltas>> ViewLeaderboard(MetricType metric, Period period, PlayerType playertype);
+
+    #endregion
 }

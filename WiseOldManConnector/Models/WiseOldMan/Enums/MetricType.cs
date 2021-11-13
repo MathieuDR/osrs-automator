@@ -1,263 +1,263 @@
 ﻿using System.Runtime.Serialization;
 
-namespace WiseOldManConnector.Models.WiseOldMan.Enums {
-    public enum MetricType {
-        [EnumMember(Value = "overall")]
-        Overall = 1,
+namespace WiseOldManConnector.Models.WiseOldMan.Enums; 
 
-        [EnumMember(Value = "attack")]
-        Attack,
+public enum MetricType {
+    [EnumMember(Value = "overall")]
+    Overall = 1,
 
-        [EnumMember(Value = "defence")]
-        Defence,
+    [EnumMember(Value = "attack")]
+    Attack,
 
-        [EnumMember(Value = "strength")]
-        Strength,
+    [EnumMember(Value = "defence")]
+    Defence,
 
-        [EnumMember(Value = "hitpoints")]
-        Hitpoints,
+    [EnumMember(Value = "strength")]
+    Strength,
 
-        [EnumMember(Value = "ranged")]
-        Ranged,
+    [EnumMember(Value = "hitpoints")]
+    Hitpoints,
 
-        [EnumMember(Value = "prayer")]
-        Prayer,
+    [EnumMember(Value = "ranged")]
+    Ranged,
 
-        [EnumMember(Value = "magic")]
-        Magic,
+    [EnumMember(Value = "prayer")]
+    Prayer,
 
-        [EnumMember(Value = "cooking")]
-        Cooking,
+    [EnumMember(Value = "magic")]
+    Magic,
 
-        [EnumMember(Value = "woodcutting")]
-        Woodcutting,
+    [EnumMember(Value = "cooking")]
+    Cooking,
 
-        [EnumMember(Value = "fletching")]
-        Fletching,
+    [EnumMember(Value = "woodcutting")]
+    Woodcutting,
 
-        [EnumMember(Value = "fishing")]
-        Fishing,
+    [EnumMember(Value = "fletching")]
+    Fletching,
 
-        [EnumMember(Value = "firemaking")]
-        Firemaking,
+    [EnumMember(Value = "fishing")]
+    Fishing,
 
-        [EnumMember(Value = "crafting")]
-        Crafting,
+    [EnumMember(Value = "firemaking")]
+    Firemaking,
 
-        [EnumMember(Value = "smithing")]
-        Smithing,
+    [EnumMember(Value = "crafting")]
+    Crafting,
 
-        [EnumMember(Value = "mining")]
-        Mining,
+    [EnumMember(Value = "smithing")]
+    Smithing,
 
-        [EnumMember(Value = "herblore")]
-        Herblore,
+    [EnumMember(Value = "mining")]
+    Mining,
 
-        [EnumMember(Value = "agility")]
-        Agility,
+    [EnumMember(Value = "herblore")]
+    Herblore,
 
-        [EnumMember(Value = "thieving")]
-        Thieving,
+    [EnumMember(Value = "agility")]
+    Agility,
 
-        [EnumMember(Value = "slayer")]
-        Slayer,
+    [EnumMember(Value = "thieving")]
+    Thieving,
 
-        [EnumMember(Value = "farming")]
-        Farming,
+    [EnumMember(Value = "slayer")]
+    Slayer,
 
-        [EnumMember(Value = "runecrafting")]
-        Runecrafting,
+    [EnumMember(Value = "farming")]
+    Farming,
 
-        [EnumMember(Value = "hunter")]
-        Hunter,
+    [EnumMember(Value = "runecrafting")]
+    Runecrafting,
 
-        [EnumMember(Value = "construction")]
-        Construction,
+    [EnumMember(Value = "hunter")]
+    Hunter,
 
-        [EnumMember(Value = "league_points")]
-        LeaguePoints = 50,
+    [EnumMember(Value = "construction")]
+    Construction,
 
-        [EnumMember(Value = "bounty_hunter_hunter")]
-        BountyHunterHunter,
+    [EnumMember(Value = "league_points")]
+    LeaguePoints = 50,
 
-        [EnumMember(Value = "bounty_hunter_rogue")]
-        BountyHunterRogue,
+    [EnumMember(Value = "bounty_hunter_hunter")]
+    BountyHunterHunter,
 
-        [EnumMember(Value = "clue_scrolls_all")]
-        ClueScrollsAll,
+    [EnumMember(Value = "bounty_hunter_rogue")]
+    BountyHunterRogue,
 
-        [EnumMember(Value = "clue_scrolls_beginner")]
-        ClueScrollsBeginner,
+    [EnumMember(Value = "clue_scrolls_all")]
+    ClueScrollsAll,
 
-        [EnumMember(Value = "clue_scrolls_easy")]
-        ClueScrollsEasy,
+    [EnumMember(Value = "clue_scrolls_beginner")]
+    ClueScrollsBeginner,
 
-        [EnumMember(Value = "clue_scrolls_medium")]
-        ClueScrollsMedium,
+    [EnumMember(Value = "clue_scrolls_easy")]
+    ClueScrollsEasy,
 
-        [EnumMember(Value = "clue_scrolls_hard")]
-        ClueScrollsHard,
+    [EnumMember(Value = "clue_scrolls_medium")]
+    ClueScrollsMedium,
 
-        [EnumMember(Value = "clue_scrolls_elite")]
-        ClueScrollsElite,
+    [EnumMember(Value = "clue_scrolls_hard")]
+    ClueScrollsHard,
 
-        [EnumMember(Value = "clue_scrolls_master")]
-        ClueScrollsMaster,
+    [EnumMember(Value = "clue_scrolls_elite")]
+    ClueScrollsElite,
 
-        [EnumMember(Value = "last_man_standing")]
-        LastManStanding,
+    [EnumMember(Value = "clue_scrolls_master")]
+    ClueScrollsMaster,
 
-        [EnumMember(Value = "soul_wars_zeal")]
-        SoulWarsZeal,
+    [EnumMember(Value = "last_man_standing")]
+    LastManStanding,
 
-        [EnumMember(Value = "abyssal_sire")]
-        AbyssalSire,
+    [EnumMember(Value = "soul_wars_zeal")]
+    SoulWarsZeal,
 
-        [EnumMember(Value = "alchemical_hydra")]
-        AlchemicalHydra,
+    [EnumMember(Value = "abyssal_sire")]
+    AbyssalSire,
 
-        [EnumMember(Value = "barrows_chests")]
-        BarrowsChests,
+    [EnumMember(Value = "alchemical_hydra")]
+    AlchemicalHydra,
 
-        [EnumMember(Value = "bryophyta")]
-        Bryophyta,
+    [EnumMember(Value = "barrows_chests")]
+    BarrowsChests,
 
-        [EnumMember(Value = "callisto")]
-        Callisto,
+    [EnumMember(Value = "bryophyta")]
+    Bryophyta,
 
-        [EnumMember(Value = "cerberus")]
-        Cerberus,
+    [EnumMember(Value = "callisto")]
+    Callisto,
 
-        [EnumMember(Value = "chambers_of_xeric")]
-        ChambersOfXeric,
+    [EnumMember(Value = "cerberus")]
+    Cerberus,
 
-        [EnumMember(Value = "chambers_of_xeric_challenge_mode")]
-        ChambersOfXericChallengeMode,
+    [EnumMember(Value = "chambers_of_xeric")]
+    ChambersOfXeric,
 
-        [EnumMember(Value = "chaos_elemental")]
-        ChaosElemental,
+    [EnumMember(Value = "chambers_of_xeric_challenge_mode")]
+    ChambersOfXericChallengeMode,
 
-        [EnumMember(Value = "chaos_fanatic")]
-        ChaosFanatic,
+    [EnumMember(Value = "chaos_elemental")]
+    ChaosElemental,
 
-        [EnumMember(Value = "commander_zilyana")]
-        CommanderZilyana,
+    [EnumMember(Value = "chaos_fanatic")]
+    ChaosFanatic,
 
-        [EnumMember(Value = "corporeal_beast")]
-        CorporealBeast,
+    [EnumMember(Value = "commander_zilyana")]
+    CommanderZilyana,
 
-        [EnumMember(Value = "crazy_archaeologist")]
-        CrazyArchaeologist,
+    [EnumMember(Value = "corporeal_beast")]
+    CorporealBeast,
 
-        [EnumMember(Value = "dagannoth_prime")]
-        DagannothPrime,
+    [EnumMember(Value = "crazy_archaeologist")]
+    CrazyArchaeologist,
 
-        [EnumMember(Value = "dagannoth_rex")]
-        DagannothRex,
+    [EnumMember(Value = "dagannoth_prime")]
+    DagannothPrime,
 
-        [EnumMember(Value = "dagannoth_supreme")]
-        DagannothSupreme,
+    [EnumMember(Value = "dagannoth_rex")]
+    DagannothRex,
 
-        [EnumMember(Value = "deranged_archaeologist")]
-        DerangedArchaeologist,
+    [EnumMember(Value = "dagannoth_supreme")]
+    DagannothSupreme,
 
-        [EnumMember(Value = "general_graardor")]
-        GeneralGraardor,
+    [EnumMember(Value = "deranged_archaeologist")]
+    DerangedArchaeologist,
 
-        [EnumMember(Value = "giant_mole")]
-        GiantMole,
+    [EnumMember(Value = "general_graardor")]
+    GeneralGraardor,
 
-        [EnumMember(Value = "grotesque_guardians")]
-        GrotesqueGuardians,
+    [EnumMember(Value = "giant_mole")]
+    GiantMole,
 
-        [EnumMember(Value = "hespori")]
-        Hespori,
+    [EnumMember(Value = "grotesque_guardians")]
+    GrotesqueGuardians,
 
-        [EnumMember(Value = "kalphite_queen")]
-        KalphiteQueen,
+    [EnumMember(Value = "hespori")]
+    Hespori,
 
-        [EnumMember(Value = "king_black_dragon")]
-        KingBlackDragon,
+    [EnumMember(Value = "kalphite_queen")]
+    KalphiteQueen,
 
-        [EnumMember(Value = "kraken")]
-        Kraken,
+    [EnumMember(Value = "king_black_dragon")]
+    KingBlackDragon,
 
-        [EnumMember(Value = "kreearra")]
-        Kreearra,
+    [EnumMember(Value = "kraken")]
+    Kraken,
 
-        [EnumMember(Value = "kril_tsutsaroth")]
-        KrilTsutsaroth,
+    [EnumMember(Value = "kreearra")]
+    Kreearra,
 
-        [EnumMember(Value = "mimic")]
-        Mimic,
+    [EnumMember(Value = "kril_tsutsaroth")]
+    KrilTsutsaroth,
 
-        [EnumMember(Value = "nightmare")]
-        Nightmare,
+    [EnumMember(Value = "mimic")]
+    Mimic,
 
-        [EnumMember(Value = "obor")]
-        Obor,
+    [EnumMember(Value = "nightmare")]
+    Nightmare,
 
-        [EnumMember(Value = "sarachnis")]
-        Sarachnis,
+    [EnumMember(Value = "obor")]
+    Obor,
 
-        [EnumMember(Value = "scorpia")]
-        Scorpia,
+    [EnumMember(Value = "sarachnis")]
+    Sarachnis,
 
-        [EnumMember(Value = "skotizo")]
-        Skotizo,
+    [EnumMember(Value = "scorpia")]
+    Scorpia,
 
-        [EnumMember(Value = "the_gauntlet")]
-        TheGauntlet,
+    [EnumMember(Value = "skotizo")]
+    Skotizo,
 
-        [EnumMember(Value = "the_corrupted_gauntlet")]
-        TheCorruptedGauntlet,
+    [EnumMember(Value = "the_gauntlet")]
+    TheGauntlet,
 
-        [EnumMember(Value = "theatre_of_blood")]
-        TheatreOfBlood,
+    [EnumMember(Value = "the_corrupted_gauntlet")]
+    TheCorruptedGauntlet,
 
-        [EnumMember(Value = "thermonuclear_smoke_devil")]
-        ThermonuclearSmokeDevil,
+    [EnumMember(Value = "theatre_of_blood")]
+    TheatreOfBlood,
 
-        [EnumMember(Value = "tzkal_zuk")]
-        TzkalZuk,
+    [EnumMember(Value = "thermonuclear_smoke_devil")]
+    ThermonuclearSmokeDevil,
 
-        [EnumMember(Value = "tztok_jad")]
-        TztokJad,
+    [EnumMember(Value = "tzkal_zuk")]
+    TzkalZuk,
 
-        [EnumMember(Value = "venenatis")]
-        Venenatis,
+    [EnumMember(Value = "tztok_jad")]
+    TztokJad,
 
-        [EnumMember(Value = "vetion")]
-        Vetion,
+    [EnumMember(Value = "venenatis")]
+    Venenatis,
 
-        [EnumMember(Value = "vorkath")]
-        Vorkath,
+    [EnumMember(Value = "vetion")]
+    Vetion,
 
-        [EnumMember(Value = "wintertodt")]
-        Wintertodt,
+    [EnumMember(Value = "vorkath")]
+    Vorkath,
 
-        [EnumMember(Value = "zalcano")]
-        Zalcano,
+    [EnumMember(Value = "wintertodt")]
+    Wintertodt,
 
-        [EnumMember(Value = "zulrah")]
-        Zulrah,
+    [EnumMember(Value = "zalcano")]
+    Zalcano,
 
-        [EnumMember(Value = "combat")]
-        Combat,
+    [EnumMember(Value = "zulrah")]
+    Zulrah,
 
-        [EnumMember(Value = "ehp")]
-        EffectiveHoursPlaying,
+    [EnumMember(Value = "combat")]
+    Combat,
 
-        [EnumMember(Value = "ehb")]
-        EffectiveHoursBossing,
+    [EnumMember(Value = "ehp")]
+    EffectiveHoursPlaying,
 
-        [EnumMember(Value = "tempoross")]
-        Tempoross,
+    [EnumMember(Value = "ehb")]
+    EffectiveHoursBossing,
 
-        [EnumMember(Value = "phosanis_nightmare")]
-        PhosanisNightmare,
+    [EnumMember(Value = "tempoross")]
+    Tempoross,
 
-        [EnumMember(Value = "theatre_of_blood_hard_mode")]
-        TheatreOfBloodHardMode
-    }
+    [EnumMember(Value = "phosanis_nightmare")]
+    PhosanisNightmare,
+
+    [EnumMember(Value = "theatre_of_blood_hard_mode")]
+    TheatreOfBloodHardMode
 }

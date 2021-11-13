@@ -2,21 +2,21 @@
 using Discord;
 using WiseOldManConnector.Models.Output;
 
-namespace DiscordBot.Transformers.TypeConverters {
-    public class DeltaLeaderboardToEmbedBuilderConverter : ITypeConverter<DeltaLeaderboard, EmbedBuilder> {
-        public EmbedBuilder Convert(DeltaLeaderboard source, EmbedBuilder destination, ResolutionContext context) {
-            destination ??= new EmbedBuilder();
+namespace DiscordBot.Transformers.TypeConverters; 
 
-            if (string.IsNullOrEmpty(destination.Title)) {
-                destination.Title = $"{source.MetricType.ToString()} - leaderboard.";
-            }
+public class DeltaLeaderboardToEmbedBuilderConverter : ITypeConverter<DeltaLeaderboard, EmbedBuilder> {
+    public EmbedBuilder Convert(DeltaLeaderboard source, EmbedBuilder destination, ResolutionContext context) {
+        destination ??= new EmbedBuilder();
 
-            destination.Description = $"```{source.MembersToString()}```";
-
-            destination.AddField("Total on leaderboard", source.PageSize, true);
-            destination.AddField("Metric", source.MetricType, true);
-
-            return destination;
+        if (string.IsNullOrEmpty(destination.Title)) {
+            destination.Title = $"{source.MetricType.ToString()} - leaderboard.";
         }
+
+        destination.Description = $"```{source.MembersToString()}```";
+
+        destination.AddField("Total on leaderboard", source.PageSize, true);
+        destination.AddField("Metric", source.MetricType, true);
+
+        return destination;
     }
 }

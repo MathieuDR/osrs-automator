@@ -1,18 +1,18 @@
 using System.Collections.Generic;
 using System.Text.Json.Serialization;
 
-namespace Dashboard.Models.ApiRequests.DiscordEmbed {
-    public class Embed {
-        [JsonPropertyName("thumbnail")]
-        public Thumbnail Thumbnail { get; set; }
+namespace Dashboard.Models.ApiRequests.DiscordEmbed; 
 
-        [JsonPropertyName("author")]
-        public Author Author { get; set; }
+public class Embed {
+    [JsonPropertyName("thumbnail")]
+    public Thumbnail Thumbnail { get; set; }
 
-        [JsonPropertyName("description")]
-        public string Description { get; set; }
+    [JsonPropertyName("author")]
+    public Author Author { get; set; }
 
-        [JsonPropertyName("fields")]
-        public List<Field> Fields { get; set; }
-    }
+    [JsonPropertyName("description")]
+    public string Description { get; set; }
+
+    [JsonPropertyName("fields")]
+    public List<Field> Fields { get; set; }
 }

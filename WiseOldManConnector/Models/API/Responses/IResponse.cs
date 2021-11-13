@@ -1,7 +1,7 @@
-﻿namespace WiseOldManConnector.Models.API.Responses {
-    internal interface IResponse { }
+﻿namespace WiseOldManConnector.Models.API.Responses; 
 
-    internal interface IMessageResponse : IResponse {
-        public string Message { get; set; }
-    }
+internal interface IResponse { }
+
+internal interface IMessageResponse : IResponse {
+    public string Message { get; set; }
 }

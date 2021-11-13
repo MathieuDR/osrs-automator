@@ -1,35 +1,35 @@
 using WiseOldManConnector.Models.WiseOldMan.Enums;
 
-namespace DiscordBot.Common.Dtos.Runescape {
-    public record RunescapeDrop {
-        public RunescapeDrop() {
-            Item = new RunescapeItem();
-            Source = new RunescapeSource();
-            Recipient = new Player();
-        }
+namespace DiscordBot.Common.Dtos.Runescape; 
 
-        public RunescapeDrop(string image) {
-            Image = image;
-        }
+public record RunescapeDrop {
+    public RunescapeDrop() {
+        Item = new RunescapeItem();
+        Source = new RunescapeSource();
+        Recipient = new Player();
+    }
 
-        public RunescapeItem Item { get; init; }
-        public int Amount { get; set; }
-        public int TotalValue => Item.Value * Amount;
-        public int TotalHaValue => Item.HaValue * Amount;
-        public RunescapeSource Source { get; init; }
-        public float Rarity { get; init; }
-        public float RarityPercent => 1f / Rarity;
+    public RunescapeDrop(string image) {
+        Image = image;
+    }
 
-        public bool IsPet { get; init; }
+    public RunescapeItem Item { get; init; }
+    public int Amount { get; set; }
+    public int TotalValue => Item.Value * Amount;
+    public int TotalHaValue => Item.HaValue * Amount;
+    public RunescapeSource Source { get; init; }
+    public float Rarity { get; init; }
+    public float RarityPercent => 1f / Rarity;
 
-        public Player Recipient { get; init; }
+    public bool IsPet { get; init; }
 
-        public string Image { get; init; }
+    public Player Recipient { get; init; }
 
-        public record Player {
-            public PlayerType PlayerType { get; init; }
-            public string IconUrl { get; init; }
-            public string Username { get; init; }
-        }
+    public string Image { get; init; }
+
+    public record Player {
+        public PlayerType PlayerType { get; init; }
+        public string IconUrl { get; init; }
+        public string Username { get; init; }
     }
 }

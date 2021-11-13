@@ -1,92 +1,92 @@
 ﻿using System.Collections.Generic;
 using WiseOldManConnector.Models.WiseOldMan.Enums;
 
-namespace WiseOldManConnector.Models.Output {
-    public abstract class Leaderboard : IBaseConnectorOutput {
-        /// <summary>
-        ///     Offset
-        /// </summary>
-        public int Page { get; set; } = 0;
+namespace WiseOldManConnector.Models.Output; 
 
-        /// <summary>
-        ///     Limit
-        /// </summary>
-        public int PageSize { get; set; } = 20;
+public abstract class Leaderboard : IBaseConnectorOutput {
+    /// <summary>
+    ///     Offset
+    /// </summary>
+    public int Page { get; set; } = 0;
+
+    /// <summary>
+    ///     Limit
+    /// </summary>
+    public int PageSize { get; set; } = 20;
+}
+
+public abstract class Leaderboard<T> : Leaderboard where T : ILeaderboardMember {
+    protected Leaderboard() { }
+
+    protected Leaderboard(List<T> items) {
+        Members = items;
+        PageSize = items.Count;
     }
 
-    public abstract class Leaderboard<T> : Leaderboard where T : ILeaderboardMember {
-        protected Leaderboard() { }
+    /// <summary>
+    ///     Response
+    /// </summary>
+    public List<T> Members { get; set; }
+}
 
-        protected Leaderboard(List<T> items) {
-            Members = items;
-            PageSize = items.Count;
-        }
+public abstract class MetricTypeLeaderboard<T> : Leaderboard<T> where T : ILeaderboardMember {
+    protected MetricTypeLeaderboard() { }
 
-        /// <summary>
-        ///     Response
-        /// </summary>
-        public List<T> Members { get; set; }
+    protected MetricTypeLeaderboard(MetricType metricType) {
+        MetricType = metricType;
     }
 
-    public abstract class MetricTypeLeaderboard<T> : Leaderboard<T> where T : ILeaderboardMember {
-        protected MetricTypeLeaderboard() { }
-
-        protected MetricTypeLeaderboard(MetricType metricType) {
-            MetricType = metricType;
-        }
-
-        protected MetricTypeLeaderboard(List<T> items, MetricType metricType) : base(items) {
-            MetricType = metricType;
-        }
-
-        /// <summary>
-        ///     From Request
-        /// </summary>
-        public MetricType MetricType { get; set; }
+    protected MetricTypeLeaderboard(List<T> items, MetricType metricType) : base(items) {
+        MetricType = metricType;
     }
 
-    // Should we use interfaces? probably..
-    public abstract class MetricTypeAndPeriodLeaderboard<T> : MetricTypeLeaderboard<T> where T : ILeaderboardMember {
-        protected MetricTypeAndPeriodLeaderboard() { }
+    /// <summary>
+    ///     From Request
+    /// </summary>
+    public MetricType MetricType { get; set; }
+}
+
+// Should we use interfaces? probably..
+public abstract class MetricTypeAndPeriodLeaderboard<T> : MetricTypeLeaderboard<T> where T : ILeaderboardMember {
+    protected MetricTypeAndPeriodLeaderboard() { }
 
 
-        protected MetricTypeAndPeriodLeaderboard(MetricType metricType, Period period) : base(metricType) {
-            Period = period;
-        }
-
-        protected MetricTypeAndPeriodLeaderboard(List<T> items, MetricType metricType, Period period) : base(items, metricType) {
-            Period = period;
-        }
-
-        /// <summary>
-        ///     From Request
-        /// </summary>
-        public Period Period { get; set; }
+    protected MetricTypeAndPeriodLeaderboard(MetricType metricType, Period period) : base(metricType) {
+        Period = period;
     }
 
-    public class RecordLeaderboard : MetricTypeAndPeriodLeaderboard<Record> {
-        public RecordLeaderboard() { }
-        public RecordLeaderboard(MetricType metricType, Period period) : base(metricType, period) { }
-        public RecordLeaderboard(List<Record> items, MetricType metricType, Period period) : base(items, metricType, period) { }
+    protected MetricTypeAndPeriodLeaderboard(List<T> items, MetricType metricType, Period period) : base(items, metricType) {
+        Period = period;
     }
 
-    public class HighscoreLeaderboard : MetricTypeLeaderboard<HighscoreMember> {
-        public HighscoreLeaderboard() { }
-        public HighscoreLeaderboard(MetricType metricType) : base(metricType) { }
-        public HighscoreLeaderboard(List<HighscoreMember> items, MetricType metricType) : base(items, metricType) { }
-    }
+    /// <summary>
+    ///     From Request
+    /// </summary>
+    public Period Period { get; set; }
+}
 
-    public class DeltaLeaderboard : MetricTypeAndPeriodLeaderboard<DeltaMember> {
-        public DeltaLeaderboard() { }
-        public DeltaLeaderboard(MetricType metricType, Period period) : base(metricType, period) { }
+public class RecordLeaderboard : MetricTypeAndPeriodLeaderboard<Record> {
+    public RecordLeaderboard() { }
+    public RecordLeaderboard(MetricType metricType, Period period) : base(metricType, period) { }
+    public RecordLeaderboard(List<Record> items, MetricType metricType, Period period) : base(items, metricType, period) { }
+}
 
-        public DeltaLeaderboard(List<DeltaMember> items, MetricType metricType, Period period) :
-            base(items, metricType, period) { }
-    }
+public class HighscoreLeaderboard : MetricTypeLeaderboard<HighscoreMember> {
+    public HighscoreLeaderboard() { }
+    public HighscoreLeaderboard(MetricType metricType) : base(metricType) { }
+    public HighscoreLeaderboard(List<HighscoreMember> items, MetricType metricType) : base(items, metricType) { }
+}
 
-    public class CompetitionLeaderboard : MetricTypeLeaderboard<CompetitionParticipant> {
-        public CompetitionLeaderboard() { }
-        public CompetitionLeaderboard(MetricType metricType) : base(metricType) { }
-        public CompetitionLeaderboard(List<CompetitionParticipant> items, MetricType metricType) : base(items, metricType) { }
-    }
+public class DeltaLeaderboard : MetricTypeAndPeriodLeaderboard<DeltaMember> {
+    public DeltaLeaderboard() { }
+    public DeltaLeaderboard(MetricType metricType, Period period) : base(metricType, period) { }
+
+    public DeltaLeaderboard(List<DeltaMember> items, MetricType metricType, Period period) :
+        base(items, metricType, period) { }
+}
+
+public class CompetitionLeaderboard : MetricTypeLeaderboard<CompetitionParticipant> {
+    public CompetitionLeaderboard() { }
+    public CompetitionLeaderboard(MetricType metricType) : base(metricType) { }
+    public CompetitionLeaderboard(List<CompetitionParticipant> items, MetricType metricType) : base(items, metricType) { }
 }
