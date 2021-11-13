@@ -27,6 +27,7 @@
 [![Issues][issues-shield]][issues-url]
 [![MIT License][license-shield]][license-url]
 [![LinkedIn][linkedin-shield]][linkedin-url]
+[![wakatime](https://wakatime.com/badge/user/f446970f-9873-48d3-95f9-f37d9a4541b3/project/c76ecca4-99d2-4dfc-814c-f4fedfee0b69.svg)](https://wakatime.com/badge/user/f446970f-9873-48d3-95f9-f37d9a4541b3/project/c76ecca4-99d2-4dfc-814c-f4fedfee0b69)
 
 
 
