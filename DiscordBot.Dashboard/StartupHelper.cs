@@ -24,24 +24,19 @@ using WiseOldManConnector.Configuration;
 
 namespace Dashboard; 
 
-public class Startup {
-    public Startup(IConfiguration configuration) {
-        Configuration = configuration;
+public static class StartupHelper {
+    private static ApiOptions GetApiOptions(IConfiguration configuration) {
+        return configuration.GetSection("WebApp").GetSection("Api").Get<ApiOptions>();
     }
-
-    public IConfiguration Configuration { get; }
-    public ApiOptions ApiOptions { get; set; }
-
-    // This method gets called by the runtime. Use this method to add services to the container.
-    // For more information on how to configure your application, visit https://go.microsoft.com/fwlink/?LinkID=398940
-    public void ConfigureServices(IServiceCollection services) {
-        ApiOptions = Configuration.GetSection("WebApp").GetSection("Api").Get<ApiOptions>();
+    
+    public static void ConfigureServices(IServiceCollection services, IConfiguration configuration) {
+        var apiOptions = GetApiOptions(configuration);
         services.AddRazorPages();
         services.AddServerSideBlazor();
         services.AddMvc(options => { options.InputFormatters.Add(new BypassFormDataInputFormatter()); });
         services.AddApiVersioning(options => {
             options.AssumeDefaultVersionWhenUnspecified = true;
-            options.DefaultApiVersion = new ApiVersion(ApiOptions.VersionMajor, ApiOptions.VersionMinor);
+            options.DefaultApiVersion = new ApiVersion(apiOptions.VersionMajor, apiOptions.VersionMinor);
             options.ReportApiVersions = true;
         });
 
@@ -60,43 +55,28 @@ public class Startup {
         services.AddSwaggerGen(options => {
             // add a custom operation filter which sets default values
             options.OperationFilter<SwaggerDefaultValues>();
-            options.SwaggerDoc(ApiOptions.Version, new OpenApiInfo {Title = ApiOptions.Description, Version = ApiOptions.Version});
+            options.SwaggerDoc(apiOptions.Version, new OpenApiInfo {Title = apiOptions.Description, Version = apiOptions.Version});
         });
 
         services
-            .AddDiscordBot(Configuration)
-            .UseLiteDbRepositories(Configuration)
+            .AddDiscordBot(configuration)
+            .UseLiteDbRepositories(configuration)
             .AddWiseOldManApi()
             .AddDiscordBotServices()
-            .ConfigureQuartz(Configuration);
+            .ConfigureQuartz(configuration);
 
         services.AddTransient<IMapper<Embed, RunescapeDrop>, EmbedToRunescapeDropMapper>();
     }
 
-
-    public static void CreateLogger() {
-        Log.Logger = new LoggerConfiguration()
-            .Enrich.FromLogContext()
-            .MinimumLevel
-            .Debug()
-            .WriteTo.File(new JsonFormatter(), "logs/web.log", rollingInterval: RollingInterval.Day)
-            .WriteTo.Console(LogEventLevel.Information)
-            .CreateLogger();
-    }
-
-    // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-    public void Configure(IApplicationBuilder app, IWebHostEnvironment env, IApiVersionDescriptionProvider apiVersionDescriptionProvider) {
+    public static void ConfigurePipeline(IApplicationBuilder app, IWebHostEnvironment env, IApiVersionDescriptionProvider apiVersionDescriptionProvider, IConfiguration configuration) {
         if (env.IsDevelopment()) {
             app.UseDeveloperExceptionPage();
         } else {
             app.UseExceptionHandler("/Error");
-            // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
-            //app.UseHsts();
         }
 
-        ConfigureSwagger(app, apiVersionDescriptionProvider);
+        ConfigureSwagger(app, apiVersionDescriptionProvider, GetApiOptions(configuration));
 
-        //app.UseHttpsRedirection();
         app.UseStaticFiles();
 
         app.UseRouting();
@@ -108,17 +88,13 @@ public class Startup {
         });
     }
 
-    private void ConfigureSwagger(IApplicationBuilder app, IApiVersionDescriptionProvider provider) {
+    private static void ConfigureSwagger(IApplicationBuilder app, IApiVersionDescriptionProvider provider, ApiOptions options) {
         app.UseSwagger();
-        // app.UseSwagger(options => {
-        //    // options.RouteTemplate = ApiOptions.JsonRoute;
-        // });
-        app.UseSwaggerUI(options => {
+        app.UseSwaggerUI(swaggerUiOptions => {
             // build a swagger endpoint for each discovered API version
             foreach (var description in provider.ApiVersionDescriptions) {
-                options.SwaggerEndpoint($"{description.GroupName}/{ApiOptions.UIEndpointSuffix}", description.GroupName.ToUpperInvariant());
+                swaggerUiOptions.SwaggerEndpoint($"{description.GroupName}/{options.UIEndpointSuffix}", description.GroupName.ToUpperInvariant());
             }
-            // options.SwaggerEndpoint(ApiOptions.UIEndpoint, ApiOptions.Description);
         });
     }
 }
