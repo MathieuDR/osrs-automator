@@ -1,17 +1,19 @@
 using Discord.Net;
 using DiscordBot.Commands.Interactive;
+using DiscordBot.Configuration;
 using DiscordBot.Data.Interfaces;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Options;
 
 namespace DiscordBot.Services; 
 
 public class InteractiveCommandHandlerService {
-    private const ulong OwnerGuildId = 403539795944538122;
     private readonly DiscordSocketClient _client;
     private readonly IApplicationCommandInfoRepository _commandInfoRepository;
     private readonly ILogger<InteractiveCommandHandlerService> _logger;
     private readonly IServiceProvider _provider;
     private readonly ICommandRegistrationService _registrationService;
+    private readonly IOptions<BotTeamConfiguration> _botTeamConfiguration;
     private readonly ICommandStrategy _strategy;
 
     public InteractiveCommandHandlerService(ILogger<InteractiveCommandHandlerService> logger,
@@ -19,18 +21,22 @@ public class InteractiveCommandHandlerService {
         ICommandStrategy strategy,
         IServiceProvider provider,
         IApplicationCommandInfoRepository commandInfoRepository,
-        ICommandRegistrationService registrationService) {
+        ICommandRegistrationService registrationService,
+        IOptions<BotTeamConfiguration> botTeamConfiguration) {
         _logger = logger;
         _client = client;
         _strategy = strategy;
         _provider = provider;
         _commandInfoRepository = commandInfoRepository;
         _registrationService = registrationService;
+        _botTeamConfiguration = botTeamConfiguration;
 
         client.InteractionCreated += OnInteraction;
     }
 
-    public async Task SetupAsync() {
+    private ulong GuildId => _botTeamConfiguration.Value.GuildId;
+
+  public async Task SetupAsync() {
         if (_client.ConnectionState != ConnectionState.Connected) {
             _client.Connected += ClientOnConnected;
             return;
@@ -83,7 +89,7 @@ public class InteractiveCommandHandlerService {
 
     private async Task RegisterCommandForOwnersGuild(IApplicationCommandHandler handler) {
         var propertiesTask = handler.GetCommandProperties();
-        var commands = await _client.GetGuild(OwnerGuildId).GetApplicationCommandsAsync();
+        var commands = await _client.GetGuild(GuildId).GetApplicationCommandsAsync();
 
         try {
             var existing = commands.FirstOrDefault(x => x.Name == handler.Name && x.IsGlobalCommand == false);
@@ -91,7 +97,7 @@ public class InteractiveCommandHandlerService {
                 await existing.DeleteAsync();
             }
 
-            await _client.Rest.CreateGuildCommand(await propertiesTask, OwnerGuildId);
+            await _client.Rest.CreateGuildCommand(await propertiesTask, GuildId);
         } catch (ApplicationCommandException e) {
             _logger.LogWarning(e, "Cannot register command {name} in the owners guild", handler.Name);
         } catch (Exception e) {

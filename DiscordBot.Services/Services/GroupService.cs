@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Text;
 using DiscordBot.Common.Dtos.Discord;
 using DiscordBot.Common.Models.Data;
 using DiscordBot.Common.Models.Decorators;
@@ -222,6 +218,12 @@ internal class GroupService : RepositoryService, IGroupService {
             Logger.LogWarning(e, "Could not create competition");
             return Result.Fail(new ExceptionalError("Could not create competition", e));
         }
+    }
+
+    public Task<Result<CommandRoleConfig>> GetCommandRoleConfig(Guild guild) {
+        var config = GetGroupConfig(guild.Id);
+        var result = config?.CommandRoleConfig ?? new CommandRoleConfig();
+        return Task.FromResult(Result.Ok(result));
     }
 
     private GuildConfig GetGroupConfig(ulong guildId, bool validate = true) {

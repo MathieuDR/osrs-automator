@@ -1,7 +1,3 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using DiscordBot.Common.Dtos.Runescape;
 using DiscordBot.Common.Models.Data;
 using DiscordBot.Data.Interfaces;

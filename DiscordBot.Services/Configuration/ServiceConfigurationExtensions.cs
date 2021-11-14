@@ -1,8 +1,6 @@
-using System;
 using DiscordBot.Services.ExternalServices;
 using DiscordBot.Services.Interfaces;
 using DiscordBot.Services.Services;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Refit;
 

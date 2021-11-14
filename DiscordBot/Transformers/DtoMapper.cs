@@ -4,7 +4,7 @@ namespace DiscordBot.Transformers;
 
 public static class DiscordMapper {
     public static GuildUser ToGuildUserDto(this IGuildUser user) {
-        return new() {
+        return new GuildUser {
             Id = user.Id,
             Username = user.DisplayName(),
             GuildId = user.GuildId
@@ -17,21 +17,21 @@ public static class DiscordMapper {
     }
 
     public static Guild ToGuildDto(this IGuildUser user) {
-        return new() {
+        return new Guild {
             Id = user.GuildId,
             Name = user.Guild.Name
         };
     }
 
     public static Guild ToGuildDto(this IGuild guild) {
-        return new() {
+        return new Guild {
             Id = guild.Id,
             Name = guild.Name
         };
     }
 
     public static Role ToRoleDto(this IRole role) {
-        return new() {
+        return new Role {
             Id = role.Id,
             Name = role.Name,
             Color = role.Color
@@ -39,14 +39,14 @@ public static class DiscordMapper {
     }
 
     public static Channel ToChannelDto(this IChannel channel) {
-        return new() {
+        return new Channel {
             Id = channel.Id,
             Name = channel.Name
         };
     }
 
     public static Channel ToChannelDto(this IGuildChannel channel) {
-        return new(channel.GuildId) {
+        return new Channel(channel.GuildId) {
             Id = channel.Id,
             Name = channel.Name,
             IsGuildChannel = true
@@ -54,7 +54,7 @@ public static class DiscordMapper {
     }
 
     public static Channel ToChannelDto(this ITextChannel channel) {
-        return new(channel.GuildId) {
+        return new Channel(channel.GuildId) {
             Id = channel.Id,
             Name = channel.Name,
             IsTextChannel = true,
@@ -63,7 +63,7 @@ public static class DiscordMapper {
     }
 
     public static Channel ToChannelDto(this IDMChannel channel) {
-        return new(channel.Recipient.Id) {
+        return new Channel(channel.Recipient.Id) {
             Id = channel.Id,
             Name = channel.Name,
             IsTextChannel = true,

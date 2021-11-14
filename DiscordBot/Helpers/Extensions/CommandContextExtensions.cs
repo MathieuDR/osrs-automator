@@ -15,6 +15,6 @@ public static class CommandContextExtensions {
     }
         
     public static DefaultDictionary<string, T> ToDefaultDictionary<T>(this IReadOnlyCollection<T> options) where T:IApplicationCommandInteractionDataOption{
-        return new(options?.ToDictionary(x => x.Name) ?? new Dictionary<string, T>());
+        return new DefaultDictionary<string, T>(options?.ToDictionary(x => x.Name) ?? new Dictionary<string, T>());
     }
 }

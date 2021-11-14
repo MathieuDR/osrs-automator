@@ -5,6 +5,7 @@ using DiscordBot.Services;
 using DiscordBot.Services.Services;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Options;
 using Serilog;
 using WiseOldManConnector.Interfaces;
 
@@ -72,7 +73,7 @@ public static class ConfigurationExtensions {
                 x.GetRequiredService<CountConfigurationApplicationCommandHandler>(),
                 x.GetRequiredService<ConfigurationApplicationCommandHandler>(),
                 x.GetRequiredService<CreateCompetitionCommandHandler>()
-            }));
+            }, x.GetRequiredService<IGroupService>(), x.GetRequiredService<IOptions<BotTeamConfiguration>>()));
     }
 
     private static IServiceCollection AddConfiguration(this IServiceCollection serviceCollection,
@@ -82,6 +83,14 @@ public static class ConfigurationExtensions {
         serviceCollection
             .AddOptions<MetricSynonymsConfiguration>()
             .Bind(configuration.GetSection("MetricSynonyms"));
+        
+        serviceCollection
+            .AddOptions<BotConfiguration>()
+            .Bind(configuration.GetSection("Bot"));
+        
+        serviceCollection
+            .AddOptions<BotTeamConfiguration>()
+            .Bind(configuration.GetSection("Bot").GetSection(nameof(BotConfiguration.TeamConfiguration)));
 
         serviceCollection.AddSingleton(configuration)
             .AddSingleton(botConfiguration)

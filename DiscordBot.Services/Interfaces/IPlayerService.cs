@@ -1,6 +1,4 @@
-﻿using System.Collections.Generic;
-using System.Threading.Tasks;
-using DiscordBot.Common.Dtos.Discord;
+﻿using DiscordBot.Common.Dtos.Discord;
 using DiscordBot.Common.Models.Decorators;
 using WiseOldManConnector.Models.Output;
 

@@ -1,6 +1,3 @@
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using DiscordBot.Services.ExternalServices;
 using DiscordBot.Services.Interfaces;
 using DiscordBot.Services.Models.MediaWikiApi;

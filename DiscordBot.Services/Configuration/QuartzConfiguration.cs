@@ -1,7 +1,4 @@
-﻿
-using System;
-using System.Linq;
-using DiscordBot.Common.Models.Enums;
+﻿using DiscordBot.Common.Models.Enums;
 using DiscordBot.Services.Jobs;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;

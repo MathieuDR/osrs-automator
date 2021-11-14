@@ -1,4 +1,3 @@
-using System;
 using DiscordBot.Data.Interfaces;
 using DiscordBot.Data.Strategies;
 using Microsoft.Extensions.Logging;
