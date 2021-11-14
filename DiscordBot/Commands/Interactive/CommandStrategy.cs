@@ -91,10 +91,10 @@ public class CommandStrategy : ICommandStrategy {
         }
         
          // Check if user is bot owner
-         // if (context.User.Id == OwnerId) {
-         //     _logger.LogInformation("User is bot owner, executing {commandName}", applicationCommand.Name);
-         //     return true;
-         // }
+         if (context.User.Id == OwnerId) {
+             _logger.LogInformation("User is bot owner, executing {commandName}", applicationCommand.Name);
+             return true;
+         }
          
          // Only owner can currently do this
          if(roleRequired <= AuthorizationRoles.BotModerator) {
