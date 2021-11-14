@@ -24,14 +24,16 @@ public interface ICommandStrategy {
 }
 
 public class CommandStrategy : ICommandStrategy {
-    public CommandStrategy(IApplicationCommandHandler[] commands, IGroupService groupService, IOptions<BotTeamConfiguration> botTeamConfiguration) {
+    public CommandStrategy(ILogger<CommandStrategy> logger, IApplicationCommandHandler[] commands, IGroupService groupService, IOptions<BotTeamConfiguration> botTeamConfiguration) {
+        _logger = logger;
         _commands = commands ?? throw new ArgumentNullException(nameof(commands));
         _groupService = groupService;
         _botTeamConfiguration = botTeamConfiguration;
     }
 
     public Dictionary<ulong, CommandRoleConfig> GuildConfigs { get; set; } = new();
-        
+
+    private readonly ILogger<CommandStrategy> _logger;
     private readonly IApplicationCommandHandler[] _commands;
     private readonly IGroupService _groupService;
     private readonly IOptions<BotTeamConfiguration> _botTeamConfiguration;
@@ -84,33 +86,39 @@ public class CommandStrategy : ICommandStrategy {
         
         // Check if authorization is required
         if (roleRequired == AuthorizationRoles.None) {
+            _logger.LogInformation("No authorization needed for {commandName}", applicationCommand.Name);
             return true;
         }
         
          // Check if user is bot owner
-         if (context.User.Id == OwnerId) {
-             return true;
-         }
+         // if (context.User.Id == OwnerId) {
+         //     _logger.LogInformation("User is bot owner, executing {commandName}", applicationCommand.Name);
+         //     return true;
+         // }
          
          // Only owner can currently do this
          if(roleRequired <= AuthorizationRoles.BotModerator) {
+             _logger.LogInformation("User is not bot owner, not executing {commandName}", applicationCommand.Name);
              return false;
          }
 
          // Check if user is in guild  
          if (!context.InGuild) {
+             _logger.LogInformation("User is not in guild, not executing {commandName}", applicationCommand.Name);
              return false;
          }
          
          // Check if user is in bot team
-         if (context.Guild.Id == GuildId) {
-             // Do special stuff. Do we actually need this? It's just a normal server you know?
-             return true;
-         }
+         // if (context.Guild.Id == GuildId) {
+         //     // Do special stuff. Do we actually need this? It's just a normal server you know?
+         //     _logger.LogInformation("User is in bot team guild, not executing {commandName}", applicationCommand.Name);
+         //     return false;
+         // }
          
          // Check if user is server owner
          if (context.Guild.OwnerId == context.User.Id) {
-             if (AuthorizationRoles.ClanOwner >= roleRequired) {
+             if (AuthorizationRoles.ClanOwner <= roleRequired) {
+                 _logger.LogInformation("User is server owner and has permission to execute {commandName}", applicationCommand.Name);
                  return true;
              }
          }
@@ -118,7 +126,8 @@ public class CommandStrategy : ICommandStrategy {
         var config = await GetGuildConfig(context.Guild.ToGuildDto());        
         // Check if user has special permission
         if (config.UserIds.TryGetValue(context.User.Id, out var userRole)) {
-            if (userRole >= roleRequired) {
+            if (userRole <= roleRequired) {
+                _logger.LogInformation("User has special permission to execute {commandName}", applicationCommand.Name);
                 return true;
             }
         }
@@ -130,11 +139,13 @@ public class CommandStrategy : ICommandStrategy {
                 continue;
             }
 
-            if (roleRole >= roleRequired) {
+            if (roleRole <= roleRequired) {
+                _logger.LogInformation("User has role permission to execute {commandName}", applicationCommand.Name);
                 return true;
             }
         }
 
+        _logger.LogInformation("User is not authorized to execute {commandName}", applicationCommand.Name);
         return false;
     }
 
