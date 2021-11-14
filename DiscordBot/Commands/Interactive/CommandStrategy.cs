@@ -108,8 +108,14 @@ public class CommandStrategy : ICommandStrategy {
              return true;
          }
          
-        var config = await GetGuildConfig(context.Guild.ToGuildDto());
-        
+         // Check if user is server owner
+         if (context.Guild.OwnerId == context.User.Id) {
+             if (AuthorizationRoles.ClanOwner >= roleRequired) {
+                 return true;
+             }
+         }
+         
+        var config = await GetGuildConfig(context.Guild.ToGuildDto());        
         // Check if user has special permission
         if (config.UserIds.TryGetValue(context.User.Id, out var userRole)) {
             if (userRole >= roleRequired) {
