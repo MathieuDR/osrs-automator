@@ -64,6 +64,14 @@ public static class DiscordHelper {
         return user.Nickname ?? user.Username;
     }
 
+    public static string DisplayName(this IUser user) {
+        if (user is IGuildUser guildUser) {
+            return guildUser.DisplayName();
+        }
+
+        return user.Username;
+    }
+
     public static SocketRole GetHighestRole(this SocketGuildUser member, bool requireColor = true) {
         return member?.Roles?.Where(x => !requireColor || x.HasColor())?
             .OrderByDescending(x => x.Position)?.FirstOrDefault();

@@ -12,6 +12,7 @@ public class InteractiveCommandHandlerService {
     private readonly IOptions<BotTeamConfiguration> _botTeamConfiguration;
     private readonly DiscordSocketClient _client;
     private readonly IApplicationCommandInfoRepository _commandInfoRepository;
+    private readonly InteractiveService _interactiveService;
     private readonly ILogger<InteractiveCommandHandlerService> _logger;
     private readonly IServiceProvider _provider;
     private readonly ICommandRegistrationService _registrationService;
@@ -23,7 +24,8 @@ public class InteractiveCommandHandlerService {
         IServiceProvider provider,
         IApplicationCommandInfoRepository commandInfoRepository,
         ICommandRegistrationService registrationService,
-        IOptions<BotTeamConfiguration> botTeamConfiguration) {
+        IOptions<BotTeamConfiguration> botTeamConfiguration,
+        InteractiveService interactiveService) {
         _logger = logger;
         _client = client;
         _strategy = strategy;
@@ -31,6 +33,7 @@ public class InteractiveCommandHandlerService {
         _commandInfoRepository = commandInfoRepository;
         _registrationService = registrationService;
         _botTeamConfiguration = botTeamConfiguration;
+        _interactiveService = interactiveService;
 
         client.InteractionCreated += OnInteraction;
     }
@@ -56,11 +59,23 @@ public class InteractiveCommandHandlerService {
     }
 
     private async Task OnInteraction(SocketInteraction arg) {
-        BaseInteractiveContext ctx = arg switch {
-            SocketSlashCommand socketSlashCommand => new ApplicationCommandContext(socketSlashCommand, _provider),
-            SocketMessageComponent socketMessageComponent => new MessageComponentContext(socketMessageComponent, _provider),
-            _ => null
-        };
+        BaseInteractiveContext ctx;
+        switch (arg) {
+            case SocketSlashCommand socketSlashCommand:
+                ctx = new ApplicationCommandContext(socketSlashCommand, _provider);
+                break;
+            case SocketMessageComponent socketMessageComponent:
+                if (_interactiveService.Callbacks.ContainsKey(socketMessageComponent.Message.Id)) {
+                    _logger.LogInformation("Interactive service callback used by {usr}", arg.User);
+                    return;
+                }
+
+                ctx = new MessageComponentContext(socketMessageComponent, _provider);
+                break;
+            default:
+                ctx = null;
+                break;
+        }
 
         if (ctx == null) {
             _logger.LogError("Could not create context stopping interaction");
@@ -79,12 +94,10 @@ public class InteractiveCommandHandlerService {
 
             _logger.LogWarning("[{ctx}] failed: {msg}", ctx, msg);
 
-            if (arg is not SocketMessageComponent) {
-                if (ctx.IsDeferred) {
-                    await arg.FollowupAsync(msg);
-                } else {
-                    await arg.RespondAsync(msg);
-                }
+            if (ctx.IsDeferred) {
+                await arg.FollowupAsync(msg);
+            } else {
+                await arg.RespondAsync(msg);
             }
         }
 
