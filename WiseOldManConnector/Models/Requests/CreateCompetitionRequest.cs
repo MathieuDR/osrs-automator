@@ -10,7 +10,7 @@ namespace WiseOldManConnector.Models.Requests;
 public class CreateCompetitionRequest {
     private CreateCompetitionRequest(string title, MetricType metric, DateTime start, DateTime end) {
         Title = title;
-        Metric = metric.GetEnumValueNameOrDefault();
+        Metric = metric.ToFriendlyNameOrDefault();
         Start = start;
         End = end;
     }

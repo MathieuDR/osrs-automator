@@ -1,7 +1,7 @@
 ﻿using DiscordBot.Common.Models.Data.Base;
 using WiseOldManConnector.Models.Output;
 
-namespace DiscordBot.Common.Models.Data; 
+namespace DiscordBot.Common.Models.Data;
 
 public class GuildConfig : BaseGuildModel {
     public GuildConfig() { }
@@ -15,4 +15,5 @@ public class GuildConfig : BaseGuildModel {
     public bool AutoAddNewAccounts { get; set; } = false;
     public AutomatedMessagesConfig AutomatedMessagesConfig { get; set; } = new();
     public CountConfig CountConfig { get; set; }
+    public CommandRoleConfig CommandRoleConfig { get; set; } = new();
 }

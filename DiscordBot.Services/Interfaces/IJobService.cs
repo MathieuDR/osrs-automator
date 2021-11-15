@@ -1,4 +1,3 @@
-using System.Threading.Tasks;
 using DiscordBot.Common.Models.Data;
 using DiscordBot.Common.Models.Enums;
 using FluentResults;

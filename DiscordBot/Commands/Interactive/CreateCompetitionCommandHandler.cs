@@ -1,4 +1,5 @@
 using Common.Parsers;
+using DiscordBot.Common.Models.Enums;
 using DiscordBot.Services.Models.Enums;
 using WiseOldManConnector.Models.WiseOldMan.Enums;
 
@@ -14,6 +15,7 @@ public class CreateCompetitionCommandHandler : ApplicationCommandHandler {
         _groupService = groupService;
     }
     public override Guid Id => Guid.Parse("B6D60A7A-68F5-42AB-8745-269D575EEFE4");
+    public override AuthorizationRoles MinimumAuthorizationRole => AuthorizationRoles.ClanModerator;
   
     public override async Task<Result> HandleCommandAsync(ApplicationCommandContext context) {
         _ = context.DeferAsync();

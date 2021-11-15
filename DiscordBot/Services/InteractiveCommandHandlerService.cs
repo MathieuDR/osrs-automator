@@ -1,12 +1,15 @@
+using Common.Extensions;
 using Discord.Net;
 using DiscordBot.Commands.Interactive;
+using DiscordBot.Configuration;
 using DiscordBot.Data.Interfaces;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Options;
 
-namespace DiscordBot.Services; 
+namespace DiscordBot.Services;
 
 public class InteractiveCommandHandlerService {
-    private const ulong OwnerGuildId = 403539795944538122;
+    private readonly IOptions<BotTeamConfiguration> _botTeamConfiguration;
     private readonly DiscordSocketClient _client;
     private readonly IApplicationCommandInfoRepository _commandInfoRepository;
     private readonly ILogger<InteractiveCommandHandlerService> _logger;
@@ -19,16 +22,20 @@ public class InteractiveCommandHandlerService {
         ICommandStrategy strategy,
         IServiceProvider provider,
         IApplicationCommandInfoRepository commandInfoRepository,
-        ICommandRegistrationService registrationService) {
+        ICommandRegistrationService registrationService,
+        IOptions<BotTeamConfiguration> botTeamConfiguration) {
         _logger = logger;
         _client = client;
         _strategy = strategy;
         _provider = provider;
         _commandInfoRepository = commandInfoRepository;
         _registrationService = registrationService;
+        _botTeamConfiguration = botTeamConfiguration;
 
         client.InteractionCreated += OnInteraction;
     }
+
+    private ulong GuildId => _botTeamConfiguration.Value.GuildId;
 
     public async Task SetupAsync() {
         if (_client.ConnectionState != ConnectionState.Connected) {
@@ -55,18 +62,29 @@ public class InteractiveCommandHandlerService {
             _ => null
         };
 
-        _logger.LogInformation("[{ctx}] Command created", ctx);
+        if (ctx == null) {
+            _logger.LogError("Could not create context stopping interaction");
+            return;
+        }
+
+        _logger.LogInformation("[{ctx}] Command triggered", ctx);
         var result = await _strategy.HandleInteractiveCommand(ctx).ConfigureAwait(false);
 
         if (result.IsFailed) {
-            var msg = string.Join(", ",
-                result.Errors.Where(x => !x.HasMetadata("404", o => (bool)(o ?? false))).Select(x => x.Message));
+            var msg = result.CombineMessage();
+
+            if (string.IsNullOrWhiteSpace(msg)) {
+                msg = "Unknown error";
+            }
+
             _logger.LogWarning("[{ctx}] failed: {msg}", ctx, msg);
 
-            if (ctx is null || ctx.IsDeferred) {
-                await arg.FollowupAsync(msg);
-            } else {
-                await arg.RespondAsync(msg);
+            if (arg is not SocketMessageComponent) {
+                if (ctx.IsDeferred) {
+                    await arg.FollowupAsync(msg);
+                } else {
+                    await arg.RespondAsync(msg);
+                }
             }
         }
 
@@ -83,7 +101,7 @@ public class InteractiveCommandHandlerService {
 
     private async Task RegisterCommandForOwnersGuild(IApplicationCommandHandler handler) {
         var propertiesTask = handler.GetCommandProperties();
-        var commands = await _client.GetGuild(OwnerGuildId).GetApplicationCommandsAsync();
+        var commands = await _client.GetGuild(GuildId).GetApplicationCommandsAsync();
 
         try {
             var existing = commands.FirstOrDefault(x => x.Name == handler.Name && x.IsGlobalCommand == false);
@@ -91,7 +109,7 @@ public class InteractiveCommandHandlerService {
                 await existing.DeleteAsync();
             }
 
-            await _client.Rest.CreateGuildCommand(await propertiesTask, OwnerGuildId);
+            await _client.Rest.CreateGuildCommand(await propertiesTask, GuildId);
         } catch (ApplicationCommandException e) {
             _logger.LogWarning(e, "Cannot register command {name} in the owners guild", handler.Name);
         } catch (Exception e) {

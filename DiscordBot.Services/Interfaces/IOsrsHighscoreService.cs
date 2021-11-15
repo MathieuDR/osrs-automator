@@ -1,6 +1,4 @@
-﻿using System.Collections.Generic;
-using System.Threading.Tasks;
-using WiseOldManConnector.Models.Output;
+﻿using WiseOldManConnector.Models.Output;
 using WiseOldManConnector.Models.WiseOldMan.Enums;
 
 namespace DiscordBot.Services.Interfaces; 

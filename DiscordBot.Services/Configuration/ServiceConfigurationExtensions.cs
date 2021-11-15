@@ -1,8 +1,6 @@
-using System;
 using DiscordBot.Services.ExternalServices;
 using DiscordBot.Services.Interfaces;
 using DiscordBot.Services.Services;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Refit;
 
@@ -30,7 +28,8 @@ public static partial class ServiceConfigurationExtensions {
             .AddTransient<IGroupService, GroupService>()
             .AddTransient<IOsrsHighscoreService, WiseOldManConnectorService>()
             .AddTransient<ICounterService, CountService>()
-            .AddTransient<IAutomatedDropperService, AutomatedDropperService>();
+            .AddTransient<IAutomatedDropperService, AutomatedDropperService>()
+            .AddTransient<IAuthorizationService, AuthorizationService>();
 
         return serviceCollection;
     }

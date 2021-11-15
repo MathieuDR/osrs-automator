@@ -1,4 +1,3 @@
-using System.Threading.Tasks;
 using DiscordBot.Common.Dtos.Discord;
 using DiscordBot.Common.Models.Data;
 using DiscordBot.Common.Models.Enums;
@@ -21,7 +20,7 @@ public abstract class ConfigurableGuildJob : BaseGuildJob {
     protected IRepositoryStrategy RepositoryStrategy { get; }
 
     protected override Task<Result> DoWorkForGuild(Guild guild) {
-        var repo = RepositoryStrategy.CreateRepository<IGuildConfigRepository>(guild.Id);
+        var repo = RepositoryStrategy.GetOrCreateRepository<IGuildConfigRepository>(guild.Id);
         var guildConfiguration = repo.GetSingle().ValueOrDefault;
         ChannelJobConfiguration jobConfiguration = null;
         guildConfiguration?.AutomatedMessagesConfig?.ChannelJobs?.TryGetValue(JobType, out jobConfiguration);

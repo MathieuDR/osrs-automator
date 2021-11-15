@@ -5,10 +5,11 @@ using DiscordBot.Services;
 using DiscordBot.Services.Services;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Options;
 using Serilog;
 using WiseOldManConnector.Interfaces;
 
-namespace DiscordBot.Configuration; 
+namespace DiscordBot.Configuration;
 
 public static class ConfigurationExtensions {
     private static IServiceCollection AddDiscordClient(this IServiceCollection serviceCollection) {
@@ -19,7 +20,7 @@ public static class ConfigurationExtensions {
                     MessageCacheSize = 100,
                     GatewayIntents = GatewayIntents.GuildMembers | GatewayIntents.GuildMessages |
                                      GatewayIntents.GuildMessageReactions | GatewayIntents.GuildMembers |
-                                     GatewayIntents.Guilds,
+                                     GatewayIntents.Guilds
                 };
                 var client = new DiscordSocketClient(config);
                 return client;
@@ -27,7 +28,7 @@ public static class ConfigurationExtensions {
             .AddSingleton<CommandService>()
             .AddSingleton<CommandHandlingService>()
             .AddSingleton<InteractiveCommandHandlerService>()
-            .AddTransient<ICommandRegistrationService,CommandRegistrationService>()
+            .AddTransient<ICommandRegistrationService, CommandRegistrationService>()
             .AddSingleton<InteractiveService>()
             .AddDiscordCommands();
 
@@ -49,7 +50,7 @@ public static class ConfigurationExtensions {
 
         return serviceCollection;
     }
-        
+
     private static IServiceCollection AddHelpers(this IServiceCollection serviceCollection) {
         serviceCollection
             .AddTransient<MetricTypeParser>();
@@ -65,14 +66,18 @@ public static class ConfigurationExtensions {
             .AddSingleton<CountConfigurationApplicationCommandHandler>()
             .AddSingleton<ConfigurationApplicationCommandHandler>()
             .AddSingleton<CreateCompetitionCommandHandler>()
-            .AddSingleton<ICommandStrategy>(x => new CommandStrategy(new IApplicationCommandHandler[] {
-                x.GetRequiredService<PingApplicationCommandHandler>(),
-                x.GetRequiredService<ManageCommandsApplicationCommandHandler>(),
-                x.GetRequiredService<CountApplicationCommandHandler>(),
-                x.GetRequiredService<CountConfigurationApplicationCommandHandler>(),
-                x.GetRequiredService<ConfigurationApplicationCommandHandler>(),
-                x.GetRequiredService<CreateCompetitionCommandHandler>()
-            }));
+            .AddSingleton<AuthorizationConfigurationCommandHandler>()
+            .AddSingleton<ICommandStrategy>(x => new CommandStrategy(
+                x.GetRequiredService<ILogger<CommandStrategy>>(),
+                new IApplicationCommandHandler[] {
+                    x.GetRequiredService<PingApplicationCommandHandler>(),
+                    x.GetRequiredService<ManageCommandsApplicationCommandHandler>(),
+                    x.GetRequiredService<CountApplicationCommandHandler>(),
+                    x.GetRequiredService<CountConfigurationApplicationCommandHandler>(),
+                    x.GetRequiredService<ConfigurationApplicationCommandHandler>(),
+                    x.GetRequiredService<CreateCompetitionCommandHandler>(),
+                    x.GetRequiredService<AuthorizationConfigurationCommandHandler>()
+                }, x.GetRequiredService<IGroupService>(), x.GetRequiredService<IOptions<BotTeamConfiguration>>()));
     }
 
     private static IServiceCollection AddConfiguration(this IServiceCollection serviceCollection,
@@ -82,6 +87,14 @@ public static class ConfigurationExtensions {
         serviceCollection
             .AddOptions<MetricSynonymsConfiguration>()
             .Bind(configuration.GetSection("MetricSynonyms"));
+
+        serviceCollection
+            .AddOptions<BotConfiguration>()
+            .Bind(configuration.GetSection("Bot"));
+
+        serviceCollection
+            .AddOptions<BotTeamConfiguration>()
+            .Bind(configuration.GetSection("Bot").GetSection(nameof(BotConfiguration.TeamConfiguration)));
 
         serviceCollection.AddSingleton(configuration)
             .AddSingleton(botConfiguration)

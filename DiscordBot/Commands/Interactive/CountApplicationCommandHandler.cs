@@ -1,4 +1,5 @@
 using System.Text;
+using DiscordBot.Common.Models.Enums;
 
 namespace DiscordBot.Commands.Interactive; 
 
@@ -18,11 +19,10 @@ public class CountApplicationCommandHandler : ApplicationCommandHandler {
     private const string ReasonOption = "reason";
     private const string UsersOption = "users";
 
-        
-        
-
     public override Guid Id => Guid.Parse("A6B2840F-DCCE-4432-A610-10954BBEE15D");
-
+    public override AuthorizationRoles MinimumAuthorizationRole => AuthorizationRoles.ClanEventHost;
+    
+    
     public override async Task<Result> HandleCommandAsync(ApplicationCommandContext context) {
         var subCommand = context.Options.First().Key;
             
@@ -33,15 +33,14 @@ public class CountApplicationCommandHandler : ApplicationCommandHandler {
             _ => Result.Fail("Did not find a correct handler")
         };
 
-        //await context.RespondAsync($"The selected command was: {first} - {second}");
         return result;
     }
 
     #region add
     private async Task<Result> AddHandler(ApplicationCommandContext context) {
         var (additive, usersString, reason) = GetAddParameters(context);
-        var users = await GetUsers(context, usersString);
-
+        var users = (await usersString.GetUsersFromString(context)).users.ToList();
+        
         if (additive == 0) {
             Result.Fail("Additive cannot be 0");
         }
@@ -87,15 +86,6 @@ public class CountApplicationCommandHandler : ApplicationCommandHandler {
         var usersString = context.SubCommandOptions.GetOptionValue<string>(UsersOption);
         var reason = context.SubCommandOptions.GetOptionValue<string>(ReasonOption);
         return (additive, usersString, reason);
-    }
-
-    private static async Task<List<IUser>> GetUsers(ApplicationCommandContext context, string usersString) {
-        var stringParams = usersString.ToCollectionOfParameters()
-            .ToArray();
-
-        var (usersEnumerable, remainingArgs) = (await stringParams.GetUsersListFromStringWithRoles(context));
-        var users = usersEnumerable.ToList();
-        return users;
     }
 
     private async Task HandleNewCount(ApplicationCommandContext context, int startCount, int newCount, IGuildUser user) {

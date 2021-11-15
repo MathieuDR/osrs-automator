@@ -1,5 +1,6 @@
 using System.Text;
 using System.Text.Json;
+using DiscordBot.Common.Models.Enums;
 using HashDepot;
 
 namespace DiscordBot.Commands.Interactive; 
@@ -12,12 +13,12 @@ public abstract class ApplicationCommandHandler : IApplicationCommandHandler {
     }
 
     public ILogger Logger { get; }
-
     public abstract Guid Id { get; }
+    public abstract AuthorizationRoles MinimumAuthorizationRole { get; }
     public string Name { get; }
     public string Description { get; }
-    public virtual bool GlobalRegister => true;
-        
+    public virtual bool GlobalRegister => false;
+
     public async Task<SlashCommandBuilder> GetCommandBuilder() {
         Logger.LogInformation("Creating SlashCommandBuilder for {command}: {description}", Name, Description);
         var builder = new SlashCommandBuilder()
@@ -48,7 +49,6 @@ public abstract class ApplicationCommandHandler : IApplicationCommandHandler {
 
     public virtual Task RemoveComponent(MessageComponentContext context) {
         return Task.CompletedTask;
-        //context.
     }
 
     public virtual bool CanHandle(ApplicationCommandContext context) {

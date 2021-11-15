@@ -1,7 +1,3 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using DiscordBot.Common.Dtos.Runescape;
 using DiscordBot.Common.Models.Data;
 using DiscordBot.Data.Interfaces;
@@ -53,7 +49,7 @@ internal class AutomatedDropperService : RepositoryService, IAutomatedDropperSer
     }
 
     private Result<RunescapeDrop> SaveDropData(Guid endpoint, RunescapeDrop drop, string base64Image) {
-        var repo = RepositoryStrategy.CreateRepository<IRuneScapeDropDataRepository>();
+        var repo = RepositoryStrategy.GetOrCreateRepository<IRuneScapeDropDataRepository>();
 
         var activeRecordResult = repo.GetActive(endpoint);
         var data = activeRecordResult.ValueOrDefault ?? new RunescapeDropData(){ Endpoint = endpoint};

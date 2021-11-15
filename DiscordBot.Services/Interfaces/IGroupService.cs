@@ -1,7 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
-using DiscordBot.Common.Dtos.Discord;
+﻿using DiscordBot.Common.Dtos.Discord;
+using DiscordBot.Common.Models.Data;
 using DiscordBot.Common.Models.Decorators;
 using DiscordBot.Common.Models.Enums;
 using DiscordBot.Services.Models.Enums;
@@ -21,7 +19,8 @@ public interface IGroupService {
     Task<ItemDecorator<Leaderboard>> GetGroupLeaderboard(GuildUser guildUser);
     Task<ItemDecorator<Leaderboard>> GetGroupLeaderboard(GuildUser guildUser, MetricType metric, Period period);
     Task QueueJob(JobType jobType);
-
     Task<Result<ItemDecorator<Competition>>> CreateCompetition(Guild guild, DateTimeOffset start, DateTimeOffset end, MetricType metric,
         CompetitionType competitionType, string name = null);
+    
+    Task<Result<CommandRoleConfig>> GetCommandRoleConfig(Guild guild);
 }

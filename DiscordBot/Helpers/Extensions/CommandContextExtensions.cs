@@ -15,6 +15,13 @@ public static class CommandContextExtensions {
     }
         
     public static DefaultDictionary<string, T> ToDefaultDictionary<T>(this IReadOnlyCollection<T> options) where T:IApplicationCommandInteractionDataOption{
-        return new(options?.ToDictionary(x => x.Name) ?? new Dictionary<string, T>());
+        return new DefaultDictionary<string, T>(options?.ToDictionary(x => x.Name) ?? new Dictionary<string, T>());
+    }
+    
+    public static async Task<(IEnumerable<IUser> users, string[] remainingArguments)> GetUsersFromString(this string usersString, ApplicationCommandContext context) {
+        var stringParams = usersString.ToCollectionOfParameters()
+            .ToArray();
+
+        return await stringParams.GetUsersListFromStringWithRoles(context);
     }
 }

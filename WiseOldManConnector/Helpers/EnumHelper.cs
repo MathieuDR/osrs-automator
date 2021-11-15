@@ -7,7 +7,7 @@ using WiseOldManConnector.Models.WiseOldMan.Enums;
 namespace WiseOldManConnector.Helpers; 
 
 public static class EnumHelper {
-    public static string GetEnumValueNameOrDefault<T>(this T enumVal) {
+    public static string ToFriendlyNameOrDefault<T>(this T enumVal) {
         var enumType = typeof(T);
         var memInfo = enumType.GetMember(enumVal.ToString());
         var attr = memInfo.FirstOrDefault()?.GetCustomAttributes(false).OfType<EnumMemberAttribute>().FirstOrDefault();
@@ -33,7 +33,7 @@ public static class EnumHelper {
     }
 
     public static string FriendlyName(this MetricType metricType, bool capitalize = false) {
-        var valName = metricType.GetEnumValueNameOrDefault();
+        var valName = metricType.ToFriendlyNameOrDefault();
         valName = valName.Replace('_', ' ');
 
         if (capitalize) {

@@ -1,3 +1,4 @@
+using DiscordBot.Common.Models.Enums;
 using DiscordBot.Data.Interfaces;
 using DiscordBot.Data.Strategies;
 using Microsoft.Extensions.DependencyInjection;
@@ -11,11 +12,11 @@ public class ManageCommandsApplicationCommandHandler : ApplicationCommandHandler
     public ManageCommandsApplicationCommandHandler(ILogger<ManageCommandsApplicationCommandHandler> logger, IServiceProvider serviceProvider, IRepositoryStrategy repositoryStrategy) : base("commands",
         "Manage commands", logger) {
         _serviceProvider = serviceProvider;
-        _applicationCommandInfoRepository = repositoryStrategy.CreateRepository<IApplicationCommandInfoRepository>();
+        _applicationCommandInfoRepository = repositoryStrategy.GetOrCreateRepository<IApplicationCommandInfoRepository>();
     }
 
     public override Guid Id => Guid.Parse("FEFC7AEA-A180-4545-81C0-0010DF72258A");
-    public override bool GlobalRegister => true;
+    public override AuthorizationRoles MinimumAuthorizationRole => AuthorizationRoles.BotAdmin;
 
     public override async Task<Result> HandleCommandAsync(ApplicationCommandContext context) {
         var embed = context.CreateEmbedBuilder("Select a command.");

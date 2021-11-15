@@ -7,7 +7,7 @@ namespace DiscordBot.Helpers.Extensions;
 
 public static class TypeHelper {
     public static List<Type> WhiteListedTypesToOutput() {
-        return new() {
+        return new List<Type> {
             typeof(BaseArguments),
             typeof(MetricArguments),
             typeof(PeriodArguments),

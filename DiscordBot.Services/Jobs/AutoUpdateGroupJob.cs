@@ -1,6 +1,4 @@
-﻿using System;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Text;
 using DiscordBot.Common.Dtos.Discord;
 using DiscordBot.Common.Models.Data;
 using DiscordBot.Common.Models.Enums;

@@ -1,4 +1,3 @@
-using System.Threading.Tasks;
 using DiscordBot.Services.Models.MediaWikiApi;
 using Refit;
 

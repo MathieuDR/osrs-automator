@@ -32,7 +32,7 @@ internal class ObjectWithMetricsConvertor<T, TU> : JsonConverter<T> where T : cl
         var metrics = Enum.GetValues(typeof(MetricType)) as MetricType[];
 
         foreach (var type in metrics) {
-            var member = type.GetEnumValueNameOrDefault();
+            var member = type.ToFriendlyNameOrDefault();
 
             if (jsonObject.ContainsKey(member)) {
                 var metricToken = jsonObject[member];

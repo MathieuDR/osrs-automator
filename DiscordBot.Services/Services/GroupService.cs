@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Text;
 using DiscordBot.Common.Dtos.Discord;
 using DiscordBot.Common.Models.Data;
 using DiscordBot.Common.Models.Decorators;
@@ -22,7 +18,7 @@ using WiseOldManConnector.Models.Output;
 using WiseOldManConnector.Models.Requests;
 using WiseOldManConnector.Models.WiseOldMan.Enums;
 
-namespace DiscordBot.Services.Services; 
+namespace DiscordBot.Services.Services;
 
 internal class GroupService : RepositoryService, IGroupService {
     private readonly IWiseOldManCompetitionApi _competitionApi;
@@ -157,12 +153,6 @@ internal class GroupService : RepositoryService, IGroupService {
         }
 
         var t = typeof(GroupService);
-        // var t = jobType switch {
-        //     JobType.GroupUpdate => typeof(AutoUpdateGroupJob),
-        //     JobType.MonthlyTop => typeof(TopLeaderBoardJob),
-        //     JobType.MonthlyTopGains => typeof(MonthlyTopDeltasJob),
-        //     _ => throw new ArgumentOutOfRangeException(nameof(jobType), jobType, null)
-        // };
 
         var job = JobBuilder.Create(t)
             .WithIdentity(Guid.NewGuid().ToString())
@@ -186,11 +176,11 @@ internal class GroupService : RepositoryService, IGroupService {
         CreateCompetitionRequest request;
 
         var title = new StringBuilder();
-        if(string.IsNullOrWhiteSpace(name)) {
+        if (string.IsNullOrWhiteSpace(name)) {
             title.Append(womConfig.WomGroup.Name);
             title.Append(" - ");
-            title.Append(metric.GetEnumValueNameOrDefault());
-        }else {
+            title.Append(metric.ToFriendlyNameOrDefault());
+        } else {
             title.Append(name);
         }
 
@@ -201,12 +191,12 @@ internal class GroupService : RepositoryService, IGroupService {
             var groupMembers = (await _groupApi.GetMembers(womConfig.WomGroupId)).Data.ToList();
             womConfig.WomGroup.Members = groupMembers;
 
-            var repo = RepositoryStrategy.CreateRepository<GuildConfigRepository>(guild.Id);
+            var repo = RepositoryStrategy.GetOrCreateRepository<GuildConfigRepository>(guild.Id);
             var updateResult = repo.Update(womConfig);
 
 
             IEnumerable<CreateCompetitionRequest.Team> teams = new[] {
-                new CreateCompetitionRequest.Team("Placeholder", new[] {groupMembers.FirstOrDefault()?.Username})
+                new CreateCompetitionRequest.Team("Placeholder", new[] { groupMembers.FirstOrDefault()?.Username })
             };
 
             if (competitionType == CompetitionType.CountryTeams) {
@@ -228,6 +218,12 @@ internal class GroupService : RepositoryService, IGroupService {
             Logger.LogWarning(e, "Could not create competition");
             return Result.Fail(new ExceptionalError("Could not create competition", e));
         }
+    }
+
+    public Task<Result<CommandRoleConfig>> GetCommandRoleConfig(Guild guild) {
+        var config = GetGroupConfig(guild.Id);
+        var result = config?.CommandRoleConfig ?? new CommandRoleConfig();
+        return Task.FromResult(Result.Ok(result));
     }
 
     private GuildConfig GetGroupConfig(ulong guildId, bool validate = true) {

@@ -1,5 +1,6 @@
 using System.Text;
 using Common.Extensions;
+using DiscordBot.Common.Models.Enums;
 
 namespace DiscordBot.Commands.Interactive; 
 
@@ -22,6 +23,7 @@ public class CountConfigurationApplicationCommandHandler : ApplicationCommandHan
     }
 
     public override Guid Id => Guid.Parse("FEC9AF04-5F59-4121-95AA-F73FFCE06131");
+    public override AuthorizationRoles MinimumAuthorizationRole => AuthorizationRoles.ClanAdmin;
 
     private static string ThresholdFormat {
         get {
