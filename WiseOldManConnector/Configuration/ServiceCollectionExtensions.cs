@@ -2,7 +2,7 @@
 using WiseOldManConnector.Api;
 using WiseOldManConnector.Interfaces;
 
-namespace WiseOldManConnector.Configuration; 
+namespace WiseOldManConnector.Configuration;
 
 public static class ServiceCollectionExtensions {
     public static IServiceCollection AddWiseOldManApi(this IServiceCollection services) {

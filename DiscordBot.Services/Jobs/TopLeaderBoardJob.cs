@@ -9,7 +9,7 @@ using WiseOldManConnector.Helpers;
 using WiseOldManConnector.Models.Output;
 using WiseOldManConnector.Models.WiseOldMan.Enums;
 
-namespace DiscordBot.Services.Jobs; 
+namespace DiscordBot.Services.Jobs;
 
 public class TopLeaderBoardJob : ConfigurableGuildJob {
     private readonly IOsrsHighscoreService _osrsHighscoreService;

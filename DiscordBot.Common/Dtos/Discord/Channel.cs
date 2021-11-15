@@ -1,4 +1,4 @@
-namespace DiscordBot.Common.Dtos.Discord; 
+namespace DiscordBot.Common.Dtos.Discord;
 
 public class Channel {
     public Channel() { }

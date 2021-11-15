@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace WiseOldManConnector.Models.Output; 
+﻿namespace WiseOldManConnector.Models.Output;
 
 public class DeltaMember : ILeaderboardMember {
     public Delta Delta { get; set; }

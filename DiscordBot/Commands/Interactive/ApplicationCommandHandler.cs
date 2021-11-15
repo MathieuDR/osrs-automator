@@ -3,7 +3,7 @@ using System.Text.Json;
 using DiscordBot.Common.Models.Enums;
 using HashDepot;
 
-namespace DiscordBot.Commands.Interactive; 
+namespace DiscordBot.Commands.Interactive;
 
 public abstract class ApplicationCommandHandler : IApplicationCommandHandler {
     public ApplicationCommandHandler(string name, string description, ILogger logger) {
@@ -19,6 +19,30 @@ public abstract class ApplicationCommandHandler : IApplicationCommandHandler {
     public string Description { get; }
     public virtual bool GlobalRegister => false;
 
+    public async Task<SlashCommandProperties> GetCommandProperties() {
+        var builder = await GetCommandBuilder();
+        return builder.Build();
+    }
+
+    public abstract Task<Result> HandleCommandAsync(ApplicationCommandContext context);
+
+    public abstract Task<Result> HandleComponentAsync(MessageComponentContext context);
+
+    public virtual bool CanHandle(ApplicationCommandContext context) {
+        return string.Equals(context.InnerContext.Data.Name, Name, StringComparison.InvariantCultureIgnoreCase);
+    }
+
+    public bool CanHandle(MessageComponentContext context) {
+        return string.Equals(context.CustomIdParts.FirstOrDefault() ?? "", Name, StringComparison.InvariantCultureIgnoreCase);
+    }
+
+    public async Task<uint> GetCommandBuilderHash() {
+        var command = await GetCommandBuilder();
+        var json = JsonSerializer.Serialize(command);
+        var stream = Encoding.ASCII.GetBytes(json);
+        return XXHash.Hash32(stream);
+    }
+
     public async Task<SlashCommandBuilder> GetCommandBuilder() {
         Logger.LogInformation("Creating SlashCommandBuilder for {command}: {description}", Name, Description);
         var builder = new SlashCommandBuilder()
@@ -30,11 +54,6 @@ public abstract class ApplicationCommandHandler : IApplicationCommandHandler {
         return builder;
     }
 
-    public async Task<SlashCommandProperties> GetCommandProperties() {
-        var builder = await GetCommandBuilder();
-        return builder.Build();
-    }
-
     protected string SubCommand(params string[] ids) {
         var stringsToJoin = new string[ids.Length + 1];
         stringsToJoin[0] = Name;
@@ -43,20 +62,8 @@ public abstract class ApplicationCommandHandler : IApplicationCommandHandler {
         return string.Join(".", stringsToJoin);
     }
 
-    public abstract Task<Result> HandleCommandAsync(ApplicationCommandContext context);
-
-    public abstract Task<Result> HandleComponentAsync(MessageComponentContext context);
-
     public virtual Task RemoveComponent(MessageComponentContext context) {
         return Task.CompletedTask;
-    }
-
-    public virtual bool CanHandle(ApplicationCommandContext context) {
-        return string.Equals(context.InnerContext.Data.Name, Name, StringComparison.InvariantCultureIgnoreCase);
-    }
-
-    public bool CanHandle(MessageComponentContext context) {
-        return string.Equals(context.CustomIdParts.FirstOrDefault() ?? "", Name, StringComparison.InvariantCultureIgnoreCase);
     }
 
     /// <summary>
@@ -65,11 +72,4 @@ public abstract class ApplicationCommandHandler : IApplicationCommandHandler {
     /// <param name="builder">Builder with name and description set</param>
     /// <returns>Fully build slash command builder</returns>
     protected abstract Task<SlashCommandBuilder> ExtendSlashCommandBuilder(SlashCommandBuilder builder);
-
-    public async Task<uint> GetCommandBuilderHash() {
-        var command = await GetCommandBuilder();
-        var json = JsonSerializer.Serialize(command);
-        var stream = Encoding.ASCII.GetBytes(json);
-        return XXHash.Hash32(stream);
-    }
 }

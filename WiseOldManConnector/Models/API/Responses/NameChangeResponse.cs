@@ -1,7 +1,6 @@
-using System;
 using Newtonsoft.Json;
 
-namespace WiseOldManConnector.Models.API.Responses; 
+namespace WiseOldManConnector.Models.API.Responses;
 
 internal class NameChangeResponse : BaseResponse {
     [JsonProperty("id")]

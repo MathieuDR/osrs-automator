@@ -2,7 +2,7 @@
 using Microsoft.Extensions.Options;
 using WiseOldManConnector.Models.WiseOldMan.Enums;
 
-namespace DiscordBot.Helpers.Extensions; 
+namespace DiscordBot.Helpers.Extensions;
 
 public class MetricTypeParser {
     private readonly IOptions<MetricSynonymsConfiguration> _options;
@@ -10,10 +10,11 @@ public class MetricTypeParser {
     public MetricTypeParser(IOptions<MetricSynonymsConfiguration> options) {
         _options = options;
     }
+
     public bool TryParseToMetricType(string metricType, out MetricType value) {
         var configuration = _options.Value;
-            
-        if (Enum.TryParse<MetricType>(metricType, true, out value)) {
+
+        if (Enum.TryParse(metricType, true, out value)) {
             return true;
         }
 

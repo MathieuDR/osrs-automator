@@ -1,6 +1,6 @@
 ﻿using AutoMapper;
 
-namespace DiscordBot.Transformers.TypeConverters; 
+namespace DiscordBot.Transformers.TypeConverters;
 
 public class DeltaLeaderboardToEmbedBuilderConverter : ITypeConverter<DeltaLeaderboard, EmbedBuilder> {
     public EmbedBuilder Convert(DeltaLeaderboard source, EmbedBuilder destination, ResolutionContext context) {

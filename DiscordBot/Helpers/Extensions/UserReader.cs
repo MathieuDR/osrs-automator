@@ -2,7 +2,7 @@ using System.Collections.Immutable;
 using System.Globalization;
 using Discord.Commands;
 
-namespace DiscordBot.Helpers.Extensions; 
+namespace DiscordBot.Helpers.Extensions;
 
 public static class UserReader {
     public static async Task<TypeReaderResult> ReadUserAsync<T, TInteraction>(this BaseInteractiveContext<TInteraction> context, string input)

@@ -1,6 +1,6 @@
 using DiscordBot.Common.Dtos.Discord;
 
-namespace DiscordBot.Transformers; 
+namespace DiscordBot.Transformers;
 
 public static class DiscordMapper {
     public static GuildUser ToGuildUserDto(this IGuildUser user) {
@@ -12,7 +12,7 @@ public static class DiscordMapper {
     }
 
     public static GuildUser ToGuildUserDto(this IUser user) {
-        var guildUser = (IGuildUser) user;
+        var guildUser = (IGuildUser)user;
         return guildUser.ToGuildUserDto();
     }
 

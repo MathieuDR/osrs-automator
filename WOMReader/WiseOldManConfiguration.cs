@@ -1,4 +1,4 @@
-﻿namespace WOMReader; 
+﻿namespace WOMReader;
 
 public class WiseOldManConfiguration {
     //public string Url { get; } = "https://wiseoldman.net/api";

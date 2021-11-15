@@ -1,4 +1,3 @@
-using System.Threading.Tasks;
 using Bogus;
 using Microsoft.Extensions.DependencyInjection;
 using WiseOldManConnector.Interfaces;
@@ -7,7 +6,7 @@ using WiseOldManConnectorTests.Configuration;
 using WiseOldManConnectorTests.Fixtures;
 using Xunit;
 
-namespace WiseOldManConnectorTests.Connectors; 
+namespace WiseOldManConnectorTests.Connectors;
 
 public class NameConnectorTests : BaseConnectorTests {
     private readonly IWiseOldManNameApi _nameApi;

@@ -1,6 +1,6 @@
 using DiscordBot.Commands.Interactive;
 
-namespace DiscordBot.Services.Interfaces; 
+namespace DiscordBot.Services.Interfaces;
 
 public interface ICommandRegistrationService {
     // Task<Result> RegisterCommand(IApplicationCommandCommand applicationCommandCommand);

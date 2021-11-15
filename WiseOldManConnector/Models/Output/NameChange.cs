@@ -1,7 +1,6 @@
-using System;
 using WiseOldManConnector.Models.WiseOldMan.Enums;
 
-namespace WiseOldManConnector.Models.Output; 
+namespace WiseOldManConnector.Models.Output;
 
 public class NameChange {
     public int Id { get; set; }

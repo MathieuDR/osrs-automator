@@ -1,15 +1,14 @@
-﻿using System.Collections.Generic;
-using AutoMapper;
+﻿using AutoMapper;
 using WiseOldManConnector.Models.API.Responses;
 using WiseOldManConnector.Models.Output;
 using WiseOldManConnector.Models.WiseOldMan.Enums;
 
-namespace WiseOldManConnector.Transformers.Resolvers; 
+namespace WiseOldManConnector.Transformers.Resolvers;
 
 internal class WOMDeltaToDeltaDictionaryResolver : IValueResolver<WOMDeltaMetric, DeltaMetric, Dictionary<DeltaType, Delta>> {
     public Dictionary<DeltaType, Delta> Resolve(WOMDeltaMetric source, DeltaMetric destination,
         Dictionary<DeltaType, Delta> destMember, ResolutionContext context) {
-        destMember = new Dictionary<DeltaType, Delta> {{DeltaType.Rank, context.Mapper.Map<Delta>(source.Rank)}};
+        destMember = new Dictionary<DeltaType, Delta> { { DeltaType.Rank, context.Mapper.Map<Delta>(source.Rank) } };
 
         if (source.Experience != null) {
             destMember.Add(DeltaType.Experience, context.Mapper.Map<Delta>(source.Experience));

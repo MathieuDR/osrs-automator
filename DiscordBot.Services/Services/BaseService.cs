@@ -1,6 +1,6 @@
 ﻿using Microsoft.Extensions.Logging;
 
-namespace DiscordBot.Services.Services; 
+namespace DiscordBot.Services.Services;
 
 public abstract class BaseService {
     protected readonly ILogger Logger;

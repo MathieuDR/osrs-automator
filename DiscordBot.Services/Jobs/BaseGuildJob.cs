@@ -3,7 +3,7 @@ using DiscordBot.Services.Interfaces;
 using FluentResults;
 using Microsoft.Extensions.Logging;
 
-namespace DiscordBot.Services.Jobs; 
+namespace DiscordBot.Services.Jobs;
 
 public abstract class BaseGuildJob : BaseJob {
     protected BaseGuildJob(ILogger logger, IDiscordService discordService) : base(logger) {
@@ -23,7 +23,7 @@ public abstract class BaseGuildJob : BaseJob {
         for (var i = 0; i < guilds.Length; i++) {
             var guild = guilds[i];
             var scopeProps = new Dictionary<string, object> {
-                {"guild", guild}
+                { "guild", guild }
             };
 
             using (Logger.BeginScope(scopeProps)) {

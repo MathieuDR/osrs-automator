@@ -1,4 +1,3 @@
-using System.Collections.Generic;
 using DiscordBot.Data.Configuration;
 using DiscordBot.Data.Repository.Migrations;
 using LiteDB;
@@ -6,7 +5,7 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Serilog.Context;
 
-namespace DiscordBot.Data; 
+namespace DiscordBot.Data;
 
 public class LiteDbManager {
     private readonly object _commonLock = new();

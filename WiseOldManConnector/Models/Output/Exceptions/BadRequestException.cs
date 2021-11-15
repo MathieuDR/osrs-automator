@@ -1,9 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Net;
+﻿using System.Net;
 using RestSharp;
 
-namespace WiseOldManConnector.Models.Output.Exceptions; 
+namespace WiseOldManConnector.Models.Output.Exceptions;
 
 public class BadRequestException : ApiException {
     public BadRequestException(string wiseOldManMessage, string resource, HttpStatusCode statusCode, List<Parameter> parameters) : base(

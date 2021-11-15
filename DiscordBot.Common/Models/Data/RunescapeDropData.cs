@@ -1,12 +1,9 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using DiscordBot.Common.Dtos.Runescape;
 using DiscordBot.Common.Models.Data.Base;
 using LiteDB;
 using WiseOldManConnector.Models.WiseOldMan.Enums;
 
-namespace DiscordBot.Common.Models.Data; 
+namespace DiscordBot.Common.Models.Data;
 
 public record RunescapeDropData : BaseRecord {
     public Guid Endpoint { get; init; }
@@ -17,6 +14,7 @@ public record RunescapeDropData : BaseRecord {
 
     [BsonIgnore]
     public IEnumerable<string> DistinctImages => Drops.Select(x => x.Image).Distinct();
+
     public PlayerType RecipientPlayerType { get; init; }
     public string RecipientUsername { get; init; }
     public IEnumerable<ulong> GuildsMessaged { get; set; }

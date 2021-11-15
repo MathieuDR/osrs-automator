@@ -1,12 +1,8 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text.RegularExpressions;
 using Common.Parsers;
 using FluentAssertions;
 using Xunit;
 
-namespace DiscordBot.ServicesTests.Parser; 
+namespace DiscordBot.ServicesTests.Parser;
 
 public class HumanizerTests {
     [Theory]
@@ -32,7 +28,7 @@ public class HumanizerTests {
     [InlineData("I'll go back 8pm today", "2021-12-01 20:00:00")]
     [InlineData("14/12/2021 18:00", "2021-12-14 18:00:00")]
     public void CanParseDates(string dateString, string parseAbleDate) {
-        var result = dateString.ToFutureDate(referenceDate: new(2021, 12, 1, 4, 10, 0));
+        var result = dateString.ToFutureDate(new DateTime(2021, 12, 1, 4, 10, 0));
 
         result.IsSuccess.Should().BeTrue();
         result.Value.Should().Be(DateTime.Parse(parseAbleDate));

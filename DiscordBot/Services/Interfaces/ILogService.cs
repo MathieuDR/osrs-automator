@@ -1,7 +1,7 @@
 ﻿using System.Diagnostics;
 using Serilog.Events;
 
-namespace DiscordBot.Services.Interfaces; 
+namespace DiscordBot.Services.Interfaces;
 
 public interface ILogService {
     Task Log(LogMessage message);

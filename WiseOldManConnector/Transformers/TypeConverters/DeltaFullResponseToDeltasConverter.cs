@@ -1,11 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using AutoMapper;
+﻿using AutoMapper;
 using WiseOldManConnector.Models.API.Responses;
 using WiseOldManConnector.Models.Output;
 
-namespace WiseOldManConnector.Transformers.TypeConverters; 
+namespace WiseOldManConnector.Transformers.TypeConverters;
 
 internal class DeltaFullResponseToDeltasConverter : ITypeConverter<DeltaFullResponse, Deltas> {
     public Deltas Convert(DeltaFullResponse source, Deltas destination, ResolutionContext context) {

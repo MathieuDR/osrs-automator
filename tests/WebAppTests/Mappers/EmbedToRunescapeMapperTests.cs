@@ -1,5 +1,3 @@
-using System.IO;
-using System.Linq;
 using System.Text.Json;
 using Dashboard.Models.ApiRequests.DiscordEmbed;
 using Dashboard.Transformers;
@@ -9,7 +7,7 @@ using WebAppTests.Resources.EmbedJsons;
 using WiseOldManConnector.Models.WiseOldMan.Enums;
 using Xunit;
 
-namespace WebAppTests.Mappers; 
+namespace WebAppTests.Mappers;
 
 public class EmbedToRunescapeMapperTests {
     private readonly IMapper<Embed, RunescapeDrop> _mapper;

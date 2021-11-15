@@ -1,34 +1,34 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
-  <PropertyGroup>
-    <TargetFramework>net6.0</TargetFramework>
-    <LangVersion>10</LangVersion>
-    <ImplicitUsings>enable</ImplicitUsings>
-  </PropertyGroup>
+    <PropertyGroup>
+        <TargetFramework>net6.0</TargetFramework>
+        <LangVersion>10</LangVersion>
+        <ImplicitUsings>enable</ImplicitUsings>
+    </PropertyGroup>
 
-  <ItemGroup>
-    <Compile Remove="Api\WiseOldManHighscoreRepository.cs" />
-  </ItemGroup>
+    <ItemGroup>
+        <Compile Remove="Api\WiseOldManHighscoreRepository.cs"/>
+    </ItemGroup>
 
-  <ItemGroup>
-    <None Include="Api\WiseOldManHighscoreRepository.cs" />
-  </ItemGroup>
+    <ItemGroup>
+        <None Include="Api\WiseOldManHighscoreRepository.cs"/>
+    </ItemGroup>
 
-  <ItemGroup>
-    <PackageReference Include="AutoMapper" Version="10.1.1" />
-    <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="6.0.0" />
-    <PackageReference Include="Microsoft.Extensions.Logging" Version="6.0.0" />
-    <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="6.0.0" />
-    <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
-    <PackageReference Include="RestSharp" Version="106.13.0" />
-    <PackageReference Include="RestSharp.Serializers.NewtonsoftJson" Version="106.13.0" />
-    <PackageReference Include="System.ComponentModel.Annotations" Version="5.0.0" />
-  </ItemGroup>
+    <ItemGroup>
+        <PackageReference Include="AutoMapper" Version="10.1.1"/>
+        <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="6.0.0"/>
+        <PackageReference Include="Microsoft.Extensions.Logging" Version="6.0.0"/>
+        <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="6.0.0"/>
+        <PackageReference Include="Newtonsoft.Json" Version="13.0.1"/>
+        <PackageReference Include="RestSharp" Version="106.13.0"/>
+        <PackageReference Include="RestSharp.Serializers.NewtonsoftJson" Version="106.13.0"/>
+        <PackageReference Include="System.ComponentModel.Annotations" Version="5.0.0"/>
+    </ItemGroup>
 
-  <ItemGroup>
-    <AssemblyAttribute Include="System.Runtime.CompilerServices.InternalsVisibleTo">
-      <_Parameter1>WiseOldManConnectorTests</_Parameter1>
-    </AssemblyAttribute>
-  </ItemGroup>
+    <ItemGroup>
+        <AssemblyAttribute Include="System.Runtime.CompilerServices.InternalsVisibleTo">
+            <_Parameter1>WiseOldManConnectorTests</_Parameter1>
+        </AssemblyAttribute>
+    </ItemGroup>
 
 </Project>

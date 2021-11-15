@@ -3,7 +3,7 @@ using DiscordBot.Transformers.TypeConverters;
 using Microsoft.Extensions.DependencyInjection;
 using WiseOldManConnector.Configuration;
 
-namespace DiscordBot.Configuration; 
+namespace DiscordBot.Configuration;
 
 public static class AutoMapperConfiguration {
     public static IServiceCollection ConfigureAutoMapper(this IServiceCollection services) {

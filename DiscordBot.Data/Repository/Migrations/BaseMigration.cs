@@ -1,7 +1,7 @@
 using LiteDB;
 using Serilog;
 
-namespace DiscordBot.Data.Repository.Migrations; 
+namespace DiscordBot.Data.Repository.Migrations;
 
 public abstract class BaseMigration : IMigration {
     private readonly ILogger _logger;

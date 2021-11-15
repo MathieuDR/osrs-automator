@@ -1,11 +1,12 @@
 ﻿using System.Text;
 
-namespace DiscordBot.Helpers.Extensions; 
+namespace DiscordBot.Helpers.Extensions;
 
 public static class TypeReaderHelper {
     //https://stackoverflow.com/questions/298830/split-string-containing-command-line-parameters-into-string-in-c-sharp
     public static IEnumerable<string> ToCollectionOfParameters(this string input) {
-        input = input.Replace("><", "> <"); // Fix users on one line. perhaps we can replace this with regex as this is defn buggy (users with a name including '><' for example
+        input = input.Replace("><",
+            "> <"); // Fix users on one line. perhaps we can replace this with regex as this is defn buggy (users with a name including '><' for example
         var result = new StringBuilder();
 
         var quoted = false;

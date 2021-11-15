@@ -5,7 +5,7 @@ using DiscordBot.Configuration;
 using Serilog.Context;
 using Serilog.Events;
 
-namespace DiscordBot.Services; 
+namespace DiscordBot.Services;
 
 public class CommandHandlingService {
     private readonly CommandService _commands;
@@ -77,7 +77,7 @@ public class CommandHandlingService {
             var commands = _commands.Search("help").Commands.ToList();
 
             await commands.FirstOrDefault().ExecuteAsync(new SocketCommandContext(_discord, message),
-                new List<object> {null}, new List<object> {null}, _provider);
+                new List<object> { null }, new List<object> { null }, _provider);
 
             return;
         }
@@ -104,8 +104,7 @@ public class CommandHandlingService {
             await logTask;
         }
     }
-        
-        
+
 
     private EmbedBuilder CreateErrorEmbedBuilder(ICommandContext context, IResult result) {
         var builder = new EmbedBuilder().AddCommonProperties().WithMessageAuthorFooter(context);

@@ -1,12 +1,10 @@
-using System.IO;
-using System.Linq;
 using System.Text.Json;
 using Dashboard.Models.ApiRequests.DiscordEmbed;
 using FluentAssertions;
 using WebAppTests.Resources.EmbedJsons;
 using Xunit;
 
-namespace WebAppTests.Deserialization; 
+namespace WebAppTests.Deserialization;
 
 public class DiscordEmbedDeserializationTests {
     [Theory]

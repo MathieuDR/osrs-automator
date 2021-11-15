@@ -3,7 +3,7 @@ using DiscordBot.Common.Models.Data;
 using FluentResults;
 using WiseOldManConnector.Models.Output;
 
-namespace DiscordBot.Services.Interfaces; 
+namespace DiscordBot.Services.Interfaces;
 
 public interface IDiscordService {
     Task<Result> SetUsername(GuildUser user, string nickname);

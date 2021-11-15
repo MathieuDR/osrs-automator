@@ -1,10 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
-using System.Linq;
+﻿using System.ComponentModel.DataAnnotations;
 using LiteDB;
 
-namespace DiscordBot.Common.Models.Data.Base; 
+namespace DiscordBot.Common.Models.Data.Base;
 
 public record BaseRecord {
     [BsonId]

@@ -1,15 +1,16 @@
 using DiscordBot.Commands.Interactive;
 using DiscordBot.Data.Interfaces;
 
-namespace DiscordBot.Services; 
+namespace DiscordBot.Services;
 
 public class CommandRegistrationService : ICommandRegistrationService {
-    private readonly DiscordSocketClient _client;
     private readonly IApplicationCommandInfoRepository _applicationCommandInfoRepository;
+    private readonly DiscordSocketClient _client;
     private readonly ILogger<CommandRegistrationService> _logger;
     private readonly ICommandStrategy _strategy;
 
-    public CommandRegistrationService(ILogger<CommandRegistrationService> logger, ICommandStrategy strategy, DiscordSocketClient client, IApplicationCommandInfoRepository applicationCommandInfoRepository) {
+    public CommandRegistrationService(ILogger<CommandRegistrationService> logger, ICommandStrategy strategy, DiscordSocketClient client,
+        IApplicationCommandInfoRepository applicationCommandInfoRepository) {
         _logger = logger;
         _strategy = strategy;
         _client = client;
@@ -30,7 +31,7 @@ public class CommandRegistrationService : ICommandRegistrationService {
 
         var guilds = _client.Guilds;
         await HandleGuildRegistries(applicationCommandHandler, applicationCommandInfo, guilds, currentHash, properties);
-            
+
         if (currentHash != applicationCommandInfo.Hash) {
             // Hash is different, so lets update
             _logger.LogInformation("Updating command info for {name} command", applicationCommandInfo.CommandName);

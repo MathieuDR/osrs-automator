@@ -1,7 +1,7 @@
 using DiscordBot.Services.Models.MediaWikiApi;
 using Refit;
 
-namespace DiscordBot.Services.ExternalServices; 
+namespace DiscordBot.Services.ExternalServices;
 
 public interface IOsrsWikiApi {
     [Get("/api.php?action=query&format=json&prop=revisions&titles={pageTitles}&rvprop=content")]

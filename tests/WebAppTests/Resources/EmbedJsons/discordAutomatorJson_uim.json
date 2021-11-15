@@ -1,31 +1,31 @@
 {
-    "embeds": [
+  "embeds": [
+    {
+      "thumbnail": {
+        "url": "https://oldschool.runescape.wiki/images/5/5e/Bones.png?3fbd5"
+      },
+      "author": {
+        "icon_url": "https://oldschool.runescape.wiki/images/0/02/Ultimate_ironman_chat_badge.png",
+        "name": "wagen"
+      },
+      "description": "Just got [Bones](https://oldschool.runescape.wiki/w/Bones) from lvl 9 [Al-Kharid warrior](https://oldschool.runescape.wiki/w/Al-Kharid_warrior)",
+      "fields": [
         {
-            "thumbnail": {
-                "url": "https://oldschool.runescape.wiki/images/5/5e/Bones.png?3fbd5"
-            },
-            "author": {
-                "icon_url": "https://oldschool.runescape.wiki/images/0/02/Ultimate_ironman_chat_badge.png",
-                "name": "wagen"
-            },
-            "description": "Just got [Bones](https://oldschool.runescape.wiki/w/Bones) from lvl 9 [Al-Kharid warrior](https://oldschool.runescape.wiki/w/Al-Kharid_warrior)",
-            "fields": [
-                {
-                    "inline": true,
-                    "name": "Rarity",
-                    "value": "```glsl\n# 1/1.0 (100.0%)\n```"
-                },
-                {
-                    "inline": true,
-                    "name": "HA Value",
-                    "value": "```fix\n0 GP\n```"
-                },
-                {
-                    "inline": true,
-                    "name": "GE Value",
-                    "value": "```fix\n92 GP\n```"
-                }
-            ]
+          "inline": true,
+          "name": "Rarity",
+          "value": "```glsl\n# 1/1.0 (100.0%)\n```"
+        },
+        {
+          "inline": true,
+          "name": "HA Value",
+          "value": "```fix\n0 GP\n```"
+        },
+        {
+          "inline": true,
+          "name": "GE Value",
+          "value": "```fix\n92 GP\n```"
         }
-    ]
+      ]
+    }
+  ]
 }

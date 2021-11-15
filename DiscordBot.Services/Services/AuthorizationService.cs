@@ -49,7 +49,7 @@ internal class AuthorizationService : BaseGuildConfigurationService, IAuthorizat
 
 
     public ValueTask<Result<CommandRoleConfig>> ViewConfig(Guild guild) {
-        return new(Result.Ok(GetGuildConfig(guild.GuildId).CommandRoleConfig));
+        return new ValueTask<Result<CommandRoleConfig>>(Result.Ok(GetGuildConfig(guild.GuildId).CommandRoleConfig));
     }
 
     private Task<Result> UpdateAuthorization<T>(IEnumerable<T> entities, AuthorizationRoles role, bool removing = false) where T : GuildEntity {

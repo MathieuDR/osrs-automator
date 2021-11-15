@@ -2,7 +2,7 @@ using System.Text.RegularExpressions;
 using FluentResults;
 using Quartz.Util;
 
-namespace DiscordBot.Services.Parsers; 
+namespace DiscordBot.Services.Parsers;
 
 public class MediaWikiContentToItemsParser {
     private const string RegexPattern = @"{{plink\|(?<item>[^}|]+)(?>\|pic[^}|]+)?(?>\|txt=(?<itemTxt>[^}|]+))?[^}]*}}";
@@ -26,6 +26,6 @@ public class MediaWikiContentToItemsParser {
             }
         }
 
-        return Result.Ok((IEnumerable<string>) result);
+        return Result.Ok((IEnumerable<string>)result);
     }
 }

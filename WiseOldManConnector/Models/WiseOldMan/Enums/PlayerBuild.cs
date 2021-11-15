@@ -1,4 +1,4 @@
-﻿namespace WiseOldManConnector.Models.WiseOldMan.Enums; 
+﻿namespace WiseOldManConnector.Models.WiseOldMan.Enums;
 
 public enum PlayerBuild {
     Main = 0,

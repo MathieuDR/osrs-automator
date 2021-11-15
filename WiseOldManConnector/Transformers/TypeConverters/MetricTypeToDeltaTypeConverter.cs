@@ -1,9 +1,8 @@
-﻿using System;
-using AutoMapper;
+﻿using AutoMapper;
 using WiseOldManConnector.Helpers;
 using WiseOldManConnector.Models.WiseOldMan.Enums;
 
-namespace WiseOldManConnector.Transformers.TypeConverters; 
+namespace WiseOldManConnector.Transformers.TypeConverters;
 
 internal class MetricTypeToDeltaTypeConverter : ITypeConverter<MetricType, DeltaType> {
     public DeltaType Convert(MetricType source, DeltaType destination, ResolutionContext context) {

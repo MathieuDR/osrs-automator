@@ -1,13 +1,11 @@
-﻿using System;
-using System.Threading.Tasks;
-using WiseOldManConnector.Helpers;
+﻿using WiseOldManConnector.Helpers;
 using WiseOldManConnector.Interfaces;
 using WiseOldManConnector.Models;
 using WiseOldManConnector.Models.API.Responses;
 using WiseOldManConnector.Models.Output;
 using WiseOldManConnector.Models.WiseOldMan.Enums;
 
-namespace WiseOldManConnector.Api; 
+namespace WiseOldManConnector.Api;
 
 internal class RecordConnector : BaseConnecter, IWiseOldManRecordApi {
     public RecordConnector(IServiceProvider provider) : base(provider) {

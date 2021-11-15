@@ -1,10 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Runtime.Serialization;
+﻿using System.Runtime.Serialization;
 using WiseOldManConnector.Models.WiseOldMan.Enums;
 
-namespace WiseOldManConnector.Helpers; 
+namespace WiseOldManConnector.Helpers;
 
 public static class EnumHelper {
     public static string ToFriendlyNameOrDefault<T>(this T enumVal) {
@@ -22,10 +19,10 @@ public static class EnumHelper {
     public static T ToEnum<T>(this string source) {
         var enumType = typeof(T);
         foreach (var name in Enum.GetNames(enumType)) {
-            var enumMemberAttribute = ((EnumMemberAttribute[]) enumType.GetField(name).GetCustomAttributes(typeof(EnumMemberAttribute), true))
+            var enumMemberAttribute = ((EnumMemberAttribute[])enumType.GetField(name).GetCustomAttributes(typeof(EnumMemberAttribute), true))
                 .Single();
             if (enumMemberAttribute.Value.ToLowerInvariant() == source.ToLowerInvariant()) {
-                return (T) Enum.Parse(enumType, name);
+                return (T)Enum.Parse(enumType, name);
             }
         }
 
@@ -96,7 +93,7 @@ public static class EnumHelper {
     }
 
     private static List<MetricType> BossMetrics() {
-        return new() {
+        return new List<MetricType> {
             MetricType.AbyssalSire,
             MetricType.AlchemicalHydra,
             MetricType.BarrowsChests,
@@ -148,7 +145,7 @@ public static class EnumHelper {
     }
 
     private static List<MetricType> ActivityMetrics() {
-        return new() {
+        return new List<MetricType> {
             MetricType.LeaguePoints,
             MetricType.BountyHunterHunter,
             MetricType.BountyHunterRogue,
@@ -165,14 +162,14 @@ public static class EnumHelper {
     }
 
     private static List<MetricType> TimeMetrics() {
-        return new() {
+        return new List<MetricType> {
             MetricType.EffectiveHoursBossing,
             MetricType.EffectiveHoursPlaying
         };
     }
 
     private static List<MetricType> SkillMetrics() {
-        return new() {
+        return new List<MetricType> {
             MetricType.Overall,
             MetricType.Attack,
             MetricType.Defence,
@@ -201,7 +198,7 @@ public static class EnumHelper {
     }
 
     private static List<MetricType> OtherMetrics() {
-        return new() {
+        return new List<MetricType> {
             MetricType.Combat
         };
     }

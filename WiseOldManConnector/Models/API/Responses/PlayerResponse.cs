@@ -1,7 +1,6 @@
-﻿using System;
-using Newtonsoft.Json;
+﻿using Newtonsoft.Json;
 
-namespace WiseOldManConnector.Models.API.Responses; 
+namespace WiseOldManConnector.Models.API.Responses;
 
 internal class PlayerResponse : BaseResponse {
     [JsonProperty("id")]
@@ -21,7 +20,7 @@ internal class PlayerResponse : BaseResponse {
 
     [JsonProperty("flagged")]
     public bool Flagged { get; set; }
-        
+
     [JsonProperty("country")]
     public string Country { get; set; }
 

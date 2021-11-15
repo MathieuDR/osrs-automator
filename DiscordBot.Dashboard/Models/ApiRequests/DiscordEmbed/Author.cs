@@ -1,6 +1,6 @@
 using System.Text.Json.Serialization;
 
-namespace Dashboard.Models.ApiRequests.DiscordEmbed; 
+namespace Dashboard.Models.ApiRequests.DiscordEmbed;
 
 public class Author {
     [JsonPropertyName("name")]

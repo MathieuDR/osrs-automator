@@ -1,6 +1,6 @@
 ﻿using System.Globalization;
 
-namespace DiscordBot.Helpers.Extensions; 
+namespace DiscordBot.Helpers.Extensions;
 
 public static class FormatHelper {
     private static readonly int[] Experiences = {
@@ -27,7 +27,7 @@ public static class FormatHelper {
     }
 
     public static string FormattedRank(this Metric metric) {
-        return FormatNumber((double) metric.Rank);
+        return FormatNumber((double)metric.Rank);
     }
 
     // public static string FormatNumber(this double number, bool zeroAsStripe = false) {
@@ -36,14 +36,14 @@ public static class FormatHelper {
 
     public static string FormatNumber(this double number, bool zeroAsStripe = false) {
         if (number >= 1) {
-            return FormatNumber((long) number);
+            return FormatNumber((long)number);
         }
 
         return number.ToString("N");
     }
 
     public static string FormatHours(this double number) {
-        return $"{number - (number - (int) number)}:{TimeSpan.FromHours(number - (int) number).ToString(@"mm")}";
+        return $"{number - (number - (int)number)}:{TimeSpan.FromHours(number - (int)number).ToString(@"mm")}";
     }
 
     // public static string FormatConditionally(this int number, bool zeroAsStripe = false) {
@@ -55,7 +55,7 @@ public static class FormatHelper {
             return "-";
         }
 
-        var nfi = (NumberFormatInfo) CultureInfo.InvariantCulture.NumberFormat.Clone();
+        var nfi = (NumberFormatInfo)CultureInfo.InvariantCulture.NumberFormat.Clone();
         nfi.NumberGroupSeparator = " ";
 
         if (number >= 100000000) {
@@ -78,7 +78,7 @@ public static class FormatHelper {
     }
 
     public static string FormatConditionally(this long number) {
-        var nfi = (NumberFormatInfo) CultureInfo.InvariantCulture.NumberFormat.Clone();
+        var nfi = (NumberFormatInfo)CultureInfo.InvariantCulture.NumberFormat.Clone();
         nfi.NumberGroupSeparator = " ";
 
         if (number >= 100000000) {
@@ -101,7 +101,7 @@ public static class FormatHelper {
     }
 
     public static int ToLevel(this double experience) {
-        return ToLevel((int) experience);
+        return ToLevel((int)experience);
     }
 
     public static int ToLevel(this long experience) {
@@ -121,7 +121,7 @@ public static class FormatHelper {
     }
 
     public static int ToExperience(this double level) {
-        return ToExperience((int) level);
+        return ToExperience((int)level);
     }
 
 

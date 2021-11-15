@@ -1,6 +1,6 @@
 using System.Collections.Immutable;
 
-namespace DiscordBot.Models.Contexts; 
+namespace DiscordBot.Models.Contexts;
 
 public class MessageComponentContext : BaseInteractiveContext<SocketMessageComponent> {
     public MessageComponentContext(SocketMessageComponent innerContext, IServiceProvider provider)
@@ -13,7 +13,9 @@ public class MessageComponentContext : BaseInteractiveContext<SocketMessageCompo
     public IEnumerable<string> SelectedMenuOptions
         => InnerContext.Data.Values?.ToHashSet() ?? new HashSet<string>();
 
-    public IReadOnlyCollection<EmbedField> EmbedFields => this.InnerContext.Message.Embeds.FirstOrDefault()?.Fields ?? new ImmutableArray<EmbedField>();
+    public IReadOnlyCollection<EmbedField> EmbedFields => InnerContext.Message.Embeds.FirstOrDefault()?.Fields ?? new ImmutableArray<EmbedField>();
+
+    public override string Message => InnerContext.Message.Content;
 
     public Task UpdateAsync(
         Optional<string> content = new(),
@@ -33,6 +35,4 @@ public class MessageComponentContext : BaseInteractiveContext<SocketMessageCompo
             props.Flags = flags;
         }, options);
     }
-        
-    public override string Message => InnerContext.Message.Content;
 }

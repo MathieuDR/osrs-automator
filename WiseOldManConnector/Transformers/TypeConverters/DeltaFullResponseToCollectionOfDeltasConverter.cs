@@ -1,10 +1,9 @@
-﻿using System.Collections.Generic;
-using AutoMapper;
+﻿using AutoMapper;
 using WiseOldManConnector.Models.API.Responses;
 using WiseOldManConnector.Models.Output;
 using WiseOldManConnector.Models.WiseOldMan.Enums;
 
-namespace WiseOldManConnector.Transformers.TypeConverters; 
+namespace WiseOldManConnector.Transformers.TypeConverters;
 
 internal class DeltaFullResponseToCollectionOfDeltasConverter : ITypeConverter<DeltaFullResponse, IEnumerable<Deltas>> {
     public IEnumerable<Deltas> Convert(DeltaFullResponse source, IEnumerable<Deltas> destination, ResolutionContext context) {

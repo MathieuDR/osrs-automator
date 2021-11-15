@@ -1,6 +1,6 @@
 using WiseOldManConnector.Models.WiseOldMan.Enums;
 
-namespace DiscordBot.Common.Dtos.Runescape; 
+namespace DiscordBot.Common.Dtos.Runescape;
 
 public record RunescapeDrop {
     public RunescapeDrop() {

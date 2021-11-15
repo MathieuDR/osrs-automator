@@ -1,10 +1,7 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using LiteDB;
 using Serilog;
 
-namespace DiscordBot.Data.Repository.Migrations; 
+namespace DiscordBot.Data.Repository.Migrations;
 
 public class MigrationManager {
     private readonly ILogger _logger;

@@ -1,9 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Net;
+﻿using System.Net;
 using RestSharp;
 
-namespace WiseOldManConnector.Models.Output.Exceptions; 
+namespace WiseOldManConnector.Models.Output.Exceptions;
 
 public abstract class ApiException : Exception {
     protected ApiException() { }

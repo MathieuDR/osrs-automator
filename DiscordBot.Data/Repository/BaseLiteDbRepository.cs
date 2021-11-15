@@ -1,12 +1,10 @@
-using System.Collections.Generic;
-using DiscordBot.Common.Models.Data;
 using DiscordBot.Common.Models.Data.Base;
 using DiscordBot.Data.Interfaces;
 using FluentResults;
 using LiteDB;
 using Microsoft.Extensions.Logging;
 
-namespace DiscordBot.Data.Repository; 
+namespace DiscordBot.Data.Repository;
 
 public abstract class BaseLiteDbRepository<T> : IRepository<T> where T : BaseModel, new() {
     public BaseLiteDbRepository(ILogger logger, LiteDatabase database) {

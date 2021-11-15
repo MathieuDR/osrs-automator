@@ -1,4 +1,4 @@
-namespace DiscordBot.Data.Configuration; 
+namespace DiscordBot.Data.Configuration;
 
 public class LiteDbOptions {
     public string PathPrefix { get; set; }

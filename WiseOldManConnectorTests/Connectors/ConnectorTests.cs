@@ -2,7 +2,7 @@
 using WiseOldManConnectorTests.Fixtures;
 using Xunit;
 
-namespace WiseOldManConnectorTests.Connectors; 
+namespace WiseOldManConnectorTests.Connectors;
 
 public class ConnectorTests : IClassFixture<ApiFixture> {
     public ServiceProvider ServiceProvider;

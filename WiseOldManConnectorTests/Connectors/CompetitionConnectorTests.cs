@@ -1,6 +1,4 @@
-﻿using System;
-using System.Net;
-using System.Threading.Tasks;
+﻿using System.Net;
 using Microsoft.Extensions.DependencyInjection;
 using WiseOldManConnector.Interfaces;
 using WiseOldManConnector.Models.Output.Exceptions;
@@ -8,7 +6,7 @@ using WiseOldManConnector.Models.WiseOldMan.Enums;
 using WiseOldManConnectorTests.Fixtures;
 using Xunit;
 
-namespace WiseOldManConnectorTests.Connectors; 
+namespace WiseOldManConnectorTests.Connectors;
 
 public class CompetitionConnectorTests : ConnectorTests {
     private readonly IWiseOldManCompetitionApi _competitionApi;

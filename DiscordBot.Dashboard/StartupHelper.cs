@@ -1,4 +1,3 @@
-
 using Dashboard.Configuration;
 using Dashboard.Configuration.Options;
 using Dashboard.InputFormatters;
@@ -15,13 +14,13 @@ using Microsoft.OpenApi.Models;
 using Swashbuckle.AspNetCore.SwaggerGen;
 using WiseOldManConnector.Configuration;
 
-namespace Dashboard; 
+namespace Dashboard;
 
 public static class StartupHelper {
     private static ApiOptions GetApiOptions(IConfiguration configuration) {
         return configuration.GetSection("WebApp").GetSection("Api").Get<ApiOptions>();
     }
-    
+
     public static void ConfigureServices(IServiceCollection services, IConfiguration configuration) {
         var apiOptions = GetApiOptions(configuration);
         services.AddRazorPages();
@@ -48,7 +47,7 @@ public static class StartupHelper {
         services.AddSwaggerGen(options => {
             // add a custom operation filter which sets default values
             options.OperationFilter<SwaggerDefaultValues>();
-            options.SwaggerDoc(apiOptions.Version, new OpenApiInfo {Title = apiOptions.Description, Version = apiOptions.Version});
+            options.SwaggerDoc(apiOptions.Version, new OpenApiInfo { Title = apiOptions.Description, Version = apiOptions.Version });
         });
 
         services
@@ -61,7 +60,8 @@ public static class StartupHelper {
         services.AddTransient<IMapper<Embed, RunescapeDrop>, EmbedToRunescapeDropMapper>();
     }
 
-    public static void ConfigurePipeline(IApplicationBuilder app, IWebHostEnvironment env, IApiVersionDescriptionProvider apiVersionDescriptionProvider, IConfiguration configuration) {
+    public static void ConfigurePipeline(IApplicationBuilder app, IWebHostEnvironment env,
+        IApiVersionDescriptionProvider apiVersionDescriptionProvider, IConfiguration configuration) {
         if (env.IsDevelopment()) {
             app.UseDeveloperExceptionPage();
         } else {

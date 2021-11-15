@@ -1,4 +1,4 @@
-﻿namespace DiscordBot.Common.Models.Enums; 
+﻿namespace DiscordBot.Common.Models.Enums;
 
 public enum JobType {
     Achievements = 1,

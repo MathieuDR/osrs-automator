@@ -1,7 +1,7 @@
 ﻿using Newtonsoft.Json;
 using WiseOldManConnector.Models.WiseOldMan.Enums;
 
-namespace WiseOldManConnector.Models.Requests; 
+namespace WiseOldManConnector.Models.Requests;
 
 public class MemberRequest {
     [JsonProperty("username")]

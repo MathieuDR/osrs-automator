@@ -1,7 +1,6 @@
 using System.Text;
 using Common.Extensions;
 using DiscordBot.Common.Models.Enums;
-using Serilog;
 using WiseOldManConnector.Helpers;
 
 namespace DiscordBot.Commands.Interactive;
@@ -15,7 +14,9 @@ public class AuthorizationConfigurationCommandHandler : ApplicationCommandHandle
     private const string AuthorizationLevel = "auth-level";
     private const string RemoveOption = "unauthorize";
 
-    private AuthorizationRoles[] _editableRolesArray = new[] {
+    private readonly IAuthorizationService _authorizationService;
+
+    private readonly AuthorizationRoles[] _editableRolesArray = {
         AuthorizationRoles.ClanAdmin,
         AuthorizationRoles.ClanModerator,
         AuthorizationRoles.ClanEventHost,
@@ -23,8 +24,6 @@ public class AuthorizationConfigurationCommandHandler : ApplicationCommandHandle
         AuthorizationRoles.ClanMember,
         AuthorizationRoles.ClanGuest
     };
-
-    private readonly IAuthorizationService _authorizationService;
 
     public AuthorizationConfigurationCommandHandler(ILogger<AuthorizationConfigurationCommandHandler> logger,
         IAuthorizationService authorizationService) : base("configuration-auth",
@@ -55,27 +54,26 @@ public class AuthorizationConfigurationCommandHandler : ApplicationCommandHandle
     private async Task<Result> ViewHandler(ApplicationCommandContext context) {
         var configResult = await _authorizationService.ViewConfig(context.Guild.ToGuildDto());
         var config = configResult.Value;
-        
+
         var pages = new PageBuilder[_editableRolesArray.Length];
 
-        for (int i = 0; i < _editableRolesArray.Length; i++) {
-
+        for (var i = 0; i < _editableRolesArray.Length; i++) {
             var role = _editableRolesArray[i];
-            
-            var users = config.UserIds.Where(x=>x.Value.HasFlag(role)).Select(x=>x.Key.ToUser()).ToList();
-            var roles = config.RoleIds.Where(x=>x.Value.HasFlag(role)).Select(x=>x.Key.ToRole()).ToList();
+
+            var users = config.UserIds.Where(x => x.Value.HasFlag(role)).Select(x => x.Key.ToUser()).ToList();
+            var roles = config.RoleIds.Where(x => x.Value.HasFlag(role)).Select(x => x.Key.ToRole()).ToList();
 
             var descriptionBuilder = new StringBuilder();
             descriptionBuilder.Append("**Users:** ");
             descriptionBuilder.AppendLine(users.Any() ? string.Join(", ", users) : "None");
-            
+
             descriptionBuilder.Append("**Roles:** ");
             descriptionBuilder.AppendLine(roles.Any() ? string.Join(", ", roles) : "None");
 
             var builder = context
                 .CreatePageBuilder(descriptionBuilder.ToString())
                 .WithTitle($"{role.ToFriendlyNameOrDefault()}");
-            
+
             pages[i] = builder;
         }
 
@@ -121,7 +119,7 @@ public class AuthorizationConfigurationCommandHandler : ApplicationCommandHandle
     private async Task<Result> AuthorizeHandler(ApplicationCommandContext context) {
         var (role, mentions, unauthorize) = GetAddParameters(context);
         var (users, roles) = await GetUsersAndRoles(mentions, context);
-        
+
         Logger.LogInformation("Users to add: {users}", users.Count);
         Logger.LogInformation("roles to add: {roles}", roles.Count);
         Logger.LogInformation("role: {role}", role.ToFriendlyNameOrDefault());
@@ -143,7 +141,7 @@ public class AuthorizationConfigurationCommandHandler : ApplicationCommandHandle
         var roleResult = unauthorize
             ? await _authorizationService.RemoveDiscordRolesToRole(rolesToAuthorize, role)
             : await _authorizationService.AddDiscordRolesToRole(rolesToAuthorize, role);
-        
+
         var returningResult = Result.Merge(result, roleResult);
 
         if (returningResult.IsSuccess) {

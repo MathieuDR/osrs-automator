@@ -1,6 +1,6 @@
 using LiteDB;
 
-namespace DiscordBot.Data.Repository.Migrations; 
+namespace DiscordBot.Data.Repository.Migrations;
 
 public interface IMigration {
     int Version { get; }

@@ -1,6 +1,4 @@
-﻿using System.Collections.Generic;
-
-namespace WiseOldManConnector.Models.Output; 
+﻿namespace WiseOldManConnector.Models.Output;
 
 public class Snapshots : IBaseConnectorOutput {
     private List<Snapshot> _combined;

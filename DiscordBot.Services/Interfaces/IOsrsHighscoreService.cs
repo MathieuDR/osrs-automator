@@ -1,7 +1,7 @@
 ﻿using WiseOldManConnector.Models.Output;
 using WiseOldManConnector.Models.WiseOldMan.Enums;
 
-namespace DiscordBot.Services.Interfaces; 
+namespace DiscordBot.Services.Interfaces;
 
 public interface IOsrsHighscoreService {
     Task<Player> GetPlayersForUsername(string username);

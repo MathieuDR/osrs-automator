@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace DiscordBot.Common.Models.Enums; 
+﻿namespace DiscordBot.Common.Models.Enums;
 
 [Flags]
 public enum BotPermissions {

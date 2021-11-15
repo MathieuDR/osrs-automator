@@ -2,7 +2,7 @@ using FluentResults;
 using Microsoft.Extensions.Logging;
 using Quartz;
 
-namespace DiscordBot.Services.Jobs; 
+namespace DiscordBot.Services.Jobs;
 
 public abstract class BaseJob : IJob {
     public BaseJob(ILogger logger) {
@@ -16,11 +16,11 @@ public abstract class BaseJob : IJob {
 
     public async Task Execute(IJobExecutionContext context) {
         var scopeProps = new Dictionary<string, object> {
-            {"jobType", GetType().Name},
-            {"jobKey", context.JobDetail.Key},
-            {"triggerKey", context.Trigger.Key},
-            {"scheduledFor", context.ScheduledFireTimeUtc},
-            {"refire", context.RefireCount}
+            { "jobType", GetType().Name },
+            { "jobKey", context.JobDetail.Key },
+            { "triggerKey", context.Trigger.Key },
+            { "scheduledFor", context.ScheduledFireTimeUtc },
+            { "refire", context.RefireCount }
         };
 
         using (Logger.BeginScope(scopeProps)) {

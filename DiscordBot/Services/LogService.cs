@@ -2,7 +2,7 @@
 using Discord.Commands;
 using Serilog.Events;
 
-namespace DiscordBot.Services; 
+namespace DiscordBot.Services;
 
 public class LogService : ILogService {
     private readonly ILogger _commandsLogger;
@@ -70,10 +70,10 @@ public class LogService : ILogService {
     }
 
     private static LogLevel LogLevelFromSeverity(LogSeverity severity) {
-        return (LogLevel) Math.Abs((int) severity - 5);
+        return (LogLevel)Math.Abs((int)severity - 5);
     }
 
     private static LogLevel LogLevelFromLogEventLevel(LogEventLevel LogEventLevel) {
-        return (LogLevel) LogEventLevel;
+        return (LogLevel)LogEventLevel;
     }
 }

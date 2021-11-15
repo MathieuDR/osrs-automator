@@ -1,14 +1,13 @@
-﻿using System;
-using AutoMapper;
+﻿using AutoMapper;
 using WiseOldManConnector.Models.WiseOldMan.Enums;
 
-namespace WiseOldManConnector.Transformers.TypeConverters; 
+namespace WiseOldManConnector.Transformers.TypeConverters;
 
 internal class StringToMetricTypeConverter : ITypeConverter<string, MetricType> {
     public MetricType Convert(string source, MetricType destination, ResolutionContext context) {
         //var lowerInvariant = source.ToLowerInvariant();
         if (Enum.TryParse(typeof(MetricType), source, true, out var temp)) {
-            destination = (MetricType) temp;
+            destination = (MetricType)temp;
             return destination;
         }
 

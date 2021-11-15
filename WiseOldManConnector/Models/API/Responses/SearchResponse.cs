@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace WiseOldManConnector.Models.API.Responses; 
+﻿namespace WiseOldManConnector.Models.API.Responses;
 
 internal class SearchResponse : BaseResponse {
     // TODO ADD JSONPROPERTTIES!

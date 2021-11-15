@@ -1,4 +1,4 @@
-﻿namespace WiseOldManConnector.Models.Output; 
+﻿namespace WiseOldManConnector.Models.Output;
 
 public class Statistics : IBaseConnectorOutput {
     public int MaxedCombatPlayers { get; set; }

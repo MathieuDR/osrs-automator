@@ -1,11 +1,9 @@
-﻿using System.Collections.Generic;
-using System.Threading.Tasks;
-using WiseOldManConnector.Models;
+﻿using WiseOldManConnector.Models;
 using WiseOldManConnector.Models.Output;
 using WiseOldManConnector.Models.Requests;
 using WiseOldManConnector.Models.WiseOldMan.Enums;
 
-namespace WiseOldManConnector.Interfaces; 
+namespace WiseOldManConnector.Interfaces;
 
 public interface IWiseOldManGroupApi {
     #region groups

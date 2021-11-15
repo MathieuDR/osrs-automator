@@ -1,7 +1,7 @@
 using System.Text;
 using Common.Extensions;
 
-namespace DiscordBot.Helpers.Builders; 
+namespace DiscordBot.Helpers.Builders;
 
 public class InteractionReplyBuilder<TInteraction> where TInteraction : SocketInteraction {
     private readonly BaseInteractiveContext<TInteraction> _context;
@@ -46,14 +46,14 @@ public class InteractionReplyBuilder<TInteraction> where TInteraction : SocketIn
     }
 
     public InteractionReplyBuilder<TInteraction> WithEmbedFrom(StringBuilder title, StringBuilder content) {
-        return WithEmbedFrom(title.ToString() ,content.ToString());
+        return WithEmbedFrom(title.ToString(), content.ToString());
     }
 
     public InteractionReplyBuilder<TInteraction> WithEmbedFrom(string title, string content) {
         Embeds.Add(_context.CreateEmbedBuilder(title, content).Build());
         return this;
     }
-        
+
     public InteractionReplyBuilder<TInteraction> WithEmbedFrom(string title, string content, Action<EmbedBuilder> embedBuilder) {
         var builder = _context.CreateEmbedBuilder(title, content);
         embedBuilder(builder);
@@ -93,7 +93,7 @@ public class InteractionReplyBuilder<TInteraction> where TInteraction : SocketIn
         foreach (var row in actionRows) {
             ActionRows.Add(row);
         }
-            
+
         return this;
     }
 
@@ -120,8 +120,8 @@ public class InteractionReplyBuilder<TInteraction> where TInteraction : SocketIn
             AllowedMentions, options, new ComponentBuilder().AddActionRows(ActionRows).Build());
         await UpdateOrNoopTask;
     }
-        
-        
+
+
     // public async Task UpdateAsync(MessageFlags? flags = null,RequestOptions options = null) {
     //     await WithComponentMessageUpdate(properties => {
     //         properties.Components = new ComponentBuilder().AddActionRows(ActionRows).Build();

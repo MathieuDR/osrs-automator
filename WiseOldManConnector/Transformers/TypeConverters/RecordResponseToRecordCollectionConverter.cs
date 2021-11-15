@@ -1,11 +1,9 @@
-﻿using System.Collections.Generic;
-using System.Linq;
-using AutoMapper;
+﻿using AutoMapper;
 using WiseOldManConnector.Models.API.Responses;
 using WiseOldManConnector.Models.Output;
 using WiseOldManConnector.Models.WiseOldMan.Enums;
 
-namespace WiseOldManConnector.Transformers.TypeConverters; 
+namespace WiseOldManConnector.Transformers.TypeConverters;
 
 internal class RecordResponseToRecordCollectionConverter : ITypeConverter<RecordResponse, IEnumerable<Record>> {
     public IEnumerable<Record> Convert(RecordResponse source, IEnumerable<Record> destination, ResolutionContext context) {

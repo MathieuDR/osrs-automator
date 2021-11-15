@@ -1,12 +1,10 @@
-using System.IO;
-using System.Linq;
 using System.Text.Json;
 using DiscordBot.Services.Models.MediaWikiApi;
 using DiscordBot.ServicesTests.Resources.EmbedJsons;
 using FluentAssertions;
 using Xunit;
 
-namespace DiscordBot.ServicesTests.Deserialization; 
+namespace DiscordBot.ServicesTests.Deserialization;
 
 public class MediaWikiJsonResponseToQueryResponseTests {
     [Theory]

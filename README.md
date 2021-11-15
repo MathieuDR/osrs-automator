@@ -81,6 +81,7 @@
 
 
 <!-- ABOUT THE PROJECT -->
+
 ## About The Project
 
 A discord bot made for OSRS clans to automate menial tasks, outputs & other tools.
@@ -90,16 +91,15 @@ A discord bot made for OSRS clans to automate menial tasks, outputs & other tool
 * [Wise old man](https://github.com/wise-old-man/wise-old-man)
 * [Discord.Net-Labs](https://github.com/Discord-Net-Labs/Discord.Net-Labs)
 
-
-
 <!-- GETTING STARTED -->
+
 ## Getting Started
 
 To get a local copy up and running follow these simple steps.
 
 ### Prerequisites
 
-* .NET 5 
+* .NET 5
 
 ### Installation
 
@@ -109,20 +109,25 @@ To get a local copy up and running follow these simple steps.
    ```
 
 <!-- USAGE EXAMPLES -->
+
 ## Usage
 
 TBA
 
 <!-- ROADMAP -->
+
 ## Roadmap
 
-See the [open issues](https://github.com/MathieuDR/orsr-discord-automator/issues) for a list of proposed features (and known issues).
+See the [open issues](https://github.com/MathieuDR/orsr-discord-automator/issues) for a list of proposed features (and
+known issues).
 
 
 <!-- CONTRIBUTING -->
+
 ## Contributing
 
-Contributions are what make the open source community such an amazing place to be learn, inspire, and create. Any contributions you make are **greatly appreciated**.
+Contributions are what make the open source community such an amazing place to be learn, inspire, and create. Any
+contributions you make are **greatly appreciated**.
 
 1. Fork the Project
 2. Create your Feature Branch (`git checkout -b feature/AmazingFeature`)
@@ -131,6 +136,7 @@ Contributions are what make the open source community such an amazing place to b
 5. Open a Pull Request
 
 <!-- LICENSE -->
+
 ## License
 
 Distributed under the MIT License. See `LICENSE` for more information.
@@ -138,6 +144,7 @@ Distributed under the MIT License. See `LICENSE` for more information.
 
 
 <!-- CONTACT -->
+
 ## Contact
 
 Project Link: [https://github.com/MathieuDR/orsr-discord-automator](https://github.com/MathieuDR/orsr-discord-automator)
@@ -145,27 +152,38 @@ Project Link: [https://github.com/MathieuDR/orsr-discord-automator](https://gith
 [![LinkedIn][linkedin-shield]][linkedin-url]
 
 <!-- ACKNOWLEDGEMENTS -->
+
 ## Acknowledgements
 
 * [Wise old man](https://github.com/wise-old-man/wise-old-man)
 * [Discord.Net-Labs](https://github.com/Discord-Net-Labs/Discord.Net-Labs)
 * [Volte](https://github.com/Ultz/Volte)
 
-
-
-
 <!-- MARKDOWN LINKS & IMAGES -->
 <!-- https://www.markdownguide.org/basic-syntax/#reference-style-links -->
+
 [contributors-shield]: https://img.shields.io/github/contributors/MathieuDR/orsr-discord-automator.svg?style=for-the-badge
+
 [contributors-url]: https://github.com/MathieuDR/orsr-discord-automator/graphs/contributors
+
 [forks-shield]: https://img.shields.io/github/forks/MathieuDR/orsr-discord-automator.svg?style=for-the-badge
+
 [forks-url]: https://github.com/MathieuDR/orsr-discord-automator/network/members
+
 [stars-shield]: https://img.shields.io/github/stars/MathieuDR/orsr-discord-automator.svg?style=for-the-badge
+
 [stars-url]: https://github.com/MathieuDR/orsr-discord-automator/stargazers
+
 [issues-shield]: https://img.shields.io/github/issues/MathieuDR/orsr-discord-automator.svg?style=for-the-badge
+
 [issues-url]: https://github.com/MathieuDR/orsr-discord-automator/issues
+
 [license-shield]: https://img.shields.io/github/license/MathieuDR/orsr-discord-automator.svg?style=for-the-badge
+
 [license-url]: https://github.com/MathieuDR/orsr-discord-automator/blob/master/LICENSE.txt
+
 [linkedin-shield]: https://img.shields.io/badge/-LinkedIn-black.svg?style=for-the-badge&logo=linkedin&colorB=555
+
 [linkedin-url]: https://linkedin.com/in/mathieuderaedt
+
 [waka-shield]: https://wakatime.com/badge/user/f446970f-9873-48d3-95f9-f37d9a4541b3/project/c76ecca4-99d2-4dfc-814c-f4fedfee0b69.svg?style=for-the-badge

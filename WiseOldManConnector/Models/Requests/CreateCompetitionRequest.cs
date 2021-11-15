@@ -1,11 +1,8 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using Newtonsoft.Json;
 using WiseOldManConnector.Helpers;
 using WiseOldManConnector.Models.WiseOldMan.Enums;
 
-namespace WiseOldManConnector.Models.Requests; 
+namespace WiseOldManConnector.Models.Requests;
 
 public class CreateCompetitionRequest {
     private CreateCompetitionRequest(string title, MetricType metric, DateTime start, DateTime end) {

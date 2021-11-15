@@ -2,7 +2,7 @@
 using DiscordBot.Common.Models.Decorators;
 using WiseOldManConnector.Models.Output;
 
-namespace DiscordBot.Services.Interfaces; 
+namespace DiscordBot.Services.Interfaces;
 
 public interface IPlayerService {
     /// <summary>

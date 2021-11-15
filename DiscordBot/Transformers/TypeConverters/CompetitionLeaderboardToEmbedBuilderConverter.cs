@@ -1,7 +1,7 @@
 ﻿using System.Text;
 using AutoMapper;
 
-namespace DiscordBot.Transformers.TypeConverters; 
+namespace DiscordBot.Transformers.TypeConverters;
 
 public class CompetitionLeaderboardToEmbedBuilderConverter : ITypeConverter<CompetitionLeaderboard, EmbedBuilder> {
     private static readonly int IdHash = 3;

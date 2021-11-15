@@ -1,8 +1,3 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
 using WiseOldManConnector.Helpers;
 using WiseOldManConnector.Interfaces;
@@ -16,7 +11,7 @@ using Xunit;
 using Xunit.Abstractions;
 using Record = WiseOldManConnector.Models.Output.Record;
 
-namespace WiseOldManConnectorTests.Connectors; 
+namespace WiseOldManConnectorTests.Connectors;
 
 public class PlayerConnectorTests : ConnectorTests {
     private readonly IWiseOldManPlayerApi _playerApi;
@@ -628,7 +623,7 @@ public class PlayerConnectorTests : ConnectorTests {
 
         foreach (var type in types) {
             _testOutputHelper.WriteLine($"metric: {type}");
-            Assert.Contains(type, (IDictionary<MetricType, Metric>) response.Data.LatestSnapshot.AllMetrics);
+            Assert.Contains(type, (IDictionary<MetricType, Metric>)response.Data.LatestSnapshot.AllMetrics);
 
             var metric = response.Data.LatestSnapshot.AllMetrics[type];
 

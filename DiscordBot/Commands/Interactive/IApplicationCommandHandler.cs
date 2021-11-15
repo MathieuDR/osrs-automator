@@ -1,6 +1,6 @@
 using DiscordBot.Common.Models.Enums;
 
-namespace DiscordBot.Commands.Interactive; 
+namespace DiscordBot.Commands.Interactive;
 
 public interface IApplicationCommandHandler {
     public Guid Id { get; }

@@ -1,5 +1,3 @@
-using System.IO;
-using System.Linq;
 using System.Text.Json;
 using DiscordBot.Services.Models.MediaWikiApi;
 using DiscordBot.Services.Parsers;
@@ -7,7 +5,7 @@ using DiscordBot.ServicesTests.Resources.EmbedJsons;
 using FluentAssertions;
 using Xunit;
 
-namespace DiscordBot.ServicesTests.Parser; 
+namespace DiscordBot.ServicesTests.Parser;
 
 public class MediaWikiToItemParserTests {
     private string GetContentString(WikiResponseFiles.File file = null) {

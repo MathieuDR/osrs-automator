@@ -1,11 +1,10 @@
-using System;
 using DiscordBot.Common.Models.Data;
 using DiscordBot.Data.Interfaces;
 using FluentResults;
 using LiteDB;
 using Microsoft.Extensions.Logging;
 
-namespace DiscordBot.Data.Repository; 
+namespace DiscordBot.Data.Repository;
 
 public class RuneScapeDropDataRepository : BaseRecordLiteDbRepository<RunescapeDropData>, IRuneScapeDropDataRepository {
     public RuneScapeDropDataRepository(ILogger<RuneScapeDropDataRepository> logger, LiteDatabase database) : base(logger, database) { }
@@ -23,7 +22,7 @@ public class RuneScapeDropDataRepository : BaseRecordLiteDbRepository<RunescapeD
 
     public Result CloseActive(Guid endpoint) {
         var item = GetActive(endpoint).Value;
-        item = item with {IsHandled = true};
+        item = item with { IsHandled = true };
         return Update(item);
     }
 }

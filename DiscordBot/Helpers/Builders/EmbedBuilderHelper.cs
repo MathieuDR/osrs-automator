@@ -1,7 +1,7 @@
 ﻿using Discord.Commands;
 using DiscordBot.Common.Models.Decorators;
 
-namespace DiscordBot.Helpers.Builders; 
+namespace DiscordBot.Helpers.Builders;
 
 public static class EmbedBuilderHelper {
     public static EmbedBuilder AddWiseOldMan(this EmbedBuilder builder, string title = "Wiseoldman.net",
@@ -54,15 +54,14 @@ public static class EmbedBuilderHelper {
         return WithMessageAuthorFooter(builder, context.User, appendToFooter);
     }
 
-        
+
     public static EmbedBuilder WithMessageAuthorFooter(this EmbedBuilder builder, IUser user,
         string appendToFooter = "") {
-
         var userName = user.Username;
         if (user is IGuildUser guildUser) {
             userName = guildUser.DisplayName();
         }
-            
+
         var footerText = $"Requested by {userName}.";
         if (!string.IsNullOrWhiteSpace(appendToFooter)) {
             footerText += $", {appendToFooter}";

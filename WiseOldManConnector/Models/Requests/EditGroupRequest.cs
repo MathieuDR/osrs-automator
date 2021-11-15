@@ -1,8 +1,7 @@
-﻿using System.Collections.Generic;
-using Newtonsoft.Json;
+﻿using Newtonsoft.Json;
 using WiseOldManConnector.Interfaces;
 
-namespace WiseOldManConnector.Models.Requests; 
+namespace WiseOldManConnector.Models.Requests;
 
 public class EditGroupRequest : CreateGroupRequest, IVerifiable {
     public EditGroupRequest(string verificationCode, string name) : this(verificationCode, name, null, null) { }

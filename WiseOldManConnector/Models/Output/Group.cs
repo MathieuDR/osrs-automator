@@ -1,8 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using WiseOldManConnector.Interfaces;
+﻿using WiseOldManConnector.Interfaces;
 
-namespace WiseOldManConnector.Models.Output; 
+namespace WiseOldManConnector.Models.Output;
 
 public class Group : IBaseConnectorOutput {
     public int Id { get; set; }

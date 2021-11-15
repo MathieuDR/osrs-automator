@@ -1,7 +1,6 @@
-using System;
 using DiscordBot.Data.Interfaces;
 
-namespace DiscordBot.Data.Strategies; 
+namespace DiscordBot.Data.Strategies;
 
 public interface IRepositoryStrategy {
     IRepository GetOrCreateRepository(Type type, ulong guildId);
