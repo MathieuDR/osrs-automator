@@ -1,8 +1,6 @@
-using System.Collections.Generic;
-using System.Linq;
 using WiseOldManConnector.Models.WiseOldMan.Enums;
 
-namespace WebAppTests.Resources.EmbedJsons; 
+namespace WebAppTests.Resources.EmbedJsons;
 
 public class DiscordEmbedFiles {
     private static IEnumerable<File> Files =>
@@ -30,17 +28,17 @@ public class DiscordEmbedFiles {
                 @"https://oldschool.runescape.wiki/images/5/5e/Bones.png?3fbd5")
         };
 
-    public static IEnumerable<object[]> AllFiles => Files.Select(x => new[] {x.Path});
+    public static IEnumerable<object[]> AllFiles => Files.Select(x => new[] { x.Path });
     public static string FirstFile => Files.Select(x => x.Path).FirstOrDefault();
     public static string FirstImFile => Files.Where(x => x.PlayerType == PlayerType.IronMan).Select(x => x.Path).FirstOrDefault();
-    public static IEnumerable<object[]> WithPlayerTypes => Files.Select(x => new object[] {x.Path, x.PlayerType});
-    public static IEnumerable<object[]> WithQuantities => Files.Select(x => new object[] {x.Path, x.Amount});
-    public static IEnumerable<object[]> WithNames => Files.Select(x => new object[] {x.Path, x.Player});
-    public static IEnumerable<object[]> WithValues => Files.Select(x => new object[] {x.Path, x.Amount, x.Value, x.HaValue});
+    public static IEnumerable<object[]> WithPlayerTypes => Files.Select(x => new object[] { x.Path, x.PlayerType });
+    public static IEnumerable<object[]> WithQuantities => Files.Select(x => new object[] { x.Path, x.Amount });
+    public static IEnumerable<object[]> WithNames => Files.Select(x => new object[] { x.Path, x.Player });
+    public static IEnumerable<object[]> WithValues => Files.Select(x => new object[] { x.Path, x.Amount, x.Value, x.HaValue });
 
-    public static IEnumerable<object[]> WithSources => Files.Select(x => new object[] {x.Path, x.Source, x.Level, x.SourceUrl});
-    public static IEnumerable<object[]> WithItem => Files.Select(x => new object[] {x.Path, x.Item, x.ItemUrl, x.IconUrl});
-    public static IEnumerable<object[]> WithRarity => Files.Select(x => new object[] {x.Path, x.Rarity});
+    public static IEnumerable<object[]> WithSources => Files.Select(x => new object[] { x.Path, x.Source, x.Level, x.SourceUrl });
+    public static IEnumerable<object[]> WithItem => Files.Select(x => new object[] { x.Path, x.Item, x.ItemUrl, x.IconUrl });
+    public static IEnumerable<object[]> WithRarity => Files.Select(x => new object[] { x.Path, x.Rarity });
 
     public class File {
         public File(string path, string player, PlayerType type, string item, int amount, float value, int haValue,

@@ -3,7 +3,7 @@ using DiscordBot.Common.Models.Decorators;
 using WiseOldManConnector.Models.Output;
 using WiseOldManConnector.Models.WiseOldMan.Enums;
 
-namespace DiscordBot.Services.Helpers; 
+namespace DiscordBot.Services.Helpers;
 
 public static class WiseOldManConnectorHelper {
     private static readonly string WiseOldManHost = "wiseoldman.net";
@@ -98,7 +98,7 @@ public static class WiseOldManConnectorHelper {
             return null;
         }
 
-        var group = new Group {Id = groupId};
+        var group = new Group { Id = groupId };
         return new ItemDecorator<Leaderboard>(deltaLeaderboard, groupName, group.Url());
     }
 
@@ -108,6 +108,6 @@ public static class WiseOldManConnectorHelper {
 
 
     private static UriBuilder GetWomBuilder() {
-        return new("https", WiseOldManHost);
+        return new UriBuilder("https", WiseOldManHost);
     }
 }

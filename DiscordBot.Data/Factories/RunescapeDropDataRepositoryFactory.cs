@@ -1,10 +1,8 @@
-using System;
-using DiscordBot.Common.Models.Data;
 using DiscordBot.Data.Interfaces;
 using DiscordBot.Data.Repository;
 using Microsoft.Extensions.Logging;
 
-namespace DiscordBot.Data.Factories; 
+namespace DiscordBot.Data.Factories;
 
 public class RunescapeDropDataRepositoryFactory : BaseLiteDbRepositoryFactory<IRuneScapeDropDataRepository, RuneScapeDropDataRepository> {
     public RunescapeDropDataRepositoryFactory(ILoggerFactory loggerFactory, LiteDbManager liteDbManager) : base(loggerFactory, liteDbManager) { }

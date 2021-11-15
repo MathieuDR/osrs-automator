@@ -2,7 +2,7 @@ using System.Text;
 using WiseOldManConnector.Helpers;
 using WiseOldManConnector.Models.WiseOldMan.Enums;
 
-namespace DiscordBot.Transformers; 
+namespace DiscordBot.Transformers;
 
 public static class DeltaLeaderboardHelper {
     private static readonly int IdHash = 3;

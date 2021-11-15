@@ -2,7 +2,7 @@
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 
-namespace WiseOldManConnector.Models.WiseOldMan.Enums; 
+namespace WiseOldManConnector.Models.WiseOldMan.Enums;
 
 [JsonConverter(typeof(StringEnumConverter))]
 public enum GroupRole {

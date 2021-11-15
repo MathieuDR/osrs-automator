@@ -1,6 +1,6 @@
 ﻿using WiseOldManConnector.Models.WiseOldMan.Enums;
 
-namespace DiscordBot.Commands.Modules.DiscordCommandArguments; 
+namespace DiscordBot.Commands.Modules.DiscordCommandArguments;
 
 public class PeriodAndMetricArguments : BaseArguments {
     public Period? Period { get; set; }

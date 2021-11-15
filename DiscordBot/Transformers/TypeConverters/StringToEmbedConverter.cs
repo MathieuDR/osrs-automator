@@ -1,6 +1,6 @@
 ﻿using AutoMapper;
 
-namespace DiscordBot.Transformers.TypeConverters; 
+namespace DiscordBot.Transformers.TypeConverters;
 
 public class StringToEmbedConverter : ITypeConverter<string, Embed> {
     public Embed Convert(string source, Embed destination, ResolutionContext context) {

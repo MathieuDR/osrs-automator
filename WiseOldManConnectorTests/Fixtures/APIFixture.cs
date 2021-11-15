@@ -1,7 +1,7 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using WiseOldManConnector.Configuration;
 
-namespace WiseOldManConnectorTests.Fixtures; 
+namespace WiseOldManConnectorTests.Fixtures;
 
 public class ApiFixture {
     public ApiFixture() {

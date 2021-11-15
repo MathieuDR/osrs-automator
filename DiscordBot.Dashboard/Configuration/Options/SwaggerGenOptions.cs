@@ -1,11 +1,9 @@
-using System;
 using Microsoft.AspNetCore.Mvc.ApiExplorer;
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using Microsoft.OpenApi.Models;
 using Swashbuckle.AspNetCore.SwaggerGen;
 
-namespace Dashboard.Configuration.Options; 
+namespace Dashboard.Configuration.Options;
 
 /// <summary>
 ///     Configures the Swagger generation options.
@@ -43,8 +41,8 @@ public class ConfigureSwaggerGenOptions : IConfigureOptions<SwaggerGenOptions> {
             Title = "Sample API",
             Version = description.ApiVersion.ToString(),
             Description = "A sample application with Swagger, Swashbuckle, and API versioning.",
-            Contact = new OpenApiContact {Name = "Bill Mei", Email = "bill.mei@somewhere.com"},
-            License = new OpenApiLicense {Name = "MIT", Url = new Uri("https://opensource.org/licenses/MIT")}
+            Contact = new OpenApiContact { Name = "Bill Mei", Email = "bill.mei@somewhere.com" },
+            License = new OpenApiLicense { Name = "MIT", Url = new Uri("https://opensource.org/licenses/MIT") }
         };
 
         if (description.IsDeprecated) {

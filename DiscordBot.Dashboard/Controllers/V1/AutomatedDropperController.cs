@@ -1,18 +1,12 @@
-using System;
-using System.IO;
-using System.Linq;
-using System.Threading.Tasks;
 using Dashboard.Binders;
 using Dashboard.Models.ApiRequests.DiscordEmbed;
 using Dashboard.Transformers;
 using DiscordBot.Common.Dtos.Runescape;
 using DiscordBot.Services.Interfaces;
 using FluentResults;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Logging;
 
-namespace Dashboard.Controllers.V1; 
+namespace Dashboard.Controllers.V1;
 
 [ApiController]
 [ApiVersion("1.0")]

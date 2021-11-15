@@ -1,12 +1,10 @@
-using System.Linq;
-using System.Threading.Tasks;
 using DiscordBot.Services.Configuration;
 using DiscordBot.Services.ExternalServices;
 using FluentAssertions;
 using Microsoft.Extensions.DependencyInjection;
 using Xunit;
 
-namespace DiscordBot.ServicesTests.Services; 
+namespace DiscordBot.ServicesTests.Services;
 
 public class OsrsWikiApeTests {
     [Fact]

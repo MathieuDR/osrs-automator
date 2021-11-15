@@ -1,7 +1,7 @@
 using Microsoft.Extensions.Logging;
 using WiseOldManConnector.Interfaces;
 
-namespace DiscordBot.Services.Services; 
+namespace DiscordBot.Services.Services;
 
 public class WisOldManLogger : IWiseOldManLogger {
     private readonly ILogger<WisOldManLogger> _logger;

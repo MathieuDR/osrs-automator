@@ -1,14 +1,13 @@
-﻿using System;
-using AutoMapper;
+﻿using AutoMapper;
 using WiseOldManConnector.Models.WiseOldMan.Enums;
 
-namespace WiseOldManConnector.Transformers.TypeConverters; 
+namespace WiseOldManConnector.Transformers.TypeConverters;
 
 internal class StringToPlayerTypeConverter : ITypeConverter<string, PlayerType> {
     public PlayerType Convert(string source, PlayerType destination, ResolutionContext context) {
         //var lowerInvariant = source.ToLowerInvariant();
         if (Enum.TryParse(typeof(PlayerType), source, true, out var temp)) {
-            destination = (PlayerType) temp;
+            destination = (PlayerType)temp;
             return destination;
         }
 

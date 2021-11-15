@@ -1,3 +1,3 @@
-namespace DiscordBot.Data.Repository.Migrations; 
+namespace DiscordBot.Data.Repository.Migrations;
 
 public static class MigrationHelper { }

@@ -8,7 +8,7 @@ using DiscordBot.Services.Interfaces;
 using Microsoft.Extensions.Logging;
 using WiseOldManConnector.Models.Output;
 
-namespace DiscordBot.Services.Services; 
+namespace DiscordBot.Services.Services;
 
 internal class PlayerService : RepositoryService, IPlayerService {
     private readonly IDiscordService _discordService;

@@ -1,7 +1,6 @@
-using System;
 using DiscordBot.Data.Interfaces;
 
-namespace DiscordBot.Data.Factories; 
+namespace DiscordBot.Data.Factories;
 
 public interface IRepositoryFactory {
     bool AppliesTo(Type type, bool requiresGuildId);

@@ -1,6 +1,6 @@
 ﻿using DiscordBot.Common.Configuration;
 
-namespace DiscordBot.Configuration; 
+namespace DiscordBot.Configuration;
 
 public class BotConfiguration {
     public string Token { get; set; }

@@ -1,4 +1,5 @@
 // Common globals
+
 global using Microsoft.Extensions.Logging;
 
 // Common package globals

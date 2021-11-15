@@ -5,7 +5,7 @@ using DiscordBot.Services.Parsers;
 using FluentResults;
 using Microsoft.Extensions.Logging;
 
-namespace DiscordBot.Services.Services; 
+namespace DiscordBot.Services.Services;
 
 internal class CollectionLogItemProvider : BaseService, ICollectionLogItemProvider {
     private const string PageTitle = "Collection log";

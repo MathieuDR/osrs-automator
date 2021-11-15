@@ -1,10 +1,9 @@
-﻿using System.Collections.Generic;
-using AutoMapper;
+﻿using AutoMapper;
 using WiseOldManConnector.Models.API.Responses;
 using WiseOldManConnector.Models.Output;
 using WiseOldManConnector.Models.WiseOldMan.Enums;
 
-namespace WiseOldManConnector.Transformers.TypeConverters; 
+namespace WiseOldManConnector.Transformers.TypeConverters;
 
 internal class WOMCompetitionToParticipantsCollectionConverter : ITypeConverter<WOMCompetition, IEnumerable<CompetitionParticipant>> {
     public IEnumerable<CompetitionParticipant> Convert(WOMCompetition source, IEnumerable<CompetitionParticipant> destination,
@@ -16,9 +15,10 @@ internal class WOMCompetitionToParticipantsCollectionConverter : ITypeConverter<
         if (source.Participants != null) {
             foreach (var sourceParticipant in source.Participants) {
                 var destinationParticipant = context.Mapper.Map<CompetitionParticipant>(sourceParticipant);
-                if( destinationParticipant.CompetitionDelta is not null) {
+                if (destinationParticipant.CompetitionDelta is not null) {
                     destinationParticipant.CompetitionDelta.DeltaType = deltaType;
                 }
+
                 result.Add(destinationParticipant);
             }
         }

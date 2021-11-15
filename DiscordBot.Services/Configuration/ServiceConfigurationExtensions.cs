@@ -4,7 +4,7 @@ using DiscordBot.Services.Services;
 using Microsoft.Extensions.DependencyInjection;
 using Refit;
 
-namespace DiscordBot.Services.Configuration; 
+namespace DiscordBot.Services.Configuration;
 
 public static partial class ServiceConfigurationExtensions {
     public static IServiceCollection AddDiscordBotServices(this IServiceCollection serviceCollection) {
@@ -12,7 +12,7 @@ public static partial class ServiceConfigurationExtensions {
             .AddServices()
             .AddExternalServices();
     }
-        
+
     private static IServiceCollection AddExternalServices(this IServiceCollection serviceCollection) {
         serviceCollection
             .AddRefitClient<IOsrsWikiApi>()

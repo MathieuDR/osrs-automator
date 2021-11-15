@@ -1,6 +1,6 @@
 ﻿using Discord.Commands;
 
-namespace DiscordBot.Preconditions; 
+namespace DiscordBot.Preconditions;
 
 public class RequireRoleAttribute : PreconditionAttribute {
     private readonly List<ulong> _ids = new();

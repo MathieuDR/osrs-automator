@@ -1,3 +1,3 @@
-﻿namespace WiseOldManConnector.Models.API.Responses; 
+﻿namespace WiseOldManConnector.Models.API.Responses;
 
 internal class WOMMessageResponse : BaseResponse { }

@@ -1,9 +1,8 @@
-﻿using System;
-using AutoMapper;
+﻿using AutoMapper;
 using WiseOldManConnector.Helpers;
 using WiseOldManConnector.Models.WiseOldMan.Enums;
 
-namespace WiseOldManConnector.Transformers.TypeConverters; 
+namespace WiseOldManConnector.Transformers.TypeConverters;
 
 internal class StringToGroupRoleConvertor : ITypeConverter<string, GroupRole?> {
     public GroupRole? Convert(string source, GroupRole? destination, ResolutionContext context) {
@@ -13,7 +12,7 @@ internal class StringToGroupRoleConvertor : ITypeConverter<string, GroupRole?> {
 
         //var lowerInvariant = source.ToLowerInvariant();
         if (Enum.TryParse(typeof(GroupRole), source, true, out var temp)) {
-            destination = (GroupRole) temp;
+            destination = (GroupRole)temp;
             return destination;
         }
 

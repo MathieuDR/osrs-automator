@@ -2,7 +2,7 @@
 using WiseOldManConnector.Models.WiseOldMan.Enums;
 using WiseOldManConnector.Transformers.TypeConverters;
 
-namespace WiseOldManConnector.Configuration; 
+namespace WiseOldManConnector.Configuration;
 
 public class MetricMappingProfile : Profile {
     public MetricMappingProfile() {

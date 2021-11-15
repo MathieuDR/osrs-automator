@@ -7,7 +7,7 @@ using DiscordBot.Services.Interfaces;
 using FluentResults;
 using Microsoft.Extensions.Logging;
 
-namespace DiscordBot.Services.Jobs; 
+namespace DiscordBot.Services.Jobs;
 
 public abstract class ConfigurableGuildJob : BaseGuildJob {
     protected ConfigurableGuildJob(ILogger logger, IDiscordService discordService, JobType jobType, IRepositoryStrategy repositoryStrategy) :

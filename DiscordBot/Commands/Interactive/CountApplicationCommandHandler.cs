@@ -1,16 +1,9 @@
 using System.Text;
 using DiscordBot.Common.Models.Enums;
 
-namespace DiscordBot.Commands.Interactive; 
+namespace DiscordBot.Commands.Interactive;
 
 public class CountApplicationCommandHandler : ApplicationCommandHandler {
-    private readonly ICounterService _counterService;
-
-    public CountApplicationCommandHandler(ILogger<CountApplicationCommandHandler> logger, ICounterService counterService) : base("count",
-        "Everything about point counting!", logger) {
-        _counterService = counterService;
-    }
-
     private const string HistorySubCommandName = "history";
     private const string TopSubCommandName = "top";
     private const string AddSubCommandName = "add";
@@ -18,14 +11,20 @@ public class CountApplicationCommandHandler : ApplicationCommandHandler {
     private const string UserOption = "user";
     private const string ReasonOption = "reason";
     private const string UsersOption = "users";
+    private readonly ICounterService _counterService;
+
+    public CountApplicationCommandHandler(ILogger<CountApplicationCommandHandler> logger, ICounterService counterService) : base("count",
+        "Everything about point counting!", logger) {
+        _counterService = counterService;
+    }
 
     public override Guid Id => Guid.Parse("A6B2840F-DCCE-4432-A610-10954BBEE15D");
     public override AuthorizationRoles MinimumAuthorizationRole => AuthorizationRoles.ClanEventHost;
-    
-    
+
+
     public override async Task<Result> HandleCommandAsync(ApplicationCommandContext context) {
         var subCommand = context.Options.First().Key;
-            
+
         var result = subCommand switch {
             HistorySubCommandName => await HistoryHandler(context),
             TopSubCommandName => await TopHandler(context),
@@ -36,11 +35,41 @@ public class CountApplicationCommandHandler : ApplicationCommandHandler {
         return result;
     }
 
+    public override Task<Result> HandleComponentAsync(MessageComponentContext context) {
+        throw new NotImplementedException();
+    }
+
+    protected override Task<SlashCommandBuilder> ExtendSlashCommandBuilder(SlashCommandBuilder builder) {
+        builder
+            .AddOption(new SlashCommandOptionBuilder()
+                .WithName(HistorySubCommandName)
+                .WithDescription("Check the count history of yourself or another user in the server")
+                .WithType(ApplicationCommandOptionType.SubCommand)
+                .AddOption(UserOption, ApplicationCommandOptionType.User, "The user that you want to see, leave blank for yourself", false)
+            )
+            .AddOption(new SlashCommandOptionBuilder()
+                .WithName(AddSubCommandName)
+                .WithDescription("Add a count to one or multiple users")
+                .WithType(ApplicationCommandOptionType.SubCommand)
+                .AddOption(ValueOption, ApplicationCommandOptionType.Integer, "The amount of points to count, can be negative to subtract", true)
+                .AddOption(UsersOption, ApplicationCommandOptionType.String, "The users to be tagged", true)
+                .AddOption(ReasonOption, ApplicationCommandOptionType.String, "The reason of the addition or subtraction", false)
+            )
+            .AddOption(new SlashCommandOptionBuilder()
+                .WithName(TopSubCommandName)
+                .WithDescription("Check the top counts of this server")
+                .WithType(ApplicationCommandOptionType.SubCommand)
+            );
+
+        return Task.FromResult(builder);
+    }
+
     #region add
+
     private async Task<Result> AddHandler(ApplicationCommandContext context) {
         var (additive, usersString, reason) = GetAddParameters(context);
         var users = (await usersString.GetUsersFromString(context)).users.ToList();
-        
+
         if (additive == 0) {
             Result.Fail("Additive cannot be 0");
         }
@@ -48,13 +77,13 @@ public class CountApplicationCommandHandler : ApplicationCommandHandler {
         if (!users.Any()) {
             Result.Fail("No users found");
         }
-            
+
         var descriptionBuilder = new StringBuilder();
         var tasks = HandleUsers(context, users, additive, reason, descriptionBuilder);
         var embed = CreateAddEmbed(context, users, additive, descriptionBuilder);
-            
+
         await Task.WhenAll(tasks);
-        await context.RespondAsync(embeds: new []{embed.Build()}, ephemeral:false);
+        await context.RespondAsync(embeds: new[] { embed.Build() }, ephemeral: false);
 
         return Result.Ok();
     }
@@ -66,7 +95,8 @@ public class CountApplicationCommandHandler : ApplicationCommandHandler {
         return embed;
     }
 
-    private List<Task> HandleUsers(ApplicationCommandContext context, List<IUser> users, int additive, string reason, StringBuilder descriptionBuilder) {
+    private List<Task> HandleUsers(ApplicationCommandContext context, List<IUser> users, int additive, string reason,
+        StringBuilder descriptionBuilder) {
         var tasks = new List<Task>();
         foreach (var user in users) {
             var guildUser = user as IGuildUser ?? throw new ArgumentException("Cannot find user");
@@ -121,9 +151,11 @@ public class CountApplicationCommandHandler : ApplicationCommandHandler {
             // ignored
         }
     }
+
     #endregion
-        
+
     #region Top
+
     private Task<Result> TopHandler(ApplicationCommandContext context) {
         var topMembers = _counterService.TopCounts(context.Guild.ToGuildDto(), 20);
 
@@ -133,7 +165,7 @@ public class CountApplicationCommandHandler : ApplicationCommandHandler {
         context.RespondAsync(embeds: new[] { builder.Build() }, ephemeral: false);
         return Task.FromResult(Result.Ok());
     }
-        
+
     private void ListTopMembers(ApplicationCommandContext context, EmbedBuilder builder, List<UserCountInfo> countInfos) {
         var historyBlockBuilder = new StringBuilder();
         for (var i = 0; i < countInfos.Count; i++) {
@@ -143,16 +175,18 @@ public class CountApplicationCommandHandler : ApplicationCommandHandler {
             historyBlockBuilder.AppendLine($": {countInfo.CurrentCount} points".PadRight(13));
         }
 
-        if (historyBlockBuilder.Length > 0 ) {
+        if (historyBlockBuilder.Length > 0) {
             builder.WithDescription($"```{historyBlockBuilder}```");
             return;
         }
 
-        builder.WithDescription($"Nobody has any points in this server");
+        builder.WithDescription("Nobody has any points in this server");
     }
+
     #endregion
 
     #region history
+
     private async Task<Result> HistoryHandler(ApplicationCommandContext context) {
         var toSearchUser = context.SubCommandOptions.GetOptionValue<IGuildUser>(UserOption) ?? context.GuildUser;
         await CountHistory(context, toSearchUser);
@@ -172,7 +206,7 @@ public class CountApplicationCommandHandler : ApplicationCommandHandler {
 
             var builder = context.CreatePageBuilder(descriptionBuilder.ToString())
                 .WithTitle($"Total count for {user.DisplayName()}: {countInfo.CurrentCount}.");
-                
+
             pages.Add(builder);
         }
 
@@ -180,12 +214,12 @@ public class CountApplicationCommandHandler : ApplicationCommandHandler {
         _ = context.SendPaginator(paginator.Build());
         return Task.CompletedTask;
     }
-        
+
     private List<string> CountHistoryToString(UserCountInfo countInfo) {
         var pages = new List<string>();
         var max = 1000;
         var blockbuilder = new StringBuilder();
-          
+
         var list = countInfo.CountHistory.OrderByDescending(x => x.RequestedOn).ToList();
 
         foreach (var count in list) {
@@ -213,33 +247,6 @@ public class CountApplicationCommandHandler : ApplicationCommandHandler {
 
         return pages;
     }
-        
-        
+
     #endregion
-    public override Task<Result> HandleComponentAsync(MessageComponentContext context) => throw new NotImplementedException();
-
-    protected override Task<SlashCommandBuilder> ExtendSlashCommandBuilder(SlashCommandBuilder builder) {
-        builder
-            .AddOption(new SlashCommandOptionBuilder()
-                .WithName(HistorySubCommandName)
-                .WithDescription("Check the count history of yourself or another user in the server")
-                .WithType(ApplicationCommandOptionType.SubCommand)
-                .AddOption(UserOption, ApplicationCommandOptionType.User, "The user that you want to see, leave blank for yourself", false)
-            )
-            .AddOption(new SlashCommandOptionBuilder()
-                .WithName(AddSubCommandName)
-                .WithDescription("Add a count to one or multiple users")
-                .WithType(ApplicationCommandOptionType.SubCommand)
-                .AddOption(ValueOption, ApplicationCommandOptionType.Integer, "The amount of points to count, can be negative to subtract", true)
-                .AddOption(UsersOption, ApplicationCommandOptionType.String, "The users to be tagged", true)
-                .AddOption(ReasonOption, ApplicationCommandOptionType.String, "The reason of the addition or subtraction", false)
-            )
-            .AddOption(new SlashCommandOptionBuilder()
-                .WithName(TopSubCommandName)
-                .WithDescription("Check the top counts of this server")
-                .WithType(ApplicationCommandOptionType.SubCommand)
-            );
-
-        return Task.FromResult(builder);
-    }
 }

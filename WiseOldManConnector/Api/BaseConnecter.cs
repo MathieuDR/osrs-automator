@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Net;
-using System.Threading.Tasks;
+﻿using System.Net;
 using AutoMapper;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
@@ -13,7 +9,7 @@ using WiseOldManConnector.Models;
 using WiseOldManConnector.Models.API.Responses;
 using WiseOldManConnector.Models.Output.Exceptions;
 
-namespace WiseOldManConnector.Api; 
+namespace WiseOldManConnector.Api;
 
 internal abstract class BaseConnecter {
     protected const string BaseUrl = "https://wiseoldman.net/api";
@@ -146,7 +142,7 @@ internal abstract class BaseConnecter {
             case HttpStatusCode.UseProxy:
             case HttpStatusCode.TooManyRequests:
                 var responseMessage = "";
-                var data = response.Data ?? (object) JsonConvert.DeserializeObject<WOMMessageResponse>(response.Content);
+                var data = response.Data ?? (object)JsonConvert.DeserializeObject<WOMMessageResponse>(response.Content);
 
                 switch (data) {
                     case BaseResponse messageResponse:

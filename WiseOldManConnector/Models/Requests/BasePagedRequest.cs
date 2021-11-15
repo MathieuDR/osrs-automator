@@ -1,8 +1,6 @@
-﻿using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
-using System.Linq;
+﻿using System.ComponentModel.DataAnnotations;
 
-namespace WiseOldManConnector.Models.Requests; 
+namespace WiseOldManConnector.Models.Requests;
 
 public abstract class BasePagedRequest {
     protected Dictionary<string, string> ValidationDictionary = new();

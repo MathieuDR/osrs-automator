@@ -3,7 +3,7 @@ using System.Text;
 using DiscordBot.Commands.Modules.DiscordCommandArguments;
 using WiseOldManConnector.Models.WiseOldMan.Enums;
 
-namespace DiscordBot.Helpers.Extensions; 
+namespace DiscordBot.Helpers.Extensions;
 
 public static class TypeHelper {
     public static List<Type> WhiteListedTypesToOutput() {

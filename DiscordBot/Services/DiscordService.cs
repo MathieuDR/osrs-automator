@@ -3,7 +3,7 @@ using Common.Extensions;
 using DiscordBot.Common.Dtos.Discord;
 using WiseOldManConnector.Helpers;
 
-namespace DiscordBot.Services; 
+namespace DiscordBot.Services;
 
 public class DiscordService : IDiscordService {
     private readonly DiscordSocketClient _client;
@@ -31,9 +31,9 @@ public class DiscordService : IDiscordService {
 
     public async Task<Result> PrintRunescapeDataDrop(RunescapeDropData data, ulong guildId, ulong channelId) {
         var imagesArr = data.DistinctImages.ToArray();
-            
+
         var channel = _client.GetGuild(guildId).GetTextChannel(channelId);
-            
+
         await channel.SendMessageAsync(
             $"New automated drop handled. Drops: {data.Drops.Count()} ({Math.Max(data.TotalValue, data.TotalHaValue)}), images: {imagesArr.Count()}");
 
@@ -60,9 +60,10 @@ public class DiscordService : IDiscordService {
     public Task<Result> SendWomGroupSuccessEmbed(ulong channelId, string message, int groupId, string groupName) {
         throw new NotImplementedException();
     }
-       
 
-    public async Task<Result> MessageLeaderboards<T>(ulong channelId, IEnumerable<MetricTypeLeaderboard<T>> leaderboards) where T : ILeaderboardMember {
+
+    public async Task<Result> MessageLeaderboards<T>(ulong channelId, IEnumerable<MetricTypeLeaderboard<T>> leaderboards)
+        where T : ILeaderboardMember {
         var channelTask = _client.GetChannelAsync(channelId);
         var metricMessages = leaderboards.Select(leaderboard => GetMessageForLeaderboard(leaderboard)).ToList();
 
@@ -70,7 +71,7 @@ public class DiscordService : IDiscordService {
         if (toSendResult.IsFailed) {
             return toSendResult.ToResult();
         }
-            
+
         var channel = (await channelTask).As<ISocketMessageChannel>();
         foreach (var message in toSendResult.Value) {
             await channel.SendMessageAsync(message);
@@ -81,7 +82,7 @@ public class DiscordService : IDiscordService {
 
 
     private string GetMessageForLeaderboard<T>(MetricTypeLeaderboard<T> leaderboard) where T : ILeaderboardMember {
-        StringBuilder builder = new StringBuilder();
+        var builder = new StringBuilder();
         builder.Append($"**{leaderboard.MetricType.FriendlyName(true)}** - Leaderboard");
 
         if (leaderboard is MetricTypeAndPeriodLeaderboard<T> periodLeaderboard) {
@@ -109,13 +110,13 @@ public class DiscordService : IDiscordService {
 
             builder.Append(message);
         }
-            
+
         // Last message
         if (builder.Length > 0) {
             compoundedMessages.Add(builder.ToString());
         }
 
-        return Result.Ok((IEnumerable<string>) compoundedMessages);
+        return Result.Ok((IEnumerable<string>)compoundedMessages);
     }
 
     private static Stream ToStream(string image) {

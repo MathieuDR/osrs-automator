@@ -1,6 +1,6 @@
 ﻿using System.Runtime.Serialization;
 
-namespace WiseOldManConnector.Models.WiseOldMan.Enums; 
+namespace WiseOldManConnector.Models.WiseOldMan.Enums;
 
 public enum Period {
     [EnumMember(Value = "day")]

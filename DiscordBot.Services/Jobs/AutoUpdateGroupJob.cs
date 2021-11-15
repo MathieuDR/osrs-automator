@@ -8,14 +8,16 @@ using FluentResults;
 using Microsoft.Extensions.Logging;
 using WiseOldManConnector.Models.Output.Exceptions;
 
-namespace DiscordBot.Services.Jobs; 
+namespace DiscordBot.Services.Jobs;
 
 public class AutoUpdateGroupJob : ConfigurableGuildJob {
     private readonly IOsrsHighscoreService _osrsHighscoreService;
 
-    public AutoUpdateGroupJob(ILogger<AutoUpdateGroupJob> logger, IDiscordService discordService, IRepositoryStrategy repositoryStrategy, IOsrsHighscoreService osrsHighscoreService) : base(logger, discordService, JobType.GroupUpdate, repositoryStrategy) {
+    public AutoUpdateGroupJob(ILogger<AutoUpdateGroupJob> logger, IDiscordService discordService, IRepositoryStrategy repositoryStrategy,
+        IOsrsHighscoreService osrsHighscoreService) : base(logger, discordService, JobType.GroupUpdate, repositoryStrategy) {
         _osrsHighscoreService = osrsHighscoreService;
     }
+
     protected override async Task<Result> DoWorkForGuildWithContext(Guild guild, GuildConfig guildConfig, ChannelJobConfiguration configuration) {
         if (configuration is null || !configuration.IsEnabled) {
             return Result.Ok();
@@ -34,6 +36,7 @@ public class AutoUpdateGroupJob : ConfigurableGuildJob {
             return Result.Fail(new ExceptionalError("Could not update WOM", badRequestException));
         }
 
-        return await DiscordService.SendWomGroupSuccessEmbed(configuration.ChannelId, response.ToString(), guildConfig.WomGroup.Id, guildConfig.WomGroup.Name);
+        return await DiscordService.SendWomGroupSuccessEmbed(configuration.ChannelId, response.ToString(), guildConfig.WomGroup.Id,
+            guildConfig.WomGroup.Name);
     }
 }

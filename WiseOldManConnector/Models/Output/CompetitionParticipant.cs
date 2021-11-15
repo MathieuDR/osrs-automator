@@ -1,6 +1,4 @@
-﻿using System.Collections.Generic;
-
-namespace WiseOldManConnector.Models.Output; 
+﻿namespace WiseOldManConnector.Models.Output;
 
 public class CompetitionParticipant : ILeaderboardMember {
     public Delta CompetitionDelta { get; set; }

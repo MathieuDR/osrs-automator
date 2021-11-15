@@ -1,7 +1,3 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using RestSharp;
 using WiseOldManConnector.Interfaces;
 using WiseOldManConnector.Models;
@@ -9,7 +5,7 @@ using WiseOldManConnector.Models.API.Responses;
 using WiseOldManConnector.Models.Output;
 using WiseOldManConnector.Models.WiseOldMan.Enums;
 
-namespace WiseOldManConnector.Api; 
+namespace WiseOldManConnector.Api;
 
 internal class NameConnector : BaseConnecter, IWiseOldManNameApi {
     public NameConnector(IServiceProvider provider) : base(provider) { }

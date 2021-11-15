@@ -1,6 +1,4 @@
-using System;
-
-namespace DiscordBot.Common.Models.Data; 
+namespace DiscordBot.Common.Models.Data;
 
 public class Count {
     public Count(ulong requesterId, string requester, int additive, string reason) {

@@ -1,8 +1,7 @@
-﻿using System;
-using Newtonsoft.Json;
+﻿using Newtonsoft.Json;
 using WiseOldManConnector.Models.WiseOldMan.Enums;
 
-namespace WiseOldManConnector.Models.API.Requests; 
+namespace WiseOldManConnector.Models.API.Requests;
 
 internal class CompetitionRequest {
     [JsonProperty("title")]

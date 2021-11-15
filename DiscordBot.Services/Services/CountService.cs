@@ -5,7 +5,7 @@ using DiscordBot.Data.Strategies;
 using DiscordBot.Services.Interfaces;
 using Microsoft.Extensions.Logging;
 
-namespace DiscordBot.Services.Services; 
+namespace DiscordBot.Services.Services;
 
 internal class CountService : RepositoryService, ICounterService {
     public CountService(ILogger<CountService> logger, IRepositoryStrategy repositoryStrategy) : base(logger, repositoryStrategy) { }
@@ -91,7 +91,7 @@ internal class CountService : RepositoryService, ICounterService {
 
     private UserCountInfo GetOrCreateUserCountInfo(GuildUser user, GuildUser requester = null) {
         var repo = GetRepository<IUserCountInfoRepository>(user.GuildId);
-        var result = repo.GetByDiscordUserId(user.Id).Value ?? new UserCountInfo(requester?.Id ?? user.Id) {DiscordId = user.Id};
+        var result = repo.GetByDiscordUserId(user.Id).Value ?? new UserCountInfo(requester?.Id ?? user.Id) { DiscordId = user.Id };
 
         return result;
     }

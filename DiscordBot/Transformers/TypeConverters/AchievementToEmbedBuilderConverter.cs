@@ -3,7 +3,7 @@ using DiscordBot.Services.Helpers;
 using WiseOldManConnector.Helpers;
 using WiseOldManConnector.Models.WiseOldMan.Enums;
 
-namespace DiscordBot.Transformers.TypeConverters; 
+namespace DiscordBot.Transformers.TypeConverters;
 
 public class AchievementToEmbedBuilderConverter : ITypeConverter<Achievement, EmbedBuilder> {
     public EmbedBuilder Convert(Achievement source, EmbedBuilder destination, ResolutionContext context) {

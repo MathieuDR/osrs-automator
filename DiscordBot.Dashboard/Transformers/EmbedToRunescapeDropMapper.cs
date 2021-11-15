@@ -1,11 +1,10 @@
-using System.Linq;
 using System.Text.RegularExpressions;
 using Dashboard.Models.ApiRequests.DiscordEmbed;
 using DiscordBot.Common.Dtos.Runescape;
 using FluentResults;
 using WiseOldManConnector.Models.WiseOldMan.Enums;
 
-namespace Dashboard.Transformers; 
+namespace Dashboard.Transformers;
 
 public class EmbedToRunescapeDropMapper : IMapper<Embed, RunescapeDrop> {
     public Result<RunescapeDrop> Map(Embed source) {
@@ -30,7 +29,7 @@ public class EmbedToRunescapeDropMapper : IMapper<Embed, RunescapeDrop> {
         }
 
         if (source.Description.ToLowerInvariant() == "just got a pet.") {
-            destination = destination with {IsPet = true};
+            destination = destination with { IsPet = true };
             return Result.Ok(destination);
         }
 
@@ -38,7 +37,7 @@ public class EmbedToRunescapeDropMapper : IMapper<Embed, RunescapeDrop> {
         if (rarityResult.IsFailed) {
             return rarityResult;
         }
-            
+
         var patterns = new {
             Quantity = @"Just got (\d+)x",
             Brackets = @"\[([^\]^\n]+)\]",
@@ -50,18 +49,20 @@ public class EmbedToRunescapeDropMapper : IMapper<Embed, RunescapeDrop> {
         if (brackets.Count != 2) {
             return Result.Fail($"Unexpected matches for brackets: {brackets.Count}");
         }
-            
+
         var urls = Regex.Matches(source.Description, patterns.Urls);
         if (urls.Count != 2) {
             return Result.Fail($"Unexpected matches for urls: {urls.Count}");
         }
-            
-        var lvl = Regex.Match(source.Description, patterns.Lvl);
-            
-        var item = destination.Item with {Name = brackets[0].Groups[1].Value, Url = urls[0].Groups[1].Value, Thumbnail = source.Thumbnail?.Url};
-        var dropSource = destination.Source with {Name = brackets[1].Groups[1].Value, Url = urls[1].Groups[1].Value, Level = lvl.Success ? int.Parse(lvl.Groups[1].Value) : null};
 
-        destination = rarityResult.Value with {Item = item, Source = dropSource};
+        var lvl = Regex.Match(source.Description, patterns.Lvl);
+
+        var item = destination.Item with { Name = brackets[0].Groups[1].Value, Url = urls[0].Groups[1].Value, Thumbnail = source.Thumbnail?.Url };
+        var dropSource = destination.Source with {
+            Name = brackets[1].Groups[1].Value, Url = urls[1].Groups[1].Value, Level = lvl.Success ? int.Parse(lvl.Groups[1].Value) : null
+        };
+
+        destination = rarityResult.Value with { Item = item, Source = dropSource };
 
         var quantity = Regex.Match(source.Description, patterns.Quantity);
         destination.Amount = quantity.Success ? int.Parse(quantity.Groups[1].Value) : 1;
@@ -76,8 +77,7 @@ public class EmbedToRunescapeDropMapper : IMapper<Embed, RunescapeDrop> {
             return Result.Fail("Author is empty");
         }
 
-           
-            
+
         var type = source.Author.Icon switch {
             string a when a.ToLower().Contains("hardcore") => PlayerType.HardcoreIronMan,
             string a when a.ToLower().Contains("ultimate") => PlayerType.UltimateIronMan,
@@ -85,9 +85,9 @@ public class EmbedToRunescapeDropMapper : IMapper<Embed, RunescapeDrop> {
             null => PlayerType.Regular,
             _ => PlayerType.Unknown
         };
-        var recipient = destination.Recipient with {Username = source.Author.Name, IconUrl = source.Author.Icon, PlayerType = type};
-           
-        return Result.Ok(destination with {Recipient = recipient});
+        var recipient = destination.Recipient with { Username = source.Author.Name, IconUrl = source.Author.Icon, PlayerType = type };
+
+        return Result.Ok(destination with { Recipient = recipient });
     }
 
     private static Result<RunescapeDrop> SetRarity(Embed source, RunescapeDrop destination) {
@@ -101,7 +101,7 @@ public class EmbedToRunescapeDropMapper : IMapper<Embed, RunescapeDrop> {
             return Result.Fail("Rarity is not a float");
         }
 
-        return Result.Ok(destination with {Rarity = rarity});
+        return Result.Ok(destination with { Rarity = rarity });
     }
 
     private static Result<RunescapeDrop> SetValues(Embed source, RunescapeDrop destination) {
@@ -118,7 +118,7 @@ public class EmbedToRunescapeDropMapper : IMapper<Embed, RunescapeDrop> {
         var value = int.Parse(Regex.Match(valueField.Value, @"(\d+)").Captures[0].Value);
         var haValue = int.Parse(Regex.Match(haValueField.Value, @"(\d+)").Captures[0].Value);
 
-        var item = destination.Item with {Value = value / destination.Amount, HaValue = haValue / destination.Amount};
-        return Result.Ok(destination with {Item = item});
+        var item = destination.Item with { Value = value / destination.Amount, HaValue = haValue / destination.Amount };
+        return Result.Ok(destination with { Item = item });
     }
 }

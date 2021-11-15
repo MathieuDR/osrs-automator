@@ -1,7 +1,7 @@
 using DiscordBot.Common.Models.Data;
 using FluentResults;
 
-namespace DiscordBot.Data.Interfaces; 
+namespace DiscordBot.Data.Interfaces;
 
 public interface IPlayerRepository : IRepository<Player> {
     Result<Player> GetByDiscordId(ulong id);

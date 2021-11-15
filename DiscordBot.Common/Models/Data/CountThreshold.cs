@@ -1,6 +1,6 @@
 using LiteDB;
 
-namespace DiscordBot.Common.Models.Data; 
+namespace DiscordBot.Common.Models.Data;
 
 public class CountThreshold {
     public ulong CreatorId { get; set; }

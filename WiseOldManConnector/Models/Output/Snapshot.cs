@@ -1,9 +1,7 @@
-﻿using System.Collections.Generic;
-using System.Linq;
-using WiseOldManConnector.Helpers;
+﻿using WiseOldManConnector.Helpers;
 using WiseOldManConnector.Models.WiseOldMan.Enums;
 
-namespace WiseOldManConnector.Models.Output; 
+namespace WiseOldManConnector.Models.Output;
 
 public class Snapshot : IBaseConnectorOutput {
     public Dictionary<MetricType, Metric> AllMetrics { get; set; } = new();

@@ -1,5 +1,4 @@
-﻿using System.Collections.Generic;
-using AutoMapper;
+﻿using AutoMapper;
 using WiseOldManConnector.Configuration;
 using WiseOldManConnector.Models.API.Responses;
 using WiseOldManConnector.Models.Output;
@@ -8,7 +7,7 @@ using WiseOldManConnector.Transformers.Resolvers;
 using WiseOldManConnector.Transformers.TypeConverters;
 using Metric = WiseOldManConnector.Models.API.Responses.Metric;
 
-namespace WiseOldManConnector.Transformers; 
+namespace WiseOldManConnector.Transformers;
 
 internal static class Configuration {
     public static Mapper GetMapper() {

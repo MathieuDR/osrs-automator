@@ -1,11 +1,5 @@
-using System;
-using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Linq;
-using System.Net.Http.Headers;
-using System.Net.Security;
 using System.Text;
-using System.Threading.Tasks;
 using AutoBogus;
 using Bogus;
 using DiscordBot.Common.Dtos.Runescape;
@@ -17,18 +11,16 @@ using FluentAssertions;
 using FluentResults;
 using Microsoft.Extensions.Logging;
 using NSubstitute;
-using NSubstitute.ClearExtensions;
 using Quartz;
 using Xunit;
 
-namespace DiscordBot.ServicesTests.Services; 
+namespace DiscordBot.ServicesTests.Services;
 
 public class AutomatedDropperServiceTests {
-    private Faker<RunescapeDrop> _faker;
-    private Faker<RunescapeItem> _itemFaker;
+    private readonly Faker<RunescapeDrop> _faker;
+    private readonly Faker<RunescapeItem> _itemFaker;
+
     public AutomatedDropperServiceTests() {
-            
-            
         _itemFaker = new AutoFaker<RunescapeItem>()
             .RuleFor(x => x.Value, faker => faker.Random.Int(0, 250000))
             .RuleFor(x => x.HaValue, faker => faker.Random.Int(0, 250000))
@@ -36,11 +28,11 @@ public class AutomatedDropperServiceTests {
                 rules.RuleFor(x => x.Value, faker => faker.Random.Int(1000000));
                 rules.RuleFor(x => x.HaValue, faker => faker.Random.Int(1000000));
             });
-            
+
         _faker = new AutoFaker<RunescapeDrop>()
             .RuleFor(x => x.Amount, faker => faker.Random.Int(1, 10))
-            .Ignore(x=>x.Image)
-            .RuleFor(x=> x.Item, _itemFaker.Generate())
+            .Ignore(x => x.Image)
+            .RuleFor(x => x.Item, _itemFaker.Generate())
             .RuleSet("expensive", rules => {
                 rules.RuleFor(x => x.Amount, faker => faker.Random.Int(1, 100));
                 rules.RuleFor(x => x.Item, _itemFaker.Generate("expensive"));
@@ -62,7 +54,7 @@ public class AutomatedDropperServiceTests {
         drop.Image.Should().BeNullOrEmpty();
         drop.Recipient.Username.Should().NotBeNullOrEmpty();
     }
-        
+
     [Fact]
     public async Task WhenReceivingImageFirstItCreatesEmptyDrop() {
         //Arrange
@@ -71,7 +63,7 @@ public class AutomatedDropperServiceTests {
         repositoryStrategy.GetOrCreateRepository<IRuneScapeDropDataRepository>().Returns(repo);
         var scheduler = Substitute.For<IScheduler>();
         var schedulerFactory = Substitute.For<ISchedulerFactory>();
-        schedulerFactory.GetAllSchedulers().Returns(new Collection<IScheduler>() {
+        schedulerFactory.GetAllSchedulers().Returns(new Collection<IScheduler> {
             scheduler
         });
         var guid = Guid.NewGuid();
@@ -84,18 +76,18 @@ public class AutomatedDropperServiceTests {
             lastUpdated = a;
         }));
 
-        scheduler.ScheduleJob(jobDetail: Arg.Do<IJobDetail>(detail => {
+        scheduler.ScheduleJob(Arg.Do<IJobDetail>(detail => {
             var key = detail.Key;
             scheduler.CheckExists(Arg.Is<JobKey>(jobKey => jobKey.Name == key.Name)).Returns(true);
             //scheduler.
         }), Arg.Do<ITrigger>(trigger => {
             var key = trigger.Key;
-            scheduler.GetTriggersOfJob(Arg.Any<JobKey>()).Returns(new List<ITrigger>(){trigger});
+            scheduler.GetTriggersOfJob(Arg.Any<JobKey>()).Returns(new List<ITrigger> { trigger });
         }));
 
         scheduler.CheckExists(Arg.Any<JobKey>()).Returns(false);
-            
-        var sut = new AutomatedDropperService(Substitute.For<ILogger<AutomatedDropperService>>(), 
+
+        var sut = new AutomatedDropperService(Substitute.For<ILogger<AutomatedDropperService>>(),
             repositoryStrategy, schedulerFactory);
         var drop = _faker.Generate();
 
@@ -103,7 +95,7 @@ public class AutomatedDropperServiceTests {
         var firstRun = await sut.HandleDropRequest(guid, null, imageString);
 
         //Assert
-        firstRun.IsSuccess.Should().BeTrue(string.Join(", ",firstRun.Errors));
+        firstRun.IsSuccess.Should().BeTrue(string.Join(", ", firstRun.Errors));
         lastUpdated.Should().NotBeNull();
         lastUpdated.Endpoint.Should().Be(guid);
         lastUpdated.Drops.Should().HaveCount(1, "We sent one drop info");
@@ -112,7 +104,7 @@ public class AutomatedDropperServiceTests {
         lastUpdated.Drops.First().Item.Should().Be(null);
         lastUpdated.RecipientUsername.Should().BeNullOrEmpty();
     }
-        
+
     [Fact]
     public void CanInitService() {
         //Arrange
@@ -121,14 +113,14 @@ public class AutomatedDropperServiceTests {
         repositoryStrategy.GetOrCreateRepository<IRuneScapeDropDataRepository>().Returns(repo);
         var scheduler = Substitute.For<IScheduler>();
         var schedulerFactory = Substitute.For<ISchedulerFactory>();
-        schedulerFactory.GetAllSchedulers().Returns(new Collection<IScheduler>() {
+        schedulerFactory.GetAllSchedulers().Returns(new Collection<IScheduler> {
             scheduler
         });
-            
+
         //Act
-        var sut = new AutomatedDropperService(Substitute.For<ILogger<AutomatedDropperService>>(), 
+        var sut = new AutomatedDropperService(Substitute.For<ILogger<AutomatedDropperService>>(),
             repositoryStrategy, schedulerFactory);
-            
+
         //Assert
         sut.Should().NotBeNull();
     }
@@ -141,7 +133,7 @@ public class AutomatedDropperServiceTests {
         repositoryStrategy.GetOrCreateRepository<IRuneScapeDropDataRepository>().Returns(repo);
         var scheduler = Substitute.For<IScheduler>();
         var schedulerFactory = Substitute.For<ISchedulerFactory>();
-        schedulerFactory.GetAllSchedulers().Returns(new Collection<IScheduler>() {
+        schedulerFactory.GetAllSchedulers().Returns(new Collection<IScheduler> {
             scheduler
         });
         var guid = Guid.NewGuid();
@@ -154,18 +146,18 @@ public class AutomatedDropperServiceTests {
             lastUpdated = a;
         }));
 
-        scheduler.ScheduleJob(jobDetail: Arg.Do<IJobDetail>(detail => {
+        scheduler.ScheduleJob(Arg.Do<IJobDetail>(detail => {
             var key = detail.Key;
             scheduler.CheckExists(Arg.Is<JobKey>(jobKey => jobKey.Name == key.Name)).Returns(true);
             //scheduler.
         }), Arg.Do<ITrigger>(trigger => {
             var key = trigger.Key;
-            scheduler.GetTriggersOfJob(Arg.Any<JobKey>()).Returns(new List<ITrigger>(){trigger});
+            scheduler.GetTriggersOfJob(Arg.Any<JobKey>()).Returns(new List<ITrigger> { trigger });
         }));
 
         scheduler.CheckExists(Arg.Any<JobKey>()).Returns(false);
-            
-        var sut = new AutomatedDropperService(Substitute.For<ILogger<AutomatedDropperService>>(), 
+
+        var sut = new AutomatedDropperService(Substitute.For<ILogger<AutomatedDropperService>>(),
             repositoryStrategy, schedulerFactory);
         var drop = _faker.Generate();
 
@@ -174,8 +166,8 @@ public class AutomatedDropperServiceTests {
         var secondRun = await sut.HandleDropRequest(guid, drop, null);
 
         //Assert
-        firstRun.IsSuccess.Should().BeTrue(string.Join(", ",firstRun.Errors));
-        secondRun.IsSuccess.Should().BeTrue(string.Join(", ",secondRun.Errors));
+        firstRun.IsSuccess.Should().BeTrue(string.Join(", ", firstRun.Errors));
+        secondRun.IsSuccess.Should().BeTrue(string.Join(", ", secondRun.Errors));
         lastUpdated.Should().NotBeNull();
         lastUpdated.Endpoint.Should().Be(guid);
         lastUpdated.Drops.Should().HaveCount(1, "We sent one drop info");
@@ -191,7 +183,7 @@ public class AutomatedDropperServiceTests {
         repositoryStrategy.GetOrCreateRepository<IRuneScapeDropDataRepository>().Returns(repo);
         var scheduler = Substitute.For<IScheduler>();
         var schedulerFactory = Substitute.For<ISchedulerFactory>();
-        schedulerFactory.GetAllSchedulers().Returns(new Collection<IScheduler>() {
+        schedulerFactory.GetAllSchedulers().Returns(new Collection<IScheduler> {
             scheduler
         });
         var guid = Guid.NewGuid();
@@ -204,18 +196,18 @@ public class AutomatedDropperServiceTests {
             lastUpdated = a;
         }));
 
-        scheduler.ScheduleJob(jobDetail: Arg.Do<IJobDetail>(detail => {
+        scheduler.ScheduleJob(Arg.Do<IJobDetail>(detail => {
             var key = detail.Key;
             scheduler.CheckExists(Arg.Is<JobKey>(jobKey => jobKey.Name == key.Name)).Returns(true);
             //scheduler.
         }), Arg.Do<ITrigger>(trigger => {
             var key = trigger.Key;
-            scheduler.GetTriggersOfJob(Arg.Any<JobKey>()).Returns(new List<ITrigger>(){trigger});
+            scheduler.GetTriggersOfJob(Arg.Any<JobKey>()).Returns(new List<ITrigger> { trigger });
         }));
 
         scheduler.CheckExists(Arg.Any<JobKey>()).Returns(false);
-            
-        var sut = new AutomatedDropperService(Substitute.For<ILogger<AutomatedDropperService>>(), 
+
+        var sut = new AutomatedDropperService(Substitute.For<ILogger<AutomatedDropperService>>(),
             repositoryStrategy, schedulerFactory);
         var drop = _faker.Generate();
 
@@ -224,8 +216,8 @@ public class AutomatedDropperServiceTests {
         var secondRun = await sut.HandleDropRequest(guid, null, imageString);
 
         //Assert
-        firstRun.IsSuccess.Should().BeTrue(string.Join(", ",firstRun.Errors));
-        secondRun.IsSuccess.Should().BeTrue(string.Join(", ",secondRun.Errors));
+        firstRun.IsSuccess.Should().BeTrue(string.Join(", ", firstRun.Errors));
+        secondRun.IsSuccess.Should().BeTrue(string.Join(", ", secondRun.Errors));
         lastUpdated.Should().NotBeNull();
         lastUpdated.Endpoint.Should().Be(guid);
         lastUpdated.Drops.Should().HaveCount(1, "We sent one drop info");
@@ -241,7 +233,7 @@ public class AutomatedDropperServiceTests {
         repositoryStrategy.GetOrCreateRepository<IRuneScapeDropDataRepository>().Returns(repo);
         var scheduler = Substitute.For<IScheduler>();
         var schedulerFactory = Substitute.For<ISchedulerFactory>();
-        schedulerFactory.GetAllSchedulers().Returns(new Collection<IScheduler>() {
+        schedulerFactory.GetAllSchedulers().Returns(new Collection<IScheduler> {
             scheduler
         });
         var guid = Guid.NewGuid();
@@ -249,8 +241,8 @@ public class AutomatedDropperServiceTests {
         RunescapeDropData lastUpdated = null;
         repo.GetActive(Arg.Is(guid)).Returns(Result.Ok<RunescapeDropData>(null));
         scheduler.CheckExists(Arg.Any<JobKey>()).Returns(false);
-            
-        var sut = new AutomatedDropperService(Substitute.For<ILogger<AutomatedDropperService>>(), 
+
+        var sut = new AutomatedDropperService(Substitute.For<ILogger<AutomatedDropperService>>(),
             repositoryStrategy, schedulerFactory);
         var drop = _faker.Generate();
 
@@ -268,11 +260,11 @@ public class AutomatedDropperServiceTests {
         repositoryStrategy.GetOrCreateRepository<IRuneScapeDropDataRepository>().Returns(repo);
         var scheduler = Substitute.For<IScheduler>();
         var schedulerFactory = Substitute.For<ISchedulerFactory>();
-        schedulerFactory.GetAllSchedulers().Returns(new Collection<IScheduler>() {
+        schedulerFactory.GetAllSchedulers().Returns(new Collection<IScheduler> {
             scheduler
         });
         var guid = Guid.NewGuid();
-            
+
         RunescapeDropData lastUpdated = null;
         repo.GetActive(Arg.Is(guid)).Returns(Result.Ok<RunescapeDropData>(null));
         repo.UpdateOrInsert(Arg.Do<RunescapeDropData>(a => {
@@ -280,25 +272,25 @@ public class AutomatedDropperServiceTests {
             lastUpdated = a;
         }));
 
-        scheduler.ScheduleJob(jobDetail: Arg.Do<IJobDetail>(detail => {
+        scheduler.ScheduleJob(Arg.Do<IJobDetail>(detail => {
             var key = detail.Key;
             scheduler.CheckExists(Arg.Is<JobKey>(jobKey => jobKey.Name == key.Name)).Returns(true);
             //scheduler.
         }), Arg.Do<ITrigger>(trigger => {
             var key = trigger.Key;
-            scheduler.GetTriggersOfJob(Arg.Any<JobKey>()).Returns(new List<ITrigger>(){trigger});
+            scheduler.GetTriggersOfJob(Arg.Any<JobKey>()).Returns(new List<ITrigger> { trigger });
         }));
 
         scheduler.CheckExists(Arg.Any<JobKey>()).Returns(false);
-            
-        var sut = new AutomatedDropperService(Substitute.For<ILogger<AutomatedDropperService>>(), 
+
+        var sut = new AutomatedDropperService(Substitute.For<ILogger<AutomatedDropperService>>(),
             repositoryStrategy, schedulerFactory);
         var drop = _faker.Generate();
 
         //Act
         var firstRun = await sut.HandleDropRequest(guid, drop, null);
         var secondRun = await sut.HandleDropRequest(guid, drop, null);
-            
+
         //Assert
         await scheduler.Received(1).ScheduleJob(Arg.Is<IJobDetail>(x => x.Key.Name == guid.ToString()), Arg.Any<ITrigger>());
         await scheduler.Received(1).RescheduleJob(Arg.Any<TriggerKey>(), Arg.Any<ITrigger>());
@@ -311,27 +303,26 @@ public class AutomatedDropperServiceTests {
         repositoryStrategy.GetOrCreateRepository<IRuneScapeDropDataRepository>().Returns(repo);
         var scheduler = Substitute.For<IScheduler>();
         var schedulerFactory = Substitute.For<ISchedulerFactory>();
-        schedulerFactory.GetAllSchedulers().Returns(new Collection<IScheduler>() {
+        schedulerFactory.GetAllSchedulers().Returns(new Collection<IScheduler> {
             scheduler
         });
         var guid = Guid.NewGuid();
-            
+
         RunescapeDropData lastUpdated = null;
         repo.GetActive(Arg.Is(guid)).Returns(Result.Ok<RunescapeDropData>(null));
 
 
         scheduler.CheckExists(Arg.Any<JobKey>()).Returns(false);
-            
-        var sut = new AutomatedDropperService(Substitute.For<ILogger<AutomatedDropperService>>(), 
+
+        var sut = new AutomatedDropperService(Substitute.For<ILogger<AutomatedDropperService>>(),
             repositoryStrategy, schedulerFactory);
         var drop = _faker.Generate();
 
         //Act
         var firstRun = await sut.HandleDropRequest(guid, drop, null);
-            
+
         //Assert
         repo.Received(1).UpdateOrInsert(Arg.Any<RunescapeDropData>());
-    
     }
 
     [Fact]
@@ -341,24 +332,24 @@ public class AutomatedDropperServiceTests {
         repositoryStrategy.GetOrCreateRepository<IRuneScapeDropDataRepository>().Returns(repo);
         var scheduler = Substitute.For<IScheduler>();
         var schedulerFactory = Substitute.For<ISchedulerFactory>();
-        schedulerFactory.GetAllSchedulers().Returns(new Collection<IScheduler>() {
+        schedulerFactory.GetAllSchedulers().Returns(new Collection<IScheduler> {
             scheduler
         });
         var guid = Guid.NewGuid();
-            
+
         RunescapeDropData lastUpdated = null;
         repo.GetActive(Arg.Is(guid)).Returns(Result.Ok<RunescapeDropData>(null));
 
 
         scheduler.CheckExists(Arg.Any<JobKey>()).Returns(false);
-            
-        var sut = new AutomatedDropperService(Substitute.For<ILogger<AutomatedDropperService>>(), 
+
+        var sut = new AutomatedDropperService(Substitute.For<ILogger<AutomatedDropperService>>(),
             repositoryStrategy, schedulerFactory);
         var drop = _faker.Generate();
 
         //Act
         var firstRun = await sut.HandleDropRequest(guid, drop, null);
-            
+
         //Assert
         repo.Received(1).GetActive(Arg.Is(guid));
     }

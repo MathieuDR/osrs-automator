@@ -1,7 +1,4 @@
-using System.IO;
-using System.Linq;
 using System.Text.Json;
-using System.Threading.Tasks;
 using DiscordBot.Services.ExternalServices;
 using DiscordBot.Services.Models.MediaWikiApi;
 using DiscordBot.Services.Services;
@@ -11,7 +8,7 @@ using Microsoft.Extensions.Logging;
 using NSubstitute;
 using Xunit;
 
-namespace DiscordBot.ServicesTests.Services; 
+namespace DiscordBot.ServicesTests.Services;
 
 public class CollectionLogItemProviderTests {
     private const string WikiPage = "Collection log";

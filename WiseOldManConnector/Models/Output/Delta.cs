@@ -1,6 +1,6 @@
 ﻿using WiseOldManConnector.Models.WiseOldMan.Enums;
 
-namespace WiseOldManConnector.Models.Output; 
+namespace WiseOldManConnector.Models.Output;
 
 public class Delta {
     public DeltaType DeltaType { get; set; }

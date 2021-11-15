@@ -4,7 +4,7 @@ using WiseOldManConnector.Models.Output;
 using WiseOldManConnector.Models.Requests;
 using WiseOldManConnector.Models.WiseOldMan.Enums;
 
-namespace DiscordBot.Services.Services; 
+namespace DiscordBot.Services.Services;
 
 public class WiseOldManConnectorService : IOsrsHighscoreService {
     private readonly IWiseOldManCompetitionApi _competitionApi;
@@ -44,12 +44,12 @@ public class WiseOldManConnectorService : IOsrsHighscoreService {
     }
 
     public Task AddOsrsAccountToToGroup(int groupId, string verificationCode, string osrsAccount) {
-        return AddOsrsAccountToToGroup(groupId, verificationCode, new[] {osrsAccount});
+        return AddOsrsAccountToToGroup(groupId, verificationCode, new[] { osrsAccount });
     }
 
     public Task AddOsrsAccountToToGroup(int groupId, string verificationCode, IEnumerable<string> osrsAccounts) {
         return _groupApi.AddMembers(groupId, verificationCode,
-            osrsAccounts.Distinct().Select(s => new MemberRequest {Name = s, Role = GroupRole.Member}));
+            osrsAccounts.Distinct().Select(s => new MemberRequest { Name = s, Role = GroupRole.Member }));
     }
 
     public async Task<Competition> GetCompetition(int competitionId) {

@@ -1,6 +1,6 @@
 using System.Text.Json.Serialization;
 
-namespace DiscordBot.Services.Models.MediaWikiApi; 
+namespace DiscordBot.Services.Models.MediaWikiApi;
 
 public class Revision {
     [JsonPropertyName("contentformat")]

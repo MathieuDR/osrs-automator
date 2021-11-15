@@ -1,6 +1,4 @@
 using Dashboard;
-using Microsoft.AspNetCore.Components;
-using Microsoft.AspNetCore.Components.Web;
 using Microsoft.AspNetCore.Mvc.ApiExplorer;
 using Serilog;
 using Serilog.Events;
@@ -17,17 +15,18 @@ try {
     // Add services to the container.
     StartupHelper.ConfigureServices(builder.Services, builder.Configuration);
     builder.WebHost.UseUrls("http://*:5829");
-    
+
     //Add bot as hosted service
     builder.Services.AddHostedService<DiscordBot.DiscordBot>();
 
     var app = builder.Build();
     StartupHelper.ConfigurePipeline(app, app.Environment, app.Services.GetRequiredService<IApiVersionDescriptionProvider>(), builder.Configuration);
-    
+
     app.Run();
 } catch (Exception e) {
     Log.Fatal(e, "FATAL ERROR: ");
-} finally {
+}
+finally {
     Log.CloseAndFlush();
 }
 

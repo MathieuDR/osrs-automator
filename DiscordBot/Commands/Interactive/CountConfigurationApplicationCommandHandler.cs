@@ -2,7 +2,7 @@ using System.Text;
 using Common.Extensions;
 using DiscordBot.Common.Models.Enums;
 
-namespace DiscordBot.Commands.Interactive; 
+namespace DiscordBot.Commands.Interactive;
 
 public class CountConfigurationApplicationCommandHandler : ApplicationCommandHandler {
     private const string SetChannelSubCommandName = "set-channel";
@@ -122,7 +122,8 @@ public class CountConfigurationApplicationCommandHandler : ApplicationCommandHan
                     .ToList());
     }
 
-    private (string WithMention, string NoMention) ThresholdToString<T>(BaseInteractiveContext<T> context, CountThreshold threshold) where T : SocketInteraction {
+    private (string WithMention, string NoMention) ThresholdToString<T>(BaseInteractiveContext<T> context, CountThreshold threshold)
+        where T : SocketInteraction {
         var noMentionBuilder = new StringBuilder();
 
         noMentionBuilder.Append($"{threshold.Threshold}: ");
@@ -198,7 +199,8 @@ public class CountConfigurationApplicationCommandHandler : ApplicationCommandHan
 
     private async Task<Result> HandleDelete(MessageComponentContext context) {
         IReadOnlyList<CountThreshold> thresholds;
-        var selected = ((SelectMenuComponent)context.InnerContext.Message.Components.First().Components.First()).Options.First(x=>x.Default == true).Value;
+        var selected = ((SelectMenuComponent)context.InnerContext.Message.Components.First().Components.First()).Options.First(x => x.Default == true)
+            .Value;
 
         try {
             await _counterService.RemoveThreshold(context.Guild.Id, int.Parse(selected));
@@ -208,7 +210,7 @@ public class CountConfigurationApplicationCommandHandler : ApplicationCommandHan
         }
 
         var thresholdInfo = thresholds.Select((x, i) => (Id: i.ToString(), Label: ThresholdToString(context, x))).ToList();
-            
+
         var components = new ComponentBuilder()
             .WithSelectMenu(GetThresholdSelectMenu(thresholdInfo))
             .WithButton(GetRemoveButton);

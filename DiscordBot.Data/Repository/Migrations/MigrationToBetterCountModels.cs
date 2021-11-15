@@ -1,7 +1,7 @@
 using LiteDB;
 using Serilog;
 
-namespace DiscordBot.Data.Repository.Migrations; 
+namespace DiscordBot.Data.Repository.Migrations;
 
 public sealed class MigrationToBetterCountModels : BaseMigration {
     public MigrationToBetterCountModels(ILogger logger) : base(logger) { }

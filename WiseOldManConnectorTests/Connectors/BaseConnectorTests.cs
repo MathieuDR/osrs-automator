@@ -1,11 +1,10 @@
-﻿using System.Threading.Tasks;
-using Microsoft.Extensions.DependencyInjection;
+﻿using Microsoft.Extensions.DependencyInjection;
 using WiseOldManConnector.Interfaces;
 using WiseOldManConnector.Models.Output.Exceptions;
 using WiseOldManConnectorTests.Fixtures;
 using Xunit;
 
-namespace WiseOldManConnectorTests.Connectors; 
+namespace WiseOldManConnectorTests.Connectors;
 
 public class BaseConnectorTests : ConnectorTests {
     private readonly IWiseOldManPlayerApi _playerApi;

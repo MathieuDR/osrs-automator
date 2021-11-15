@@ -1,6 +1,6 @@
 ﻿using Discord.Commands;
 
-namespace DiscordBot.Helpers.Extensions; 
+namespace DiscordBot.Helpers.Extensions;
 
 public static class DiscordHelper {
     public static void AddEmptyField(this EmbedBuilder builder, bool inline = false) {
@@ -63,13 +63,15 @@ public static class DiscordHelper {
 
         return user.Nickname ?? user.Username;
     }
-        
-    public static SocketRole GetHighestRole(this SocketGuildUser member, bool requireColor = true)
-        => member?.Roles?.Where(x => !requireColor || x.HasColor())?
-            .OrderByDescending(x => x.Position)?.FirstOrDefault();
 
-    public static bool HasColor(this IRole role)
-        => role.Color.RawValue != 0;
+    public static SocketRole GetHighestRole(this SocketGuildUser member, bool requireColor = true) {
+        return member?.Roles?.Where(x => !requireColor || x.HasColor())?
+            .OrderByDescending(x => x.Position)?.FirstOrDefault();
+    }
+
+    public static bool HasColor(this IRole role) {
+        return role.Color.RawValue != 0;
+    }
 
     /// <summary>
     ///     Gets a list of discord users that have been mentioned at the start of the array.
@@ -79,7 +81,8 @@ public static class DiscordHelper {
     /// <param name="context"></param>
     /// <param name="serviceProvider">To create a user type reader</param>
     /// <returns></returns>
-    public static async Task<(IEnumerable<IUser> users, string[] remainingArgs)> GetDiscordUsersListFromStrings<T>(this string[] args, BaseInteractiveContext<T> context) where T : SocketInteraction {
+    public static async Task<(IEnumerable<IUser> users, string[] remainingArgs)> GetDiscordUsersListFromStrings<T>(this string[] args,
+        BaseInteractiveContext<T> context) where T : SocketInteraction {
         var result = new List<IUser>();
         var remainingArguments = new List<string>();
 
@@ -89,18 +92,18 @@ public static class DiscordHelper {
                 remainingArguments.Add(arg);
                 continue;
             }
-            
+
             var readerValue = parseResult.Values.FirstOrDefault();
             if (readerValue.Score >= 0.60f) {
                 result.Add(readerValue.Value as IUser);
-            }else {
+            } else {
                 remainingArguments.Add(arg);
             }
         }
-            
+
         return (result, remainingArguments.ToArray());
     }
-        
+
     /// <summary>
     ///     Gets a list of discord roles that have been mentioned at the start of the array.
     ///     When a role can't be found, it will skip the string
@@ -109,24 +112,25 @@ public static class DiscordHelper {
     /// <param name="context">Context</param>
     /// <typeparam name="T">Context type</typeparam>
     /// <returns>Roles and arguments it could not parse</returns>
-    public static async Task<(IEnumerable<IRole> roles, string[] remainingArgs)> GetDiscordRolesListFromStrings<T>(this string[] args, BaseInteractiveContext<T> context) where T : SocketInteraction {
+    public static async Task<(IEnumerable<IRole> roles, string[] remainingArgs)> GetDiscordRolesListFromStrings<T>(this string[] args,
+        BaseInteractiveContext<T> context) where T : SocketInteraction {
         var result = new List<IRole>();
         var remainingArguments = new List<string>();
-            
+
         foreach (var arg in args) {
             var parseResult = await context.ReadRolesAsync<IRole, T>(arg); //parser.ReadAsync(context, arg, serviceProvider).GetAwaiter().GetResult();
             if (!parseResult.IsSuccess) {
                 remainingArguments.Add(arg);
                 continue;
             }
-            
+
             var readerValue = parseResult.Values.FirstOrDefault();
             result.Add(readerValue.Value as IRole);
         }
-            
+
         return (result, remainingArguments.ToArray());
     }
-        
+
     /// <summary>
     ///     Gets a list of discord users and roles that have been mentioned at the start of the array.
     ///     When a user or role cannot be found, it will skip the string
@@ -135,14 +139,15 @@ public static class DiscordHelper {
     /// <param name="context">Context</param>
     /// <typeparam name="T">Context type</typeparam>
     /// <returns>Roles and arguments it could not parse</returns>
-    public static async Task<(IEnumerable<IUser> users, IEnumerable<IRole> roles, string[] remainingArgs)> GetDiscordUsersAndRolesListFromStrings<T>(this string[] args, BaseInteractiveContext<T> context) where T : SocketInteraction {
+    public static async Task<(IEnumerable<IUser> users, IEnumerable<IRole> roles, string[] remainingArgs)> GetDiscordUsersAndRolesListFromStrings<T>(
+        this string[] args, BaseInteractiveContext<T> context) where T : SocketInteraction {
         var (roles, remainingRolesArgs) = await args.GetDiscordRolesListFromStrings(context);
-        var (users, remainingUserArgs) = (await remainingRolesArgs.GetDiscordUsersListFromStrings(context));
+        var (users, remainingUserArgs) = await remainingRolesArgs.GetDiscordUsersListFromStrings(context);
         return (users, roles, remainingUserArgs);
     }
 
     /// <summary>
-    /// Returns all users from the argument, including found roles
+    ///     Returns all users from the argument, including found roles
     /// </summary>
     /// <param name="args"></param>
     /// <param name="context"></param>
@@ -152,29 +157,29 @@ public static class DiscordHelper {
         BaseInteractiveContext<T> context) where T : SocketInteraction {
         var (usersMentions, roles, remainingRolesArgs) = await args.GetDiscordUsersAndRolesListFromStrings(context);
         var users = usersMentions.ToList();
-            
-        foreach (IRole role in roles) {
+
+        foreach (var role in roles) {
             users.AddRange(role.GetUsersFromRole(context));
         }
+
         return (users.Distinct(), remainingRolesArgs);
     }
 
     public static string ToChannel(this ulong id) {
         return $"<#{id}>";
     }
-        
+
     public static string ToRole(this ulong id) {
         return $"<@&{id}>";
     }
-        
+
     public static string ToUser(this ulong id) {
         return $"<@{id}>";
     }
 
-        
-        
+
     /// <summary>
-    /// Get all users in role
+    ///     Get all users in role
     /// </summary>
     /// <param name="role"></param>
     /// <param name="context"></param>

@@ -1,10 +1,8 @@
-using System.Collections.Generic;
-using DiscordBot.Common.Models.Data;
 using DiscordBot.Common.Models.Data.Base;
 using FluentResults;
 using LiteDB;
 
-namespace DiscordBot.Data.Interfaces; 
+namespace DiscordBot.Data.Interfaces;
 
 public interface IRepository { }
 

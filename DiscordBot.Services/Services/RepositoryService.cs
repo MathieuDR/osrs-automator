@@ -2,7 +2,7 @@ using DiscordBot.Data.Interfaces;
 using DiscordBot.Data.Strategies;
 using Microsoft.Extensions.Logging;
 
-namespace DiscordBot.Services.Services; 
+namespace DiscordBot.Services.Services;
 
 internal abstract class RepositoryService : BaseService {
     protected RepositoryService(ILogger logger, IRepositoryStrategy repositoryStrategy) : base(logger) {
@@ -12,8 +12,8 @@ internal abstract class RepositoryService : BaseService {
     protected IRepositoryStrategy RepositoryStrategy { get; }
 
     /// <summary>
-    /// Gets a repository of the type T
-    /// If no Id is given, the default repository is returned
+    ///     Gets a repository of the type T
+    ///     If no Id is given, the default repository is returned
     /// </summary>
     /// <param name="guildId">Id of a guild</param>
     /// <typeparam name="T">Type of repository</typeparam>

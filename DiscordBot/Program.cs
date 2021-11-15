@@ -8,7 +8,7 @@ using Serilog.Events;
 using Serilog.Formatting.Json;
 using WiseOldManConnector.Configuration;
 
-namespace DiscordBot; 
+namespace DiscordBot;
 
 internal class Program {
     public async Task EntryPointAsync() {
@@ -37,7 +37,7 @@ internal class Program {
             .Enrich.FromLogContext()
             .MinimumLevel.Debug()
             .WriteTo.File(new JsonFormatter(), "logs/osrs_bot.log", rollingInterval: RollingInterval.Day)
-            .WriteTo.Console(restrictedToMinimumLevel: LogEventLevel.Information)
+            .WriteTo.Console(LogEventLevel.Information)
             .CreateLogger();
     }
 

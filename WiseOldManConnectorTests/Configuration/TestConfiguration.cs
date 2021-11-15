@@ -1,4 +1,4 @@
-﻿namespace WiseOldManConnectorTests.Configuration; 
+﻿namespace WiseOldManConnectorTests.Configuration;
 
 public static class TestConfiguration {
     public static string ValidPlayerUsernameWithValidCapatilization = "ErkendRserke";

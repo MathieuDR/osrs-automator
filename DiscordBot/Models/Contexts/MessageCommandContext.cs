@@ -1,9 +1,8 @@
 using Common.Extensions;
 
-namespace DiscordBot.Models.Contexts; 
+namespace DiscordBot.Models.Contexts;
 
-public class MessageCommandContext : BaseInteractiveContext<SocketMessageCommand>
-{
+public class MessageCommandContext : BaseInteractiveContext<SocketMessageCommand> {
     public MessageCommandContext(SocketMessageCommand innerContext, IServiceProvider provider)
         : base(innerContext, provider) { }
 

@@ -1,11 +1,10 @@
-using System;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using WiseOldManConnector.Helpers;
 using WiseOldManConnector.Models.API.Responses;
 using WiseOldManConnector.Models.WiseOldMan.Enums;
 
-namespace WiseOldManConnector.Deserializers; 
+namespace WiseOldManConnector.Deserializers;
 
 internal class ObjectWithMetricsConvertor<T, TU> : JsonConverter<T> where T : class, IMetricBearer<TU>, new() where TU : class, new() {
     public override bool CanWrite => false;

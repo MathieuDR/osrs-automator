@@ -1,4 +1,4 @@
-namespace DiscordBot.Common.Dtos.Runescape; 
+namespace DiscordBot.Common.Dtos.Runescape;
 
 public record RunescapeItem : RunescapeBaseDto {
     public int Value { get; init; }

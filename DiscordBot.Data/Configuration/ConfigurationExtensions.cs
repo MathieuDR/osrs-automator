@@ -1,13 +1,10 @@
-
-using Common.Extensions;
 using DiscordBot.Data.Factories;
-using DiscordBot.Data.Interfaces;
 using DiscordBot.Data.Repository.Migrations;
 using DiscordBot.Data.Strategies;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace DiscordBot.Data.Configuration; 
+namespace DiscordBot.Data.Configuration;
 
 public static class ConfigurationExtensions {
     public static IServiceCollection UseLiteDbRepositories(this IServiceCollection serviceCollection,
@@ -21,8 +18,8 @@ public static class ConfigurationExtensions {
             .AddTransient<AutomatedJobStateLiteDbRepositoryFactory>()
             .AddTransient<RunescapeDropDataRepositoryFactory>()
             .AddTransient<CommandInfoRepositoryFactory>()
-            .AddTransient<IApplicationCommandInfoRepository>(x => x.GetRequiredService<CommandInfoRepositoryFactory>().Create())
-            .AddTransient<IRuneScapeDropDataRepository>(x => x.GetRequiredService<RunescapeDropDataRepositoryFactory>().Create())
+            .AddTransient(x => x.GetRequiredService<CommandInfoRepositoryFactory>().Create())
+            .AddTransient(x => x.GetRequiredService<RunescapeDropDataRepositoryFactory>().Create())
             .AddSingleton<IRepositoryStrategy>(x =>
                 new RepositoryStrategy(new IRepositoryFactory[] {
                     x.GetRequiredService<PlayerLiteDbRepositoryFactory>(),

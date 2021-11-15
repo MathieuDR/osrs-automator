@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
-using RestSharp;
+﻿using RestSharp;
 using WiseOldManConnector.Helpers;
 using WiseOldManConnector.Interfaces;
 using WiseOldManConnector.Models;
@@ -10,7 +7,7 @@ using WiseOldManConnector.Models.Output;
 using WiseOldManConnector.Models.Requests;
 using WiseOldManConnector.Models.WiseOldMan.Enums;
 
-namespace WiseOldManConnector.Api; 
+namespace WiseOldManConnector.Api;
 
 internal class GroupConnector : BaseConnecter, IWiseOldManGroupApi {
     public GroupConnector(IServiceProvider provider) : base(provider) {
@@ -244,7 +241,7 @@ internal class GroupConnector : BaseConnecter, IWiseOldManGroupApi {
         var restRequest = GetNewRestRequest("{id}");
         restRequest.AddParameter("id", id, ParameterType.UrlSegment);
         restRequest.Method = Method.DELETE;
-        restRequest.AddJsonBody(new {verificationCode});
+        restRequest.AddJsonBody(new { verificationCode });
 
         var restResult = await ExecuteRequest<WOMMessageResponse>(restRequest);
         return GetResponse<MessageResponse>(restResult);

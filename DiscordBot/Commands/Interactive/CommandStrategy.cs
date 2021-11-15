@@ -4,7 +4,7 @@ using DiscordBot.Common.Models.Enums;
 using DiscordBot.Configuration;
 using Microsoft.Extensions.Options;
 
-namespace DiscordBot.Commands.Interactive; 
+namespace DiscordBot.Commands.Interactive;
 
 public interface ICommandStrategy {
     public Task<Result> HandleApplicationCommand(ApplicationCommandContext context);
@@ -14,17 +14,25 @@ public interface ICommandStrategy {
     public Task<uint> GetCommandHash(string applicationCommandName);
     public Task<Result> HandleInteractiveCommand(BaseInteractiveContext context);
     public Task<IApplicationCommandHandler> GetHandler(string applicationCommandName);
+
     /// <summary>
-    /// Get the names and descriptions of the commands
+    ///     Get the names and descriptions of the commands
     /// </summary>
     /// <returns>Name, Description of commands</returns>
     public IEnumerable<(string Name, string Description)> GetCommandDescriptions();
-    
+
     public Task ResetCommandRoleConfig(ulong guildId);
 }
 
 public class CommandStrategy : ICommandStrategy {
-    public CommandStrategy(ILogger<CommandStrategy> logger, IApplicationCommandHandler[] commands, IGroupService groupService, IOptions<BotTeamConfiguration> botTeamConfiguration) {
+    private readonly IOptions<BotTeamConfiguration> _botTeamConfiguration;
+    private readonly IApplicationCommandHandler[] _commands;
+    private readonly IGroupService _groupService;
+
+    private readonly ILogger<CommandStrategy> _logger;
+
+    public CommandStrategy(ILogger<CommandStrategy> logger, IApplicationCommandHandler[] commands, IGroupService groupService,
+        IOptions<BotTeamConfiguration> botTeamConfiguration) {
         _logger = logger;
         _commands = commands ?? throw new ArgumentNullException(nameof(commands));
         _groupService = groupService;
@@ -33,11 +41,6 @@ public class CommandStrategy : ICommandStrategy {
 
     public Dictionary<ulong, CommandRoleConfig> GuildConfigs { get; set; } = new();
 
-    private readonly ILogger<CommandStrategy> _logger;
-    private readonly IApplicationCommandHandler[] _commands;
-    private readonly IGroupService _groupService;
-    private readonly IOptions<BotTeamConfiguration> _botTeamConfiguration;
-    
     private ulong GuildId => _botTeamConfiguration.Value.GuildId;
     private ulong OwnerId => _botTeamConfiguration.Value.OwnerId;
 
@@ -50,17 +53,18 @@ public class CommandStrategy : ICommandStrategy {
     }
 
     public Task<IApplicationCommandHandler> GetHandler(string applicationCommandName) {
-        return Task.FromResult(_commands.FirstOrDefault(c => string.Equals(c.Name, applicationCommandName, StringComparison.InvariantCultureIgnoreCase)));
+        return Task.FromResult(_commands.FirstOrDefault(c =>
+            string.Equals(c.Name, applicationCommandName, StringComparison.InvariantCultureIgnoreCase)));
     }
 
     public async Task<Result> HandleApplicationCommand(ApplicationCommandContext context) {
         var command = _commands.FirstOrDefault(c => c.CanHandle(context));
 
         if (command is null) {
-            return Result.Fail(new Error("Could not find proper command handler").WithMetadata("404", true)); 
+            return Result.Fail(new Error("Could not find proper command handler").WithMetadata("404", true));
         }
-        
-        if(!await Authorized(context, command)) {
+
+        if (!await Authorized(context, command)) {
             return Result.Fail(new Error("You are not authorized to use this command").WithMetadata("401", true));
         }
 
@@ -73,57 +77,105 @@ public class CommandStrategy : ICommandStrategy {
         if (command is null) {
             return Result.Fail(new Error("Could not find proper component handler").WithMetadata("404", true));
         }
-        
-        if(!await Authorized(context, command)) {
+
+        if (!await Authorized(context, command)) {
             return Result.Fail(new Error("You are not authorized to use this command").WithMetadata("401", true));
         }
 
         return await command.HandleComponentAsync(context);
     }
 
-    private async Task<bool> Authorized<T>(BaseInteractiveContext<T> context, IApplicationCommandHandler applicationCommand) where T : SocketInteraction {
+    /// <summary>
+    ///     Get all the command builders
+    /// </summary>
+    /// <param name="allBuilders">Retrieve all commands, even if they're not set to 'global'</param>
+    /// <returns>SlashCommandProperties in the strategy</returns>
+    public async Task<SlashCommandProperties[]> GetCommandPropertiesCollection(bool allBuilders = false) {
+        var commandsToRetrieve = _commands.Where(c => c.GlobalRegister || allBuilders).ToList();
+
+        var tasks = new Task<SlashCommandProperties>[commandsToRetrieve.Count];
+        for (var i = 0; i < commandsToRetrieve.Count; i++) {
+            var command = commandsToRetrieve[i];
+            var builderTask = command.GetCommandProperties();
+            tasks[i] = builderTask;
+        }
+
+        return await Task.WhenAll(tasks);
+    }
+
+    public async Task<SlashCommandProperties> GetCommandProperties(string applicationCommandName) {
+        var command = await GetHandler(applicationCommandName);
+
+        if (command is null) {
+            return null;
+        }
+
+        return await command.GetCommandProperties();
+    }
+
+    public Task<uint> GetCommandHash(string applicationCommandName) {
+        var command = _commands.FirstOrDefault(c => string.Equals(c.Name, applicationCommandName, StringComparison.InvariantCultureIgnoreCase));
+
+        if (command is null) {
+            return null;
+        }
+
+        return command.GetCommandBuilderHash();
+    }
+
+    public IEnumerable<(string Name, string Description)> GetCommandDescriptions() {
+        return _commands.Select(c => (c.Name, c.Description));
+    }
+
+    public Task ResetCommandRoleConfig(ulong guildId) {
+        GuildConfigs.Remove(guildId);
+        return Task.CompletedTask;
+    }
+
+    private async Task<bool> Authorized<T>(BaseInteractiveContext<T> context, IApplicationCommandHandler applicationCommand)
+        where T : SocketInteraction {
         var roleRequired = applicationCommand.MinimumAuthorizationRole;
-        
+
         // Check if authorization is required
         if (roleRequired == AuthorizationRoles.None) {
             _logger.LogInformation("No authorization needed for {commandName}", applicationCommand.Name);
             return true;
         }
-        
-         // Check if user is bot owner
-         if (context.User.Id == OwnerId) {
-             _logger.LogInformation("User is bot owner, executing {commandName}", applicationCommand.Name);
-             return true;
-         }
-         
-         // Only owner can currently do this
-         if(roleRequired <= AuthorizationRoles.BotModerator) {
-             _logger.LogInformation("User is not bot owner, not executing {commandName}", applicationCommand.Name);
-             return false;
-         }
 
-         // Check if user is in guild  
-         if (!context.InGuild) {
-             _logger.LogInformation("User is not in guild, not executing {commandName}", applicationCommand.Name);
-             return false;
-         }
-         
-         // Check if user is in bot team
-         // if (context.Guild.Id == GuildId) {
-         //     // Do special stuff. Do we actually need this? It's just a normal server you know?
-         //     _logger.LogInformation("User is in bot team guild, not executing {commandName}", applicationCommand.Name);
-         //     return false;
-         // }
-         
-         // Check if user is server owner
-         if (context.Guild.OwnerId == context.User.Id) {
-             if (AuthorizationRoles.ClanOwner <= roleRequired) {
-                 _logger.LogInformation("User is server owner and has permission to execute {commandName}", applicationCommand.Name);
-                 return true;
-             }
-         }
-         
-        var config = await GetGuildConfig(context.Guild.ToGuildDto());        
+        // Check if user is bot owner
+        if (context.User.Id == OwnerId) {
+            _logger.LogInformation("User is bot owner, executing {commandName}", applicationCommand.Name);
+            return true;
+        }
+
+        // Only owner can currently do this
+        if (roleRequired <= AuthorizationRoles.BotModerator) {
+            _logger.LogInformation("User is not bot owner, not executing {commandName}", applicationCommand.Name);
+            return false;
+        }
+
+        // Check if user is in guild  
+        if (!context.InGuild) {
+            _logger.LogInformation("User is not in guild, not executing {commandName}", applicationCommand.Name);
+            return false;
+        }
+
+        // Check if user is in bot team
+        // if (context.Guild.Id == GuildId) {
+        //     // Do special stuff. Do we actually need this? It's just a normal server you know?
+        //     _logger.LogInformation("User is in bot team guild, not executing {commandName}", applicationCommand.Name);
+        //     return false;
+        // }
+
+        // Check if user is server owner
+        if (context.Guild.OwnerId == context.User.Id) {
+            if (AuthorizationRoles.ClanOwner <= roleRequired) {
+                _logger.LogInformation("User is server owner and has permission to execute {commandName}", applicationCommand.Name);
+                return true;
+            }
+        }
+
+        var config = await GetGuildConfig(context.Guild.ToGuildDto());
         // Check if user has special permission
         if (config.UserIds.TryGetValue(context.User.Id, out var userRole)) {
             if (userRole <= roleRequired) {
@@ -133,7 +185,7 @@ public class CommandStrategy : ICommandStrategy {
         }
 
         // Check if user has specific role
-        var roleIds = context.GuildUser.Roles.OrderByDescending(x=>x.Position).Select(r => r.Id);
+        var roleIds = context.GuildUser.Roles.OrderByDescending(x => x.Position).Select(r => r.Id);
         foreach (var roleId in roleIds) {
             if (!config.RoleIds.TryGetValue(roleId, out var roleRole)) {
                 continue;
@@ -159,55 +211,8 @@ public class CommandStrategy : ICommandStrategy {
         if (guildConfigResult.IsFailed) {
             throw new Exception(guildConfigResult.CombineMessage());
         }
-        
+
         GuildConfigs.Add(guild.Id, guildConfigResult.Value);
         return guildConfig;
-    }
-
-    /// <summary>
-    /// Get all the command builders
-    /// </summary>
-    /// <param name="allBuilders">Retrieve all commands, even if they're not set to 'global'</param>
-    /// <returns>SlashCommandProperties in the strategy</returns>
-    public async Task<SlashCommandProperties[]> GetCommandPropertiesCollection(bool allBuilders = false) {
-        var commandsToRetrieve = _commands.Where(c => c.GlobalRegister || allBuilders).ToList();
-            
-        var tasks = new Task<SlashCommandProperties>[commandsToRetrieve.Count];
-        for (var i = 0; i < commandsToRetrieve.Count; i++) {
-            var command = commandsToRetrieve[i];
-            var builderTask = command.GetCommandProperties();
-            tasks[i] = builderTask;
-        }
-
-        return await Task.WhenAll(tasks);
-    }
-
-    public async Task<SlashCommandProperties> GetCommandProperties(string applicationCommandName) {
-        var command = await GetHandler(applicationCommandName);
-   
-        if (command is null) {
-            return null;
-        }
-            
-        return await command.GetCommandProperties();
-    }
-        
-    public Task<uint> GetCommandHash(string applicationCommandName) {
-        var command = _commands.FirstOrDefault(c => string.Equals(c.Name, applicationCommandName, StringComparison.InvariantCultureIgnoreCase));
-   
-        if (command is null) {
-            return null;
-        }
-
-        return command.GetCommandBuilderHash();
-    }
-
-    public IEnumerable<(string Name, string Description)> GetCommandDescriptions() {
-        return _commands.Select(c => (c.Name, c.Description));
-    }
-
-    public Task ResetCommandRoleConfig(ulong guildId) {
-        GuildConfigs.Remove(guildId);
-        return Task.CompletedTask;
     }
 }

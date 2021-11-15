@@ -1,10 +1,9 @@
-using System.Linq;
 using System.Text.Json;
 using Microsoft.AspNetCore.Mvc.ApiExplorer;
 using Microsoft.OpenApi.Models;
 using Swashbuckle.AspNetCore.SwaggerGen;
 
-namespace Dashboard.Configuration; 
+namespace Dashboard.Configuration;
 
 /// <summary>
 ///     Represents the Swagger/Swashbuckle operation filter used to document the implicit API version parameter.

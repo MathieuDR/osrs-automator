@@ -3,13 +3,14 @@ using DiscordBot.Data.Interfaces;
 using DiscordBot.Data.Strategies;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace DiscordBot.Commands.Interactive; 
+namespace DiscordBot.Commands.Interactive;
 
 public class ManageCommandsApplicationCommandHandler : ApplicationCommandHandler {
-    private readonly IServiceProvider _serviceProvider;
     private readonly IApplicationCommandInfoRepository _applicationCommandInfoRepository;
+    private readonly IServiceProvider _serviceProvider;
 
-    public ManageCommandsApplicationCommandHandler(ILogger<ManageCommandsApplicationCommandHandler> logger, IServiceProvider serviceProvider, IRepositoryStrategy repositoryStrategy) : base("commands",
+    public ManageCommandsApplicationCommandHandler(ILogger<ManageCommandsApplicationCommandHandler> logger, IServiceProvider serviceProvider,
+        IRepositoryStrategy repositoryStrategy) : base("commands",
         "Manage commands", logger) {
         _serviceProvider = serviceProvider;
         _applicationCommandInfoRepository = repositoryStrategy.GetOrCreateRepository<IApplicationCommandInfoRepository>();
@@ -46,7 +47,7 @@ public class ManageCommandsApplicationCommandHandler : ApplicationCommandHandler
     }
 
     /// <summary>
-    /// Creates a guild command
+    ///     Creates a guild command
     /// </summary>
     /// <param name="context"></param>
     /// <returns></returns>
@@ -65,7 +66,7 @@ public class ManageCommandsApplicationCommandHandler : ApplicationCommandHandler
 
         var list = commandInfo.RegisteredGuilds;
         string embedDescription;
-        if(!commandInfo.RegisteredGuilds.Contains(guild.Id)) {
+        if (!commandInfo.RegisteredGuilds.Contains(guild.Id)) {
             list.Add(guild.Id);
             embedDescription = $"Creating command: {command} for guild {guild.Name} ({guild.Id})";
         } else {
@@ -102,13 +103,13 @@ public class ManageCommandsApplicationCommandHandler : ApplicationCommandHandler
     }
 
     /// <summary>
-    /// Creates a global command
+    ///     Creates a global command
     /// </summary>
     /// <param name="context"></param>
     /// <returns></returns>
     private async Task<Result> HandleGlobalSubCommand(MessageComponentContext context) {
         var command = context.EmbedFields.First(x => x.Name == "Command").Value;
-            
+
         var commandInfo = (await _applicationCommandInfoRepository.GetByCommandName(command)).Value;
 
         if (commandInfo is null) {
@@ -121,7 +122,7 @@ public class ManageCommandsApplicationCommandHandler : ApplicationCommandHandler
         _applicationCommandInfoRepository.UpdateOrInsert(commandInfo);
         var registrationService = _serviceProvider.GetRequiredService<ICommandRegistrationService>();
         await registrationService.UpdateCommand(commandInfo);
-            
+
         var embed = context.CreateEmbedBuilder("Success!", $"Creating global command: {command}");
 
         await context.UpdateAsync(embed: embed.Build(), component: null, content: null);
@@ -129,14 +130,14 @@ public class ManageCommandsApplicationCommandHandler : ApplicationCommandHandler
     }
 
     /// <summary>
-    /// Creates a guild select menu and buttons to register globally
+    ///     Creates a guild select menu and buttons to register globally
     /// </summary>
     /// <param name="context"></param>
     /// <returns></returns>
     private async Task<Result> HandleCommandSubCommand(MessageComponentContext context) {
         var command = context.SelectedMenuOptions.First();
         var commandInfo = (await _applicationCommandInfoRepository.GetByCommandName(command)).Value ?? new ApplicationCommandInfo(command);
-            
+
         var guildSelector = GetGuildsSelectMenu(commandInfo.RegisteredGuilds)
             .WithButton("Back", SubCommand("reset"), ButtonStyle.Secondary)
             .WithButton("Cancel", SubCommand("cancel"), ButtonStyle.Danger);
@@ -156,9 +157,9 @@ public class ManageCommandsApplicationCommandHandler : ApplicationCommandHandler
         return Result.Ok();
     }
 
-        
+
     /// <summary>
-    /// Resets the command to the start
+    ///     Resets the command to the start
     /// </summary>
     /// <param name="context"></param>
     /// <returns></returns>
@@ -166,7 +167,7 @@ public class ManageCommandsApplicationCommandHandler : ApplicationCommandHandler
         var s2 = context
             .CreateEmbedBuilder("Select a command.")
             .WithMessageAuthorFooter(context.User);
-            
+
         var commandMenu = GetCommandsSelectMenu()
             .WithButton("Cancel", SubCommand("cancel"), ButtonStyle.Danger);
         await context.UpdateAsync(embeds: new[] { s2.Build() }, component: commandMenu.Build());
@@ -175,7 +176,7 @@ public class ManageCommandsApplicationCommandHandler : ApplicationCommandHandler
     }
 
     /// <summary>
-    /// Cancels the command
+    ///     Cancels the command
     /// </summary>
     /// <param name="context"></param>
     /// <returns></returns>
@@ -185,7 +186,7 @@ public class ManageCommandsApplicationCommandHandler : ApplicationCommandHandler
     }
 
     /// <summary>
-    /// Put the commands in a select list
+    ///     Put the commands in a select list
     /// </summary>
     /// <returns></returns>
     private ComponentBuilder GetCommandsSelectMenu() {
@@ -201,7 +202,7 @@ public class ManageCommandsApplicationCommandHandler : ApplicationCommandHandler
     }
 
     /// <summary>
-    /// Gets the select menu for the guilds
+    ///     Gets the select menu for the guilds
     /// </summary>
     /// <param name="registeredCommands">Guildids where the command has been registered</param>
     /// <returns></returns>
@@ -216,8 +217,9 @@ public class ManageCommandsApplicationCommandHandler : ApplicationCommandHandler
                 .WithOptions(guilds.Select(c => {
                     var label = $"{c.Name}";
                     if (registeredCommands.Contains(c.Id)) {
-                        label += $" (Deregister)";
+                        label += " (Deregister)";
                     }
+
                     return new SelectMenuOptionBuilder()
                         .WithLabel(label)
                         .WithValue(c.Id.ToString());

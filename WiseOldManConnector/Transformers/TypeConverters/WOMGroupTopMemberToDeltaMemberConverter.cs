@@ -3,7 +3,7 @@ using WiseOldManConnector.Models.API.Responses;
 using WiseOldManConnector.Models.Output;
 using WiseOldManConnector.Models.WiseOldMan.Enums;
 
-namespace WiseOldManConnector.Transformers.TypeConverters; 
+namespace WiseOldManConnector.Transformers.TypeConverters;
 
 internal class WOMGroupTopMemberToDeltaMemberConverter : ITypeConverter<WOMGroupDeltaMember, DeltaMember> {
     public DeltaMember Convert(WOMGroupDeltaMember source, DeltaMember destination, ResolutionContext context) {

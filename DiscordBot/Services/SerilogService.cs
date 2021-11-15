@@ -2,7 +2,7 @@
 using Discord.Commands;
 using Serilog.Events;
 
-namespace DiscordBot.Services; 
+namespace DiscordBot.Services;
 
 public class SerilogService : ILogService {
     public SerilogService(DiscordSocketClient discord, CommandService commands) {

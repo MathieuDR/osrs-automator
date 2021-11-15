@@ -1,8 +1,7 @@
-using System;
 using DiscordBot.Data.Interfaces;
 using Microsoft.Extensions.Logging;
 
-namespace DiscordBot.Data.Factories; 
+namespace DiscordBot.Data.Factories;
 
 public abstract class BaseLiteDbRepositoryFactory<TInterface, TConcrete> : IRepositoryFactory<TInterface>
     where TInterface : IRepository where TConcrete : TInterface {

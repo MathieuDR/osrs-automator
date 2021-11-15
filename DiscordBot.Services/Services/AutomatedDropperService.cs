@@ -8,7 +8,7 @@ using FluentResults;
 using Microsoft.Extensions.Logging;
 using Quartz;
 
-namespace DiscordBot.Services.Services; 
+namespace DiscordBot.Services.Services;
 
 internal class AutomatedDropperService : RepositoryService, IAutomatedDropperService {
     private readonly ISchedulerFactory _schedulerFactory;
@@ -22,7 +22,7 @@ internal class AutomatedDropperService : RepositoryService, IAutomatedDropperSer
         if (drop is null && string.IsNullOrEmpty(base64Image)) {
             return Result.Fail("No new information");
         }
-            
+
         //Check user Id
         var allowedCheckResult = IsValidEndpoint(endpoint);
         if (allowedCheckResult.IsFailed) {
@@ -52,12 +52,12 @@ internal class AutomatedDropperService : RepositoryService, IAutomatedDropperSer
         var repo = RepositoryStrategy.GetOrCreateRepository<IRuneScapeDropDataRepository>();
 
         var activeRecordResult = repo.GetActive(endpoint);
-        var data = activeRecordResult.ValueOrDefault ?? new RunescapeDropData(){ Endpoint = endpoint};
+        var data = activeRecordResult.ValueOrDefault ?? new RunescapeDropData { Endpoint = endpoint };
 
         // Update list reference
-        List<RunescapeDrop> dropList = data.Drops.ToList();
-        data = data with { Drops = dropList};
-            
+        var dropList = data.Drops.ToList();
+        data = data with { Drops = dropList };
+
         if (drop is not null) {
             // update recipient
             if (data.RecipientUsername is null) {
@@ -68,10 +68,10 @@ internal class AutomatedDropperService : RepositoryService, IAutomatedDropperSer
 
             var lastDrop = dropList.LastOrDefault();
             if (lastDrop is not null && !string.IsNullOrEmpty(lastDrop.Image) && lastDrop.Item is null) {
-                drop = drop with {Image = lastDrop.Image};
+                drop = drop with { Image = lastDrop.Image };
                 dropList.Remove(lastDrop);
             }
-                
+
             dropList.Add(drop);
         }
 
@@ -90,7 +90,7 @@ internal class AutomatedDropperService : RepositoryService, IAutomatedDropperSer
 
     private Result<RunescapeDrop> AddImage(List<RunescapeDrop> drops, string image) {
         RunescapeDrop toUpdate;
-            
+
         var lastDrop = drops.LastOrDefault();
         if (lastDrop is null) {
             toUpdate = new RunescapeDrop(image);
@@ -99,7 +99,7 @@ internal class AutomatedDropperService : RepositoryService, IAutomatedDropperSer
         }
 
 
-        toUpdate = lastDrop with {Image = image};
+        toUpdate = lastDrop with { Image = image };
         drops.Remove(lastDrop);
         drops.Add(toUpdate);
 
@@ -174,6 +174,6 @@ internal class AutomatedDropperService : RepositoryService, IAutomatedDropperSer
     }
 
     private JobKey CreateJobKeyByEndpoint(Guid endpoint) {
-        return new(endpoint.ToString(), "automated-dropper");
+        return new JobKey(endpoint.ToString(), "automated-dropper");
     }
 }

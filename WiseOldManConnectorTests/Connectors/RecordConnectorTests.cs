@@ -1,6 +1,4 @@
-﻿using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.Extensions.DependencyInjection;
+﻿using Microsoft.Extensions.DependencyInjection;
 using WiseOldManConnector.Interfaces;
 using WiseOldManConnector.Models;
 using WiseOldManConnector.Models.WiseOldMan.Enums;
@@ -8,7 +6,7 @@ using WiseOldManConnectorTests.Fixtures;
 using Xunit;
 using Record = WiseOldManConnector.Models.Output.Record;
 
-namespace WiseOldManConnectorTests.Connectors; 
+namespace WiseOldManConnectorTests.Connectors;
 
 public class RecordConnectorTests : ConnectorTests {
     private readonly IWiseOldManRecordApi _recordApi;

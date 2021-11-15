@@ -1,4 +1,4 @@
-﻿namespace WiseOldManConnector.Models; 
+﻿namespace WiseOldManConnector.Models;
 
 public class ConnectorResponse<T> : ConnectorResponseBase {
     internal ConnectorResponse(T data) : this(data, null) { }

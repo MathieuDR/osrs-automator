@@ -7,7 +7,7 @@ using FluentResults;
 using WiseOldManConnector.Models.Output;
 using WiseOldManConnector.Models.WiseOldMan.Enums;
 
-namespace DiscordBot.Services.Interfaces; 
+namespace DiscordBot.Services.Interfaces;
 
 public interface IGroupService {
     public Task<ItemDecorator<Group>> SetGroupForGuild(GuildUser guildUser, int womGroupId, string verificationCode);
@@ -19,8 +19,9 @@ public interface IGroupService {
     Task<ItemDecorator<Leaderboard>> GetGroupLeaderboard(GuildUser guildUser);
     Task<ItemDecorator<Leaderboard>> GetGroupLeaderboard(GuildUser guildUser, MetricType metric, Period period);
     Task QueueJob(JobType jobType);
+
     Task<Result<ItemDecorator<Competition>>> CreateCompetition(Guild guild, DateTimeOffset start, DateTimeOffset end, MetricType metric,
         CompetitionType competitionType, string name = null);
-    
+
     Task<Result<CommandRoleConfig>> GetCommandRoleConfig(Guild guild);
 }

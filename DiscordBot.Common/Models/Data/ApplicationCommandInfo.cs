@@ -1,9 +1,6 @@
-using System;
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using DiscordBot.Common.Models.Data.Base;
 
-namespace DiscordBot.Common.Models.Data; 
+namespace DiscordBot.Common.Models.Data;
 
 public record ApplicationCommandInfo : BaseRecord {
     public ApplicationCommandInfo(string commandName) {
@@ -15,5 +12,5 @@ public record ApplicationCommandInfo : BaseRecord {
     public string CommandName { get; init; }
     public uint Hash { get; init; }
     public bool IsGlobal { get; init; }
-    public List<ulong> RegisteredGuilds { get; set; } = new List<ulong>();
+    public List<ulong> RegisteredGuilds { get; set; } = new();
 }

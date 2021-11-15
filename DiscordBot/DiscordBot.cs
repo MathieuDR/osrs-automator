@@ -6,7 +6,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Quartz;
 
-namespace DiscordBot; 
+namespace DiscordBot;
 
 public class DiscordBot : BackgroundService {
     private readonly IConfiguration _config;
@@ -38,10 +38,10 @@ public class DiscordBot : BackgroundService {
 
     private async Task ConfigureDiscord() {
         _client = _services.GetRequiredService<DiscordSocketClient>();
-        await ((CommandHandlingService) _services.GetRequiredService(typeof(CommandHandlingService)))
+        await ((CommandHandlingService)_services.GetRequiredService(typeof(CommandHandlingService)))
             .InitializeAsync(_services);
-            
-        await ((InteractiveCommandHandlerService) _services.GetRequiredService(typeof(InteractiveCommandHandlerService)))
+
+        await ((InteractiveCommandHandlerService)_services.GetRequiredService(typeof(InteractiveCommandHandlerService)))
             .SetupAsync();
 
         var botConfig = _config.GetSection("Bot").Get<BotConfiguration>();

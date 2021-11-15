@@ -1,9 +1,7 @@
-using System;
-using System.Linq;
 using DiscordBot.Data.Factories;
 using DiscordBot.Data.Interfaces;
 
-namespace DiscordBot.Data.Strategies; 
+namespace DiscordBot.Data.Strategies;
 
 public class RepositoryStrategy : IRepositoryStrategy {
     private readonly IRepositoryFactory[] _factories;
@@ -35,10 +33,10 @@ public class RepositoryStrategy : IRepositoryStrategy {
     }
 
     public T GetOrCreateRepository<T>(ulong guildId) {
-        return (T) GetOrCreateRepository(typeof(T), guildId);
+        return (T)GetOrCreateRepository(typeof(T), guildId);
     }
 
     public T GetOrCreateRepository<T>() {
-        return (T) GetOrCreateRepository(typeof(T));
+        return (T)GetOrCreateRepository(typeof(T));
     }
 }

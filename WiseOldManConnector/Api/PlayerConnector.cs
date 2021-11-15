@@ -1,6 +1,4 @@
-﻿using System;
-using System.Threading.Tasks;
-using RestSharp;
+﻿using RestSharp;
 using WiseOldManConnector.Helpers;
 using WiseOldManConnector.Interfaces;
 using WiseOldManConnector.Models;
@@ -8,7 +6,7 @@ using WiseOldManConnector.Models.API.Responses;
 using WiseOldManConnector.Models.Output;
 using WiseOldManConnector.Models.WiseOldMan.Enums;
 
-namespace WiseOldManConnector.Api; 
+namespace WiseOldManConnector.Api;
 
 internal class PlayerConnector : BaseConnecter, IWiseOldManPlayerApi {
     public PlayerConnector(IServiceProvider provider) : base(provider) {
@@ -35,7 +33,7 @@ internal class PlayerConnector : BaseConnecter, IWiseOldManPlayerApi {
         var request = GetNewRestRequest("track");
         request.Method = Method.POST;
         username = username.ToLowerInvariant();
-        request.AddJsonBody(new {username});
+        request.AddJsonBody(new { username });
 
         var result = await ExecuteRequest<PlayerResponse>(request);
         return GetResponse<Player>(result);
@@ -48,7 +46,7 @@ internal class PlayerConnector : BaseConnecter, IWiseOldManPlayerApi {
     public async Task<ConnectorResponse<MessageResponse>> Import(string username) {
         var request = GetNewRestRequest("import");
         request.Method = Method.POST;
-        request.AddJsonBody(new {username});
+        request.AddJsonBody(new { username });
 
         var result = await ExecuteRequest<WOMMessageResponse>(request);
         return GetResponse<MessageResponse>(result);
@@ -81,7 +79,7 @@ internal class PlayerConnector : BaseConnecter, IWiseOldManPlayerApi {
     public async Task<ConnectorResponse<PlayerType>> AssertPlayerType(string username) {
         var request = GetNewRestRequest("/assert-type");
         request.Method = Method.POST;
-        request.AddJsonBody(new {username});
+        request.AddJsonBody(new { username });
 
         var result = await ExecuteRequest<AssertPlayerTypeResponse>(request);
         return GetResponse<PlayerType>(result);
@@ -90,7 +88,7 @@ internal class PlayerConnector : BaseConnecter, IWiseOldManPlayerApi {
     public async Task<ConnectorResponse<string>> AssertDisplayName(string username) {
         var request = GetNewRestRequest("/assert-name");
         request.Method = Method.POST;
-        request.AddJsonBody(new {username});
+        request.AddJsonBody(new { username });
 
         var result = await ExecuteRequest<AssertDisplayNameResponse>(request);
         return GetResponse<string>(result);
@@ -240,7 +238,7 @@ internal class PlayerConnector : BaseConnecter, IWiseOldManPlayerApi {
 
         // We fill in username ourselves. Since it's not added by the response
         foreach (var item in result.Data) {
-            item.Player = new Player {Username = username};
+            item.Player = new Player { Username = username };
         }
 
         return result;

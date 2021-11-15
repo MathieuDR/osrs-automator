@@ -1,4 +1,4 @@
-﻿namespace DiscordBot.Common.Models.Data.Base; 
+﻿namespace DiscordBot.Common.Models.Data.Base;
 
 public class BaseGuildModel : BaseModel {
     public BaseGuildModel() { }
@@ -9,11 +9,11 @@ public class BaseGuildModel : BaseModel {
 
     public ulong GuildId { get; set; }
 }
-    
-public record BaseGuildRecord: BaseRecord {
+
+public record BaseGuildRecord : BaseRecord {
     public BaseGuildRecord() { }
 
-    public BaseGuildRecord(ulong guildId, ulong discordId) : base() {
+    public BaseGuildRecord(ulong guildId, ulong discordId) {
         GuildId = guildId;
         CreatedById = discordId;
     }

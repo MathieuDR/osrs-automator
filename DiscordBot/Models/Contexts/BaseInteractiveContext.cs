@@ -2,13 +2,15 @@ using Common.Extensions;
 using Fergun.Interactive.Pagination;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace DiscordBot.Models.Contexts; 
+namespace DiscordBot.Models.Contexts;
 
 public abstract class BaseInteractiveContext {
     public abstract bool IsDeferred { get; }
 }
 
 public abstract class BaseInteractiveContext<T> : BaseInteractiveContext where T : SocketInteraction {
+    private bool _isDeferred;
+
     protected BaseInteractiveContext(T innerContext, IServiceProvider provider) {
         InnerContext = innerContext;
         ServiceProvider = provider;
@@ -31,6 +33,11 @@ public abstract class BaseInteractiveContext<T> : BaseInteractiveContext where T
 
     public abstract string Message { get; }
     public string MessageLocation => InGuild ? $"{Channel} ({Guild})" : "Direct Message";
+
+    /// <summary>
+    ///     Is only accurate if the inner context is not used by itself
+    /// </summary>
+    public override bool IsDeferred => _isDeferred;
 
     public PageBuilder CreatePageBuilder(string description = null) {
         return new PageBuilder()
@@ -74,13 +81,6 @@ public abstract class BaseInteractiveContext<T> : BaseInteractiveContext where T
     public InteractionReplyBuilder<T> CreateReplyBuilder(bool ephemeral = false) {
         return new InteractionReplyBuilder<T>(this).WithEphemeral(ephemeral);
     }
-
-    /// <summary>
-    /// Is only accurate if the inner context is not used by itself
-    /// </summary>
-    public override bool IsDeferred => _isDeferred;
-
-    private bool _isDeferred = false;
 
     public Task DeferAsync(bool ephemeral = false, RequestOptions options = null) {
         _isDeferred = true;

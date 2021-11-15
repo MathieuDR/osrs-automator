@@ -1,6 +1,6 @@
 ﻿using AutoMapper;
 
-namespace WiseOldManConnectorTests.Fixtures; 
+namespace WiseOldManConnectorTests.Fixtures;
 
 public class MapperFixture {
     public MapperFixture() {

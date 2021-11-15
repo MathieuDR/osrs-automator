@@ -3,7 +3,7 @@ using WiseOldManConnector.Models.WiseOldMan.Enums;
 using WiseOldManConnectorTests.Fixtures;
 using Xunit;
 
-namespace WiseOldManConnectorTests.TransformerTests; 
+namespace WiseOldManConnectorTests.TransformerTests;
 
 public class MetricTypeTests : IClassFixture<MapperFixture> {
     private readonly MapperFixture _fixture;

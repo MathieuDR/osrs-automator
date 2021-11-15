@@ -1,7 +1,7 @@
 using DiscordBot.Common.Dtos.Discord;
 using DiscordBot.Common.Models.Data;
 
-namespace DiscordBot.Services.Interfaces; 
+namespace DiscordBot.Services.Interfaces;
 
 public interface ICounterService {
     int TotalCount(GuildUser user);

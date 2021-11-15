@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text.RegularExpressions;
-using System.Threading.Tasks;
+﻿using System.Text.RegularExpressions;
 using Microsoft.Extensions.DependencyInjection;
 using WiseOldManConnector.Helpers;
 using WiseOldManConnector.Interfaces;
@@ -14,7 +10,7 @@ using WiseOldManConnectorTests.Fixtures;
 using Xunit;
 using Xunit.Abstractions;
 
-namespace WiseOldManConnectorTests.Connectors; 
+namespace WiseOldManConnectorTests.Connectors;
 
 public class GroupConnectorTests : ConnectorTests {
     private readonly IWiseOldManGroupApi _groupApi;
@@ -96,7 +92,7 @@ public class GroupConnectorTests : ConnectorTests {
         var cname = GetClanName();
         var cc = "MyClanChat";
         var createRequest = new CreateGroupRequest(cname, cc, new List<MemberRequest> {
-            new() {Name = "Den Badjas", Role = GroupRole.Leader}
+            new() { Name = "Den Badjas", Role = GroupRole.Leader }
         });
 
 
@@ -161,8 +157,8 @@ public class GroupConnectorTests : ConnectorTests {
         var cname = GetClanName();
         var cc = "MyClanChat";
         var request = new CreateGroupRequest(cname, cc, new List<MemberRequest> {
-            new() {Name = "ErkendRserke"},
-            new() {Name = "Den Badjas", Role = GroupRole.Leader}
+            new() { Name = "ErkendRserke" },
+            new() { Name = "Den Badjas", Role = GroupRole.Leader }
         });
 
         var response = await _groupApi.Create(request);
@@ -193,8 +189,8 @@ public class GroupConnectorTests : ConnectorTests {
         var cname = GetClanName();
         var cc = "MyClanChat";
         var request = new CreateGroupRequest(cname, cc, new List<MemberRequest> {
-            new() {Name = "ErkendRserke"},
-            new() {Name = "Den Badjas", Role = GroupRole.Leader}
+            new() { Name = "ErkendRserke" },
+            new() { Name = "Den Badjas", Role = GroupRole.Leader }
         });
 
         var response = await _groupApi.Create(request);
@@ -211,8 +207,8 @@ public class GroupConnectorTests : ConnectorTests {
     [Fact]
     public async Task DeleteGroupResultsInDeletedGroupMessage() {
         var request = new CreateGroupRequest(GetClanName(), "myChat", new List<MemberRequest> {
-            new() {Name = "ErkendRserke"},
-            new() {Name = "Den Badjas", Role = GroupRole.Leader}
+            new() { Name = "ErkendRserke" },
+            new() { Name = "Den Badjas", Role = GroupRole.Leader }
         });
 
         var createdGroup = await _groupApi.Create(request);
@@ -228,8 +224,8 @@ public class GroupConnectorTests : ConnectorTests {
         var cname = GetClanName();
         var cc = "MyClanChat";
         var createRequest = new CreateGroupRequest(cname, cc, new List<MemberRequest> {
-            new() {Name = "ErkendRserke"},
-            new() {Name = "Den Badjas", Role = GroupRole.Leader}
+            new() { Name = "ErkendRserke" },
+            new() { Name = "Den Badjas", Role = GroupRole.Leader }
         });
 
 
@@ -237,7 +233,7 @@ public class GroupConnectorTests : ConnectorTests {
 
 
         var request = new EditGroupRequest(createResponse.Data.VerificationCode, GetClanName(), "MySecondChat",
-            new[] {new MemberRequest {Name = "WouterPils"}});
+            new[] { new MemberRequest { Name = "WouterPils" } });
 
         var response = await _groupApi.Edit(createResponse.Data.Id, request);
 
@@ -379,7 +375,7 @@ public class GroupConnectorTests : ConnectorTests {
         var response = await _groupApi.GetMembers(id);
         var player = response.Data.FirstOrDefault();
 
-        var flags = response.Data.Select(x=> x.Country).Distinct();
+        var flags = response.Data.Select(x => x.Country).Distinct();
 
         Assert.NotEmpty(player.DisplayName);
         Assert.NotEmpty(player.Username);

@@ -1,9 +1,8 @@
-using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Formatters;
 using Microsoft.AspNetCore.Mvc.ModelBinding.Binders;
 
-namespace Dashboard.InputFormatters; 
+namespace Dashboard.InputFormatters;
 
 /// <summary>
 ///     This input formatter bypasses the <see cref="BodyModelBinder" /> by returning a null result, when the request has a

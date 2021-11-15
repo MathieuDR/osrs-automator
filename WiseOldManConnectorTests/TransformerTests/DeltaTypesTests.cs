@@ -2,7 +2,7 @@
 using WiseOldManConnectorTests.Fixtures;
 using Xunit;
 
-namespace WiseOldManConnectorTests.TransformerTests; 
+namespace WiseOldManConnectorTests.TransformerTests;
 
 public class DeltaTypesTests : IClassFixture<MapperFixture> {
     private readonly MapperFixture _fixture;

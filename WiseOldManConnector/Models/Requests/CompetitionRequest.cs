@@ -1,6 +1,6 @@
 ﻿using WiseOldManConnector.Models.WiseOldMan.Enums;
 
-namespace WiseOldManConnector.Models.Requests; 
+namespace WiseOldManConnector.Models.Requests;
 
 public class CompetitionRequest : BasePagedRequest {
     public string Title { get; set; }
