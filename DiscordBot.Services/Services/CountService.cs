@@ -56,7 +56,7 @@ internal class CountService : RepositoryService, ICounterService {
         toAdd.CreatorId = creator.Id;
         toAdd.CreatorUsername = creator.Username;
 
-        var result = config.CountConfig.AddTreshold(toAdd);
+        var result = config.CountConfig.AddThreshold(toAdd);
 
         if (result) {
             var repo = GetRepository<IGuildConfigRepository>(creator.GuildId);
@@ -80,7 +80,7 @@ internal class CountService : RepositoryService, ICounterService {
 
     public Task<IReadOnlyList<CountThreshold>> GetThresholds(ulong guildId) {
         var config = GetGroupConfigWithValidCountConfig(guildId);
-        return Task.FromResult(config.CountConfig.Tresholds);
+        return Task.FromResult(config.CountConfig.Thresholds);
     }
 
     public Task<ulong> GetChannelForGuild(ulong guildId) {
