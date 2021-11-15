@@ -6,15 +6,15 @@ using DiscordBot.Data.Interfaces;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 
-namespace DiscordBot.Services; 
+namespace DiscordBot.Services;
 
 public class InteractiveCommandHandlerService {
+    private readonly IOptions<BotTeamConfiguration> _botTeamConfiguration;
     private readonly DiscordSocketClient _client;
     private readonly IApplicationCommandInfoRepository _commandInfoRepository;
     private readonly ILogger<InteractiveCommandHandlerService> _logger;
     private readonly IServiceProvider _provider;
     private readonly ICommandRegistrationService _registrationService;
-    private readonly IOptions<BotTeamConfiguration> _botTeamConfiguration;
     private readonly ICommandStrategy _strategy;
 
     public InteractiveCommandHandlerService(ILogger<InteractiveCommandHandlerService> logger,
@@ -37,7 +37,7 @@ public class InteractiveCommandHandlerService {
 
     private ulong GuildId => _botTeamConfiguration.Value.GuildId;
 
-  public async Task SetupAsync() {
+    public async Task SetupAsync() {
         if (_client.ConnectionState != ConnectionState.Connected) {
             _client.Connected += ClientOnConnected;
             return;
@@ -61,24 +61,22 @@ public class InteractiveCommandHandlerService {
             SocketMessageComponent socketMessageComponent => new MessageComponentContext(socketMessageComponent, _provider),
             _ => null
         };
-        
+
         if (ctx == null) {
             _logger.LogError("Could not create context stopping interaction");
             return;
         }
-        
-        
 
         _logger.LogInformation("[{ctx}] Command triggered", ctx);
         var result = await _strategy.HandleInteractiveCommand(ctx).ConfigureAwait(false);
 
         if (result.IsFailed) {
             var msg = result.CombineMessage();
-            
+
             if (string.IsNullOrWhiteSpace(msg)) {
                 msg = "Unknown error";
             }
-            
+
             _logger.LogWarning("[{ctx}] failed: {msg}", ctx, msg);
 
             if (arg is not SocketMessageComponent) {
@@ -92,7 +90,6 @@ public class InteractiveCommandHandlerService {
 
         _logger.LogInformation("[{ctx}] done", ctx);
     }
-   
 
     private async Task InitializeCommands() {
         var manageCommand = _provider.GetRequiredService<ManageCommandsApplicationCommandHandler>();
