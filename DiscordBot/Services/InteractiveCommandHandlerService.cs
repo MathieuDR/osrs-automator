@@ -61,8 +61,15 @@ public class InteractiveCommandHandlerService {
             SocketMessageComponent socketMessageComponent => new MessageComponentContext(socketMessageComponent, _provider),
             _ => null
         };
+        
+        if (ctx == null) {
+            _logger.LogError("Could not create context stopping interaction");
+            return;
+        }
+        
+        
 
-        _logger.LogInformation("[{ctx}] Command created", ctx);
+        _logger.LogInformation("[{ctx}] Command triggered", ctx);
         var result = await _strategy.HandleInteractiveCommand(ctx).ConfigureAwait(false);
 
         if (result.IsFailed) {
@@ -73,15 +80,19 @@ public class InteractiveCommandHandlerService {
             }
             
             _logger.LogWarning("[{ctx}] failed: {msg}", ctx, msg);
-            if (ctx is null || ctx.IsDeferred) {
-                await arg.FollowupAsync(msg);
-            } else {
-                await arg.RespondAsync(msg);
+
+            if (arg is not SocketMessageComponent) {
+                if (ctx.IsDeferred) {
+                    await arg.FollowupAsync(msg);
+                } else {
+                    await arg.RespondAsync(msg);
+                }
             }
         }
 
         _logger.LogInformation("[{ctx}] done", ctx);
     }
+   
 
     private async Task InitializeCommands() {
         var manageCommand = _provider.GetRequiredService<ManageCommandsApplicationCommandHandler>();
