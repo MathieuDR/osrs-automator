@@ -64,7 +64,7 @@ internal class Program {
                             logger.LogInformation(
                                 $"{metric.ToString()} {participant.Player.Username}, gained {participant.CompetitionDelta.Gained}");
 
-                            double treshold = metric.Category() switch {
+                            double threshold = metric.Category() switch {
                                 MetricTypeCategory.Skills => 10000,
                                 MetricTypeCategory.Bosses => 5,
                                 MetricTypeCategory.Activities => 10,
@@ -72,7 +72,7 @@ internal class Program {
                                 _ => throw new ArgumentOutOfRangeException()
                             };
 
-                            if (participant.CompetitionDelta.Gained <= treshold) {
+                            if (participant.CompetitionDelta.Gained <= threshold) {
                                 logger.LogInformation(
                                     $"{metric.ToString()} {participant.Player.Username}, inactive");
                                 continue;

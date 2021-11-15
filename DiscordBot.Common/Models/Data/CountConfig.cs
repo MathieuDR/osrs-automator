@@ -6,19 +6,20 @@ public class CountConfig {
     public ulong OutputChannelId { get; set; }
 
     // public for litedb
-    public List<CountThreshold> _tresholds { get; set; } = new();
+    [BsonField("Thresholds")]
+    public List<CountThreshold> _thresholds { get; set; } = new();
 
     [BsonIgnore]
-    public IReadOnlyList<CountThreshold> Tresholds => _tresholds.AsReadOnly();
+    public IReadOnlyList<CountThreshold> Thresholds => _thresholds.AsReadOnly();
 
-    public bool AddTreshold(CountThreshold toAdd) {
-        _tresholds.Add(toAdd);
-        _tresholds = _tresholds.OrderBy(x => x.Threshold).ToList();
+    public bool AddThreshold(CountThreshold toAdd) {
+        _thresholds.Add(toAdd);
+        _thresholds = _thresholds.OrderBy(x => x.Threshold).ToList();
         return true;
     }
 
     public bool RemoveAtIndex(int index) {
-        _tresholds.RemoveAt(index);
+        _thresholds.RemoveAt(index);
         return true;
     }
 }
