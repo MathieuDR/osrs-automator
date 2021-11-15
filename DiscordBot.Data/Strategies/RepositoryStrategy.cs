@@ -12,7 +12,7 @@ public class RepositoryStrategy : IRepositoryStrategy {
         _factories = factories ?? throw new ArgumentNullException(nameof(factories));
     }
 
-    public IRepository CreateRepository(Type type, ulong guildId) {
+    public IRepository GetOrCreateRepository(Type type, ulong guildId) {
         var factory = _factories
             .FirstOrDefault(f => f.AppliesTo(type, true));
 
@@ -23,7 +23,7 @@ public class RepositoryStrategy : IRepositoryStrategy {
         return factory.Create(guildId);
     }
 
-    public IRepository CreateRepository(Type type) {
+    public IRepository GetOrCreateRepository(Type type) {
         var factory = _factories
             .FirstOrDefault(f => f.AppliesTo(type, false));
 
@@ -34,11 +34,11 @@ public class RepositoryStrategy : IRepositoryStrategy {
         return factory.Create();
     }
 
-    public T CreateRepository<T>(ulong guildId) {
-        return (T) CreateRepository(typeof(T), guildId);
+    public T GetOrCreateRepository<T>(ulong guildId) {
+        return (T) GetOrCreateRepository(typeof(T), guildId);
     }
 
-    public T CreateRepository<T>() {
-        return (T) CreateRepository(typeof(T));
+    public T GetOrCreateRepository<T>() {
+        return (T) GetOrCreateRepository(typeof(T));
     }
 }

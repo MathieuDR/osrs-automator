@@ -28,7 +28,8 @@ public static partial class ServiceConfigurationExtensions {
             .AddTransient<IGroupService, GroupService>()
             .AddTransient<IOsrsHighscoreService, WiseOldManConnectorService>()
             .AddTransient<ICounterService, CountService>()
-            .AddTransient<IAutomatedDropperService, AutomatedDropperService>();
+            .AddTransient<IAutomatedDropperService, AutomatedDropperService>()
+            .AddTransient<IAuthorizationService, AuthorizationService>();
 
         return serviceCollection;
     }

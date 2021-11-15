@@ -18,7 +18,7 @@ using WiseOldManConnector.Models.Output;
 using WiseOldManConnector.Models.Requests;
 using WiseOldManConnector.Models.WiseOldMan.Enums;
 
-namespace DiscordBot.Services.Services; 
+namespace DiscordBot.Services.Services;
 
 internal class GroupService : RepositoryService, IGroupService {
     private readonly IWiseOldManCompetitionApi _competitionApi;
@@ -153,7 +153,7 @@ internal class GroupService : RepositoryService, IGroupService {
         }
 
         var t = typeof(GroupService);
-        
+
         var job = JobBuilder.Create(t)
             .WithIdentity(Guid.NewGuid().ToString())
             .Build();
@@ -176,11 +176,11 @@ internal class GroupService : RepositoryService, IGroupService {
         CreateCompetitionRequest request;
 
         var title = new StringBuilder();
-        if(string.IsNullOrWhiteSpace(name)) {
+        if (string.IsNullOrWhiteSpace(name)) {
             title.Append(womConfig.WomGroup.Name);
             title.Append(" - ");
-            title.Append(metric.GetEnumValueNameOrDefault());
-        }else {
+            title.Append(metric.ToFriendlyNameOrDefault());
+        } else {
             title.Append(name);
         }
 
@@ -191,12 +191,12 @@ internal class GroupService : RepositoryService, IGroupService {
             var groupMembers = (await _groupApi.GetMembers(womConfig.WomGroupId)).Data.ToList();
             womConfig.WomGroup.Members = groupMembers;
 
-            var repo = RepositoryStrategy.CreateRepository<GuildConfigRepository>(guild.Id);
+            var repo = RepositoryStrategy.GetOrCreateRepository<GuildConfigRepository>(guild.Id);
             var updateResult = repo.Update(womConfig);
 
 
             IEnumerable<CreateCompetitionRequest.Team> teams = new[] {
-                new CreateCompetitionRequest.Team("Placeholder", new[] {groupMembers.FirstOrDefault()?.Username})
+                new CreateCompetitionRequest.Team("Placeholder", new[] { groupMembers.FirstOrDefault()?.Username })
             };
 
             if (competitionType == CompetitionType.CountryTeams) {

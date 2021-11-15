@@ -12,7 +12,7 @@ public class ManageCommandsApplicationCommandHandler : ApplicationCommandHandler
     public ManageCommandsApplicationCommandHandler(ILogger<ManageCommandsApplicationCommandHandler> logger, IServiceProvider serviceProvider, IRepositoryStrategy repositoryStrategy) : base("commands",
         "Manage commands", logger) {
         _serviceProvider = serviceProvider;
-        _applicationCommandInfoRepository = repositoryStrategy.CreateRepository<IApplicationCommandInfoRepository>();
+        _applicationCommandInfoRepository = repositoryStrategy.GetOrCreateRepository<IApplicationCommandInfoRepository>();
     }
 
     public override Guid Id => Guid.Parse("FEFC7AEA-A180-4545-81C0-0010DF72258A");

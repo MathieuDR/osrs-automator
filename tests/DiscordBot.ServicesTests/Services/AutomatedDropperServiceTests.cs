@@ -68,7 +68,7 @@ public class AutomatedDropperServiceTests {
         //Arrange
         var repo = Substitute.For<IRuneScapeDropDataRepository>();
         var repositoryStrategy = Substitute.For<IRepositoryStrategy>();
-        repositoryStrategy.CreateRepository<IRuneScapeDropDataRepository>().Returns(repo);
+        repositoryStrategy.GetOrCreateRepository<IRuneScapeDropDataRepository>().Returns(repo);
         var scheduler = Substitute.For<IScheduler>();
         var schedulerFactory = Substitute.For<ISchedulerFactory>();
         schedulerFactory.GetAllSchedulers().Returns(new Collection<IScheduler>() {
@@ -118,7 +118,7 @@ public class AutomatedDropperServiceTests {
         //Arrange
         var repo = Substitute.For<IRuneScapeDropDataRepository>();
         var repositoryStrategy = Substitute.For<IRepositoryStrategy>();
-        repositoryStrategy.CreateRepository<IRuneScapeDropDataRepository>().Returns(repo);
+        repositoryStrategy.GetOrCreateRepository<IRuneScapeDropDataRepository>().Returns(repo);
         var scheduler = Substitute.For<IScheduler>();
         var schedulerFactory = Substitute.For<ISchedulerFactory>();
         schedulerFactory.GetAllSchedulers().Returns(new Collection<IScheduler>() {
@@ -138,7 +138,7 @@ public class AutomatedDropperServiceTests {
         //Arrange
         var repo = Substitute.For<IRuneScapeDropDataRepository>();
         var repositoryStrategy = Substitute.For<IRepositoryStrategy>();
-        repositoryStrategy.CreateRepository<IRuneScapeDropDataRepository>().Returns(repo);
+        repositoryStrategy.GetOrCreateRepository<IRuneScapeDropDataRepository>().Returns(repo);
         var scheduler = Substitute.For<IScheduler>();
         var schedulerFactory = Substitute.For<ISchedulerFactory>();
         schedulerFactory.GetAllSchedulers().Returns(new Collection<IScheduler>() {
@@ -188,7 +188,7 @@ public class AutomatedDropperServiceTests {
     public async Task WhenReceivingDropAndImageItMerges() {
         var repo = Substitute.For<IRuneScapeDropDataRepository>();
         var repositoryStrategy = Substitute.For<IRepositoryStrategy>();
-        repositoryStrategy.CreateRepository<IRuneScapeDropDataRepository>().Returns(repo);
+        repositoryStrategy.GetOrCreateRepository<IRuneScapeDropDataRepository>().Returns(repo);
         var scheduler = Substitute.For<IScheduler>();
         var schedulerFactory = Substitute.For<ISchedulerFactory>();
         schedulerFactory.GetAllSchedulers().Returns(new Collection<IScheduler>() {
@@ -238,7 +238,7 @@ public class AutomatedDropperServiceTests {
     public async Task WhenReceivingDropItSetsTask() {
         var repo = Substitute.For<IRuneScapeDropDataRepository>();
         var repositoryStrategy = Substitute.For<IRepositoryStrategy>();
-        repositoryStrategy.CreateRepository<IRuneScapeDropDataRepository>().Returns(repo);
+        repositoryStrategy.GetOrCreateRepository<IRuneScapeDropDataRepository>().Returns(repo);
         var scheduler = Substitute.For<IScheduler>();
         var schedulerFactory = Substitute.For<ISchedulerFactory>();
         schedulerFactory.GetAllSchedulers().Returns(new Collection<IScheduler>() {
@@ -265,7 +265,7 @@ public class AutomatedDropperServiceTests {
     public async Task WhenReceivingMultipleDropsItOnlySetsOneTask() {
         var repo = Substitute.For<IRuneScapeDropDataRepository>();
         var repositoryStrategy = Substitute.For<IRepositoryStrategy>();
-        repositoryStrategy.CreateRepository<IRuneScapeDropDataRepository>().Returns(repo);
+        repositoryStrategy.GetOrCreateRepository<IRuneScapeDropDataRepository>().Returns(repo);
         var scheduler = Substitute.For<IScheduler>();
         var schedulerFactory = Substitute.For<ISchedulerFactory>();
         schedulerFactory.GetAllSchedulers().Returns(new Collection<IScheduler>() {
@@ -308,7 +308,7 @@ public class AutomatedDropperServiceTests {
     public async Task WhenReceivingDropItSavesItToDb() {
         var repo = Substitute.For<IRuneScapeDropDataRepository>();
         var repositoryStrategy = Substitute.For<IRepositoryStrategy>();
-        repositoryStrategy.CreateRepository<IRuneScapeDropDataRepository>().Returns(repo);
+        repositoryStrategy.GetOrCreateRepository<IRuneScapeDropDataRepository>().Returns(repo);
         var scheduler = Substitute.For<IScheduler>();
         var schedulerFactory = Substitute.For<ISchedulerFactory>();
         schedulerFactory.GetAllSchedulers().Returns(new Collection<IScheduler>() {
@@ -338,7 +338,7 @@ public class AutomatedDropperServiceTests {
     public async Task WhenReceivingDropsItUsesActiveDropFromDb() {
         var repo = Substitute.For<IRuneScapeDropDataRepository>();
         var repositoryStrategy = Substitute.For<IRepositoryStrategy>();
-        repositoryStrategy.CreateRepository<IRuneScapeDropDataRepository>().Returns(repo);
+        repositoryStrategy.GetOrCreateRepository<IRuneScapeDropDataRepository>().Returns(repo);
         var scheduler = Substitute.For<IScheduler>();
         var schedulerFactory = Substitute.For<ISchedulerFactory>();
         schedulerFactory.GetAllSchedulers().Returns(new Collection<IScheduler>() {

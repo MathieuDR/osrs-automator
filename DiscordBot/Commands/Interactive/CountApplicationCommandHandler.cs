@@ -39,8 +39,8 @@ public class CountApplicationCommandHandler : ApplicationCommandHandler {
     #region add
     private async Task<Result> AddHandler(ApplicationCommandContext context) {
         var (additive, usersString, reason) = GetAddParameters(context);
-        var users = await GetUsers(context, usersString);
-
+        var users = (await usersString.GetUsersFromString(context)).users.ToList();
+        
         if (additive == 0) {
             Result.Fail("Additive cannot be 0");
         }
@@ -86,15 +86,6 @@ public class CountApplicationCommandHandler : ApplicationCommandHandler {
         var usersString = context.SubCommandOptions.GetOptionValue<string>(UsersOption);
         var reason = context.SubCommandOptions.GetOptionValue<string>(ReasonOption);
         return (additive, usersString, reason);
-    }
-
-    private static async Task<List<IUser>> GetUsers(ApplicationCommandContext context, string usersString) {
-        var stringParams = usersString.ToCollectionOfParameters()
-            .ToArray();
-
-        var (usersEnumerable, remainingArgs) = (await stringParams.GetUsersListFromStringWithRoles(context));
-        var users = usersEnumerable.ToList();
-        return users;
     }
 
     private async Task HandleNewCount(ApplicationCommandContext context, int startCount, int newCount, IGuildUser user) {

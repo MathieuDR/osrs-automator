@@ -35,8 +35,7 @@ internal class Program {
     private void ConfigureSerilogger() {
         Log.Logger = new LoggerConfiguration()
             .Enrich.FromLogContext()
-            .MinimumLevel
-            .Debug()
+            .MinimumLevel.Debug()
             .WriteTo.File(new JsonFormatter(), "logs/osrs_bot.log", rollingInterval: RollingInterval.Day)
             .WriteTo.Console(restrictedToMinimumLevel: LogEventLevel.Information)
             .CreateLogger();

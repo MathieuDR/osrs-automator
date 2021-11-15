@@ -16,12 +16,13 @@ public static class SlashCommandOptionBuilderExtensions {
         var enumOptions = Enum.GetValues<T>().ToList();
         return builder.AddEnumChoices(enumOptions);
     }
-    public static SlashCommandOptionBuilder AddEnumChoices<T>(this SlashCommandOptionBuilder builder, List<T> enumOptions) where  T : struct, Enum{
+    public static SlashCommandOptionBuilder AddEnumChoices<T>(this SlashCommandOptionBuilder builder, IEnumerable<T> enumOptions) where  T : struct, Enum{
         builder.WithType(ApplicationCommandOptionType.Integer);
-
-        for (var i = 0; i < enumOptions.Count; i++) {
-            T option = enumOptions[i];  
-            var name = option.GetEnumValueNameOrDefault();
+        var enumOptionsArr = enumOptions.ToArray();
+        
+        for (var i = 0; i < enumOptionsArr.Length; i++) {
+            T option = enumOptionsArr[i];  
+            var name = option.ToFriendlyNameOrDefault();
             var value = Unsafe.As<T, int>(ref option);
             builder.AddChoice(name, value);
         }

@@ -67,7 +67,7 @@ internal class CompetitionConnector : BaseConnecter, IWiseOldManCompetitionApi {
     public async Task<ConnectorResponse<Competition>> View(int id, MetricType metric) {
         var request = GetNewRestRequest("{id}");
         request.AddParameter("id", id, ParameterType.UrlSegment);
-        request.AddParameter("metric", metric.GetEnumValueNameOrDefault(), ParameterType.QueryString);
+        request.AddParameter("metric", metric.ToFriendlyNameOrDefault(), ParameterType.QueryString);
 
         var result = await ExecuteRequest<WOMCompetition>(request);
         return GetResponse<Competition>(result);

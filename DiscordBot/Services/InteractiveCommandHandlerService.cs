@@ -1,3 +1,4 @@
+using Common.Extensions;
 using Discord.Net;
 using DiscordBot.Commands.Interactive;
 using DiscordBot.Configuration;
@@ -65,10 +66,13 @@ public class InteractiveCommandHandlerService {
         var result = await _strategy.HandleInteractiveCommand(ctx).ConfigureAwait(false);
 
         if (result.IsFailed) {
-            var msg = string.Join(", ",
-                result.Errors.Where(x => !x.HasMetadata("404", o => (bool)(o ?? false))).Select(x => x.Message));
+            var msg = result.CombineMessage();
+            
+            if (string.IsNullOrWhiteSpace(msg)) {
+                msg = "Unknown error";
+            }
+            
             _logger.LogWarning("[{ctx}] failed: {msg}", ctx, msg);
-
             if (ctx is null || ctx.IsDeferred) {
                 await arg.FollowupAsync(msg);
             } else {

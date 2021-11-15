@@ -133,7 +133,7 @@ internal class PlayerConnector : BaseConnecter, IWiseOldManPlayerApi {
     public async Task<ConnectorCollectionResponse<Snapshot>> Snapshots(int id, Period period) {
         var request = GetNewRestRequest("/{id}/snapshots");
         request.AddParameter("id", id, ParameterType.UrlSegment);
-        request.AddParameter("period", period.GetEnumValueNameOrDefault());
+        request.AddParameter("period", period.ToFriendlyNameOrDefault());
 
         var result = await ExecuteCollectionRequest<WOMSnapshot>(request);
         return GetResponse<WOMSnapshot, Snapshot>(result);
@@ -142,7 +142,7 @@ internal class PlayerConnector : BaseConnecter, IWiseOldManPlayerApi {
     public async Task<ConnectorCollectionResponse<Snapshot>> Snapshots(string username, Period period) {
         var request = GetNewRestRequest("/username/{username}/snapshots");
         request.AddParameter("username", username, ParameterType.UrlSegment);
-        request.AddParameter("period", period.GetEnumValueNameOrDefault());
+        request.AddParameter("period", period.ToFriendlyNameOrDefault());
 
         var result = await ExecuteCollectionRequest<WOMSnapshot>(request);
         return GetResponse<WOMSnapshot, Snapshot>(result);
@@ -163,7 +163,7 @@ internal class PlayerConnector : BaseConnecter, IWiseOldManPlayerApi {
     public async Task<ConnectorResponse<Deltas>> Gained(int id, Period period) {
         var request = GetNewRestRequest("/{id}/gained");
         request.AddParameter("id", id, ParameterType.UrlSegment);
-        request.AddParameter("period", period.GetEnumValueNameOrDefault());
+        request.AddParameter("period", period.ToFriendlyNameOrDefault());
 
         var result = await ExecuteRequest<DeltaResponse>(request);
         return GetResponse<Deltas>(result);
@@ -180,7 +180,7 @@ internal class PlayerConnector : BaseConnecter, IWiseOldManPlayerApi {
     public async Task<ConnectorResponse<Deltas>> Gained(string username, Period period) {
         var request = GetNewRestRequest("/username/{username}/gained");
         request.AddParameter("username", username, ParameterType.UrlSegment);
-        request.AddParameter("period", period.GetEnumValueNameOrDefault());
+        request.AddParameter("period", period.ToFriendlyNameOrDefault());
 
         var result = await ExecuteRequest<DeltaResponse>(request);
         return GetResponse<Deltas>(result);
@@ -227,11 +227,11 @@ internal class PlayerConnector : BaseConnecter, IWiseOldManPlayerApi {
         request.AddParameter("username", username, ParameterType.UrlSegment);
 
         if (metric.HasValue) {
-            request.AddParameter("metric", metric.Value.GetEnumValueNameOrDefault());
+            request.AddParameter("metric", metric.Value.ToFriendlyNameOrDefault());
         }
 
         if (period.HasValue) {
-            request.AddParameter("period", period.Value.GetEnumValueNameOrDefault());
+            request.AddParameter("period", period.Value.ToFriendlyNameOrDefault());
         }
 
         var queryResult = await ExecuteCollectionRequest<WOMRecord>(request);
@@ -251,11 +251,11 @@ internal class PlayerConnector : BaseConnecter, IWiseOldManPlayerApi {
         request.AddParameter("id", id, ParameterType.UrlSegment);
 
         if (metric.HasValue) {
-            request.AddParameter("metric", metric.Value.GetEnumValueNameOrDefault());
+            request.AddParameter("metric", metric.Value.ToFriendlyNameOrDefault());
         }
 
         if (period.HasValue) {
-            request.AddParameter("period", period.Value.GetEnumValueNameOrDefault());
+            request.AddParameter("period", period.Value.ToFriendlyNameOrDefault());
         }
 
         var result = await ExecuteCollectionRequest<WOMRecord>(request);

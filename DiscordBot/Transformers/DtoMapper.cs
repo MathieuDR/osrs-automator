@@ -18,14 +18,14 @@ public static class DiscordMapper {
 
     public static Guild ToGuildDto(this IGuildUser user) {
         return new Guild {
-            Id = user.GuildId,
+            GuildId = user.GuildId,
             Name = user.Guild.Name
         };
     }
 
     public static Guild ToGuildDto(this IGuild guild) {
         return new Guild {
-            Id = guild.Id,
+            GuildId = guild.Id,
             Name = guild.Name
         };
     }
@@ -34,7 +34,8 @@ public static class DiscordMapper {
         return new Role {
             Id = role.Id,
             Name = role.Name,
-            Color = role.Color
+            Color = role.Color,
+            GuildId = role.Guild.Id
         };
     }
 
