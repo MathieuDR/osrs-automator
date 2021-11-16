@@ -18,9 +18,9 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <Compile Remove="ImageProcessor\**"/>
-        <EmbeddedResource Remove="ImageProcessor\**"/>
-        <None Remove="ImageProcessor\**"/>
+        <Compile Remove="ImageProcessor\**" />
+        <EmbeddedResource Remove="ImageProcessor\**" />
+        <None Remove="ImageProcessor\**" />
         <None Update="appsettings.json">
             <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
         </None>
@@ -33,54 +33,54 @@
         <None Update="appsettings.Development.json">
             <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
         </None>
-        <Compile Remove="Modules\AdminModule.cs"/>
-        <Compile Remove="Modules\BaseEmbeddedResponseModule.cs"/>
-        <Compile Remove="Modules\BaseWaitMessageEmbeddedResponseModule.cs"/>
-        <Compile Remove="Modules\CountModule.cs"/>
-        <Compile Remove="Modules\HelpModule.cs"/>
-        <Compile Remove="Modules\JobTestmodule.cs"/>
-        <Compile Remove="Modules\PlayerModule.cs"/>
-        <Compile Remove="Paginator\CustomActionsPaginatedAppearanceOptions.cs"/>
-        <Compile Remove="Paginator\CustomPaginatedMessageCallback.cs"/>
-        <Compile Remove="Paginator\PaginatedStringWithContext.cs"/>
-        <Compile Remove="Models\CustomPaginatedMessage.cs"/>
-        <Compile Remove="Helpers\WiseOldManConnectorHelper.cs"/>
-        <Compile Remove="Images\**"/>
-        <EmbeddedResource Remove="Images\**"/>
-        <None Remove="Images\**"/>
-        <Compile Remove="Paginator\**"/>
-        <EmbeddedResource Remove="Paginator\**"/>
-        <None Remove="Paginator\**"/>
-        <Compile Remove="Commands\Modules\AdminModule.cs"/>
-        <Compile Remove="Commands\Modules\BaseEmbeddedResponseModule.cs"/>
-        <Compile Remove="Commands\Modules\BaseWaitMessageEmbeddedResponseModule.cs"/>
-        <Compile Remove="Commands\Modules\CountModule.cs"/>
-        <Compile Remove="Commands\Modules\HelpModule.cs"/>
-        <Compile Remove="Commands\Modules\JobTestmodule.cs"/>
-        <Compile Remove="Commands\Modules\PlayerModule.cs"/>
+        <Compile Remove="Modules\AdminModule.cs" />
+        <Compile Remove="Modules\BaseEmbeddedResponseModule.cs" />
+        <Compile Remove="Modules\BaseWaitMessageEmbeddedResponseModule.cs" />
+        <Compile Remove="Modules\CountModule.cs" />
+        <Compile Remove="Modules\HelpModule.cs" />
+        <Compile Remove="Modules\JobTestmodule.cs" />
+        <Compile Remove="Modules\PlayerModule.cs" />
+        <Compile Remove="Paginator\CustomActionsPaginatedAppearanceOptions.cs" />
+        <Compile Remove="Paginator\CustomPaginatedMessageCallback.cs" />
+        <Compile Remove="Paginator\PaginatedStringWithContext.cs" />
+        <Compile Remove="Models\CustomPaginatedMessage.cs" />
+        <Compile Remove="Helpers\WiseOldManConnectorHelper.cs" />
+        <Compile Remove="Images\**" />
+        <EmbeddedResource Remove="Images\**" />
+        <None Remove="Images\**" />
+        <Compile Remove="Paginator\**" />
+        <EmbeddedResource Remove="Paginator\**" />
+        <None Remove="Paginator\**" />
+        <Compile Remove="Commands\Modules\AdminModule.cs" />
+        <Compile Remove="Commands\Modules\BaseEmbeddedResponseModule.cs" />
+        <Compile Remove="Commands\Modules\BaseWaitMessageEmbeddedResponseModule.cs" />
+        <Compile Remove="Commands\Modules\CountModule.cs" />
+        <Compile Remove="Commands\Modules\HelpModule.cs" />
+        <Compile Remove="Commands\Modules\JobTestmodule.cs" />
+        <Compile Remove="Commands\Modules\PlayerModule.cs" />
     </ItemGroup>
 
     <ItemGroup>
-        <None Remove=".gitignore"/>
+        <None Remove=".gitignore" />
     </ItemGroup>
 
     <ItemGroup>
-        <PackageReference Include="Discord.Net.Labs" Version="3.2.0"/>
-        <PackageReference Include="Fergun.Interactive.Labs" Version="1.2.4"/>
-        <PackageReference Include="HashDepot" Version="2.0.3"/>
-        <PackageReference Include="LiteDB" Version="5.0.11"/>
-        <PackageReference Include="Microsoft.Extensions.Configuration" Version="6.0.0"/>
-        <PackageReference Include="Microsoft.Extensions.Configuration.Binder" Version="6.0.0"/>
-        <PackageReference Include="Microsoft.Extensions.Configuration.EnvironmentVariables" Version="6.0.0"/>
-        <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="6.0.0"/>
-        <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="6.0.0"/>
-        <PackageReference Include="Microsoft.Extensions.Hosting" Version="6.0.0"/>
-        <PackageReference Include="Microsoft.Extensions.Logging.Console" Version="6.0.0"/>
-        <PackageReference Include="Serilog" Version="2.10.0"/>
-        <PackageReference Include="Serilog.Extensions.Logging" Version="3.1.0"/>
-        <PackageReference Include="Serilog.Sinks.Console" Version="4.0.0"/>
-        <PackageReference Include="Serilog.Sinks.File" Version="5.0.0"/>
-        <PackageReference Include="System.Drawing.Common" Version="6.0.0"/>
+        <PackageReference Include="Discord.Net.Labs" Version="3.2.0" />
+        <PackageReference Include="Fergun.Interactive.Labs" Version="1.2.4" />
+        <PackageReference Include="HashDepot" Version="2.0.3" />
+        <PackageReference Include="LiteDB" Version="5.0.11" />
+        <PackageReference Include="Microsoft.Extensions.Configuration" Version="6.0.0" />
+        <PackageReference Include="Microsoft.Extensions.Configuration.Binder" Version="6.0.0" />
+        <PackageReference Include="Microsoft.Extensions.Configuration.EnvironmentVariables" Version="6.0.0" />
+        <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="6.0.0" />
+        <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="6.0.0" />
+        <PackageReference Include="Microsoft.Extensions.Hosting" Version="6.0.0" />
+        <PackageReference Include="Microsoft.Extensions.Logging.Console" Version="6.0.0" />
+        <PackageReference Include="Serilog" Version="2.10.0" />
+        <PackageReference Include="Serilog.Extensions.Logging" Version="3.1.0" />
+        <PackageReference Include="Serilog.Sinks.Console" Version="4.0.0" />
+        <PackageReference Include="Serilog.Sinks.File" Version="5.0.0" />
+        <PackageReference Include="System.Drawing.Common" Version="6.0.0" />
     </ItemGroup>
 
     <ItemGroup>
@@ -90,9 +90,9 @@
     </ItemGroup>
 
     <ItemGroup>
-        <ProjectReference Include="..\DiscordBot.Common\DiscordBot.Common.csproj"/>
-        <ProjectReference Include="..\DiscordBot.Services\DiscordBot.Services.csproj"/>
-        <ProjectReference Include="..\WiseOldManConnector\WiseOldManConnector.csproj"/>
+        <ProjectReference Include="..\DiscordBot.Common\DiscordBot.Common.csproj" />
+        <ProjectReference Include="..\DiscordBot.Services\DiscordBot.Services.csproj" />
+        <ProjectReference Include="..\WiseOldManConnector\WiseOldManConnector.csproj" />
     </ItemGroup>
 
     <ItemGroup>

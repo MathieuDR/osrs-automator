@@ -70,10 +70,6 @@ public class CreateCompetitionCommandHandler : ApplicationCommandHandler {
         return Result.Ok();
     }
 
-    public override Task<Result> HandleComponentAsync(MessageComponentContext context) {
-        throw new NotImplementedException();
-    }
-
     protected override Task<SlashCommandBuilder> ExtendSlashCommandBuilder(SlashCommandBuilder builder) {
         builder
             .AddOption(StartDateOption, ApplicationCommandOptionType.String, "The start date and time", true)

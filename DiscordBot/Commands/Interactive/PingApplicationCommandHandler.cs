@@ -45,8 +45,4 @@ public class PingApplicationCommandHandler : ApplicationCommandHandler {
         await context.RespondAsync(builder.ToString());
         return Result.Ok();
     }
-
-    public override Task<Result> HandleComponentAsync(MessageComponentContext context) {
-        throw new NotImplementedException();
-    }
 }

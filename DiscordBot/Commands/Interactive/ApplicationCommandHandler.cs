@@ -24,9 +24,14 @@ public abstract class ApplicationCommandHandler : IApplicationCommandHandler {
         return builder.Build();
     }
 
-    public abstract Task<Result> HandleCommandAsync(ApplicationCommandContext context);
+    public virtual Task<Result> HandleCommandAsync(ApplicationCommandContext context) =>
+        throw new InvalidOperationException("Handling is not supported");
 
-    public abstract Task<Result> HandleComponentAsync(MessageComponentContext context);
+    public virtual Task<Result> HandleComponentAsync(MessageComponentContext context) =>
+        throw new InvalidOperationException("Handling is not supported");
+    
+    public virtual Task<Result> HandleAutocompleteAsync(AutocompleteCommandContext context) =>
+        throw new InvalidOperationException("Handling is not supported");
 
     public virtual bool CanHandle(ApplicationCommandContext context) {
         return string.Equals(context.InnerContext.Data.Name, Name, StringComparison.InvariantCultureIgnoreCase);
@@ -34,6 +39,10 @@ public abstract class ApplicationCommandHandler : IApplicationCommandHandler {
 
     public bool CanHandle(MessageComponentContext context) {
         return string.Equals(context.CustomIdParts.FirstOrDefault() ?? "", Name, StringComparison.InvariantCultureIgnoreCase);
+    }
+    
+    public bool CanHandle(AutocompleteCommandContext context) {
+        return string.Equals(context.CommandName ?? "", Name, StringComparison.InvariantCultureIgnoreCase);
     }
 
     public async Task<uint> GetCommandBuilderHash() {
