@@ -87,7 +87,7 @@ public abstract class BaseInteractiveContext<T> : BaseInteractiveContext where T
         return InnerContext.DeferAsync(ephemeral, options);
     }
 
-    public Task RespondAsync(
+    public virtual Task RespondAsync(
         string text = null,
         IEnumerable<Embed> embeds = null,
         bool isTts = false,

@@ -1,6 +1,7 @@
 using System.Text;
 using DiscordBot.Common.Models.Decorators;
 using DiscordBot.Common.Models.Enums;
+using TimeZoneNames;
 
 namespace DiscordBot.Commands.Interactive;
 
@@ -10,12 +11,16 @@ public class ConfigurationApplicationCommandHandler : ApplicationCommandHandler 
     private const string TimeZoneOption = "timezone";
     private const string WomGroupId = "group-id";
     private const string WomVerificationCode = "verification-code";
-    
+    private readonly IDictionary<string, string> _timeZones;
+
+
     private readonly IGroupService _groupService;
 
     public ConfigurationApplicationCommandHandler(ILogger<ConfigurationApplicationCommandHandler> logger, IGroupService groupService) : base(
         "Configure", "Configure this bot for this server", logger) {
         _groupService = groupService;
+
+        _timeZones = TZNames.GetDisplayNames("en-GB");
     }
 
     public override Guid Id => Guid.Parse("C94327FC-2FBE-484B-B054-E1F88A02895C");
@@ -32,6 +37,22 @@ public class ConfigurationApplicationCommandHandler : ApplicationCommandHandler 
         };
 
         return result;
+    }
+
+    public override Task<Result> HandleAutocompleteAsync(AutocompleteCommandContext context) {
+        if (context.SubCommand == SetServerSubCommandName && context.CurrentOption == TimeZoneOption) {
+            Logger.LogInformation("Searching {tzCount} timezones for the string '{string}'", _timeZones.Count, context.CurrentOptionAsString);
+            
+            var opts = _timeZones.Where(x => x.Value.ToLowerInvariant().Contains(context.CurrentOptionAsString.ToLowerInvariant()))
+                .Select(x => x.Value).ToList();
+            
+            Logger.LogInformation("Found the following {@opts}", opts);
+            
+            _ = context.RespondAsync(opts);
+            return Task.FromResult(Result.Ok());
+        }
+
+        return Task.FromResult(Result.Fail("Could not find correct auto complete option"));
     }
 
     private async Task<Result> ViewHandler(ApplicationCommandContext context) {
@@ -53,6 +74,8 @@ public class ConfigurationApplicationCommandHandler : ApplicationCommandHandler 
     private async Task<Result> SetConfiguration(ApplicationCommandContext context) {
         var groupId = (int)context.SubCommandOptions.GetOptionValue<long>(WomGroupId);
         var verificationCode = context.SubCommandOptions.GetOptionValue<string>(WomVerificationCode);
+        var timeZone = context.SubCommandOptions.GetOptionValue<string>(TimeZoneOption);
+        
 
         if (groupId <= 0) {
             return Result.Fail("Group id must be higher then 0");
@@ -61,6 +84,10 @@ public class ConfigurationApplicationCommandHandler : ApplicationCommandHandler 
         // Needs more verification
         if (string.IsNullOrEmpty(verificationCode)) {
             return Result.Fail("Group verification must be set");
+        }
+
+        if (!string.IsNullOrWhiteSpace(timeZone)) {
+            var result = HandleNewTimezone(timeZone);
         }
 
         ItemDecorator<Group> decoratedGroup;
@@ -74,6 +101,16 @@ public class ConfigurationApplicationCommandHandler : ApplicationCommandHandler 
             .WithEmbedFrom("Success", $"Group set to {decoratedGroup.Item.Name}", builder => builder
                 .AddWiseOldMan(decoratedGroup)).RespondAsync();
 
+        return Result.Ok();
+    }
+
+    private Result HandleNewTimezone(string timeZone) {
+        var tz = _timeZones.FirstOrDefault(x => x.Value == timeZone);
+        
+        if(tz is null) {
+            return Result.Fail("Cannot find the timezone: " + timeZone + ". Please use the auto complete feature.");
+        }
+        
         return Result.Ok();
     }
 
