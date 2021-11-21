@@ -32,11 +32,7 @@ public static partial class ServiceConfigurationExtensions {
                 // to have public no-arg constructor
                 // the MS DI is expected to produce transient job instances
                 // this WONT'T work with scoped services like EF Core's DbContext
-                q.UseMicrosoftDependencyInjectionJobFactory(options => {
-                    // if we don't have the job in DI, allow fallback 
-                    // to configure via default constructor
-                    options.AllowDefaultConstructor = true;
-                });
+                q.UseMicrosoftDependencyInjectionJobFactory();
 
                 q.UseDefaultThreadPool(tp => { tp.MaxConcurrency = 10; });
 
