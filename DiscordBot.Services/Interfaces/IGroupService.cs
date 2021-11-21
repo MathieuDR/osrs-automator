@@ -11,6 +11,7 @@ namespace DiscordBot.Services.Interfaces;
 
 public interface IGroupService {
     public Task<ItemDecorator<Group>> SetGroupForGuild(GuildUser guildUser, int womGroupId, string verificationCode);
+    public ValueTask<Result> SetTimeZone(GuildUser guildUser, string key);
     Task SetAutoAdd(GuildUser guildUser, bool autoAdd);
     Task SetAutomationJobChannel(JobType jobType, GuildUser user, Channel messageChannel);
     Task<bool> ToggleAutomationJob(JobType jobType, Guild guild);
@@ -21,6 +22,9 @@ public interface IGroupService {
     Task QueueJob(JobType jobType);
 
     Task<Result<ItemDecorator<Competition>>> CreateCompetition(Guild guild, DateTimeOffset start, DateTimeOffset end, MetricType metric,
+        CompetitionType competitionType, string name = null);
+    
+    Task<Result<ItemDecorator<Competition>>> CreateCompetition(Guild guild, DateTime start, DateTime end, MetricType metric,
         CompetitionType competitionType, string name = null);
 
     Task<Result<CommandRoleConfig>> GetCommandRoleConfig(Guild guild);

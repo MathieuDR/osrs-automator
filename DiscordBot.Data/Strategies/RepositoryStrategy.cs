@@ -31,7 +31,7 @@ public class RepositoryStrategy : IRepositoryStrategy {
 
         return factory.Create();
     }
-
+    
     public T GetOrCreateRepository<T>(ulong guildId) {
         return (T)GetOrCreateRepository(typeof(T), guildId);
     }

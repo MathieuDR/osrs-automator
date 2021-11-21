@@ -1,4 +1,5 @@
 ﻿using DiscordBot.Common.Models.Data.Base;
+using LiteDB;
 using WiseOldManConnector.Models.Output;
 
 namespace DiscordBot.Common.Models.Data;
@@ -12,6 +13,7 @@ public class GuildConfig : BaseGuildModel {
 
     public string WomVerificationCode { get; set; }
     public Group WomGroup { get; set; }
+    public string Timezone { get; set; }
     public bool AutoAddNewAccounts { get; set; } = false;
     public AutomatedMessagesConfig AutomatedMessagesConfig { get; set; } = new();
     public CountConfig CountConfig { get; set; }

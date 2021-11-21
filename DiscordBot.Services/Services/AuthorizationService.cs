@@ -93,7 +93,7 @@ internal class AuthorizationService : BaseGuildConfigurationService, IAuthorizat
                 return;
             }
 
-            dictionary.Add(id, role);
+            dictionary.Add(id, roleToUpdate);
         } else {
             if (removing) {
                 role &= ~roleToUpdate;

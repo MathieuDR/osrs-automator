@@ -1,6 +1,8 @@
 using System.Text;
+using DiscordBot.Common.Dtos.Discord;
 using DiscordBot.Common.Models.Decorators;
 using DiscordBot.Common.Models.Enums;
+using TimeZoneConverter;
 using TimeZoneNames;
 
 namespace DiscordBot.Commands.Interactive;
@@ -86,8 +88,9 @@ public class ConfigurationApplicationCommandHandler : ApplicationCommandHandler 
             return Result.Fail("Group verification must be set");
         }
 
+        Result tzResult = Result.Ok();
         if (!string.IsNullOrWhiteSpace(timeZone)) {
-            var result = HandleNewTimezone(timeZone);
+            tzResult = await HandleNewTimezone(context.GuildUser.ToGuildUserDto(), timeZone);
         }
 
         ItemDecorator<Group> decoratedGroup;
@@ -101,17 +104,17 @@ public class ConfigurationApplicationCommandHandler : ApplicationCommandHandler 
             .WithEmbedFrom("Success", $"Group set to {decoratedGroup.Item.Name}", builder => builder
                 .AddWiseOldMan(decoratedGroup)).RespondAsync();
 
-        return Result.Ok();
+        return tzResult;
     }
 
-    private Result HandleNewTimezone(string timeZone) {
-        var tz = _timeZones.FirstOrDefault(x => x.Value == timeZone);
+    private async Task<Result> HandleNewTimezone(GuildUser caller, string timeZone) {
+        var key = _timeZones.FirstOrDefault(x => String.Equals(x.Value, timeZone, StringComparison.InvariantCultureIgnoreCase)).Key;
         
-        if(tz is null) {
+        if(key is null) {
             return Result.Fail("Cannot find the timezone: " + timeZone + ". Please use the auto complete feature.");
         }
-        
-        return Result.Ok();
+
+        return await _groupService.SetTimeZone(caller, key);
     }
 
     protected override Task<SlashCommandBuilder> ExtendSlashCommandBuilder(SlashCommandBuilder builder) {

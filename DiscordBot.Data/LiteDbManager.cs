@@ -7,7 +7,7 @@ using Serilog.Context;
 
 namespace DiscordBot.Data;
 
-public class LiteDbManager {
+public class LiteDbManager: IDisposable {
     private readonly object _commonLock = new();
     private readonly object _createLock = new();
     private readonly Dictionary<ulong, LiteDatabase> _databases = new();
@@ -61,5 +61,20 @@ public class LiteDbManager {
         }
 
         return liteDatabase;
+    }
+
+    public void ClearDb() {
+        _commonDatabase?.Dispose();
+        _commonDatabase = null;
+        foreach (var liteDatabase in _databases) {
+            liteDatabase.Value.Dispose();
+        }
+        
+        _databases.Clear();
+    }
+
+    public void Dispose() {
+        _logger.LogInformation("Disposing");
+        ClearDb();
     }
 }
