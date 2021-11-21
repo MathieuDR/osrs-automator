@@ -5,10 +5,10 @@ using Discord.Commands;
 namespace DiscordBot.Helpers.Extensions;
 
 public static class RoleReader {
-    public static async Task<TypeReaderResult> ReadRolesAsync<T, TInteraction>(this BaseInteractiveContext<TInteraction> context, string input)
+    public static Task<TypeReaderResult> ReadRolesAsync<T, TInteraction>(this BaseInteractiveContext<TInteraction> context, string input)
         where T : class, IRole where TInteraction : SocketInteraction {
         if (string.IsNullOrWhiteSpace(input)) {
-            return TypeReaderResult.FromError(CommandError.ObjectNotFound, "Input emptly");
+            return Task.FromResult(TypeReaderResult.FromError(CommandError.ObjectNotFound, "Input emptly"));
         }
 
         if (context.Guild != null) {
@@ -37,11 +37,11 @@ public static class RoleReader {
             }
 
             if (results.Count > 0) {
-                return TypeReaderResult.FromSuccess(results.Values.ToImmutableArray());
+                return Task.FromResult(TypeReaderResult.FromSuccess(results.Values.ToImmutableArray()));
             }
         }
 
-        return TypeReaderResult.FromError(CommandError.ObjectNotFound, "Role not found.");
+        return Task.FromResult(TypeReaderResult.FromError(CommandError.ObjectNotFound, "Role not found."));
     }
 
     private static void AddResult(Dictionary<ulong, TypeReaderValue> results, IRole user, float score) {
