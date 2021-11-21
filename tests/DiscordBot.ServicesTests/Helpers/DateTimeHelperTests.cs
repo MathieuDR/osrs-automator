@@ -28,6 +28,24 @@ public class DateTimeHelperTests {
     }
     
     [Fact]
+    public void CanGetCorrectDateWithNoOffsetForNullKey() {
+        var date = new DateTime(2021, 11, 21, 14, 0, 0);
+        var dateTimeOffset = date.GetCorrectDateTimeOffset(null);
+
+        dateTimeOffset.Should().NotBe(default);
+        dateTimeOffset.Offset.Should().Be(TimeSpan.Zero);
+    }
+    
+    [Fact]
+    public void CanGetCorrectDateWithNoOffsetForEmptyKey() {
+        var date = new DateTime(2021, 11, 21, 14, 0, 0);
+        var dateTimeOffset = date.GetCorrectDateTimeOffset("");
+
+        dateTimeOffset.Should().NotBe(default);
+        dateTimeOffset.Offset.Should().Be(TimeSpan.Zero);
+    }
+    
+    [Fact]
     public void HawaiianStandardTimeDoesNotHaveDST() {
         var tz = TZConvert.GetTimeZoneInfo(HawaiianTimeKey);
         tz.SupportsDaylightSavingTime.Should().BeFalse();
