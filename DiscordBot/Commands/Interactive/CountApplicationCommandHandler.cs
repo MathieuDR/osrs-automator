@@ -35,10 +35,6 @@ public class CountApplicationCommandHandler : ApplicationCommandHandler {
         return result;
     }
 
-    public override Task<Result> HandleComponentAsync(MessageComponentContext context) {
-        throw new NotImplementedException();
-    }
-
     protected override Task<SlashCommandBuilder> ExtendSlashCommandBuilder(SlashCommandBuilder builder) {
         builder
             .AddOption(new SlashCommandOptionBuilder()

@@ -72,6 +72,9 @@ public class InteractiveCommandHandlerService {
 
                 ctx = new MessageComponentContext(socketMessageComponent, _provider);
                 break;
+            case SocketAutocompleteInteraction autocompleteInteraction:
+                ctx = new AutocompleteCommandContext(autocompleteInteraction, _provider);
+                break;
             default:
                 ctx = null;
                 break;

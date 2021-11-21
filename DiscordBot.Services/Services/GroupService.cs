@@ -55,6 +55,14 @@ internal class GroupService : RepositoryService, IGroupService {
         return group.Decorate();
     }
 
+    public ValueTask<Result> SetTimeZone(GuildUser guildUser, string key) {
+        GuildConfig config = GetGroupConfig(guildUser.GuildId);
+        config.Timezone = key;
+        var repo = GetRepository<GuildConfigRepository>(guildUser.GuildId);
+        repo.Update(config);
+        return ValueTask.FromResult(Result.Ok());
+    }
+
     public async Task SetAutoAdd(GuildUser guildUser, bool autoAdd) {
         var repo = GetRepository<GuildConfigRepository>(guildUser.GuildId);
         var config = GetGroupConfig(guildUser.GuildId);
@@ -164,20 +172,14 @@ internal class GroupService : RepositoryService, IGroupService {
         await scheduler.ScheduleJob(job, trigger);
     }
 
-    public async Task<Result<ItemDecorator<Competition>>> CreateCompetition(Guild guild, DateTimeOffset start,
+    private async Task<Result<ItemDecorator<Competition>>> CreateCompetition(GuildConfig config, DateTimeOffset start,
         DateTimeOffset end, MetricType metric, CompetitionType competitionType, string name) {
-        GuildConfig womConfig = null;
-        try {
-            womConfig = GetGroupConfig(guild.Id);
-        } catch (Exception e) {
-            return Result.Fail(new ExceptionalError("Could not retrieve configuration", e));
-        }
-
+        
         CreateCompetitionRequest request;
 
         var title = new StringBuilder();
         if (string.IsNullOrWhiteSpace(name)) {
-            title.Append(womConfig.WomGroup.Name);
+            title.Append(config.WomGroup.Name);
             title.Append(" - ");
             title.Append(metric.ToFriendlyNameOrDefault());
         } else {
@@ -185,14 +187,14 @@ internal class GroupService : RepositoryService, IGroupService {
         }
 
         if (competitionType == CompetitionType.Normal) {
-            request = new CreateCompetitionRequest(title.ToString(), metric, start.DateTime, end.DateTime,
-                womConfig.WomGroupId, womConfig.WomVerificationCode);
+            request = new CreateCompetitionRequest(title.ToString(), metric, start.UtcDateTime, end.UtcDateTime,
+                config.WomGroupId, config.WomVerificationCode);
         } else {
-            var groupMembers = (await _groupApi.GetMembers(womConfig.WomGroupId)).Data.ToList();
-            womConfig.WomGroup.Members = groupMembers;
+            var groupMembers = (await _groupApi.GetMembers(config.WomGroupId)).Data.ToList();
+            config.WomGroup.Members = groupMembers;
 
-            var repo = RepositoryStrategy.GetOrCreateRepository<GuildConfigRepository>(guild.Id);
-            var updateResult = repo.Update(womConfig);
+            var repo = RepositoryStrategy.GetOrCreateRepository<GuildConfigRepository>(config.GuildId);
+            var updateResult = repo.Update(config);
 
 
             IEnumerable<CreateCompetitionRequest.Team> teams = new[] {
@@ -207,8 +209,8 @@ internal class GroupService : RepositoryService, IGroupService {
                     .Select(x => new CreateCompetitionRequest.Team(x));
             }
 
-            request = new CreateCompetitionRequest(title.ToString(), metric, start.DateTime, end.DateTime,
-                womConfig.WomGroupId, womConfig.WomVerificationCode, teams);
+            request = new CreateCompetitionRequest(title.ToString(), metric, start.UtcDateTime, end.UtcDateTime,
+                config.WomGroupId, config.WomVerificationCode, teams);
         }
 
         try {
@@ -218,6 +220,31 @@ internal class GroupService : RepositoryService, IGroupService {
             Logger.LogWarning(e, "Could not create competition");
             return Result.Fail(new ExceptionalError("Could not create competition", e));
         }
+    }
+
+    public async Task<Result<ItemDecorator<Competition>>> CreateCompetition(Guild guild, DateTime start,
+        DateTime end, MetricType metric, CompetitionType competitionType, string name) {
+        GuildConfig config = null;
+        try {
+            config = GetGroupConfig(guild.Id);
+        } catch (Exception e) {
+            return Result.Fail(new ExceptionalError("Could not retrieve configuration", e));
+        }
+
+        return await CreateCompetition(config, start.GetCorrectDateTimeOffset(config.Timezone), 
+            end.GetCorrectDateTimeOffset(config.Timezone), metric, competitionType, name);
+    }
+
+    public async Task<Result<ItemDecorator<Competition>>> CreateCompetition(Guild guild, DateTimeOffset start,
+        DateTimeOffset end, MetricType metric, CompetitionType competitionType, string name) {
+        GuildConfig config = null;
+        try {
+            config = GetGroupConfig(guild.Id);
+        } catch (Exception e) {
+            return Result.Fail(new ExceptionalError("Could not retrieve configuration", e));
+        }
+
+        return await CreateCompetition(config, start, end, metric, competitionType, name);
     }
 
     public Task<Result<CommandRoleConfig>> GetCommandRoleConfig(Guild guild) {

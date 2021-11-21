@@ -64,6 +64,10 @@ public class BaseModel {
         var dict = new Dictionary<string, string>();
 
         foreach (var prp in props) {
+            if (!IsPrimitiveOrString(prp.PropertyType)) {
+                continue;
+            }
+            
             var value = prp.GetValue(this, new object[] { });
             var friendlyValue = "not set";
 
@@ -75,5 +79,10 @@ public class BaseModel {
         }
 
         return dict;
+    }
+    
+    bool IsPrimitiveOrString(Type type) {
+        return type.IsPrimitive 
+               || type.Equals(typeof(string));
     }
 }

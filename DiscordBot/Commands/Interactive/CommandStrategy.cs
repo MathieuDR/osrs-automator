@@ -6,24 +6,6 @@ using Microsoft.Extensions.Options;
 
 namespace DiscordBot.Commands.Interactive;
 
-public interface ICommandStrategy {
-    public Task<Result> HandleApplicationCommand(ApplicationCommandContext context);
-    public Task<Result> HandleComponentCommand(MessageComponentContext context);
-    public Task<SlashCommandProperties[]> GetCommandPropertiesCollection(bool allBuilders);
-    public Task<SlashCommandProperties> GetCommandProperties(string applicationCommandName);
-    public Task<uint> GetCommandHash(string applicationCommandName);
-    public Task<Result> HandleInteractiveCommand(BaseInteractiveContext context);
-    public Task<IApplicationCommandHandler> GetHandler(string applicationCommandName);
-
-    /// <summary>
-    ///     Get the names and descriptions of the commands
-    /// </summary>
-    /// <returns>Name, Description of commands</returns>
-    public IEnumerable<(string Name, string Description)> GetCommandDescriptions();
-
-    public Task ResetCommandRoleConfig(ulong guildId);
-}
-
 public class CommandStrategy : ICommandStrategy {
     private readonly IOptions<BotTeamConfiguration> _botTeamConfiguration;
     private readonly IApplicationCommandHandler[] _commands;
@@ -48,6 +30,7 @@ public class CommandStrategy : ICommandStrategy {
         return context switch {
             MessageComponentContext messageComponentContext => HandleComponentCommand(messageComponentContext),
             ApplicationCommandContext applicationCommandContext => HandleApplicationCommand(applicationCommandContext),
+            AutocompleteCommandContext autocompleteCommandContext => HandleAutoComplete(autocompleteCommandContext),
             _ => Task.FromResult(Result.Fail("Could not find context type"))
         };
     }
@@ -57,6 +40,21 @@ public class CommandStrategy : ICommandStrategy {
             string.Equals(c.Name, applicationCommandName, StringComparison.InvariantCultureIgnoreCase)));
     }
 
+    public async Task<Result> HandleAutoComplete(AutocompleteCommandContext context) {
+        var command = _commands.FirstOrDefault(c => c.CanHandle(context));
+
+        if (command is null) {
+            return Result.Fail(new Error("Could not find proper command handler").WithMetadata("404", true));
+        }
+
+        if (!await Authorized(context, command)) {
+            return Result.Fail(new Error("You are not authorized to use this command").WithMetadata("401", true));
+        }
+
+        return await command.HandleAutocompleteAsync(context);
+    }
+
+    
     public async Task<Result> HandleApplicationCommand(ApplicationCommandContext context) {
         var command = _commands.FirstOrDefault(c => c.CanHandle(context));
 

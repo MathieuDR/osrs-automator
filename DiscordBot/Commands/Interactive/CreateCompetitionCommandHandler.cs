@@ -30,7 +30,7 @@ public class CreateCompetitionCommandHandler : ApplicationCommandHandler {
         var endString = context.Options.GetOptionValue<string>(EndDateOption);
         var metricString = context.Options.GetOptionValue<string>(MetricOption);
         var nameString = context.Options.GetOptionValue<string>(NameOption);
-        var compType = (CompetitionType)context.Options.GetOptionValue<long>(TeamOption);
+        var compType = context.Options.ContainsKey(TeamOption) ? (CompetitionType)context.Options.GetOptionValue<long>(TeamOption) : CompetitionType.Normal;
 
         var start = startString.ToFutureDate();
         var end = endString.ToFutureDate();
@@ -42,7 +42,6 @@ public class CreateCompetitionCommandHandler : ApplicationCommandHandler {
 
         if (end.IsFailed) {
             return Result.Merge(Result.Fail("Please enter a correct end date"), end).ToResult();
-            ;
         }
 
         if (start.Value >= end.Value) {
@@ -52,10 +51,9 @@ public class CreateCompetitionCommandHandler : ApplicationCommandHandler {
         if (!canParse) {
             return Result.Fail("I do not recognize this metric!");
         }
-
+     
         var createRequest = await _groupService.CreateCompetition(context.Guild.ToGuildDto(),
-            new DateTimeOffset(start.Value),
-            new DateTimeOffset(end.Value), metric, compType, nameString);
+            start.Value, end.Value, metric, compType, nameString);
 
         if (createRequest.IsFailed) {
             return createRequest.ToResult();
@@ -70,16 +68,12 @@ public class CreateCompetitionCommandHandler : ApplicationCommandHandler {
         return Result.Ok();
     }
 
-    public override Task<Result> HandleComponentAsync(MessageComponentContext context) {
-        throw new NotImplementedException();
-    }
-
     protected override Task<SlashCommandBuilder> ExtendSlashCommandBuilder(SlashCommandBuilder builder) {
         builder
             .AddOption(StartDateOption, ApplicationCommandOptionType.String, "The start date and time", true)
             .AddOption(EndDateOption, ApplicationCommandOptionType.String, "The end date and time", true)
             .AddOption(MetricOption, ApplicationCommandOptionType.String, "The metric of the competition", true)
-            .AddEnumOption<CompetitionType>(TeamOption, "Select competition type")
+            .AddEnumOption<CompetitionType>(TeamOption, "Select competition type", false)
             .AddOption(NameOption, ApplicationCommandOptionType.String, "A custom name for the competition", false);
 
         return Task.FromResult(builder);
