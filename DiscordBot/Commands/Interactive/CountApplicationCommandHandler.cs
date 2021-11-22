@@ -166,9 +166,9 @@ public class CountApplicationCommandHandler : ApplicationCommandHandler {
         var historyBlockBuilder = new StringBuilder();
         for (var i = 0; i < countInfos.Count; i++) {
             var countInfo = countInfos[i];
-            historyBlockBuilder.Append($"{i + 1}, ".PadLeft(4));
+            historyBlockBuilder.Append($"{(i + 1).ToString()}, ".PadLeft(4));
             historyBlockBuilder.Append($"{context.GetDisplayNameById(countInfo.DiscordId)}".PadRight(25));
-            historyBlockBuilder.AppendLine($": {countInfo.CurrentCount} points".PadRight(13));
+            historyBlockBuilder.AppendLine($": {countInfo.CurrentCount.ToString()} points".PadRight(13));
         }
 
         if (historyBlockBuilder.Length > 0) {
@@ -221,7 +221,7 @@ public class CountApplicationCommandHandler : ApplicationCommandHandler {
         foreach (var count in list) {
             var historyBlockBuilder = new StringBuilder();
             historyBlockBuilder.Append(count.Additive > 0 ? "+ " : "- ");
-            historyBlockBuilder.Append($"{Math.Abs(count.Additive)}".PadLeft(4));
+            historyBlockBuilder.Append($"{Math.Abs(count.Additive).ToString()}".PadLeft(4));
             historyBlockBuilder.Append(string.IsNullOrEmpty(count.Reason) ? "".PadRight(25) : $", {count.Reason}".PadRight(25));
             historyBlockBuilder.Append($"| By {count.RequestedDiscordTag} on {count.RequestedOn.ToString("d")}");
 
