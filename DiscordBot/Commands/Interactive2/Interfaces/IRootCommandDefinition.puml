@@ -1,0 +1,31 @@
+@startuml
+interface "IHandleableCommand`3"<out TCommandDefinition,out TContext,TContextType> {
+    + MinimumAuthorizationRole : AuthorizationRoles <<get>>
+    + Context : TContext <<get>>
+    + CommandDefinition : TCommandDefinition <<get>>
+}
+interface ICommandDefinition {
+    + Name : string <<get>>
+    + Description : string <<get>>
+}
+interface IRootCommandDefinition {
+    + Id : Guid <<get>>
+    + GetCommandBuilderHash() : Task<uint>
+    + GetCommandProperties() : Task<SlashCommandProperties>
+}
+interface "ISubCommandDefinition`1"<TParentCommand> {
+    + GetOptionBuilder() : Task<SlashCommandOptionBuilder>
+}
+interface "ICommandHandler`4"<in TCommand,TCommandDefinition,TContext,TContextType> {
+}
+interface "IRequest`1"<T> {
+}
+class "IRequestHandler`2"<T1,T2> {
+}
+
+
+"IRequest`1" "<Result>" <|-- "IHandleableCommand`3"
+ICommandDefinition <|-- IRootCommandDefinition
+ICommandDefinition <|-- "ISubCommandDefinition`1"
+"IRequestHandler`2" "<TCommand,Result>" <|-- "ICommandHandler`4"
+@enduml
