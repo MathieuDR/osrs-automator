@@ -130,6 +130,7 @@ public class AuthorizationConfigurationCommandHandler : ApplicationCommandHandle
         }
 
         if (!roles.Any()) {
+            _ = context.CreateReplyBuilder().WithEmbedFrom("Success", "Authorization updated").RespondAsync();
             return result;
         }
 
