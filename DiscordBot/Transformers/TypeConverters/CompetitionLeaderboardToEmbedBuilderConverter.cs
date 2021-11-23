@@ -28,7 +28,7 @@ public class CompetitionLeaderboardToEmbedBuilderConverter : ITypeConverter<Comp
         for (var i = 0; i < bound; i++) {
             var competitionParticipant = source.Members[i];
 
-            description.Append($"{i + 1}, ".PadLeft(IdSpace));
+            description.Append($"{(i + 1).ToString()}, ".PadLeft(IdSpace));
             description.Append(competitionParticipant.Player.DisplayName.PadRight(NameSpace));
             description.Append(competitionParticipant.CompetitionDelta.Gained.FormatNumber().PadLeft(NumberSpace) +
                                Environment.NewLine);

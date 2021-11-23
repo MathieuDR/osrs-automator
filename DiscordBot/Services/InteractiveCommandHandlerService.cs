@@ -98,9 +98,9 @@ public class InteractiveCommandHandlerService {
             _logger.LogWarning("[{ctx}] failed: {msg}", ctx, msg);
 
             if (ctx.IsDeferred) {
-                await arg.FollowupAsync(msg);
+                await arg.FollowupAsync(msg, ephemeral: true);
             } else {
-                await arg.RespondAsync(msg);
+                await arg.RespondAsync(msg, ephemeral:true);
             }
         }
 

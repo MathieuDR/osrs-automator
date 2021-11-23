@@ -54,11 +54,12 @@ public abstract class BaseInteractiveContext<T> : BaseInteractiveContext where T
         return GetDisplayNameById(user.Id);
     }
 
-
     public StaticPaginatorBuilder GetBaseStaticPaginatorBuilder(IEnumerable<PageBuilder> pageBuilders) {
         var builder = new StaticPaginatorBuilder()
             .WithFooter(PaginatorFooter.Users | PaginatorFooter.PageNumber)
             .WithActionOnCancellation(ActionOnStop.DeleteInput)
+            .WithActionOnTimeout(ActionOnStop.DeleteInput)
+            .WithDeletion(DeletionOptions.Invalid) // Not sure what this does.
             .AddUser(InnerContext.User)
             .WithPages(pageBuilders)
             .AddOption(new Emoji("⏪"), PaginatorAction.SkipToStart)
@@ -70,10 +71,15 @@ public abstract class BaseInteractiveContext<T> : BaseInteractiveContext where T
         return builder;
     }
 
+    /// <summary>
+    /// Default timeout is 5 minutes
+    /// </summary>
     public Task<InteractiveMessageResult> SendPaginator(Paginator paginator, TimeSpan? timeout = null,
         InteractionResponseType responseType = InteractionResponseType.ChannelMessageWithSource,
-        bool ephemeral = false, Action<IUserMessage> messageAction = null, bool resetTimeoutOnInput = false,
+        bool ephemeral = false, Action<IUserMessage> messageAction = null, bool resetTimeoutOnInput = true,
         CancellationToken cancellationToken = default) {
+        timeout ??= TimeSpan.FromMinutes(5);
+
         return InteractiveService.SendPaginatorAsync(paginator, InnerContext, timeout, responseType, ephemeral, messageAction,
             resetTimeoutOnInput, cancellationToken);
     }

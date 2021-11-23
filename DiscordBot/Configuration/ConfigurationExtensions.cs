@@ -64,7 +64,7 @@ public static class ConfigurationExtensions {
             .AddSingleton<ManageCommandsApplicationCommandHandler>()
             .AddSingleton<CountApplicationCommandHandler>()
             .AddSingleton<CountConfigurationApplicationCommandHandler>()
-            .AddSingleton<ConfigurationApplicationCommandHandler>()
+            .AddSingleton<ConfigureApplicationCommandHandler>()
             .AddSingleton<CreateCompetitionCommandHandler>()
             .AddSingleton<AuthorizationConfigurationCommandHandler>()
             .AddSingleton<ICommandStrategy>(x => new CommandStrategy(
@@ -74,7 +74,7 @@ public static class ConfigurationExtensions {
                     x.GetRequiredService<ManageCommandsApplicationCommandHandler>(),
                     x.GetRequiredService<CountApplicationCommandHandler>(),
                     x.GetRequiredService<CountConfigurationApplicationCommandHandler>(),
-                    x.GetRequiredService<ConfigurationApplicationCommandHandler>(),
+                    x.GetRequiredService<ConfigureApplicationCommandHandler>(),
                     x.GetRequiredService<CreateCompetitionCommandHandler>(),
                     x.GetRequiredService<AuthorizationConfigurationCommandHandler>()
                 }, x.GetRequiredService<IGroupService>(), x.GetRequiredService<IOptions<BotTeamConfiguration>>()));

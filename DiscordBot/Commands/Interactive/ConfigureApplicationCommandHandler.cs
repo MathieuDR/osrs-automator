@@ -2,23 +2,22 @@ using System.Text;
 using DiscordBot.Common.Dtos.Discord;
 using DiscordBot.Common.Models.Decorators;
 using DiscordBot.Common.Models.Enums;
-using TimeZoneConverter;
 using TimeZoneNames;
 
 namespace DiscordBot.Commands.Interactive;
 
-public class ConfigurationApplicationCommandHandler : ApplicationCommandHandler {
+public class ConfigureApplicationCommandHandler : ApplicationCommandHandler {
     private const string SetServerSubCommandName = "server";
     private const string ViewConfigurationSubCommand = "view";
     private const string TimeZoneOption = "timezone";
     private const string WomGroupId = "group-id";
     private const string WomVerificationCode = "verification-code";
-    private readonly IDictionary<string, string> _timeZones;
 
 
     private readonly IGroupService _groupService;
+    private readonly IDictionary<string, string> _timeZones;
 
-    public ConfigurationApplicationCommandHandler(ILogger<ConfigurationApplicationCommandHandler> logger, IGroupService groupService) : base(
+    public ConfigureApplicationCommandHandler(ILogger<ConfigureApplicationCommandHandler> logger, IGroupService groupService) : base(
         "Configure", "Configure this bot for this server", logger) {
         _groupService = groupService;
 
@@ -44,12 +43,12 @@ public class ConfigurationApplicationCommandHandler : ApplicationCommandHandler 
     public override Task<Result> HandleAutocompleteAsync(AutocompleteCommandContext context) {
         if (context.SubCommand == SetServerSubCommandName && context.CurrentOption == TimeZoneOption) {
             Logger.LogInformation("Searching {tzCount} timezones for the string '{string}'", _timeZones.Count, context.CurrentOptionAsString);
-            
+
             var opts = _timeZones.Where(x => x.Value.ToLowerInvariant().Contains(context.CurrentOptionAsString.ToLowerInvariant()))
                 .Select(x => x.Value).ToList();
-            
+
             Logger.LogInformation("Found the following {@opts}", opts);
-            
+
             _ = context.RespondAsync(opts);
             return Task.FromResult(Result.Ok());
         }
@@ -68,8 +67,9 @@ public class ConfigurationApplicationCommandHandler : ApplicationCommandHandler 
         await context
             .CreateReplyBuilder()
             .WithEmbedFrom("Configuration", builder.ToString(), x => x.AddCommonProperties())
+            .WithEphemeral()
             .RespondAsync();
-        
+
         return Result.Ok();
     }
 
@@ -77,7 +77,7 @@ public class ConfigurationApplicationCommandHandler : ApplicationCommandHandler 
         var groupId = (int)context.SubCommandOptions.GetOptionValue<long>(WomGroupId);
         var verificationCode = context.SubCommandOptions.GetOptionValue<string>(WomVerificationCode);
         var timeZone = context.SubCommandOptions.GetOptionValue<string>(TimeZoneOption);
-        
+
 
         if (groupId <= 0) {
             return Result.Fail("Group id must be higher then 0");
@@ -88,11 +88,6 @@ public class ConfigurationApplicationCommandHandler : ApplicationCommandHandler 
             return Result.Fail("Group verification must be set");
         }
 
-        Result tzResult = Result.Ok();
-        if (!string.IsNullOrWhiteSpace(timeZone)) {
-            tzResult = await HandleNewTimezone(context.GuildUser.ToGuildUserDto(), timeZone);
-        }
-
         ItemDecorator<Group> decoratedGroup;
         try {
             decoratedGroup = await _groupService.SetGroupForGuild(context.GuildUser.ToGuildUserDto(), groupId, verificationCode);
@@ -100,17 +95,24 @@ public class ConfigurationApplicationCommandHandler : ApplicationCommandHandler 
             return Result.Fail(new ExceptionalError(e));
         }
 
+        var tzResult = Result.Ok();
+        if (!string.IsNullOrWhiteSpace(timeZone)) {
+            tzResult = await HandleNewTimezone(context.GuildUser.ToGuildUserDto(), timeZone);
+        }
+
         await context.CreateReplyBuilder(true)
             .WithEmbedFrom("Success", $"Group set to {decoratedGroup.Item.Name}", builder => builder
-                .AddWiseOldMan(decoratedGroup)).RespondAsync();
+                .AddWiseOldMan(decoratedGroup))
+            .WithEphemeral()
+            .RespondAsync();
 
         return tzResult;
     }
 
     private async Task<Result> HandleNewTimezone(GuildUser caller, string timeZone) {
-        var key = _timeZones.FirstOrDefault(x => String.Equals(x.Value, timeZone, StringComparison.InvariantCultureIgnoreCase)).Key;
-        
-        if(key is null) {
+        var key = _timeZones.FirstOrDefault(x => string.Equals(x.Value, timeZone, StringComparison.InvariantCultureIgnoreCase)).Key;
+
+        if (key is null) {
             return Result.Fail("Cannot find the timezone: " + timeZone + ". Please use the auto complete feature.");
         }
 
@@ -123,9 +125,9 @@ public class ConfigurationApplicationCommandHandler : ApplicationCommandHandler 
                 .WithName(SetServerSubCommandName)
                 .WithDescription("Set the basic WOM configuration for this bot")
                 .WithType(ApplicationCommandOptionType.SubCommand)
-                    .AddOption(WomGroupId, ApplicationCommandOptionType.Integer, "The ID of your wise old man group", true)
-                    .AddOption(WomVerificationCode, ApplicationCommandOptionType.String, "The verification code of your group", true)
-                    .AddOption(TimeZoneOption, ApplicationCommandOptionType.String, "Set the timezone", true, isAutocomplete:true)
+                .AddOption(WomGroupId, ApplicationCommandOptionType.Integer, "The ID of your wise old man group", true)
+                .AddOption(WomVerificationCode, ApplicationCommandOptionType.String, "The verification code of your group", true)
+                .AddOption(TimeZoneOption, ApplicationCommandOptionType.String, "Set the timezone", true, isAutocomplete: true)
             )
             .AddOption(new SlashCommandOptionBuilder()
                 .WithName(ViewConfigurationSubCommand)

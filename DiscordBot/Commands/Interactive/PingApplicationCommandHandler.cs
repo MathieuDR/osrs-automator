@@ -42,7 +42,7 @@ public class PingApplicationCommandHandler : ApplicationCommandHandler {
             builder.AppendLine($"Difference is: {timeDifference.TotalMilliseconds}ms");
         }
 
-        await context.RespondAsync(builder.ToString());
+        await context.RespondAsync(builder.ToString(), ephemeral: true);
         return Result.Ok();
     }
 }

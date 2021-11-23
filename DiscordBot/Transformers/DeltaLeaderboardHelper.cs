@@ -39,7 +39,7 @@ public static class DeltaLeaderboardHelper {
         for (var i = 0; i < bound; i++) {
             var member = source.Members[i];
 
-            description.Append($"{i + 1}, ".PadLeft(IdSpace));
+            description.Append($"{(i + 1).ToString()}, ".PadLeft(IdSpace));
             description.Append(member.Player.DisplayName.PadRight(NameSpace));
             switch (source.MetricType.Category()) {
                 case MetricTypeCategory.Time:
