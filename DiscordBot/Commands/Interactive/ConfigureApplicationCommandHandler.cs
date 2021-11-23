@@ -7,7 +7,7 @@ using TimeZoneNames;
 
 namespace DiscordBot.Commands.Interactive;
 
-public class ConfigurationApplicationCommandHandler : ApplicationCommandHandler {
+public class ConfigureApplicationCommandHandler : ApplicationCommandHandler {
     private const string SetServerSubCommandName = "server";
     private const string ViewConfigurationSubCommand = "view";
     private const string TimeZoneOption = "timezone";
@@ -18,7 +18,7 @@ public class ConfigurationApplicationCommandHandler : ApplicationCommandHandler 
 
     private readonly IGroupService _groupService;
 
-    public ConfigurationApplicationCommandHandler(ILogger<ConfigurationApplicationCommandHandler> logger, IGroupService groupService) : base(
+    public ConfigureApplicationCommandHandler(ILogger<ConfigureApplicationCommandHandler> logger, IGroupService groupService) : base(
         "Configure", "Configure this bot for this server", logger) {
         _groupService = groupService;
 
@@ -88,16 +88,16 @@ public class ConfigurationApplicationCommandHandler : ApplicationCommandHandler 
             return Result.Fail("Group verification must be set");
         }
 
-        Result tzResult = Result.Ok();
-        if (!string.IsNullOrWhiteSpace(timeZone)) {
-            tzResult = await HandleNewTimezone(context.GuildUser.ToGuildUserDto(), timeZone);
-        }
-
         ItemDecorator<Group> decoratedGroup;
         try {
             decoratedGroup = await _groupService.SetGroupForGuild(context.GuildUser.ToGuildUserDto(), groupId, verificationCode);
         } catch (Exception e) {
             return Result.Fail(new ExceptionalError(e));
+        }
+        
+        Result tzResult = Result.Ok();
+        if (!string.IsNullOrWhiteSpace(timeZone)) {
+            tzResult = await HandleNewTimezone(context.GuildUser.ToGuildUserDto(), timeZone);
         }
 
         await context.CreateReplyBuilder(true)
