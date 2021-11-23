@@ -69,6 +69,7 @@ public class CountConfigurationApplicationCommandHandler : ApplicationCommandHan
 
         await context.CreateReplyBuilder()
             .WithEmbedFrom("Success!", "Successfully created the threshold")
+            .WithEphemeral()
             .RespondAsync();
 
         return Result.Ok();
@@ -105,7 +106,7 @@ public class CountConfigurationApplicationCommandHandler : ApplicationCommandHan
                 .WithButtons(GetRemoveButton.WithDisabled(true));
         }
 
-        await response.RespondAsync();
+        await response.WithEphemeral().RespondAsync();
         return Result.Ok();
     }
 
@@ -164,6 +165,7 @@ public class CountConfigurationApplicationCommandHandler : ApplicationCommandHan
 
         await context.CreateReplyBuilder()
             .WithEmbedFrom("Success!", "Successfully set the channel.")
+            .WithEphemeral()
             .RespondAsync();
         return Result.Ok();
     }

@@ -24,7 +24,7 @@ public class CreateCompetitionCommandHandler : ApplicationCommandHandler {
     public override AuthorizationRoles MinimumAuthorizationRole => AuthorizationRoles.ClanModerator;
 
     public override async Task<Result> HandleCommandAsync(ApplicationCommandContext context) {
-        _ = context.DeferAsync();
+        _ = context.DeferAsync(ephemeral: true);
 
         var startString = context.Options.GetOptionValue<string>(StartDateOption);
         var endString = context.Options.GetOptionValue<string>(EndDateOption);
@@ -63,6 +63,7 @@ public class CreateCompetitionCommandHandler : ApplicationCommandHandler {
             .CreateReplyBuilder(true)
             .WithEmbed(builder =>
                 builder.AddWiseOldMan(createRequest.Value))
+            .WithEphemeral()
             .FollowupAsync();
 
         return Result.Ok();
