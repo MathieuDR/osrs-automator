@@ -78,7 +78,7 @@ public class AuthorizationConfigurationCommandHandler : ApplicationCommandHandle
         }
 
         var paginator = context.GetBaseStaticPaginatorBuilder(pages);
-        _ = context.SendPaginator(paginator.Build());
+        _ = context.SendPaginator(paginator.Build(), ephemeral: true);
         return Result.Ok();
     }
 
@@ -109,7 +109,6 @@ public class AuthorizationConfigurationCommandHandler : ApplicationCommandHandle
         return Task.FromResult(builder);
     }
 
-
     #region authorize
 
     private async Task<Result> AuthorizeHandler(ApplicationCommandContext context) {
@@ -130,6 +129,7 @@ public class AuthorizationConfigurationCommandHandler : ApplicationCommandHandle
         }
 
         if (!roles.Any()) {
+            _ = context.CreateReplyBuilder().WithEmbedFrom("Success", "Authorization updated").WithEphemeral().RespondAsync();
             return result;
         }
 
@@ -141,7 +141,7 @@ public class AuthorizationConfigurationCommandHandler : ApplicationCommandHandle
         var returningResult = Result.Merge(result, roleResult);
 
         if (returningResult.IsSuccess) {
-            _ = context.CreateReplyBuilder().WithEmbedFrom("Success", "Authorization updated").RespondAsync();
+            _ = context.CreateReplyBuilder().WithEmbedFrom("Success", "Authorization updated").WithEphemeral().RespondAsync();
         }
 
         return returningResult;
