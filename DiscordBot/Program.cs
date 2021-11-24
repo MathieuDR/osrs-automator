@@ -47,7 +47,7 @@ internal class Program {
         ConfigureSerilogger();
 
         serviceCollection
-            .AddDiscordBot(config)
+            .AddDiscordBot<Program>(config)
             .UseLiteDbRepositories(config)
             .AddWiseOldManApi()
             .AddDiscordBotServices()

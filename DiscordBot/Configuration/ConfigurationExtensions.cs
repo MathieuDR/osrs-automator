@@ -1,5 +1,6 @@
 using Discord.Commands;
 using DiscordBot.Commands.Interactive;
+using DiscordBot.Commands.Interactive2.Interfaces;
 using DiscordBot.Common.Configuration;
 using DiscordBot.Services;
 using DiscordBot.Services.Services;
@@ -104,6 +105,52 @@ public static class ConfigurationExtensions {
     }
 
 
+    
+    private static IServiceCollection AddCommandsFromAssemblies(this IServiceCollection serviceCollection, params Type[] assemblTypes) {
+        // Get assemblies from types
+        var assemblies = assemblTypes.Select(x => x.Assembly).Distinct().ToArray();
+        
+        // Get all commands from assemblies
+        var commands = assemblies.SelectMany(x => x.GetTypes())
+            .Where(x => typeof(ICommandDefinition).IsAssignableFrom(x) && !x.IsAbstract && !x.IsInterface)
+            .ToArray();
+        
+        // Split them up into root and sub commands through interface
+        var rootCommands = commands.Where(x => typeof(IRootCommandDefinition).IsAssignableFrom(x)).ToArray();
+        var subCommands = commands.Where(x => typeof(ISubCommandDefinition).IsAssignableFrom(x)).Where(x => x.GetInterfaces().Any(y => y.IsGenericType && y.GetGenericTypeDefinition() == typeof(ISubCommandDefinition<>))).ToArray();
+
+        // Place commands in a dictionary based on generic type
+        var commandDictionary = new Dictionary<Type, IEnumerable<Type>>();
+        foreach (var rootCommand in rootCommands) {
+           // Get all subcommands that have a generic parameter of rootcommand
+            var subCommandsOfRootCommandOfType = subCommands.Where(x => x.GetInterfaces().Any(y => y.GetGenericArguments().Any(z => z == rootCommand))).ToArray();
+            commandDictionary.Add(rootCommand, subCommandsOfRootCommandOfType);
+        }
+        
+
+        return serviceCollection;
+    }
+    public static IServiceCollection AddDiscordBot(this IServiceCollection serviceCollection, IConfiguration configuration, params Type[] assemblies) {
+        serviceCollection
+            .AddLoggingInformation()
+            .AddDiscordClient()
+            .AddExternalServices()
+            .AddConfiguration(configuration)
+            .AddHelpers()
+            .ConfigureAutoMapper()
+            .AddCommandsFromAssemblies(assemblies);
+
+   
+
+        return serviceCollection;
+    }
+
+
+    public static IServiceCollection AddDiscordBot<T>(this IServiceCollection serviceCollection, IConfiguration configuration) {
+        return serviceCollection.AddDiscordBot(configuration, typeof(T));
+    }
+
+    [Obsolete]
     public static IServiceCollection AddDiscordBot(this IServiceCollection serviceCollection,
         IConfiguration configuration) {
         serviceCollection

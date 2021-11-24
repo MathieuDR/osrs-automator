@@ -24,8 +24,11 @@ public interface IRootCommandDefinition : ICommandDefinition {
     Task<SlashCommandProperties> GetCommandProperties();
 }
 
-public interface ISubCommandDefinition<TParentCommand> : ICommandDefinition
+public interface ISubCommandDefinition<TParentCommand> : ISubCommandDefinition
     where TParentCommand : IRootCommandDefinition {
+}
+
+public interface ISubCommandDefinition : ICommandDefinition {
     Task<SlashCommandOptionBuilder> GetOptionBuilder();
 }
 
