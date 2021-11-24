@@ -1,6 +1,7 @@
 using System.Text;
 using Common.Extensions;
 using DiscordBot.Common.Dtos.Discord;
+using DiscordBot.Common.Models.Decorators;
 using WiseOldManConnector.Helpers;
 
 namespace DiscordBot.Services;
@@ -50,15 +51,41 @@ public class DiscordService : IDiscordService {
     }
 
     public Task<Result<IEnumerable<Guild>>> GetAllGuilds() {
-        throw new NotImplementedException();
+        var result = Result.Ok(_client.Guilds.Select(x=>x.ToGuildDto()));
+        return Task.FromResult(result);
     }
 
-    public Task<Result> SendFailedEmbed(ulong channelId, string message, Guid traceId) {
-        throw new NotImplementedException();
+    public async Task<Result> SendFailedEmbed(ulong channelId, string message, Guid traceId) {
+        EmbedBuilder builder = new EmbedBuilder();
+
+        builder
+            .AddCommonProperties()
+            .WithDescription(message).WithTitle($"Failed to update group.")
+            .AddField("TraceId", traceId.ToString());
+
+        return await SendEmbed(channelId, builder);
     }
 
-    public Task<Result> SendWomGroupSuccessEmbed(ulong channelId, string message, int groupId, string groupName) {
-        throw new NotImplementedException();
+    public async Task<Result> SendWomGroupSuccessEmbed(ulong channelId, string message, int groupId, string groupName) {
+        EmbedBuilder builder = new EmbedBuilder();
+
+        builder
+            .AddWiseOldMan(groupName, $"https://wiseoldman.net/groups/{groupId}")
+            .AddCommonProperties()
+            .WithDescription(message).WithTitle($"Group {groupName} updated");
+
+        return await SendEmbed(channelId, builder);
+    }
+    
+    private async Task<Result> SendEmbed(ulong channelId, EmbedBuilder builder) {
+        var channel = await _client.GetChannelAsync(channelId);
+        
+        if(channel is ISocketMessageChannel socketChannel) {
+            await socketChannel.SendMessageAsync("", false, builder.Build());
+            return Result.Ok();
+        }
+
+        return Result.Fail("Could not send message");
     }
 
 

@@ -1,4 +1,5 @@
 ﻿using DiscordBot.Common.Models.Enums;
+using LiteDB;
 
 namespace DiscordBot.Common.Models.Data;
 
@@ -19,7 +20,7 @@ public class ChannelJobConfiguration {
         ChannelId = channelId;
         IsEnabled = isEnabled;
     }
-
+    
     public bool IsEnabled { get; set; }
     public ulong ChannelId { get; set; }
     public ulong GuildId { get; set; }
