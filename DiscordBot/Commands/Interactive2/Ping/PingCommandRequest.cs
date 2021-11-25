@@ -1,9 +1,8 @@
 ﻿using DiscordBot.Commands.Interactive2.Base.Handlers;
 using DiscordBot.Commands.Interactive2.Base.Requests;
-using DiscordBot.Commands.Interactive2.Ping.Definition;
 using DiscordBot.Common.Models.Enums;
 
-namespace DiscordBot.Commands.Interactive2.Ping.CommandRequest; 
+namespace DiscordBot.Commands.Interactive2.Ping; 
 
 public class PingCommandRequest : ApplicationCommandRequestBase<PingRootCommandDefinition> {
     public PingCommandRequest(ApplicationCommandContext context) : base(context) { }

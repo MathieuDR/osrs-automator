@@ -1,4 +1,4 @@
-﻿using DiscordBot.Commands.Interactive2.Base.Definition;
+﻿using DiscordBot.Commands.Interactive2.Base.Definitions;
 using DiscordBot.Common.Models.Enums;
 
 namespace DiscordBot.Commands.Interactive2.Base.Requests;

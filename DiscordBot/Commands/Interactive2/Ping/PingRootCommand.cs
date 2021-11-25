@@ -1,6 +1,6 @@
-﻿using DiscordBot.Commands.Interactive2.Base.Definition;
+﻿using DiscordBot.Commands.Interactive2.Base.Definitions;
 
-namespace DiscordBot.Commands.Interactive2.Ping.Definition;
+namespace DiscordBot.Commands.Interactive2.Ping;
 
 
 public class PingRootCommandDefinition : RootCommandDefinitionBase {

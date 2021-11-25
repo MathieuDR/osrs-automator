@@ -2,7 +2,7 @@
 using System.Text.Json;
 using HashDepot;
 
-namespace DiscordBot.Commands.Interactive2.Base.Definition;
+namespace DiscordBot.Commands.Interactive2.Base.Definitions;
 
 public abstract class SubCommandDefinitionBase<TRoot> : ISubCommandDefinition<TRoot> where TRoot : IRootCommandDefinition {
     public async Task<SlashCommandOptionBuilder> GetOptionBuilder() {

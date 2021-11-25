@@ -1,5 +1,4 @@
-﻿using DiscordBot.Commands.Interactive2.Base.Definition;
-using DiscordBot.Commands.Interactive2.Base.Requests;
+﻿using DiscordBot.Commands.Interactive2.Base.Requests;
 using MediatR;
 
 namespace DiscordBot.Commands.Interactive2.Base.Handlers;

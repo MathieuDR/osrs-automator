@@ -1,4 +1,4 @@
-﻿namespace DiscordBot.Commands.Interactive2.Base.Definition; 
+﻿namespace DiscordBot.Commands.Interactive2.Base.Definitions; 
 
 public interface ICommandDefinition {
     public string Name { get; }
