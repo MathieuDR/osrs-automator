@@ -1,6 +1,6 @@
 using Discord.Commands;
 using DiscordBot.Commands.Interactive;
-using DiscordBot.Commands.Interactive2.Interfaces;
+using DiscordBot.Commands.Interactive2.Base.Definition;
 using DiscordBot.Common.Configuration;
 using DiscordBot.Services;
 using DiscordBot.Services.Services;

@@ -103,6 +103,10 @@
         </Content>
     </ItemGroup>
 
+    <ItemGroup>
+      <Folder Include="Commands\Interactive2\Interfaces" />
+    </ItemGroup>
+
     <!--  <Target Name="PostBuild" AfterTargets="PostBuildEvent">-->
     <!--    <Exec Command="mkdir $(TargetDir)Images/;cp -r $(ProjectDir)DiscordBot/Images/* $(TargetDir)Images/" />-->
     <!--  </Target>-->

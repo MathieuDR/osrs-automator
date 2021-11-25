@@ -1,9 +1,9 @@
-﻿using DiscordBot.Commands.Interactive2.Base;
+﻿using DiscordBot.Commands.Interactive2.Base.Definition;
 
-namespace DiscordBot.Commands.Interactive2.Ping;
+namespace DiscordBot.Commands.Interactive2.Ping.Definition;
 
 
-public class PingRootCommand : BaseRootCommand {
+public class PingRootCommandDefinition : RootCommandDefinitionBase {
     public override string Name => "ping2";
     public override string Description => "Ping command through mediatr";
 
@@ -14,7 +14,7 @@ public class PingRootCommand : BaseRootCommand {
     }
 }
 
-public class PingSubCommand : BaseSubCommand<PingRootCommand> {
+public class InsultSubCommandDefinition : SubCommandDefinitionBase<PingRootCommandDefinition> {
     public override string Name => "insult";
     public  override string Description => "Receive an insult";
     public string VariantOtion => "Variant";

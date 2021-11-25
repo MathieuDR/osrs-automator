@@ -1,11 +1,10 @@
 ﻿using System.Text;
 using System.Text.Json;
-using DiscordBot.Commands.Interactive2.Interfaces;
 using HashDepot;
 
-namespace DiscordBot.Commands.Interactive2.Base;
+namespace DiscordBot.Commands.Interactive2.Base.Definition;
 
-public abstract class BaseSubCommand<TRoot> : ISubCommandDefinition<TRoot> where TRoot : IRootCommandDefinition {
+public abstract class SubCommandDefinitionBase<TRoot> : ISubCommandDefinition<TRoot> where TRoot : IRootCommandDefinition {
     public async Task<SlashCommandOptionBuilder> GetOptionBuilder() {
         var builder = new SlashCommandOptionBuilder()
             .WithName(Name)
@@ -28,7 +27,7 @@ public abstract class BaseSubCommand<TRoot> : ISubCommandDefinition<TRoot> where
     protected abstract Task<SlashCommandOptionBuilder> ExtendOptionCommandBuilder(SlashCommandOptionBuilder builder);
 }
 
-public abstract class BaseRootCommand : IRootCommandDefinition {
+public abstract class RootCommandDefinitionBase : IRootCommandDefinition {
     public abstract Guid Id { get; }
 
     public async Task<uint> GetCommandBuilderHash() {
@@ -64,8 +63,8 @@ public abstract class BaseRootCommand : IRootCommandDefinition {
         builder.AddOptions(opts);
     }
 
-    private async Task<IEnumerable<ISubCommandDefinition<BaseRootCommand>>> GetSubcommands() {
-        return await Task.FromResult(Array.Empty<ISubCommandDefinition<BaseRootCommand>>());
+    private async Task<IEnumerable<ISubCommandDefinition<RootCommandDefinitionBase>>> GetSubcommands() {
+        return await Task.FromResult(Array.Empty<ISubCommandDefinition<RootCommandDefinitionBase>>());
     }
 
     /// <summary>
