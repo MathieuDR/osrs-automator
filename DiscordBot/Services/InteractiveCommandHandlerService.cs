@@ -85,6 +85,8 @@ public class InteractiveCommandHandlerService {
             return;
         }
 
+        //Instagator.Handle(ctx);
+        
         _logger.LogInformation("[{ctx}] Command triggered", ctx);
         var result = await _strategy.HandleInteractiveCommand(ctx).ConfigureAwait(false);
 

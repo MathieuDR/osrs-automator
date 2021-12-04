@@ -12,7 +12,7 @@ public abstract class
         Context = context;
     }
 
-    protected TContext Context { get; }
+    public TContext Context { get; }
     protected TCommandDefinition CommandDefinition { get; }
     public abstract AuthorizationRoles MinimumAuthorizationRole { get; }
 }

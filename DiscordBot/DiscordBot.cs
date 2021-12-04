@@ -38,11 +38,8 @@ public class DiscordBot : BackgroundService {
 
     private async Task ConfigureDiscord() {
         _client = _services.GetRequiredService<DiscordSocketClient>();
-        await ((CommandHandlingService)_services.GetRequiredService(typeof(CommandHandlingService)))
-            .InitializeAsync(_services);
 
-        await ((InteractiveCommandHandlerService)_services.GetRequiredService(typeof(InteractiveCommandHandlerService)))
-            .SetupAsync();
+        await _services.GetRequiredService<InteractiveCommandHandlerService>().SetupAsync();
 
         var botConfig = _config.GetSection("Bot").Get<BotConfiguration>();
 

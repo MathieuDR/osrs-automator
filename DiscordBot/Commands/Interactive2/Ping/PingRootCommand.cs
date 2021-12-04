@@ -17,10 +17,17 @@ public class PingRootCommandDefinition : RootCommandDefinitionBase {
 public class InsultSubCommandDefinition : SubCommandDefinitionBase<PingRootCommandDefinition> {
     public override string Name => "insult";
     public  override string Description => "Receive an insult";
-    public string VariantOtion => "Variant";
+    public string VariantOption => "Variant";
     
     protected override Task<SlashCommandOptionBuilder> ExtendOptionCommandBuilder(SlashCommandOptionBuilder builder) {
-        builder.AddOption(VariantOtion, ApplicationCommandOptionType.Boolean,"Variant of insult", false);
+        builder.AddOption(VariantOption, ApplicationCommandOptionType.Boolean,"Variant of insult", false);
         return Task.FromResult(builder);
+    }
+
+    protected override Task FillOptions() {
+        var optionList = Options.ToList();
+        optionList.Add((VariantOption, typeof(bool)));
+        
+        return base.FillOptions();
     }
 }

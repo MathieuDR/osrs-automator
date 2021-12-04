@@ -27,7 +27,6 @@ public static class ConfigurationExtensions {
                 return client;
             })
             .AddSingleton<CommandService>()
-            .AddSingleton<CommandHandlingService>()
             .AddSingleton<InteractiveCommandHandlerService>()
             .AddTransient<ICommandRegistrationService, CommandRegistrationService>()
             .AddSingleton<InteractiveService>()
@@ -117,19 +116,21 @@ public static class ConfigurationExtensions {
         
         // Split them up into root and sub commands through interface
         var rootCommands = commands.Where(x => typeof(IRootCommandDefinition).IsAssignableFrom(x)).ToArray();
-        var subCommands = commands.Where(x => typeof(ISubCommandDefinition).IsAssignableFrom(x)).Where(x => x.GetInterfaces().Any(y => y.IsGenericType && y.GetGenericTypeDefinition() == typeof(ISubCommandDefinition<>))).ToArray();
+        var subCommands = commands.Where(x => typeof(ISubCommandDefinition).IsAssignableFrom(x)).Where(x => x.GetInterfaces()
+            .Any(y => y.IsGenericType && y.GetGenericTypeDefinition() == typeof(ISubCommandDefinition<>))).ToArray();
 
         // Place commands in a dictionary based on generic type
         var commandDictionary = new Dictionary<Type, IEnumerable<Type>>();
         foreach (var rootCommand in rootCommands) {
-           // Get all subcommands that have a generic parameter of rootcommand
-            var subCommandsOfRootCommandOfType = subCommands.Where(x => x.GetInterfaces().Any(y => y.GetGenericArguments().Any(z => z == rootCommand))).ToArray();
+            // Get all subcommands that have a generic parameter of rootcommand
+            var subCommandsOfRootCommandOfType = subCommands.Where(x => x.GetInterfaces()
+                .Any(y => y.GetGenericArguments().Any(z => z == rootCommand))).ToArray();
             commandDictionary.Add(rootCommand, subCommandsOfRootCommandOfType);
         }
-        
 
         return serviceCollection;
     }
+
     public static IServiceCollection AddDiscordBot(this IServiceCollection serviceCollection, IConfiguration configuration, params Type[] assemblies) {
         serviceCollection
             .AddLoggingInformation()
@@ -139,8 +140,6 @@ public static class ConfigurationExtensions {
             .AddHelpers()
             .ConfigureAutoMapper()
             .AddCommandsFromAssemblies(assemblies);
-
-   
 
         return serviceCollection;
     }

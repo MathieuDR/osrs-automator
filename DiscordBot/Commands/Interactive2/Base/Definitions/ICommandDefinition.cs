@@ -3,6 +3,8 @@
 public interface ICommandDefinition {
     public string Name { get; }
     public string Description { get; }
+    
+    public IEnumerable<(String optionName, Type optionType)> Options { get; } 
 }
 
 public interface IRootCommandDefinition : ICommandDefinition {

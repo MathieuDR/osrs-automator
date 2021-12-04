@@ -10,7 +10,21 @@ public class PingCommandRequest : ApplicationCommandRequestBase<PingRootCommandD
 }
 
 public class PingApplicationCommandHandler : ApplicationCommandHandlerBase<PingCommandRequest> {
-    public override Task<Result> Handle(PingCommandRequest request, CancellationToken cancellationToken) {
-        throw new NotImplementedException();
+    protected override async Task<Result> DoWork(IEnumerable<(string optionName, Type optionType, object? optionValue)> options) {
+        await Context.RespondAsync($"At do work with {options.Count()} options");
+        return Result.Ok();
     }
 }
+
+public class InsultCommandRequest : ApplicationCommandRequestBase<InsultSubCommandDefinition> {
+    public InsultCommandRequest(ApplicationCommandContext context) : base(context) { }
+    public override AuthorizationRoles MinimumAuthorizationRole => AuthorizationRoles.ClanGuest;
+}
+
+public class InsultApplicationCommandHandler : ApplicationCommandHandlerBase<InsultCommandRequest> {
+    protected override async Task<Result> DoWork(IEnumerable<(string optionName, Type optionType, object? optionValue)> options) {
+        await Context.RespondAsync($"At insults do work with {options.Count()} options");
+        return Result.Ok();
+    }
+}
+

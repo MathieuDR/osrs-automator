@@ -2,11 +2,12 @@
 using DiscordBot.Common.Models.Enums;
 using MediatR;
 
-namespace DiscordBot.Commands.Interactive2.Base.Requests; 
+namespace DiscordBot.Commands.Interactive2.Base.Requests;
 
 public interface ICommandRequest<out TContext>: IRequest<Result>
     where TContext : BaseInteractiveContext{
     public AuthorizationRoles MinimumAuthorizationRole { get; }
+    public TContext Context { get; }
 }
 
 public interface ICommandRequest<out TCommandDefinition, out TContext> : ICommandRequest<TContext>
@@ -24,4 +25,3 @@ public interface
 public interface
     IMessageComponentCommandRequest<out TCommandDefinition> : ICommandRequest<TCommandDefinition, MessageComponentContext>
     where TCommandDefinition : ICommandDefinition { }
-

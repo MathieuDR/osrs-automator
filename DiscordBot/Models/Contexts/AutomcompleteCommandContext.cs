@@ -6,15 +6,18 @@ public class AutocompleteCommandContext : BaseInteractiveContext<SocketAutocompl
     public string CurrentOptionAsString => Current.Value.ToString();
 
     public AutocompleteOption Current => InnerContext.Data.Current;
+    
+    public override string Command => InnerContext.Data.CommandName;
 
-    public string CommandName => InnerContext.Data.CommandName;
-
-    public string SubCommand => InnerContext.Data.Options.Where(x => x.Type == ApplicationCommandOptionType.SubCommand).Select(x => x.Name)
+    public override string SubCommand => InnerContext.Data.Options.Where(x => x.Type == ApplicationCommandOptionType.SubCommand).Select(x => x.Name)
         .FirstOrDefault();
 
+    public override string SubCommandGroup => InnerContext.Data.Options.Where(x => x.Type == ApplicationCommandOptionType.SubCommandGroup).Select(x => x.Name)
+        .FirstOrDefault();
+   
     public string CurrentOption => InnerContext.Data.Options.Where(x => x.Value == Current.Value).Select(x => x.Name).FirstOrDefault();
 
-    public string CommandFullName => string.IsNullOrWhiteSpace(SubCommand) ? CommandName : $"{CommandName} {SubCommand}";
+    public string CommandFullName => string.IsNullOrWhiteSpace(SubCommand) ? Command : $"{Command} {SubCommand}";
     public override string Message => $"Autocompleting '{Current}' for {CurrentOption} in {CommandFullName}";
     
     public Task RespondAsync<T>(IEnumerable<T> options) {

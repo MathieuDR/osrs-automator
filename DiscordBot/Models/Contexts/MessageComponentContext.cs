@@ -16,6 +16,8 @@ public class MessageComponentContext : BaseInteractiveContext<SocketMessageCompo
     public IReadOnlyCollection<EmbedField> EmbedFields => InnerContext.Message.Embeds.FirstOrDefault()?.Fields ?? new ImmutableArray<EmbedField>();
 
     public override string Message => InnerContext.Message.Content;
+    
+    
 
     public Task UpdateAsync(
         Optional<string> content = new(),
@@ -35,4 +37,8 @@ public class MessageComponentContext : BaseInteractiveContext<SocketMessageCompo
             props.Flags = flags;
         }, options);
     }
+
+    public override string Command => CustomIdParts.FirstOrDefault();
+    public override string SubCommand => CustomIdParts.LastOrDefault();
+    public override string SubCommandGroup => CustomIdParts.Count() == 3 ? CustomIdParts[1] : null;
 }

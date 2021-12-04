@@ -4,7 +4,21 @@ using HashDepot;
 
 namespace DiscordBot.Commands.Interactive2.Base.Definitions;
 
-public abstract class SubCommandDefinitionBase<TRoot> : ISubCommandDefinition<TRoot> where TRoot : IRootCommandDefinition {
+public abstract class CommandDefinitionBase : ICommandDefinition {
+    public abstract string Name { get; }
+    public abstract string Description { get; }
+    public IEnumerable<(string optionName, Type optionType)> Options { get; } = new List<(string optionName, Type optionType)>();
+    /// <summary>
+    /// Set options in here with correct type.
+    /// This will be used in the handlers to automatically get all options
+    /// </summary>
+    /// <returns></returns>
+    protected virtual Task FillOptions() {
+        return Task.CompletedTask;
+    }
+}
+
+public abstract class SubCommandDefinitionBase<TRoot> :CommandDefinitionBase, ISubCommandDefinition<TRoot> where TRoot : IRootCommandDefinition {
     public async Task<SlashCommandOptionBuilder> GetOptionBuilder() {
         var builder = new SlashCommandOptionBuilder()
             .WithName(Name)
@@ -16,18 +30,16 @@ public abstract class SubCommandDefinitionBase<TRoot> : ISubCommandDefinition<TR
         return builder;
     }
 
-    public abstract string Name { get; }
-    public abstract string Description { get; }
-    
     /// <summary>
     ///     Extend the builder. The Name and description is already set
     /// </summary>
     /// <param name="builder">Builder with name and description set</param>
     /// <returns>Fully build slash command builder</returns>
     protected abstract Task<SlashCommandOptionBuilder> ExtendOptionCommandBuilder(SlashCommandOptionBuilder builder);
+    
 }
 
-public abstract class RootCommandDefinitionBase : IRootCommandDefinition {
+public abstract class RootCommandDefinitionBase :CommandDefinitionBase, IRootCommandDefinition {
     public abstract Guid Id { get; }
 
     public async Task<uint> GetCommandBuilderHash() {
@@ -41,10 +53,7 @@ public abstract class RootCommandDefinitionBase : IRootCommandDefinition {
         var builder = await GetCommandBuilder();
         return builder.Build();
     }
-
-    public abstract string Name { get; }
-    public abstract string Description { get; }
-
+  
     public async Task<SlashCommandBuilder> GetCommandBuilder() {
         var builder = new SlashCommandBuilder()
             .WithName(Name)

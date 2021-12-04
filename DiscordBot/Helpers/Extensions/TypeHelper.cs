@@ -1,21 +1,10 @@
 ﻿using System.Diagnostics;
 using System.Text;
-using DiscordBot.Commands.Modules.DiscordCommandArguments;
 using WiseOldManConnector.Models.WiseOldMan.Enums;
 
 namespace DiscordBot.Helpers.Extensions;
 
 public static class TypeHelper {
-    public static List<Type> WhiteListedTypesToOutput() {
-        return new List<Type> {
-            typeof(BaseArguments),
-            typeof(MetricArguments),
-            typeof(PeriodArguments),
-            typeof(PeriodAndMetricArguments),
-            typeof(UserListWithImageArguments)
-        };
-    }
-
     public static string ToFriendlyExplenation(this Type type) {
         var builder = new StringBuilder();
         var identified = false;
@@ -67,26 +56,6 @@ public static class TypeHelper {
 
         if (type == typeof(int)) {
             builder.Append("Number");
-            identified = true;
-        }
-
-        if (type == typeof(MetricArguments)) {
-            builder.Append("Metric OSRS Arguments");
-            identified = true;
-        }
-
-        if (type == typeof(PeriodAndMetricArguments)) {
-            builder.Append("Complete OSRS Arguments");
-            identified = true;
-        }
-
-        if (type == typeof(PeriodAndMetricArguments)) {
-            builder.Append("Period OSRS Arguments");
-            identified = true;
-        }
-
-        if (type == typeof(UserListWithImageArguments)) {
-            builder.Append("List of users and an image (with url or attachment)");
             identified = true;
         }
 
