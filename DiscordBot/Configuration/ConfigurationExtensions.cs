@@ -127,6 +127,11 @@ public static class ConfigurationExtensions {
                 .Any(y => y.GetGenericArguments().Any(z => z == rootCommand))).ToArray();
             commandDictionary.Add(rootCommand, subCommandsOfRootCommandOfType);
         }
+        
+        // Add all commands to service collection
+        foreach (var command in commands) {
+            serviceCollection.AddSingleton(command);
+        }
 
         return serviceCollection;
     }
