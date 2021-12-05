@@ -13,7 +13,6 @@ public abstract class ApplicationCommandHandler : IApplicationCommandHandler {
     }
 
     public ILogger Logger { get; }
-    public abstract Guid Id { get; }
     public abstract AuthorizationRoles MinimumAuthorizationRole { get; }
     public string Name { get; }
     public string Description { get; }

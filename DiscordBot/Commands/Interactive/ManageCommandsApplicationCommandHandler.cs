@@ -16,7 +16,6 @@ public class ManageCommandsApplicationCommandHandler : ApplicationCommandHandler
         _applicationCommandInfoRepository = repositoryStrategy.GetOrCreateRepository<IApplicationCommandInfoRepository>();
     }
 
-    public override Guid Id => Guid.Parse("FEFC7AEA-A180-4545-81C0-0010DF72258A");
     public override AuthorizationRoles MinimumAuthorizationRole => AuthorizationRoles.BotAdmin;
 
     public override async Task<Result> HandleCommandAsync(ApplicationCommandContext context) {

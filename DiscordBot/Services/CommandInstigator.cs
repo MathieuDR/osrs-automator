@@ -6,33 +6,36 @@ namespace DiscordBot.Services;
 
 public interface ICommandInstigator {
     Task<Result> ExecuteCommandAsync<T>(BaseInteractiveContext<T> context) where T : SocketInteraction;
+
+    Task<Result> ExecuteCommandAsync(BaseInteractiveContext context);
+
 }
 
 public class CommandInstigator : ICommandInstigator {
-    private readonly (IRootCommandDefinition rootCommand, IEnumerable<ISubCommandDefinition> subCommands)[] _commands;
+    private readonly Dictionary<ICommandDefinition, IEnumerable<ICommandDefinition>> _commands;
     private readonly IMediator _mediator;
     private readonly Type[] _requests;
     
     private readonly Dictionary<ICommandDefinition, Dictionary<Type, Type>> _commandRequests = new();
 
     public CommandInstigator(IMediator mediator,
-        IEnumerable<(IRootCommandDefinition rootCommand, IEnumerable<ISubCommandDefinition> subCommands)> commands, 
-        IEnumerable<Type> requests,
-        IEnumerable<Type> contextTypes) {
+        Dictionary<ICommandDefinition, IEnumerable<ICommandDefinition>> commands,
+         
+        IEnumerable<Type> requests) {
         _mediator = mediator;
-        _commands = commands.ToArray();
+        _commands = commands;
         _requests = requests.ToArray();
 
         InitializeCommandRequestDictionary(_commands, _requests);
     }
     
-    private void InitializeCommandRequestDictionary((IRootCommandDefinition rootCommand, IEnumerable<ISubCommandDefinition> subCommands)[] commands, Type[] requests) {
+    private void InitializeCommandRequestDictionary(Dictionary<ICommandDefinition, IEnumerable<ICommandDefinition>> commands, Type[] requests) {
         foreach (var commandBundle in commands) {
-            foreach (var subCommand in commandBundle.subCommands) {
+            foreach (var subCommand in commandBundle.Value) {
                 // check if the requests has the subcommand type as generic type parameter
-                _commandRequests.Add(subCommand, GetTypeOfCommandRequestForCommandDefinition(subCommand, requests));
+                _commandRequests.Add(subCommand, GetTypeOfCommandRequestForCommandDefinition(subCommand.GetType(), requests));
             }
-            _commandRequests.Add(commandBundle.rootCommand, GetTypeOfCommandRequestForCommandDefinition(commandBundle.rootCommand, requests));
+            _commandRequests.Add(commandBundle.Key, GetTypeOfCommandRequestForCommandDefinition(commandBundle.Key.GetType(), requests));
         }
     }
     
@@ -42,8 +45,8 @@ public class CommandInstigator : ICommandInstigator {
     /// <param name="commandDefinition"></param>
     /// <param name="requests"></param>
     /// <returns>Dictionary of types. First type is a context type and the value is the request</returns>
-    private Dictionary<Type, Type> GetTypeOfCommandRequestForCommandDefinition(ICommandDefinition commandDefinition, Type[] requests) {
-       var requestsOfCommand =  requests.Where(x => x.GetGenericArguments().Contains(commandDefinition.GetType())).ToArray();
+    private Dictionary<Type, Type> GetTypeOfCommandRequestForCommandDefinition(Type commandDefinition, Type[] requests) {
+       var requestsOfCommand =  requests.Where(x => x.GetGenericArguments().Contains(commandDefinition)).ToArray();
        var withContextType = requestsOfCommand.Select(requestType => (Context:requestType.GetGenericArguments().FirstOrDefault(generic => typeof(BaseInteractiveContext).IsAssignableFrom(generic)), requestType))
            .Where(item=>item.Context is not null).ToDictionary(x=> x.Context, x=>x.requestType);
 
@@ -65,6 +68,15 @@ public class CommandInstigator : ICommandInstigator {
         return await _mediator.Send(request);
     }
 
+    public Task<Result> ExecuteCommandAsync(BaseInteractiveContext context) {
+        return context switch {
+            ApplicationCommandContext appCtx => ExecuteCommandAsync(appCtx),
+            AutocompleteCommandContext autocompleteCtx => ExecuteCommandAsync(autocompleteCtx),
+            MessageComponentContext messageCtx => ExecuteCommandAsync(messageCtx),
+            _ => throw new ArgumentOutOfRangeException(nameof(context), context, null)
+        };
+    }
+
     private ICommandRequest<TContext> CreateCommandRequest<TContext>(TContext context, ICommandDefinition definition) where TContext : BaseInteractiveContext {
         if (!_commandRequests.ContainsKey(definition)) {
             return null;
@@ -79,7 +91,7 @@ public class CommandInstigator : ICommandInstigator {
     }
 
     private Result<ICommandDefinition> GetCommandDefinition<T>(BaseInteractiveContext<T> context) where T : SocketInteraction {
-        var commandDefinitions = _commands.Where(x => x.rootCommand.Name == context.Command).ToList();
+        var commandDefinitions = _commands.Where(x => x.Key.Name == context.Command).ToList();
 
         // Error handling
         if (commandDefinitions.Count == 0) {
@@ -91,10 +103,10 @@ public class CommandInstigator : ICommandInstigator {
         }
 
         if (string.IsNullOrEmpty(context.SubCommand)) {
-            var sub = commandDefinitions.First().subCommands.FirstOrDefault(x => x.Name == context.SubCommand);
+            var sub = commandDefinitions.First().Value.FirstOrDefault(x => x.Name == context.SubCommand);
             return sub == null ? Result.Fail<ICommandDefinition>("Could not find command") : Result.Ok<ICommandDefinition>(sub);
         }
 
-        return Result.Ok<ICommandDefinition>(commandDefinitions.First().rootCommand);
+        return Result.Ok<ICommandDefinition>(commandDefinitions.First().Key);
     }
 }

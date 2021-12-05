@@ -3,7 +3,6 @@ using DiscordBot.Common.Models.Enums;
 namespace DiscordBot.Commands.Interactive;
 
 public interface IApplicationCommandHandler {
-    public Guid Id { get; }
     public string Name { get; }
     public string Description { get; }
     public bool GlobalRegister { get; }

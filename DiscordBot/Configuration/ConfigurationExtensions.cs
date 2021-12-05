@@ -1,9 +1,12 @@
+using Common.Extensions;
 using Discord.Commands;
 using DiscordBot.Commands.Interactive;
 using DiscordBot.Commands.Interactive2.Base.Definitions;
+using DiscordBot.Commands.Interactive2.Base.Requests;
 using DiscordBot.Common.Configuration;
 using DiscordBot.Services;
 using DiscordBot.Services.Services;
+using MediatR;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
@@ -106,14 +109,27 @@ public static class ConfigurationExtensions {
 
     
     private static IServiceCollection AddCommandsFromAssemblies(this IServiceCollection serviceCollection, params Type[] assemblTypes) {
-        // Get assemblies from types
-        var assemblies = assemblTypes.Select(x => x.Assembly).Distinct().ToArray();
+        var commands = GetTypeFromTypes(assemblTypes, typeof(ICommandDefinition));
+        var requests = GetTypeFromTypes(assemblTypes, typeof(ICommandRequest<>));
+        var commandDefinitionTypeDictionary = SortCommandDefintionTypesByRootCommand(commands);
         
-        // Get all commands from assemblies
-        var commands = assemblies.SelectMany(x => x.GetTypes())
-            .Where(x => typeof(ICommandDefinition).IsAssignableFrom(x) && !x.IsAbstract && !x.IsInterface)
-            .ToArray();
+        // Creates instances of all these commandDefinitions
+        var commandsDictionary = commandDefinitionTypeDictionary
+            .ToDictionary(x=> Activator.CreateInstance(x.Key).As<ICommandDefinition>(), 
+                x=> x.Value.Select(x=>Activator.CreateInstance(x).As<ICommandDefinition>()));
         
+        // Register instigator
+        serviceCollection.AddSingleton<ICommandInstigator>(x=> new CommandInstigator(x.GetRequiredService<IMediator>(), commandsDictionary, requests));
+        
+        return serviceCollection;
+    }
+
+    /// <summary>
+    /// Sort commands by root and sub commands
+    /// </summary>
+    /// <param name="commands"></param>
+    /// <returns></returns>
+    private static Dictionary<Type, IEnumerable<Type>> SortCommandDefintionTypesByRootCommand(Type[] commands) {
         // Split them up into root and sub commands through interface
         var rootCommands = commands.Where(x => typeof(IRootCommandDefinition).IsAssignableFrom(x)).ToArray();
         var subCommands = commands.Where(x => typeof(ISubCommandDefinition).IsAssignableFrom(x)).Where(x => x.GetInterfaces()
@@ -127,13 +143,25 @@ public static class ConfigurationExtensions {
                 .Any(y => y.GetGenericArguments().Any(z => z == rootCommand))).ToArray();
             commandDictionary.Add(rootCommand, subCommandsOfRootCommandOfType);
         }
-        
-        // Add all commands to service collection
-        foreach (var command in commands) {
-            serviceCollection.AddSingleton(command);
-        }
 
-        return serviceCollection;
+        return commandDictionary;
+    }
+
+    /// <summary>
+    /// Gets all types from an assembly that implement a given interface and is not abstract
+    /// </summary>
+    /// <param name="assemblyTypes"></param>
+    /// <param name="typeToScan"></param>
+    /// <returns></returns>
+    private static Type[] GetTypeFromTypes(Type[] assemblyTypes, Type typeToScan) {
+        // Get assemblies from types
+        var assemblies = assemblyTypes.Select(x => x.Assembly).Distinct().ToArray();
+
+        // Get all commands from assemblies
+        var foundTypes = assemblies.SelectMany(x => x.GetTypes())
+            .Where(x => typeToScan.IsAssignableFrom(x) && !x.IsAbstract && !x.IsInterface)
+            .ToArray();
+        return foundTypes;
     }
 
     public static IServiceCollection AddDiscordBot(this IServiceCollection serviceCollection, IConfiguration configuration, params Type[] assemblies) {

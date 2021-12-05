@@ -24,7 +24,6 @@ public class ConfigureApplicationCommandHandler : ApplicationCommandHandler {
         _timeZones = TZNames.GetDisplayNames("en-GB");
     }
 
-    public override Guid Id => Guid.Parse("C94327FC-2FBE-484B-B054-E1F88A02895C");
     public override AuthorizationRoles MinimumAuthorizationRole => AuthorizationRoles.ClanAdmin;
 
 
