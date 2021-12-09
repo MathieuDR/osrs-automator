@@ -6,7 +6,7 @@ using MediatR;
 namespace DiscordBot.Services;
 
 public class CommandInstigator : ICommandInstigator {
-    private readonly Dictionary<ICommandDefinition, IEnumerable<ICommandDefinition>> _commands;
+    private readonly Dictionary<ICommandDefinition, ICommandDefinition[]> _commands;
     private readonly IMediator _mediator;
 
     private readonly Dictionary<ICommandDefinition, Dictionary<Type, Type>> _commandRequests = new();
@@ -20,7 +20,7 @@ public class CommandInstigator : ICommandInstigator {
         InitializeCommandRequestDictionary(_commands,  requests.ToArray());
     }
 
-    private static Dictionary<ICommandDefinition, IEnumerable<ICommandDefinition>> GetCommandsFromProvider(ICommandDefinitionProvider commandDefinitionProvider) {
+    private static Dictionary<ICommandDefinition, ICommandDefinition[]> GetCommandsFromProvider(ICommandDefinitionProvider commandDefinitionProvider) {
         var results = commandDefinitionProvider.GetRootDefinitionsWithSubDefinition();
         if (results.IsFailed) {
             throw new Exception(results.CombineMessage());
@@ -29,7 +29,7 @@ public class CommandInstigator : ICommandInstigator {
         return results.Value;
     }
 
-    private void InitializeCommandRequestDictionary(Dictionary<ICommandDefinition, IEnumerable<ICommandDefinition>> commands, Type[] requests) {
+    private void InitializeCommandRequestDictionary(Dictionary<ICommandDefinition, ICommandDefinition[]> commands, Type[] requests) {
         foreach (var commandBundle in commands) {
             foreach (var subCommand in commandBundle.Value) {
                 // check if the requests has the subcommand type as generic type parameter
