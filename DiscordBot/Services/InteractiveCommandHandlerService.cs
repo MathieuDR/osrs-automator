@@ -65,6 +65,9 @@ public class InteractiveCommandHandlerService {
                 ctx = new ApplicationCommandContext(socketSlashCommand, _provider);
                 break;
             case SocketMessageComponent socketMessageComponent:
+                
+                // Check if this is used from in the 'Fergun interactive service'
+                // Paginator, ...
                 if (_interactiveService.Callbacks.ContainsKey(socketMessageComponent.Message.Id)) {
                     _logger.LogInformation("Interactive service callback used by {usr}", arg.User);
                     return;
@@ -85,8 +88,6 @@ public class InteractiveCommandHandlerService {
             return;
         }
 
-        //Instagator.Handle(ctx);
-        
         _logger.LogInformation("[{ctx}] Command triggered", ctx);
         //var result = await _strategy.HandleInteractiveCommand(ctx).ConfigureAwait(false);
         var result = await _commandInstigator.ExecuteCommandAsync(ctx).ConfigureAwait(false);

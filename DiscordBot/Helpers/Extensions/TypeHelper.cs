@@ -114,4 +114,31 @@ public static class TypeHelper {
 
         return type;
     }
+    
+    /// <summary>
+    /// Gets all types from a assemblies that implement a given interface and is not abstract
+    /// </summary>
+    /// <param name="assemblyTypes"></param>
+    /// <param name="typeToScan"></param>
+    /// <returns></returns>
+    public static Type[] GetConcreteClassFromType(this Type[] assemblyTypes, Type typeToScan) {
+        // Get assemblies from types
+        var assemblies = assemblyTypes.Select(x => x.Assembly).Distinct().ToArray();
+
+        // Get all commands from assemblies
+        var foundTypes = assemblies.SelectMany(x => x.GetTypes())
+            .Where(x => typeToScan.IsAssignableFrom(x) && !x.IsAbstract && !x.IsInterface)
+            .ToArray();
+        return foundTypes;
+    }
+    
+    /// <summary>
+    /// Gets all types from an assembly that implement a given interface and is not abstract
+    /// </summary>
+    /// <param name="assemblyType"></param>
+    /// <param name="typeToScan"></param>
+    /// <returns></returns>
+    public static Type[] GetTypeFromTypes(this Type assemblyType, Type typeToScan) {
+        return new[] { assemblyType }.GetConcreteClassFromType(typeToScan);
+    }
 }

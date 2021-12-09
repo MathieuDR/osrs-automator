@@ -1,34 +1,34 @@
-﻿using DiscordBot.Commands.Interactive2.Base.Definitions;
+﻿using Common.Extensions;
+using DiscordBot.Commands.Interactive2.Base.Definitions;
 using DiscordBot.Commands.Interactive2.Base.Requests;
 using MediatR;
 
 namespace DiscordBot.Services;
 
-public interface ICommandInstigator {
-    Task<Result> ExecuteCommandAsync<T>(BaseInteractiveContext<T> context) where T : SocketInteraction;
-
-    Task<Result> ExecuteCommandAsync(BaseInteractiveContext context);
-
-}
-
 public class CommandInstigator : ICommandInstigator {
     private readonly Dictionary<ICommandDefinition, IEnumerable<ICommandDefinition>> _commands;
     private readonly IMediator _mediator;
-    private readonly Type[] _requests;
-    
+
     private readonly Dictionary<ICommandDefinition, Dictionary<Type, Type>> _commandRequests = new();
 
     public CommandInstigator(IMediator mediator,
-        Dictionary<ICommandDefinition, IEnumerable<ICommandDefinition>> commands,
-         
+        ICommandDefinitionProvider commandDefinitionProvider,
         IEnumerable<Type> requests) {
+        
         _mediator = mediator;
-        _commands = commands;
-        _requests = requests.ToArray();
-
-        InitializeCommandRequestDictionary(_commands, _requests);
+        _commands = GetCommandsFromProvider(commandDefinitionProvider);
+        InitializeCommandRequestDictionary(_commands,  requests.ToArray());
     }
-    
+
+    private static Dictionary<ICommandDefinition, IEnumerable<ICommandDefinition>> GetCommandsFromProvider(ICommandDefinitionProvider commandDefinitionProvider) {
+        var results = commandDefinitionProvider.GetRootDefinitionsWithSubDefinition();
+        if (results.IsFailed) {
+            throw new Exception(results.CombineMessage());
+        }
+
+        return results.Value;
+    }
+
     private void InitializeCommandRequestDictionary(Dictionary<ICommandDefinition, IEnumerable<ICommandDefinition>> commands, Type[] requests) {
         foreach (var commandBundle in commands) {
             foreach (var subCommand in commandBundle.Value) {
