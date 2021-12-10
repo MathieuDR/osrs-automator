@@ -69,7 +69,9 @@ public abstract class RootCommandDefinitionBase :CommandDefinitionBase, IRootCom
     private async Task AddSubCommands(SlashCommandBuilder builder) {
         var subs = await GetSubcommands();
         var opts = await Task.WhenAll(subs.Select(x => x.GetOptionBuilder()));
-        builder.AddOptions(opts);
+        if(opts.Any()) {
+            builder.AddOptions(opts);
+        }
     }
 
     private async Task<IEnumerable<ISubCommandDefinition<RootCommandDefinitionBase>>> GetSubcommands() {

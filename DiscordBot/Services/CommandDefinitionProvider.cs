@@ -46,11 +46,19 @@ public class CommandDefinitionProvider : ICommandDefinitionProvider {
         return _commandsDictionary.SelectMany(x => new []{x.Key.As<ICommandDefinition>()}.Concat(x.Value)).ToResult();
     }
 
-    public Result<IEnumerable<(string name, string description)>> GetAllDefinitionDescriptions() {
+    public Result<IEnumerable<(string Name, string Description)>> GetAllDefinitionDescriptions() {
         return _commandsDictionary.SelectMany(x => new []{x.Key.As<ICommandDefinition>()}.Concat(x.Value)).Select(x=> (x.Name, x.Description)).ToResult();
+    }
+
+    public Result<IEnumerable<(string Name, string Description)>> GetRootDefinitionDescriptions() {
+        return _commandsDictionary.Select(x=> (x.Key.Name, x.Key.Description)).ToResult();
     }
 
     public Result<Dictionary<IRootCommandDefinition, ISubCommandDefinition[]>> GetRootDefinitionsWithSubDefinition() {
         return _commandsDictionary.ToResult();
+    }
+
+    public Result<IRootCommandDefinition> GetRootCommandByName(string command) {
+        return _commandsDictionary.FirstOrDefault(x=> x.Key.Name == command).Key.ToResult();
     }
 }
