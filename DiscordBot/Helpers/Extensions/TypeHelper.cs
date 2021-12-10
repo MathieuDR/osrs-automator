@@ -125,9 +125,12 @@ public static class TypeHelper {
         // Get assemblies from types
         var assemblies = assemblyTypes.Select(x => x.Assembly).Distinct().ToArray();
 
-        // Get all commands from assemblies
+        // Get all types
         var foundTypes = assemblies.SelectMany(x => x.GetTypes())
-            .Where(x => typeToScan.IsAssignableFrom(x) && !x.IsAbstract && !x.IsInterface)
+            // Check if it's a concrete class (no abstract & no interface
+            .Where(x=> !x.IsAbstract && !x.IsInterface)
+            // Check is is not null, or is a concrete class that we can assign from x OR if it's a generic that is equal to the type definition
+            .Where(x => x != null && (typeToScan.IsAssignableFrom(x) || x.GetInterfaces().Any(generic=> generic.IsGenericType && generic.GetGenericTypeDefinition() == typeToScan)))
             .ToArray();
         return foundTypes;
     }
