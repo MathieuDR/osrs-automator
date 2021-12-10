@@ -102,9 +102,9 @@ public class CommandInstigator : ICommandInstigator {
             return Result.Fail<ICommandDefinition>("Found more then one command");
         }
 
-        if (string.IsNullOrEmpty(context.SubCommand)) {
+        if (!string.IsNullOrEmpty(context.SubCommand)) {
             var sub = commandDefinitions.First().Value.FirstOrDefault(x => x.Name == context.SubCommand);
-            return sub == null ? Result.Fail<ICommandDefinition>("Could not find command") : Result.Ok<ICommandDefinition>(sub);
+            return sub == null ? Result.Fail<ICommandDefinition>("Could not find subcommand") : Result.Ok<ICommandDefinition>(sub);
         }
 
         return Result.Ok<ICommandDefinition>(commandDefinitions.First().Key);
