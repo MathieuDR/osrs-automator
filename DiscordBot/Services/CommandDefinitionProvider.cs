@@ -4,18 +4,18 @@ using DiscordBot.Commands.Interactive2.Base.Definitions;
 namespace DiscordBot.Services;
 
 public class CommandDefinitionProvider : ICommandDefinitionProvider {
-    private Dictionary<Type, Type[]> _commandDefinitionTypeDictionary;
-    private Dictionary<ICommandDefinition, ICommandDefinition[]> _commandsDictionary;
+    private readonly Dictionary<IRootCommandDefinition, ISubCommandDefinition[]> _commandsDictionary;
 
     public CommandDefinitionProvider(Type[] assemblyTypes) {
-        _commandDefinitionTypeDictionary = SortCommandDefinitionTypesByRootCommand(assemblyTypes.GetConcreteClassFromType(typeof(ICommandDefinition)));
+        var commandDefinitionTypeDictionary = SortCommandDefinitionTypesByRootCommand(assemblyTypes.GetConcreteClassFromType(typeof(ICommandDefinition)));
+        _commandsDictionary = ActivateTypes(commandDefinitionTypeDictionary);
     }
 
-    private void ActivateTypes(Dictionary<Type, IEnumerable<Type>> commandDefinitionTypeDictionary) {
+    private Dictionary<IRootCommandDefinition, ISubCommandDefinition[]> ActivateTypes(Dictionary<Type, Type[]> commandDefinitionTypeDictionary) {
         // Creates instances of all these commandDefinitions
-        _commandsDictionary = commandDefinitionTypeDictionary
-            .ToDictionary(x=> Activator.CreateInstance(x.Key).As<ICommandDefinition>(), 
-                x=> x.Value.Select(x=>Activator.CreateInstance(x).As<ICommandDefinition>()).ToArray());
+        return commandDefinitionTypeDictionary
+            .ToDictionary(x=> Activator.CreateInstance(x.Key).As<IRootCommandDefinition>(), 
+                x=> x.Value.Select(x=>Activator.CreateInstance(x).As<ISubCommandDefinition>()).ToArray());
     }
     
     /// <summary>
@@ -43,14 +43,14 @@ public class CommandDefinitionProvider : ICommandDefinitionProvider {
     
     public Result<IEnumerable<ICommandDefinition>> GetAllDefinitions() {
         // We concat the subs to the root
-        return _commandsDictionary.SelectMany(x => new []{x.Key}.Concat(x.Value)).ToResult();
+        return _commandsDictionary.SelectMany(x => new []{x.Key.As<ICommandDefinition>()}.Concat(x.Value)).ToResult();
     }
 
     public Result<IEnumerable<(string name, string description)>> GetAllDefinitionDescriptions() {
-        return _commandsDictionary.SelectMany(x => new []{x.Key}.Concat(x.Value)).Select(x=> (x.Name, x.Description)).ToResult();
+        return _commandsDictionary.SelectMany(x => new []{x.Key.As<ICommandDefinition>()}.Concat(x.Value)).Select(x=> (x.Name, x.Description)).ToResult();
     }
 
-    public Result<Dictionary<ICommandDefinition, ICommandDefinition[]>> GetRootDefinitionsWithSubDefinition() {
+    public Result<Dictionary<IRootCommandDefinition, ISubCommandDefinition[]>> GetRootDefinitionsWithSubDefinition() {
         return _commandsDictionary.ToResult();
     }
 }

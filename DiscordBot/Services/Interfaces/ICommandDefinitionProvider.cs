@@ -5,5 +5,5 @@ namespace DiscordBot.Services.Interfaces;
 public interface ICommandDefinitionProvider {
     Result<IEnumerable<ICommandDefinition>> GetAllDefinitions();
     Result<IEnumerable<(string name, string description)>> GetAllDefinitionDescriptions();
-    Result<Dictionary<ICommandDefinition, ICommandDefinition[]>> GetRootDefinitionsWithSubDefinition();
+    Result<Dictionary<IRootCommandDefinition, ISubCommandDefinition[]>> GetRootDefinitionsWithSubDefinition();
 }

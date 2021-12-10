@@ -17,6 +17,7 @@ public class InteractiveCommandHandlerService {
     private readonly IServiceProvider _provider;
     private readonly ICommandRegistrationService _registrationService;
     private readonly ICommandInstigator _commandInstigator;
+    private readonly ICommandStrategy _strategy;
 
     public InteractiveCommandHandlerService(ILogger<InteractiveCommandHandlerService> logger,
         DiscordSocketClient client,
@@ -25,7 +26,8 @@ public class InteractiveCommandHandlerService {
         ICommandRegistrationService registrationService,
         IOptions<BotTeamConfiguration> botTeamConfiguration,
         ICommandInstigator commandInstigator,
-        InteractiveService interactiveService) {
+        InteractiveService interactiveService,
+        ICommandStrategy strategy) {
         _logger = logger;
         _client = client;
         _provider = provider;
@@ -33,6 +35,7 @@ public class InteractiveCommandHandlerService {
         _registrationService = registrationService;
         _botTeamConfiguration = botTeamConfiguration;
         _interactiveService = interactiveService;
+        _strategy = strategy;
         _commandInstigator = commandInstigator;
         
         client.InteractionCreated += OnInteraction;
@@ -89,8 +92,14 @@ public class InteractiveCommandHandlerService {
         }
 
         _logger.LogInformation("[{ctx}] Command triggered", ctx);
-        //var result = await _strategy.HandleInteractiveCommand(ctx).ConfigureAwait(false);
+        
         var result = await _commandInstigator.ExecuteCommandAsync(ctx).ConfigureAwait(false);
+        if (result.IsFailed) {
+            var stratResult = await _strategy.HandleInteractiveCommand(ctx).ConfigureAwait(false);
+            if (stratResult.IsSuccess) {
+                result = stratResult;
+            }
+        }
 
         if (result.IsFailed) {
             var msg = result.CombineMessage();

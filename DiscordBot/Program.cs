@@ -62,6 +62,6 @@ internal class Program {
         return new ConfigurationBuilder()
             .SetBasePath(Directory.GetCurrentDirectory())
             .AddJsonFile("appsettings.json")
-            .AddJsonFile($"appsettings.{environmentName}.json", true).Build();
+            .AddJsonFile($"appsettings.{environmentName.ToLowerInvariant()}.json", true).Build();
     }
 }

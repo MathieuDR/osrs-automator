@@ -6,17 +6,20 @@ namespace DiscordBot.Services;
 
 public class CommandDefinitionRegistrationService : ICommandRegistrationService {
     private readonly IApplicationCommandInfoRepository _applicationCommandInfoRepository;
-    private readonly Dictionary<IRootCommandDefinition, IEnumerable<ISubCommandDefinition>> _commandDefinitions;
+    private readonly ICommandRegistrationService _oldRegistration;
+    private readonly Dictionary<IRootCommandDefinition, ISubCommandDefinition[]> _commandDefinitions;
     private readonly DiscordSocketClient _client;
     private readonly ILogger<CommandDefinitionRegistrationService> _logger;
 
     public CommandDefinitionRegistrationService(ILogger<CommandDefinitionRegistrationService> logger, DiscordSocketClient client,
         IApplicationCommandInfoRepository applicationCommandInfoRepository,
-        Dictionary<IRootCommandDefinition, IEnumerable<ISubCommandDefinition>> commandDefinitions) {
+        ICommandDefinitionProvider provider,
+        ICommandRegistrationService oldRegistration) {
         _logger = logger;
         _client = client;
         _applicationCommandInfoRepository = applicationCommandInfoRepository;
-        _commandDefinitions = commandDefinitions;
+        _oldRegistration = oldRegistration;
+        _commandDefinitions = provider.GetRootDefinitionsWithSubDefinition().Value;
     }
 
 
@@ -47,7 +50,7 @@ public class CommandDefinitionRegistrationService : ICommandRegistrationService 
     public async Task<Result> UpdateCommand(ApplicationCommandInfo applicationCommandInfo) {
         var definitions = _commandDefinitions.FirstOrDefault(x => x.Key.Name == applicationCommandInfo.CommandName);
         if (definitions.Equals(default(KeyValuePair<IRootCommandDefinition, IEnumerable<ISubCommandDefinition>>))) {
-            return Result.Fail("Command not found");
+            return await _oldRegistration.UpdateCommand(applicationCommandInfo);
         }
         return await UpdateCommand((rootCommand: definitions.Key, subCommands: definitions.Value), applicationCommandInfo);
     }
@@ -55,13 +58,15 @@ public class CommandDefinitionRegistrationService : ICommandRegistrationService 
     public async Task<Result> UpdateAllCommands(IEnumerable<ApplicationCommandInfo> commandInfos) {
         // List<Result> results = new List<Result>();
         var commandInfoArr = commandInfos.ToArray();
-        var tasks = new Task<Result>[commandInfoArr.Length];
+        var tasks = new Task<Result>[commandInfoArr.Length + 1];
         for (var i = 0; i < commandInfoArr.Length; i++) {
             var commandInfo = commandInfoArr[i];
             tasks[i] = UpdateCommand(commandInfo);
         }
 
+        tasks[^1] = _oldRegistration.UpdateAllCommands(commandInfoArr);
         ResultBase[] results = await Task.WhenAll(tasks);
+
         return Result.Merge(results);
     }
 
