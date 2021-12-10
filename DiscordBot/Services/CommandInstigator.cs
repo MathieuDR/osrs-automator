@@ -83,11 +83,12 @@ public class CommandInstigator : ICommandInstigator {
         }
         
         var dictionary = _commandRequests[definition];
-        var requestType = dictionary[context.GetType()];
-        if (requestType is null) {
-            return null;
+
+        if (dictionary.TryGetValue(context.GetType(), out var requestType)) {
+            return (ICommandRequest<TContext>) Activator.CreateInstance(requestType, context);
         }
-        return (ICommandRequest<TContext>) Activator.CreateInstance(requestType, context);
+
+        return null;
     }
 
     private Result<ICommandDefinition> GetCommandDefinition<T>(BaseInteractiveContext<T> context) where T : SocketInteraction {
