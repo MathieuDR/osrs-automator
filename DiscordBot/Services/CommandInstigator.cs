@@ -46,11 +46,18 @@ public class CommandInstigator : ICommandInstigator {
     /// <param name="requests"></param>
     /// <returns>Dictionary of types. First type is a context type and the value is the request</returns>
     private Dictionary<Type, Type> GetTypeOfCommandRequestForCommandDefinition(Type commandDefinition, Type[] requests) {
-       var requestsOfCommand =  requests.Where(x => x.GetGenericArguments().Contains(commandDefinition)).ToArray();
+       var requestsOfCommand =  requests.Where(x => x.GetInterfaces().Any(i => i.GetGenericArguments().Contains(commandDefinition))).ToArray();
+
+       var withContextType2 = requestsOfCommand
+           .Select(request => 
+               (Context:request.GetInterfaces().Select(i => i.GetGenericArguments().FirstOrDefault(generic => typeof(BaseInteractiveContext).IsAssignableFrom(generic))).FirstOrDefault(t=> t is not null) as Type,
+               requestType:request))
+           .Where(item=>item.Context is not null).ToDictionary(x=> x.Context, x=>x.requestType);; 
+       
        var withContextType = requestsOfCommand.Select(requestType => (Context:requestType.GetGenericArguments().FirstOrDefault(generic => typeof(BaseInteractiveContext).IsAssignableFrom(generic)), requestType))
            .Where(item=>item.Context is not null).ToDictionary(x=> x.Context, x=>x.requestType);
 
-       return withContextType;
+       return withContextType2;
 
     }
 
