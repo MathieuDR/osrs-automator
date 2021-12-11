@@ -1,4 +1,5 @@
-﻿using Common.Extensions;
+﻿using System.Reflection;
+using Common.Extensions;
 using DiscordBot.Commands.Interactive2.Base.Definitions;
 using DiscordBot.Commands.Interactive2.Base.Requests;
 using MediatR;
@@ -9,7 +10,7 @@ public class CommandInstigator : ICommandInstigator {
     private readonly Dictionary<IRootCommandDefinition, ISubCommandDefinition[]> _commands;
     private readonly IMediator _mediator;
 
-    private readonly Dictionary<ICommandDefinition, Dictionary<Type, Type>> _commandRequests = new();
+    private readonly Dictionary<ICommandDefinition, Dictionary<Type, TypeHelper.ObjectActivator>> _commandRequestsActivators = new();
 
     public CommandInstigator(IMediator mediator,
         ICommandDefinitionProvider commandDefinitionProvider,
@@ -33,9 +34,9 @@ public class CommandInstigator : ICommandInstigator {
         foreach (var commandBundle in commands) {
             foreach (var subCommand in commandBundle.Value) {
                 // check if the requests has the subcommand type as generic type parameter
-                _commandRequests.Add(subCommand, GetTypeOfCommandRequestForCommandDefinition(subCommand.GetType(), requests));
+                _commandRequestsActivators.Add(subCommand, GetTypeOfCommandRequestForCommandDefinition(subCommand.GetType(), requests));
             }
-            _commandRequests.Add(commandBundle.Key, GetTypeOfCommandRequestForCommandDefinition(commandBundle.Key.GetType(), requests));
+            _commandRequestsActivators.Add(commandBundle.Key, GetTypeOfCommandRequestForCommandDefinition(commandBundle.Key.GetType(), requests));
         }
     }
     
@@ -45,20 +46,27 @@ public class CommandInstigator : ICommandInstigator {
     /// <param name="commandDefinition"></param>
     /// <param name="requests"></param>
     /// <returns>Dictionary of types. First type is a context type and the value is the request</returns>
-    private Dictionary<Type, Type> GetTypeOfCommandRequestForCommandDefinition(Type commandDefinition, Type[] requests) {
-       var requestsOfCommand =  requests.Where(x => x.GetInterfaces().Any(i => i.GetGenericArguments().Contains(commandDefinition))).ToArray();
+    private Dictionary<Type, TypeHelper.ObjectActivator> GetTypeOfCommandRequestForCommandDefinition(Type commandDefinition, Type[] requests) {
+        var requestsOfCommand =  requests.Where(x => x.GetInterfaces().Any(i => i.GetGenericArguments().Contains(commandDefinition))).ToArray();
+        var result = new Dictionary<Type, TypeHelper.ObjectActivator>();
 
-       var withContextType2 = requestsOfCommand
-           .Select(request => 
-               (Context:request.GetInterfaces().Select(i => i.GetGenericArguments().FirstOrDefault(generic => typeof(BaseInteractiveContext).IsAssignableFrom(generic))).FirstOrDefault(t=> t is not null) as Type,
-               requestType:request))
-           .Where(item=>item.Context is not null).ToDictionary(x=> x.Context, x=>x.requestType);; 
-       
-       var withContextType = requestsOfCommand.Select(requestType => (Context:requestType.GetGenericArguments().FirstOrDefault(generic => typeof(BaseInteractiveContext).IsAssignableFrom(generic)), requestType))
-           .Where(item=>item.Context is not null).ToDictionary(x=> x.Context, x=>x.requestType);
+        foreach (var request in requestsOfCommand) {
+            var contextType = request.GetInterfaces()
+                .Select(i => i.GetGenericArguments().FirstOrDefault(generic => typeof(BaseInteractiveContext).IsAssignableFrom(generic)))
+                .FirstOrDefault(t => t is not null);
 
-       return withContextType2;
+            if (contextType is null) {
+                continue;
+            }
+            
+            var ctor = request.GetConstructors().First(x => x.GetParameters().Length == 1);
+            var activator = ctor.GetActivator();
+            
+            result.Add(contextType, activator);
+        }
 
+    
+        return result;
     }
 
     public async Task<Result> ExecuteCommandAsync<T>(BaseInteractiveContext<T> context) where T : SocketInteraction {
@@ -85,14 +93,14 @@ public class CommandInstigator : ICommandInstigator {
     }
 
     private ICommandRequest<TContext> CreateCommandRequest<TContext>(TContext context, ICommandDefinition definition) where TContext : BaseInteractiveContext {
-        if (!_commandRequests.ContainsKey(definition)) {
+        if (!_commandRequestsActivators.ContainsKey(definition)) {
             return null;
         }
         
-        var dictionary = _commandRequests[definition];
+        var dictionary = _commandRequestsActivators[definition];
 
-        if (dictionary.TryGetValue(context.GetType(), out var requestType)) {
-            return (ICommandRequest<TContext>) Activator.CreateInstance(requestType, context);
+        if (dictionary.TryGetValue(context.GetType(), out var activator)) {
+            return activator(context).As<ICommandRequest<TContext>>();
         }
 
         return null;
