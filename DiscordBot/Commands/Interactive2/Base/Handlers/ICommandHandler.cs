@@ -1,4 +1,6 @@
-﻿using DiscordBot.Commands.Interactive2.Base.Definitions;
+﻿using System.Linq.Expressions;
+using System.Reflection;
+using DiscordBot.Commands.Interactive2.Base.Definitions;
 using DiscordBot.Commands.Interactive2.Base.Requests;
 using MediatR;
 
@@ -36,7 +38,9 @@ public abstract class
         // Check if generic parameter is ICommandDefinition
         if (genericType is not null) {
             // Instantiate a object of the generic type
-            return Activator.CreateInstance(genericType) as ICommandDefinition;
+            ConstructorInfo ctor = genericType.GetConstructors().First(x => x.GetParameters().Length == 0);
+            TypeHelper.ObjectActivator<ICommandDefinition> createdActivator = ctor.GetActivator<ICommandDefinition>();
+            return createdActivator();
         }
 
         throw new Exception("Cannot find generic parameter");
