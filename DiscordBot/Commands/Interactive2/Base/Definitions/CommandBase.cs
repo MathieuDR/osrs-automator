@@ -2,6 +2,7 @@
 using System.Text.Json;
 using HashDepot;
 using Microsoft.Extensions.DependencyInjection;
+using RestSharp.Validation;
 
 namespace DiscordBot.Commands.Interactive2.Base.Definitions;
 
@@ -27,7 +28,7 @@ public abstract class CommandDefinitionBase : ICommandDefinition {
     }
 }
 
-public abstract class SubCommandDefinitionBase<TRoot> :CommandDefinitionBase, ISubCommandDefinition<TRoot> where TRoot : IRootCommandDefinition {
+public abstract class SubCommandDefinitionBase<TRoot> : CommandDefinitionBase, ISubCommandDefinition<TRoot> where TRoot : IRootCommandDefinition {
     public async Task<SlashCommandOptionBuilder> GetOptionBuilder() {
         var builder = new SlashCommandOptionBuilder()
             .WithName(Name)
@@ -74,8 +75,32 @@ public abstract class RootCommandDefinitionBase: CommandDefinitionBase, IRootCom
         builder = await ExtendBaseSlashCommandBuilder(builder);
 
         await AddSubCommands(builder);
+        
+        ValidateCommandBuilder(builder);
 
         return builder;
+    }
+
+    private void ValidateCommandBuilder(SlashCommandBuilder builder) {
+        if (builder.Name != builder.Name.ToLowerInvariant()) {
+            throw new ArgumentException("Command name must be lowercase");
+        }
+
+        foreach (var option in builder.Options) {
+            ValidateOption(option);
+        }
+    }
+
+    private void ValidateOption(SlashCommandOptionBuilder option) {
+        if(option.Name != option.Name.ToLowerInvariant()) {
+            throw new ArgumentException($"Option name {option.Name} must be lowercase");
+        }
+
+        if (option.Type == ApplicationCommandOptionType.SubCommand) {
+            foreach (var subOptions in option.Options) {
+                ValidateOption(subOptions);
+            }
+        }
     }
 
     private async Task AddSubCommands(SlashCommandBuilder builder) {
