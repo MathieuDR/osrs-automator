@@ -4,18 +4,25 @@ using DiscordBot.Commands.Interactive2.Base.Definitions;
 namespace DiscordBot.Services;
 
 public class CommandDefinitionProvider : ICommandDefinitionProvider {
+    private readonly IServiceProvider _provider;
     private readonly Dictionary<IRootCommandDefinition, ISubCommandDefinition[]> _commandsDictionary;
 
-    public CommandDefinitionProvider(Type[] assemblyTypes) {
+    public CommandDefinitionProvider(Type[] assemblyTypes, IServiceProvider provider) {
+        _provider = provider;
         var commandDefinitionTypeDictionary = SortCommandDefinitionTypesByRootCommand(assemblyTypes.GetConcreteClassFromType(typeof(ICommandDefinition)));
         _commandsDictionary = ActivateTypes(commandDefinitionTypeDictionary);
     }
 
     private Dictionary<IRootCommandDefinition, ISubCommandDefinition[]> ActivateTypes(Dictionary<Type, Type[]> commandDefinitionTypeDictionary) {
         // Creates instances of all these commandDefinitions
-        return commandDefinitionTypeDictionary
-            .ToDictionary(x=> Activator.CreateInstance(x.Key).As<IRootCommandDefinition>(), 
-                x=> x.Value.Select(x=>Activator.CreateInstance(x).As<ISubCommandDefinition>()).ToArray());
+        Dictionary<IRootCommandDefinition, ISubCommandDefinition[]> result = new();
+        foreach (var kvp in commandDefinitionTypeDictionary) {
+            var subs = kvp.Value.Select(x => Activator.CreateInstance(x, _provider).As<ISubCommandDefinition>()).ToArray();
+            var root = Activator.CreateInstance(kvp.Key, _provider, subs).As<IRootCommandDefinition>();
+            result.Add(root, subs);
+        }
+
+        return result;
     }
     
     /// <summary>
@@ -60,5 +67,10 @@ public class CommandDefinitionProvider : ICommandDefinitionProvider {
 
     public Result<IRootCommandDefinition> GetRootCommandByName(string command) {
         return _commandsDictionary.FirstOrDefault(x=> x.Key.Name == command).Key.ToResult();
+    }
+
+    public Result<IEnumerable<ISubCommandDefinition>> GetSubCommandsForRoot(string command) {
+        var subCommandDefinitions = _commandsDictionary.FirstOrDefault(x => x.Key.Name == command).Value;
+        return Result.Ok<IEnumerable<ISubCommandDefinition>>(subCommandDefinitions);
     }
 }

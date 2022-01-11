@@ -1,10 +1,19 @@
 ﻿using System.Text;
 using System.Text.Json;
 using HashDepot;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace DiscordBot.Commands.Interactive2.Base.Definitions;
 
-public abstract class CommandDefinitionBase : ICommandDefinition {
+public abstract class CommandDefinitionBase : ICommandDefinition { 
+    protected ILogger Logger { get; }
+    protected IServiceProvider ServiceProvider { get; }
+
+    public CommandDefinitionBase(IServiceProvider serviceProvider) {
+        ServiceProvider = serviceProvider;
+        var loggerFactory = ServiceProvider.GetRequiredService<ILoggerFactory>();
+        Logger = loggerFactory.CreateLogger(GetType());
+    }
     public abstract string Name { get; }
     public abstract string Description { get; }
     public IEnumerable<(string optionName, Type optionType)> Options { get; } = new List<(string optionName, Type optionType)>();
@@ -36,10 +45,13 @@ public abstract class SubCommandDefinitionBase<TRoot> :CommandDefinitionBase, IS
     /// <param name="builder">Builder with name and description set</param>
     /// <returns>Fully build slash command builder</returns>
     protected abstract Task<SlashCommandOptionBuilder> ExtendOptionCommandBuilder(SlashCommandOptionBuilder builder);
-    
+
+    protected SubCommandDefinitionBase(IServiceProvider serviceProvider) : base(serviceProvider) { }
 }
 
-public abstract class RootCommandDefinitionBase :CommandDefinitionBase, IRootCommandDefinition {
+public abstract class RootCommandDefinitionBase: CommandDefinitionBase, IRootCommandDefinition {
+    private readonly IEnumerable<ISubCommandDefinition> _subCommandDefinitions;
+
     public abstract Guid Id { get; }
 
     public async Task<uint> GetCommandBuilderHash() {
@@ -74,8 +86,8 @@ public abstract class RootCommandDefinitionBase :CommandDefinitionBase, IRootCom
         }
     }
 
-    private async Task<IEnumerable<ISubCommandDefinition<RootCommandDefinitionBase>>> GetSubcommands() {
-        return await Task.FromResult(Array.Empty<ISubCommandDefinition<RootCommandDefinitionBase>>());
+    private async Task<IEnumerable<ISubCommandDefinition>> GetSubcommands() {
+        return await Task.FromResult(_subCommandDefinitions);
     }
 
     /// <summary>
@@ -84,4 +96,8 @@ public abstract class RootCommandDefinitionBase :CommandDefinitionBase, IRootCom
     /// <param name="builder">Builder with name and description set</param>
     /// <returns>Fully build slash command builder</returns>
     protected abstract Task<SlashCommandBuilder> ExtendBaseSlashCommandBuilder(SlashCommandBuilder builder);
+
+    protected RootCommandDefinitionBase(IServiceProvider serviceProvider, IEnumerable<ISubCommandDefinition> subCommandDefinitions) : base(serviceProvider) {
+        _subCommandDefinitions = subCommandDefinitions;
+    }
 }

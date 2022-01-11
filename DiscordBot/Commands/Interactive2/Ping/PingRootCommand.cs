@@ -12,6 +12,8 @@ public class PingRootCommandDefinition : RootCommandDefinitionBase {
     protected override Task<SlashCommandBuilder> ExtendBaseSlashCommandBuilder(SlashCommandBuilder builder) {
         return Task.FromResult<SlashCommandBuilder>(builder);
     }
+
+    public PingRootCommandDefinition(IServiceProvider serviceProvider, IEnumerable<ISubCommandDefinition> subCommandDefinitions) : base(serviceProvider, subCommandDefinitions) { }
 }
 
 public class InsultSubCommandDefinition : SubCommandDefinitionBase<PingRootCommandDefinition> {
@@ -30,4 +32,6 @@ public class InsultSubCommandDefinition : SubCommandDefinitionBase<PingRootComma
         
         return base.FillOptions();
     }
+
+    public InsultSubCommandDefinition(IServiceProvider serviceProvider) : base(serviceProvider) { }
 }

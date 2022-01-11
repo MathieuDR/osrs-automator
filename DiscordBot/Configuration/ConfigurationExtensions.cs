@@ -110,7 +110,7 @@ public static class ConfigurationExtensions {
 
     private static IServiceCollection AddCommandsFromAssemblies(this IServiceCollection serviceCollection, params Type[] assemblyTypes) {
         // Register provider
-        serviceCollection.AddSingleton<ICommandDefinitionProvider>(_ => new CommandDefinitionProvider(assemblyTypes));
+        serviceCollection.AddSingleton<ICommandDefinitionProvider>(x => new CommandDefinitionProvider(assemblyTypes, x));
 
         // Register instigator
         serviceCollection.AddSingleton<ICommandInstigator>(x => new CommandInstigator(x.GetRequiredService<IMediator>(),

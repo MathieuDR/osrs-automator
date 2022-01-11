@@ -26,13 +26,21 @@ public class CommandStrategy : ICommandStrategy {
     private ulong GuildId => _botTeamConfiguration.Value.GuildId;
     private ulong OwnerId => _botTeamConfiguration.Value.OwnerId;
 
-    public Task<Result> HandleInteractiveCommand(BaseInteractiveContext context) {
-        return context switch {
-            MessageComponentContext messageComponentContext => HandleComponentCommand(messageComponentContext),
-            ApplicationCommandContext applicationCommandContext => HandleApplicationCommand(applicationCommandContext),
-            AutocompleteCommandContext autocompleteCommandContext => HandleAutoComplete(autocompleteCommandContext),
-            _ => Task.FromResult(Result.Fail("Could not find context type"))
-        };
+    public async Task<Result> HandleInteractiveCommand(BaseInteractiveContext context) {
+        try {
+            var result = context switch {
+                MessageComponentContext messageComponentContext => HandleComponentCommand(messageComponentContext),
+                ApplicationCommandContext applicationCommandContext => HandleApplicationCommand(applicationCommandContext),
+                AutocompleteCommandContext autocompleteCommandContext => HandleAutoComplete(autocompleteCommandContext),
+                _ => Task.FromResult(Result.Fail("Could not find context type"))
+            };
+
+            return await result;
+        } catch (Exception e) {
+            var guid = Guid.NewGuid();
+            _logger.LogError(e, "Error handling command, trace {guid}", guid);
+            return Result.Fail($"Error handling command. Trace: {guid}");
+        }
     }
 
     public Task<IApplicationCommandHandler> GetHandler(string applicationCommandName) {
