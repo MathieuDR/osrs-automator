@@ -5,123 +5,119 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace DiscordBot.Commands.Interactive2.Base.Definitions;
 
-public abstract class CommandDefinitionBase : ICommandDefinition { 
-    protected ILogger Logger { get; }
-    protected IServiceProvider ServiceProvider { get; }
+public abstract class CommandDefinitionBase : ICommandDefinition {
+	public CommandDefinitionBase(IServiceProvider serviceProvider) {
+		ServiceProvider = serviceProvider;
+		var loggerFactory = ServiceProvider.GetRequiredService<ILoggerFactory>();
+		Logger = loggerFactory.CreateLogger(GetType());
+	}
 
-    public CommandDefinitionBase(IServiceProvider serviceProvider) {
-        ServiceProvider = serviceProvider;
-        var loggerFactory = ServiceProvider.GetRequiredService<ILoggerFactory>();
-        Logger = loggerFactory.CreateLogger(GetType());
-    }
-    public abstract string Name { get; }
-    public abstract string Description { get; }
-    public IEnumerable<(string optionName, Type optionType)> Options { get; } = new List<(string optionName, Type optionType)>();
+	protected ILogger Logger { get; }
+	protected IServiceProvider ServiceProvider { get; }
+	public abstract string Name { get; }
+	public abstract string Description { get; }
+	public IEnumerable<(string optionName, Type optionType)> Options { get; } = new List<(string optionName, Type optionType)>();
+
     /// <summary>
-    /// Set options in here with correct type.
-    /// This will be used in the handlers to automatically get all options
+    ///     Set options in here with correct type.
+    ///     This will be used in the handlers to automatically get all options
     /// </summary>
     /// <returns></returns>
-    protected virtual Task FillOptions() {
-        return Task.CompletedTask;
-    }
+    protected virtual Task FillOptions() => Task.CompletedTask;
 }
 
 public abstract class SubCommandDefinitionBase<TRoot> : CommandDefinitionBase, ISubCommandDefinition<TRoot> where TRoot : IRootCommandDefinition {
-    public async Task<SlashCommandOptionBuilder> GetOptionBuilder() {
-        var builder = new SlashCommandOptionBuilder()
-            .WithName(Name)
-            .WithDescription(Description)
-            .WithType(ApplicationCommandOptionType.SubCommand);
+	protected SubCommandDefinitionBase(IServiceProvider serviceProvider) : base(serviceProvider) { }
 
-        builder = await ExtendOptionCommandBuilder(builder);
+	public async Task<SlashCommandOptionBuilder> GetOptionBuilder() {
+		var builder = new SlashCommandOptionBuilder()
+			.WithName(Name)
+			.WithDescription(Description)
+			.WithType(ApplicationCommandOptionType.SubCommand);
 
-        return builder;
-    }
+		builder = await ExtendOptionCommandBuilder(builder);
 
-    /// <summary>
-    ///     Extend the builder. The Name and description is already set
-    /// </summary>
-    /// <param name="builder">Builder with name and description set</param>
-    /// <returns>Fully build slash command builder</returns>
-    protected abstract Task<SlashCommandOptionBuilder> ExtendOptionCommandBuilder(SlashCommandOptionBuilder builder);
+		return builder;
+	}
 
-    protected SubCommandDefinitionBase(IServiceProvider serviceProvider) : base(serviceProvider) { }
+	/// <summary>
+	///     Extend the builder. The Name and description is already set
+	/// </summary>
+	/// <param name="builder">Builder with name and description set</param>
+	/// <returns>Fully build slash command builder</returns>
+	protected abstract Task<SlashCommandOptionBuilder> ExtendOptionCommandBuilder(SlashCommandOptionBuilder builder);
 }
 
-public abstract class RootCommandDefinitionBase: CommandDefinitionBase, IRootCommandDefinition {
-    private readonly IEnumerable<ISubCommandDefinition> _subCommandDefinitions;
+public abstract class RootCommandDefinitionBase : CommandDefinitionBase, IRootCommandDefinition {
+	private readonly IEnumerable<ISubCommandDefinition> _subCommandDefinitions;
 
-    public async Task<uint> GetCommandBuilderHash() {
-        var command = await GetCommandBuilder();
-        var json = JsonSerializer.Serialize(command);
-        var stream = Encoding.ASCII.GetBytes(json);
-        return XXHash.Hash32(stream);
-    }
+	protected RootCommandDefinitionBase(IServiceProvider serviceProvider, IEnumerable<ISubCommandDefinition> subCommandDefinitions) :
+		base(serviceProvider) => _subCommandDefinitions = subCommandDefinitions;
 
-    public async Task<SlashCommandProperties> GetCommandProperties() {
-        var builder = await GetCommandBuilder();
-        return builder.Build();
-    }
-  
-    public async Task<SlashCommandBuilder> GetCommandBuilder() {
-        var builder = new SlashCommandBuilder()
-            .WithName(Name)
-            .WithDescription(Description);
+	public async Task<uint> GetCommandBuilderHash() {
+		var command = await GetCommandBuilder();
+		var json = JsonSerializer.Serialize(command);
+		var stream = Encoding.ASCII.GetBytes(json);
+		return XXHash.Hash32(stream);
+	}
 
-        builder = await ExtendBaseSlashCommandBuilder(builder);
+	public async Task<SlashCommandProperties> GetCommandProperties() {
+		var builder = await GetCommandBuilder();
+		return builder.Build();
+	}
 
-        await AddSubCommands(builder);
-        
-        ValidateCommandBuilder(builder);
+	public async Task<SlashCommandBuilder> GetCommandBuilder() {
+		var builder = new SlashCommandBuilder()
+			.WithName(Name)
+			.WithDescription(Description);
 
-        return builder;
-    }
+		builder = await ExtendBaseSlashCommandBuilder(builder);
 
-    private void ValidateCommandBuilder(SlashCommandBuilder builder) {
-        if (builder.Name != builder.Name.ToLowerInvariant()) {
-            throw new ArgumentException("Command name must be lowercase");
-        }
+		await AddSubCommands(builder);
 
-        foreach (var option in builder.Options) {
-            ValidateOption(option);
-        }
-    }
+		ValidateCommandBuilder(builder);
 
-    private void ValidateOption(SlashCommandOptionBuilder option) {
-        if(option.Name != option.Name.ToLowerInvariant()) {
-            throw new ArgumentException($"Option name {option.Name} must be lowercase");
-        }
+		return builder;
+	}
 
-        if (option.Type == ApplicationCommandOptionType.SubCommand) {
-            if(option.Options is not null) {
-                foreach (var subOptions in option.Options) {
-                    ValidateOption(subOptions);
-                }
-            }
-        }
-    }
+	private void ValidateCommandBuilder(SlashCommandBuilder builder) {
+		if (builder.Name != builder.Name.ToLowerInvariant()) {
+			throw new ArgumentException("Command name must be lowercase");
+		}
 
-    private async Task AddSubCommands(SlashCommandBuilder builder) {
-        var subs = await GetSubcommands();
-        var opts = await Task.WhenAll(subs.Select(x => x.GetOptionBuilder()));
-        if(opts.Any()) {
-            builder.AddOptions(opts);
-        }
-    }
+		foreach (var option in builder.Options) {
+			ValidateOption(option);
+		}
+	}
 
-    private async Task<IEnumerable<ISubCommandDefinition>> GetSubcommands() {
-        return await Task.FromResult(_subCommandDefinitions);
-    }
+	private void ValidateOption(SlashCommandOptionBuilder option) {
+		if (option.Name != option.Name.ToLowerInvariant()) {
+			throw new ArgumentException($"Option name {option.Name} must be lowercase");
+		}
 
-    /// <summary>
-    ///     Extend the builder. The Name and description is already set
-    /// </summary>
-    /// <param name="builder">Builder with name and description set</param>
-    /// <returns>Fully build slash command builder</returns>
-    protected abstract Task<SlashCommandBuilder> ExtendBaseSlashCommandBuilder(SlashCommandBuilder builder);
+		if (option.Type == ApplicationCommandOptionType.SubCommand) {
+			if (option.Options is not null) {
+				foreach (var subOptions in option.Options) {
+					ValidateOption(subOptions);
+				}
+			}
+		}
+	}
 
-    protected RootCommandDefinitionBase(IServiceProvider serviceProvider, IEnumerable<ISubCommandDefinition> subCommandDefinitions) : base(serviceProvider) {
-        _subCommandDefinitions = subCommandDefinitions;
-    }
+	private async Task AddSubCommands(SlashCommandBuilder builder) {
+		var subs = await GetSubcommands();
+		var opts = await Task.WhenAll(subs.Select(x => x.GetOptionBuilder()));
+		if (opts.Any()) {
+			builder.AddOptions(opts);
+		}
+	}
+
+	private async Task<IEnumerable<ISubCommandDefinition>> GetSubcommands() => await Task.FromResult(_subCommandDefinitions);
+
+	/// <summary>
+	///     Extend the builder. The Name and description is already set
+	/// </summary>
+	/// <param name="builder">Builder with name and description set</param>
+	/// <returns>Fully build slash command builder</returns>
+	protected abstract Task<SlashCommandBuilder> ExtendBaseSlashCommandBuilder(SlashCommandBuilder builder);
 }

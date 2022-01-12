@@ -8,7 +8,6 @@ public interface ICommandDefinition {
 }
 
 public interface IRootCommandDefinition : ICommandDefinition {
-    public Guid Id { get; }
     Task<uint> GetCommandBuilderHash();
     Task<SlashCommandProperties> GetCommandProperties();
 }
