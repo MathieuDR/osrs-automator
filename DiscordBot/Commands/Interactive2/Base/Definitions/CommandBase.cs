@@ -52,8 +52,6 @@ public abstract class SubCommandDefinitionBase<TRoot> : CommandDefinitionBase, I
 public abstract class RootCommandDefinitionBase: CommandDefinitionBase, IRootCommandDefinition {
     private readonly IEnumerable<ISubCommandDefinition> _subCommandDefinitions;
 
-    public abstract Guid Id { get; }
-
     public async Task<uint> GetCommandBuilderHash() {
         var command = await GetCommandBuilder();
         var json = JsonSerializer.Serialize(command);
