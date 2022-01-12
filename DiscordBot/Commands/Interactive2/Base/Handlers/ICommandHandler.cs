@@ -13,9 +13,14 @@ public interface ICommandHandler<in TRequest, TContext> : IRequestHandler<TReque
 public abstract class
     CommandHandlerBase<TRequest, TContext> : ICommandHandler<TRequest, TContext>
     where TRequest : ICommandRequest<TContext> where TContext : BaseInteractiveContext {
+    protected IServiceProvider ServiceProvider { get; }
     protected TContext Context { get; set; }
     protected TRequest Request { get; set; }
     protected ICommandDefinition CommandDefinition { get; set; }
+
+    public CommandHandlerBase(IServiceProvider serviceProvider) {
+        ServiceProvider = serviceProvider;
+    }
 
     public Task<Result> Handle(TRequest request, CancellationToken cancellationToken) {
         // Set context and request
@@ -41,7 +46,7 @@ public abstract class
             // Instantiate a object of the generic type
             // Use activator instead of a compiled lambda.
             // We can improve this by creating a singleton service that holds all the activators.
-            return Activator.CreateInstance(genericType).As<ICommandDefinition>();
+            return Activator.CreateInstance(genericType, ServiceProvider).As<ICommandDefinition>();
         }
 
         throw new Exception("Cannot find generic parameter");
@@ -57,12 +62,18 @@ public abstract class
 
 public abstract class
     ApplicationCommandHandlerBase<TRequest> : CommandHandlerBase<TRequest, ApplicationCommandContext>
-    where TRequest : ICommandRequest<ApplicationCommandContext> { }
+    where TRequest : ICommandRequest<ApplicationCommandContext> {
+    protected ApplicationCommandHandlerBase(IServiceProvider serviceProvider) : base(serviceProvider) { }
+}
 
 public abstract class
     AutoCompleteHandlerBase<TRequest> : CommandHandlerBase<TRequest, AutocompleteCommandContext>
-    where TRequest : ICommandRequest<AutocompleteCommandContext> { }
+    where TRequest : ICommandRequest<AutocompleteCommandContext> {
+    protected AutoCompleteHandlerBase(IServiceProvider serviceProvider) : base(serviceProvider) { }
+}
 
 public abstract class
     MessageComponentHandlerBase<TRequest> : CommandHandlerBase<TRequest, MessageComponentContext>
-    where TRequest : ICommandRequest<MessageComponentContext> { }
+    where TRequest : ICommandRequest<MessageComponentContext> {
+    protected MessageComponentHandlerBase(IServiceProvider serviceProvider) : base(serviceProvider) { }
+}

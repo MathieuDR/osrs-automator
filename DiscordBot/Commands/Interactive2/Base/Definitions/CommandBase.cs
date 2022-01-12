@@ -2,7 +2,6 @@
 using System.Text.Json;
 using HashDepot;
 using Microsoft.Extensions.DependencyInjection;
-using RestSharp.Validation;
 
 namespace DiscordBot.Commands.Interactive2.Base.Definitions;
 
@@ -97,8 +96,10 @@ public abstract class RootCommandDefinitionBase: CommandDefinitionBase, IRootCom
         }
 
         if (option.Type == ApplicationCommandOptionType.SubCommand) {
-            foreach (var subOptions in option.Options) {
-                ValidateOption(subOptions);
+            if(option.Options is not null) {
+                foreach (var subOptions in option.Options) {
+                    ValidateOption(subOptions);
+                }
             }
         }
     }
