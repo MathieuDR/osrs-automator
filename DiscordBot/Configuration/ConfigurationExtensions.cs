@@ -67,6 +67,7 @@ public static class ConfigurationExtensions {
             .AddSingleton<PingApplicationCommandHandler>()
             .AddSingleton<ManageCommandsApplicationCommandHandler>()
             .AddSingleton<CountApplicationCommandHandler>()
+            .AddSingleton<KillBotCommandHandler>()
             .AddSingleton<CountConfigurationApplicationCommandHandler>()
             .AddSingleton<ConfigureApplicationCommandHandler>()
             .AddSingleton<CreateCompetitionCommandHandler>()
@@ -78,6 +79,7 @@ public static class ConfigurationExtensions {
                     x.GetRequiredService<ManageCommandsApplicationCommandHandler>(),
                     x.GetRequiredService<CountApplicationCommandHandler>(),
                     x.GetRequiredService<CountConfigurationApplicationCommandHandler>(),
+                    x.GetRequiredService<KillBotCommandHandler>(),
                     x.GetRequiredService<ConfigureApplicationCommandHandler>(),
                     x.GetRequiredService<CreateCompetitionCommandHandler>(),
                     x.GetRequiredService<AuthorizationConfigurationCommandHandler>()

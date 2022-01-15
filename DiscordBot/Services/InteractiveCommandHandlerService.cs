@@ -122,6 +122,11 @@ public class InteractiveCommandHandlerService {
 		_logger.LogInformation("[{ctx}] done", ctx);
 	}
 
+    private async Task InitializeCommands() {
+        var manageCommand = _provider.GetRequiredService<ManageCommandsApplicationCommandHandler>();
+        var killCommand = _provider.GetRequiredService<KillBotCommandHandler>();
+        await RegisterCommandForOwnersGuild(manageCommand);
+        await RegisterCommandForOwnersGuild(killCommand);
 	private async Task InitializeCommands() {
 		var manageCommand = _provider.GetRequiredService<ManageCommandsApplicationCommandHandler>();
 		await RegisterCommandForOwnersGuild(manageCommand);
