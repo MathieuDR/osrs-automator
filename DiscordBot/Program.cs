@@ -14,9 +14,9 @@ internal class Program {
     public async Task EntryPointAsync() {
         var config = BuildConfig();
         var services = ConfigureServices(config); // No using statement?
-        //var schedulerTask = CreateQuartzScheduler();
-
+        
         try {
+            Log.Logger.Information("Starting!");
             var bot = new DiscordBot(config, services, services.GetRequiredService<ILogger<DiscordBot>>());
             await bot.Run(new CancellationToken());
             await Task.Delay(-1);
@@ -47,7 +47,7 @@ internal class Program {
         ConfigureSerilogger();
 
         serviceCollection
-            .AddDiscordBot(config)
+            .AddDiscordBot<Program>(config)
             .UseLiteDbRepositories(config)
             .AddWiseOldManApi()
             .AddDiscordBotServices()
@@ -62,6 +62,6 @@ internal class Program {
         return new ConfigurationBuilder()
             .SetBasePath(Directory.GetCurrentDirectory())
             .AddJsonFile("appsettings.json")
-            .AddJsonFile($"appsettings.{environmentName}.json", true).Build();
+            .AddJsonFile($"appsettings.{environmentName.ToLowerInvariant()}.json", true).Build();
     }
 }

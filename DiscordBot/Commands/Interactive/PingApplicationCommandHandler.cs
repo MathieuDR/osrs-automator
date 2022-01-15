@@ -7,7 +7,6 @@ public class PingApplicationCommandHandler : ApplicationCommandHandler {
     public PingApplicationCommandHandler(ILogger<PingApplicationCommandHandler> logger) : base("ping",
         "Lets see if the bot is awake, with a new description!", logger) { }
 
-    public override Guid Id => Guid.Parse("912DFB5E-4837-40C5-8E66-CDA3779FE823");
     public override AuthorizationRoles MinimumAuthorizationRole => AuthorizationRoles.ClanGuest;
     public override bool GlobalRegister => true;
 

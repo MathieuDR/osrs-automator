@@ -1,3 +1,4 @@
+using DiscordBot.Commands.Interactive2.Base.Definitions;
 using DiscordBot.Common.Models.Enums;
 using DiscordBot.Data.Interfaces;
 using DiscordBot.Data.Strategies;
@@ -8,15 +9,16 @@ namespace DiscordBot.Commands.Interactive;
 public class ManageCommandsApplicationCommandHandler : ApplicationCommandHandler {
     private readonly IApplicationCommandInfoRepository _applicationCommandInfoRepository;
     private readonly IServiceProvider _serviceProvider;
+    private readonly ICommandDefinitionProvider _commandDefinitionProvider;
 
     public ManageCommandsApplicationCommandHandler(ILogger<ManageCommandsApplicationCommandHandler> logger, IServiceProvider serviceProvider,
-        IRepositoryStrategy repositoryStrategy) : base("commands",
+        IRepositoryStrategy repositoryStrategy, ICommandDefinitionProvider commandDefinitionProvider) : base("commands",
         "Manage commands", logger) {
         _serviceProvider = serviceProvider;
+        _commandDefinitionProvider = commandDefinitionProvider;
         _applicationCommandInfoRepository = repositoryStrategy.GetOrCreateRepository<IApplicationCommandInfoRepository>();
     }
 
-    public override Guid Id => Guid.Parse("FEFC7AEA-A180-4545-81C0-0010DF72258A");
     public override AuthorizationRoles MinimumAuthorizationRole => AuthorizationRoles.BotAdmin;
 
     public override async Task<Result> HandleCommandAsync(ApplicationCommandContext context) {
@@ -59,9 +61,20 @@ public class ManageCommandsApplicationCommandHandler : ApplicationCommandHandler
         Logger.LogInformation("{@info}", commandInfo);
 
         if (commandInfo is null) {
-            var commandStrategy = _serviceProvider.GetRequiredService<ICommandStrategy>();
-            var commandHash = await commandStrategy.GetCommandHash(command);
-            commandInfo = new ApplicationCommandInfo(command) { Hash = commandHash };
+            try {
+                var commandStrategy = _serviceProvider.GetRequiredService<ICommandStrategy>();
+                var commandHash = await commandStrategy.GetCommandHash(command);
+                commandInfo = new ApplicationCommandInfo(command) { Hash = commandHash };
+            } catch {
+                // ignored
+            }
+
+            // do definition
+            if (commandInfo is null) {
+                var definition = _commandDefinitionProvider.GetRootCommandByName(command).Value;
+                var hash = await definition.GetCommandBuilderHash();
+                commandInfo = new ApplicationCommandInfo(command) { Hash = hash };
+            }
         }
 
         var list = commandInfo.RegisteredGuilds;
@@ -191,7 +204,8 @@ public class ManageCommandsApplicationCommandHandler : ApplicationCommandHandler
     /// <returns></returns>
     private ComponentBuilder GetCommandsSelectMenu() {
         var strategy = _serviceProvider.GetRequiredService<ICommandStrategy>();
-        var commands = strategy.GetCommandDescriptions();
+        var commands = strategy.GetCommandDescriptions().ToList();
+        commands.AddRange(_commandDefinitionProvider.GetRootDefinitionDescriptions().Value);
         return new ComponentBuilder()
             .WithSelectMenu(new SelectMenuBuilder()
                 .WithCustomId(SubCommand("command"))

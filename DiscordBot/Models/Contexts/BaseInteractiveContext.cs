@@ -6,6 +6,10 @@ namespace DiscordBot.Models.Contexts;
 
 public abstract class BaseInteractiveContext {
     public abstract bool IsDeferred { get; }
+
+    public abstract string Command { get; }
+    public abstract string SubCommand { get; }
+    public abstract string SubCommandGroup { get; }
 }
 
 public abstract class BaseInteractiveContext<T> : BaseInteractiveContext where T : SocketInteraction {
@@ -33,7 +37,8 @@ public abstract class BaseInteractiveContext<T> : BaseInteractiveContext where T
 
     public abstract string Message { get; }
     public string MessageLocation => InGuild ? $"{Channel} ({Guild})" : "Direct Message";
-
+    
+    
     /// <summary>
     ///     Is only accurate if the inner context is not used by itself
     /// </summary>

@@ -1,13 +1,18 @@
 using Discord.Commands;
 using DiscordBot.Commands.Interactive;
+using DiscordBot.Commands.Interactive2.Base.Requests;
 using DiscordBot.Common.Configuration;
+using DiscordBot.Data.Interfaces;
 using DiscordBot.Services;
 using DiscordBot.Services.Services;
+using MediatR;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
+using Refit;
 using Serilog;
 using WiseOldManConnector.Interfaces;
+using ILogger = Serilog.ILogger;
 
 namespace DiscordBot.Configuration;
 
@@ -26,9 +31,7 @@ public static class ConfigurationExtensions {
                 return client;
             })
             .AddSingleton<CommandService>()
-            .AddSingleton<CommandHandlingService>()
             .AddSingleton<InteractiveCommandHandlerService>()
-            .AddTransient<ICommandRegistrationService, CommandRegistrationService>()
             .AddSingleton<InteractiveService>()
             .AddDiscordCommands();
 
@@ -46,7 +49,8 @@ public static class ConfigurationExtensions {
 
     private static IServiceCollection AddExternalServices(this IServiceCollection serviceCollection) {
         serviceCollection
-            .AddTransient<IDiscordService, DiscordService>();
+            .AddTransient<IDiscordService, DiscordService>()
+            .AddMediatR(typeof(Program));
 
         return serviceCollection;
     }
@@ -106,6 +110,45 @@ public static class ConfigurationExtensions {
     }
 
 
+    private static IServiceCollection AddCommandsFromAssemblies(this IServiceCollection serviceCollection, params Type[] assemblyTypes) {
+        // Register provider
+        serviceCollection.AddSingleton<ICommandDefinitionProvider>(x => new CommandDefinitionProvider(assemblyTypes, x));
+
+        // Register instigator
+        serviceCollection.AddSingleton<ICommandInstigator>(x => new CommandInstigator(x.GetRequiredService<IMediator>(),
+            x.GetRequiredService<ICommandDefinitionProvider>(), assemblyTypes.GetConcreteClassFromType(typeof(ICommandRequest<>))));
+        
+        // Add RegistrationService
+        serviceCollection.AddTransient<ICommandRegistrationService, CommandRegistrationService>()
+            .Decorate<ICommandRegistrationService>((inner, provider) => new CommandDefinitionRegistrationService(provider.GetRequiredService<ILogger<CommandDefinitionRegistrationService>>(),
+                provider.GetRequiredService<DiscordSocketClient>(),
+                provider.GetRequiredService<IApplicationCommandInfoRepository>(),
+                provider.GetRequiredService<ICommandDefinitionProvider>(),
+                inner));
+
+        return serviceCollection;
+    }
+
+    public static IServiceCollection AddDiscordBot(this IServiceCollection serviceCollection, IConfiguration configuration,
+        params Type[] assemblies) {
+        serviceCollection
+            .AddLoggingInformation()
+            .AddDiscordClient()
+            .AddExternalServices()
+            .AddConfiguration(configuration)
+            .AddHelpers()
+            .ConfigureAutoMapper()
+            .AddCommandsFromAssemblies(assemblies);
+
+        return serviceCollection;
+    }
+
+
+    public static IServiceCollection AddDiscordBot<T>(this IServiceCollection serviceCollection, IConfiguration configuration) {
+        return serviceCollection.AddDiscordBot(configuration, typeof(T));
+    }
+
+    [Obsolete]
     public static IServiceCollection AddDiscordBot(this IServiceCollection serviceCollection,
         IConfiguration configuration) {
         serviceCollection

@@ -12,7 +12,6 @@ public class KillBotCommandHandler : ApplicationCommandHandler {
         _manager = manager;
     }
 
-    public override Guid Id => Guid.Parse("5DACBE44-6352-4A47-BC14-030E554649A1");
     public override AuthorizationRoles MinimumAuthorizationRole => AuthorizationRoles.BotAdmin;
     public override bool GlobalRegister => false;
 

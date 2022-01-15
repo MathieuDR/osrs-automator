@@ -13,7 +13,6 @@ public abstract class ApplicationCommandHandler : IApplicationCommandHandler {
     }
 
     public ILogger Logger { get; }
-    public abstract Guid Id { get; }
     public abstract AuthorizationRoles MinimumAuthorizationRole { get; }
     public string Name { get; }
     public string Description { get; }
@@ -42,7 +41,7 @@ public abstract class ApplicationCommandHandler : IApplicationCommandHandler {
     }
     
     public bool CanHandle(AutocompleteCommandContext context) {
-        return string.Equals(context.CommandName ?? "", Name, StringComparison.InvariantCultureIgnoreCase);
+        return string.Equals(context.Command ?? "", Name, StringComparison.InvariantCultureIgnoreCase);
     }
 
     public async Task<uint> GetCommandBuilderHash() {

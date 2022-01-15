@@ -1,21 +1,12 @@
 ﻿using System.Diagnostics;
+using System.Linq.Expressions;
+using System.Reflection;
 using System.Text;
-using DiscordBot.Commands.Modules.DiscordCommandArguments;
 using WiseOldManConnector.Models.WiseOldMan.Enums;
 
 namespace DiscordBot.Helpers.Extensions;
 
 public static class TypeHelper {
-    public static List<Type> WhiteListedTypesToOutput() {
-        return new List<Type> {
-            typeof(BaseArguments),
-            typeof(MetricArguments),
-            typeof(PeriodArguments),
-            typeof(PeriodAndMetricArguments),
-            typeof(UserListWithImageArguments)
-        };
-    }
-
     public static string ToFriendlyExplenation(this Type type) {
         var builder = new StringBuilder();
         var identified = false;
@@ -67,26 +58,6 @@ public static class TypeHelper {
 
         if (type == typeof(int)) {
             builder.Append("Number");
-            identified = true;
-        }
-
-        if (type == typeof(MetricArguments)) {
-            builder.Append("Metric OSRS Arguments");
-            identified = true;
-        }
-
-        if (type == typeof(PeriodAndMetricArguments)) {
-            builder.Append("Complete OSRS Arguments");
-            identified = true;
-        }
-
-        if (type == typeof(PeriodAndMetricArguments)) {
-            builder.Append("Period OSRS Arguments");
-            identified = true;
-        }
-
-        if (type == typeof(UserListWithImageArguments)) {
-            builder.Append("List of users and an image (with url or attachment)");
             identified = true;
         }
 
@@ -144,5 +115,133 @@ public static class TypeHelper {
         }
 
         return type;
+    }
+    
+    /// <summary>
+    /// Gets all types from a assemblies that implement a given interface and is not abstract
+    /// </summary>
+    /// <param name="assemblyTypes"></param>
+    /// <param name="typeToScan"></param>
+    /// <returns></returns>
+    public static Type[] GetConcreteClassFromType(this Type[] assemblyTypes, Type typeToScan) {
+        // Get assemblies from types
+        var assemblies = assemblyTypes.Select(x => x.Assembly).Distinct().ToArray();
+
+        // Get all types
+        var foundTypes = assemblies.SelectMany(x => x.GetTypes())
+            // Check if it's a concrete class (no abstract & no interface
+            .Where(x=> !x.IsAbstract && !x.IsInterface)
+            // Check is is not null, or is a concrete class that we can assign from x OR if it's a generic that is equal to the type definition
+            .Where(x => x != null && (typeToScan.IsAssignableFrom(x) || x.GetInterfaces().Any(generic=> generic.IsGenericType && generic.GetGenericTypeDefinition() == typeToScan)))
+            .ToArray();
+        return foundTypes;
+    }
+    
+    /// <summary>
+    /// Gets all types from an assembly that implement a given interface and is not abstract
+    /// </summary>
+    /// <param name="assemblyType"></param>
+    /// <param name="typeToScan"></param>
+    /// <returns></returns>
+    public static Type[] GetTypeFromTypes(this Type assemblyType, Type typeToScan) {
+        return new[] { assemblyType }.GetConcreteClassFromType(typeToScan);
+    }
+    
+    public delegate T ObjectActivator<T>(params object[] args);
+    
+    /// <summary>
+    /// Linq expression trees to replace Activator.CreateInstance.
+    /// </summary>
+    /// <param name="ctor"></param>
+    /// <typeparam name="T"></typeparam>
+    /// <returns></returns>
+    public static ObjectActivator<T> GetActivator<T>(this ConstructorInfo ctor) {
+        Type type = ctor.DeclaringType;
+        ParameterInfo[] paramsInfo = ctor.GetParameters();                  
+
+        //create a single param of type object[]
+        ParameterExpression param =
+            Expression.Parameter(typeof(object[]), "args");
+ 
+        Expression[] argsExp =
+            new Expression[paramsInfo.Length];            
+
+        //pick each arg from the params array 
+        //and create a typed expression of them
+        for (int i = 0; i < paramsInfo.Length; i++)
+        {
+            Expression index = Expression.Constant(i);
+            Type paramType = paramsInfo[i].ParameterType;              
+
+            Expression paramAccessorExp =
+                Expression.ArrayIndex(param, index);              
+
+            Expression paramCastExp =
+                Expression.Convert (paramAccessorExp, paramType);              
+
+            argsExp[i] = paramCastExp;
+        }                  
+
+        //make a NewExpression that calls the
+        //ctor with the args we just created
+        NewExpression newExp = Expression.New(ctor,argsExp);                  
+
+        //create a lambda with the New
+        //Expression as body and our param object[] as arg
+        LambdaExpression lambda =
+            Expression.Lambda(typeof(ObjectActivator<T>), newExp, param);              
+
+        //compile it
+        ObjectActivator<T> compiled = (ObjectActivator<T>)lambda.Compile();
+        return compiled;
+    }
+    
+    public delegate object ObjectActivator(params object[] args);
+    
+    /// <summary>
+    /// Linq expression trees to replace Activator.CreateInstance.
+    /// </summary>
+    /// <param name="ctor"></param>
+    /// <typeparam name="T"></typeparam>
+    /// <returns></returns>
+    public static ObjectActivator GetActivator(this ConstructorInfo ctor) {
+        Type type = ctor.DeclaringType;
+        ParameterInfo[] paramsInfo = ctor.GetParameters();                  
+
+        //create a single param of type object[]
+        ParameterExpression param =
+            Expression.Parameter(typeof(object[]), "args");
+ 
+        Expression[] argsExp =
+            new Expression[paramsInfo.Length];            
+
+        //pick each arg from the params array 
+        //and create a typed expression of them
+        for (int i = 0; i < paramsInfo.Length; i++)
+        {
+            Expression index = Expression.Constant(i);
+            Type paramType = paramsInfo[i].ParameterType;              
+
+            Expression paramAccessorExp =
+                Expression.ArrayIndex(param, index);              
+
+            Expression paramCastExp =
+                Expression.Convert (paramAccessorExp, paramType);              
+
+            argsExp[i] = paramCastExp;
+        }                  
+
+        //make a NewExpression that calls the
+        //ctor with the args we just created
+        NewExpression newExp = Expression.New(ctor,argsExp);                  
+
+        //create a lambda with the New
+        //Expression as body and our param object[] as arg
+        LambdaExpression lambda =
+            Expression.Lambda(typeof(ObjectActivator), newExp, param);              
+
+        //compile it
+        ObjectActivator compiled = (ObjectActivator)lambda.Compile();
+        return compiled;
     }
 }

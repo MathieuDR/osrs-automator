@@ -9,10 +9,16 @@ public class ApplicationCommandContext : BaseInteractiveContext<SocketSlashComma
 
     public DefaultDictionary<string, SocketSlashCommandDataOption> SubCommandOptions =>
         Options.FirstOrDefault().Value?.Options.ToDefaultDictionary() ?? new DefaultDictionary<string, SocketSlashCommandDataOption>();
-
-    public override string Message => InnerContext.CommandName;
-
+    
     public SocketSlashCommandDataOption GetOption(string name) {
         return InnerContext.Data.Options?.FirstOrDefault(x => string.Equals(x.Name, name, StringComparison.InvariantCultureIgnoreCase));
     }
+    
+    public override string Message => Command;
+    public override string Command => InnerContext.CommandName;
+    public override string SubCommand => InnerContext.Data.Options.Where(x => x.Type == ApplicationCommandOptionType.SubCommand).Select(x => x.Name)
+        .FirstOrDefault();
+
+    public override string SubCommandGroup => InnerContext.Data.Options.Where(x => x.Type == ApplicationCommandOptionType.SubCommandGroup).Select(x => x.Name)
+        .FirstOrDefault();
 }

@@ -31,7 +31,6 @@ public class AuthorizationConfigurationCommandHandler : ApplicationCommandHandle
         _authorizationService = authorizationService;
     }
 
-    public override Guid Id => Guid.Parse("E63F5A17-7A7B-4046-AABA-2DBD70F90D0D");
     public override AuthorizationRoles MinimumAuthorizationRole => AuthorizationRoles.ClanAdmin;
     public override bool GlobalRegister => true;
 
