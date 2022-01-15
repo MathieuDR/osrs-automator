@@ -127,9 +127,7 @@ public class InteractiveCommandHandlerService {
         var killCommand = _provider.GetRequiredService<KillBotCommandHandler>();
         await RegisterCommandForOwnersGuild(manageCommand);
         await RegisterCommandForOwnersGuild(killCommand);
-	private async Task InitializeCommands() {
-		var manageCommand = _provider.GetRequiredService<ManageCommandsApplicationCommandHandler>();
-		await RegisterCommandForOwnersGuild(manageCommand);
+		
 
 		var commandInfos = _commandInfoRepository.GetAll().Value;
 		await _registrationService.UpdateAllCommands(commandInfos);
