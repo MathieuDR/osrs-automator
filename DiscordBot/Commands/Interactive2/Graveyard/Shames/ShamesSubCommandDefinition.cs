@@ -1,11 +1,12 @@
+using DiscordBot.Commands.Interactive2.Base.Definitions;
 
-namespace DiscordBot.Commands.Interactive2.Graveyard;
+namespace DiscordBot.Commands.Interactive2.Graveyard.Shames;
 
 public class ShamesSubCommandDefinition : SubCommandDefinitionBase<GraveyardRootDefinition> {
 	public ShamesSubCommandDefinition(IServiceProvider serviceProvider) : base(serviceProvider) { }
 	public override string Name => "shames";
 	public override string Description => "Shows the number of shames you or another player have!";
-	private static string ShamedOption => "shamed";
+private static string ShamedOption => "shamed";
 	private static string LocationOption => "location";
 
 	protected override Task<SlashCommandOptionBuilder> ExtendOptionCommandBuilder(SlashCommandOptionBuilder builder) {

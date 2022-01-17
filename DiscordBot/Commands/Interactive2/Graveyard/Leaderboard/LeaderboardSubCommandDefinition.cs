@@ -1,6 +1,6 @@
 using DiscordBot.Commands.Interactive2.Base.Definitions;
 
-namespace DiscordBot.Commands.Interactive2.Graveyard;
+namespace DiscordBot.Commands.Interactive2.Graveyard.Leaderboard;
 
 public class LeaderboardSubCommandDefinition : SubCommandDefinitionBase<GraveyardRootDefinition> {
 	public LeaderboardSubCommandDefinition(IServiceProvider serviceProvider) : base(serviceProvider) { }

@@ -1,6 +1,6 @@
 using DiscordBot.Commands.Interactive2.Base.Definitions;
 
-namespace DiscordBot.Commands.Interactive2.Graveyard;
+namespace DiscordBot.Commands.Interactive2.Graveyard.Shame;
 
 public class ShameSubCommandDefinition : SubCommandDefinitionBase<GraveyardRootDefinition> {
 	public ShameSubCommandDefinition(IServiceProvider serviceProvider) : base(serviceProvider) { }
