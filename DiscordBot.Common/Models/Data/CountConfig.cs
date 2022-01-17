@@ -17,7 +17,7 @@ public class CountConfig {
         _thresholds = _thresholds.OrderBy(x => x.Threshold).ToList();
         return true;
     }
-
+    
     public bool RemoveAtIndex(int index) {
         _thresholds.RemoveAt(index);
         return true;
