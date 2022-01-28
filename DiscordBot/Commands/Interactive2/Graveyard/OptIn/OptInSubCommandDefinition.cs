@@ -7,7 +7,7 @@ public class OptInSubCommandDefinition : SubCommandDefinitionBase<GraveyardRootD
 	public override string Name => "enable";
 	public override string Description => "Walk in the graveyard, be part of the graveyard.";
 	
-	private static string EnableOption => "enable";
+	public static string EnableOption => "enable";
 	protected override Task<SlashCommandOptionBuilder> ExtendOptionCommandBuilder(SlashCommandOptionBuilder builder) {
 		builder.AddOption(EnableOption, ApplicationCommandOptionType.Boolean, "Enable the graveyard.");
 		return Task.FromResult(builder);
@@ -15,7 +15,7 @@ public class OptInSubCommandDefinition : SubCommandDefinitionBase<GraveyardRootD
 
 	protected override Task FillOptions() {
 		var opt = Options.ToList();
-	opt.Add((EnableOption, typeof(bool))); 
+		opt.Add((EnableOption, typeof(bool))); 
 		return base.FillOptions();
 	}
 }

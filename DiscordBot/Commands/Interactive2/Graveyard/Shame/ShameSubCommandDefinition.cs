@@ -7,13 +7,13 @@ public class ShameSubCommandDefinition : SubCommandDefinitionBase<GraveyardRootD
 	public override string Name => "shame";
 	public override string Description => "Shame somebody that died!";
 
-	private static string ShamedOption => "shamed";
-	private static string PictureOption => "picture";
-	private static string LocationOption => "location";
+	public static string ShamedOption => "shamed";
+	public static string PictureOption => "picture";
+	public static string LocationOption => "location";
 
 	protected override Task<SlashCommandOptionBuilder> ExtendOptionCommandBuilder(SlashCommandOptionBuilder builder) {
 		builder.AddOption(ShamedOption, ApplicationCommandOptionType.User, "Shame a user that died", true);
-		builder.AddOption(LocationOption, ApplicationCommandOptionType.String, "Location of the shame", true);
+		builder.AddOption(LocationOption, ApplicationCommandOptionType.String, "Location of the shame", true, isAutocomplete: true);
 		builder.AddOption(PictureOption, ApplicationCommandOptionType.String, "Picture url of the shame", false);
 		return Task.FromResult(builder);
 	}
@@ -23,7 +23,6 @@ public class ShameSubCommandDefinition : SubCommandDefinitionBase<GraveyardRootD
 		list.Add((ShamedOption, typeof(string)));
 		list.Add((PictureOption, typeof(string)));
 		list.Add((LocationOption, typeof(string)));
-
 		return base.FillOptions();
 	}
 }

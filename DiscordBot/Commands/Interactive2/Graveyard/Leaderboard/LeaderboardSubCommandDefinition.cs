@@ -7,7 +7,7 @@ public class LeaderboardSubCommandDefinition : SubCommandDefinitionBase<Graveyar
 	public override string Name => "leaderboard";
 	public override string Description => "Shows the top 10 players with the most shames!";
 
-	private static string LocationOption => "location";
+	public static string LocationOption => "location";
 
 	protected override Task<SlashCommandOptionBuilder> ExtendOptionCommandBuilder(SlashCommandOptionBuilder builder) {
 		builder.AddOption(LocationOption, ApplicationCommandOptionType.String, "Location of the shame", false);

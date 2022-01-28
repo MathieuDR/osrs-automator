@@ -10,8 +10,8 @@ public class PingCommandRequest : ApplicationCommandRequestBase<PingRootCommandD
 }
 
 public class PingApplicationCommandHandler : ApplicationCommandHandlerBase<PingCommandRequest> {
-    protected override async Task<Result> DoWork(IEnumerable<(string optionName, Type optionType, object? optionValue)> options) {
-        await Context.RespondAsync($"At do work with {options.Count()} options");
+    protected override async Task<Result> DoWork(CancellationToken cancellationToken) {
+        await Context.RespondAsync($"At do work");
         return Result.Ok();
     }
 
@@ -24,8 +24,8 @@ public class NormalPingCommandRequest : ApplicationCommandRequestBase<NormalSubC
 }
 
 public class NormalPingApplicationCommandHandler : ApplicationCommandHandlerBase<NormalPingCommandRequest> {
-    protected override async Task<Result> DoWork(IEnumerable<(string optionName, Type optionType, object? optionValue)> options) {
-        await Context.RespondAsync($"At normal do work with {options.Count()} options");
+    protected override async Task<Result> DoWork(CancellationToken cancellationToken) {
+        await Context.RespondAsync($"At normal do work");
         return Result.Ok();
     }
 
@@ -39,8 +39,8 @@ public class InsultCommandRequest : ApplicationCommandRequestBase<InsultSubComma
 }
 
 public class InsultApplicationCommandHandler : ApplicationCommandHandlerBase<InsultCommandRequest> {
-    protected override async Task<Result> DoWork(IEnumerable<(string optionName, Type optionType, object? optionValue)> options) {
-        await Context.RespondAsync($"At insults do work with {options.Count()} options");
+    protected override async Task<Result> DoWork(CancellationToken cancellationToken) {
+        await Context.RespondAsync($"At insults do work");
         return Result.Ok();
     }
 

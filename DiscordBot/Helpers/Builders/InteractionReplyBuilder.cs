@@ -121,22 +121,6 @@ public class InteractionReplyBuilder<TInteraction> where TInteraction : SocketIn
         await UpdateOrNoopTask;
     }
 
-
-    // public async Task UpdateAsync(MessageFlags? flags = null,RequestOptions options = null) {
-    //     await WithComponentMessageUpdate(properties => {
-    //         properties.Components = new ComponentBuilder().AddActionRows(ActionRows).Build();
-    //         properties.Content = Content;
-    //         properties.Embeds = Embeds.ToArray();
-    //         properties.Flags = flags;
-    //         properties.AllowedMentions = AllowedMentions;
-    //         
-    //     });
-    //     
-    //     await _context.RespondAsync(Content, Embeds.ToArray(), IsTts, IsEphemeral,
-    //         AllowedMentions, options, new ComponentBuilder().AddActionRows(ActionRows).Build());
-    //     await UpdateOrNoopTask;
-    // }
-
     public async Task<RestFollowupMessage> FollowupAsync(RequestOptions options = null) {
         var result = await _context.FollowupAsync(Content, Embeds.ToArray(), IsTts, IsEphemeral,
             AllowedMentions, options, new ComponentBuilder().AddActionRows(ActionRows).Build());

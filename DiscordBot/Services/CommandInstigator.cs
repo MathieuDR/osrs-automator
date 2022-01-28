@@ -9,14 +9,16 @@ namespace DiscordBot.Services;
 public class CommandInstigator : ICommandInstigator {
     private readonly Dictionary<IRootCommandDefinition, ISubCommandDefinition[]> _commands;
     private readonly IMediator _mediator;
+    private readonly ILogger<CommandInstigator> _logger;
 
     private readonly Dictionary<ICommandDefinition, Dictionary<Type, TypeHelper.ObjectActivator>> _commandRequestsActivators = new();
 
     public CommandInstigator(IMediator mediator,
         ICommandDefinitionProvider commandDefinitionProvider,
-        IEnumerable<Type> requests) {
+        IEnumerable<Type> requests, ILogger<CommandInstigator> logger) {
         
         _mediator = mediator;
+        _logger = logger;
         _commands = GetCommandsFromProvider(commandDefinitionProvider);
         InitializeCommandRequestDictionary(_commands,  requests.ToArray());
     }
@@ -80,7 +82,12 @@ public class CommandInstigator : ICommandInstigator {
         var request = CreateCommandRequest(context, commandDefinitionResult.Value);
 
         // execute command from definition through mediatr
-        return await _mediator.Send(request);
+        try {
+            return await _mediator.Send(request);
+        }catch(Exception e) {
+            _logger.LogError(e, "Could not execute command");
+            return Result.Fail("Could not execute command").WithError(new ExceptionalError(e));
+        }
     }
 
     public Task<Result> ExecuteCommandAsync(BaseInteractiveContext context) {

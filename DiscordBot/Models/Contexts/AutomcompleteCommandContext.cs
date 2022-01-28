@@ -15,10 +15,10 @@ public class AutocompleteCommandContext : BaseInteractiveContext<SocketAutocompl
     public override string SubCommandGroup => InnerContext.Data.Options.Where(x => x.Type == ApplicationCommandOptionType.SubCommandGroup).Select(x => x.Name)
         .FirstOrDefault();
    
-    public string CurrentOption => InnerContext.Data.Options.Where(x => x.Value == Current.Value).Select(x => x.Name).FirstOrDefault();
+    public string CurrentOptionName => InnerContext.Data.Options.Where(x => x.Value == Current.Value).Select(x => x.Name).FirstOrDefault();
 
     public string CommandFullName => string.IsNullOrWhiteSpace(SubCommand) ? Command : $"{Command} {SubCommand}";
-    public override string Message => $"Autocompleting '{Current}' for {CurrentOption} in {CommandFullName}";
+    public override string Message => $"Autocompleting '{Current}' for {CurrentOptionName} in {CommandFullName}";
     
     public Task RespondAsync<T>(IEnumerable<T> options) {
         return InnerContext.RespondAsync(options?.Take(20).Select(x => new AutocompleteResult(x.ToString(), x.ToString()?.ToLower())));

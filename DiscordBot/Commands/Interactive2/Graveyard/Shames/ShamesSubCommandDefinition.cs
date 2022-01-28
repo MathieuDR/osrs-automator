@@ -6,8 +6,8 @@ public class ShamesSubCommandDefinition : SubCommandDefinitionBase<GraveyardRoot
 	public ShamesSubCommandDefinition(IServiceProvider serviceProvider) : base(serviceProvider) { }
 	public override string Name => "shames";
 	public override string Description => "Shows the number of shames you or another player have!";
-private static string ShamedOption => "shamed";
-	private static string LocationOption => "location";
+	public static string ShamedOption => "shamed";
+	public static string LocationOption => "location";
 
 	protected override Task<SlashCommandOptionBuilder> ExtendOptionCommandBuilder(SlashCommandOptionBuilder builder) {
 		builder.AddOption(ShamedOption, ApplicationCommandOptionType.User, "Shame a user that died", false);
