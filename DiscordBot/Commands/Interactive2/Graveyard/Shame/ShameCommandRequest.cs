@@ -7,10 +7,3 @@ public class ShameCommandRequest :ApplicationCommandRequestBase<ShameSubCommandD
 	public ShameCommandRequest(ApplicationCommandContext context) : base(context) { }
 	public override AuthorizationRoles MinimumAuthorizationRole => AuthorizationRoles.ClanMember;
 }
-
-public class ShameAutoCompleteRequest :AutoCompleteCommandRequestBase<ShameSubCommandDefinition>{
-	public ShameAutoCompleteRequest(AutocompleteCommandContext context) : base(context) { }
-	public override AuthorizationRoles MinimumAuthorizationRole=> AuthorizationRoles.ClanMember;
-}
-
-
