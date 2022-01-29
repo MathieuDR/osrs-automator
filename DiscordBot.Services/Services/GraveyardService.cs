@@ -8,13 +8,13 @@ using WiseOldManConnector.Models.WiseOldMan.Enums;
 namespace DiscordBot.Services.Services; 
 
 internal class GraveyardService: IGraveyardService {
-	public Task<Result> OptIn(GuildUser user) => Task.FromResult( Result.Ok());
+	public Task<Result> OptIn(GuildUser user) => throw new NotImplementedException();
 
-	public Task<Result> OptOut(GuildUser user) =>  Task.FromResult( Result.Ok());
+	public Task<Result> OptOut(GuildUser user) => throw new NotImplementedException();
 
-	public Task<Result> Shame(GuildUser user, ShameLocation location, string imageUrl, MetricType? metricType) => throw new NotImplementedException();
+	public Task<Result> Shame(GuildUser user, ShameLocation location, string imageUrl, MetricType? metricType)=> throw new NotImplementedException();
 
-	public Task<Result<Shame>> GetShames(GuildUser user, ShameLocation? location, MetricType? metricTypeLocation) => throw new NotImplementedException();
+	public Task<Result<IEnumerable<Shame>>> GetShames(GuildUser user, ShameLocation? location, MetricType? metricTypeLocation) => throw new NotImplementedException();
 
-	public Task<Result<Shame>> GetShames(Guild guild, ShameLocation? location, MetricType? metricTypeLocation) => throw new NotImplementedException();
+	public Task<Result<IEnumerable<Shame>>> GetShames(Guild guild, ShameLocation? location, MetricType? metricTypeLocation) => throw new NotImplementedException();
 }

@@ -10,6 +10,6 @@ public interface IGraveyardService {
 	Task<Result> OptIn(GuildUser user);
 	Task<Result> OptOut(GuildUser user);
 	Task<Result> Shame(GuildUser user, ShameLocation location, string imageUrl, MetricType? metricType);
-	Task<Result<Shame>> GetShames(GuildUser user, ShameLocation? location, MetricType? metricTypeLocation);
-	Task<Result<Shame>> GetShames(Guild guild, ShameLocation? location, MetricType? metricTypeLocation);
+	Task<Result<IEnumerable<Shame>>> GetShames(GuildUser user, ShameLocation? location, MetricType? metricTypeLocation);
+	Task<Result<IEnumerable<Shame>>> GetShames(Guild guild, ShameLocation? location, MetricType? metricTypeLocation);
 }
