@@ -28,6 +28,11 @@ public class InteractionReplyBuilder<TInteraction> where TInteraction : SocketIn
         Embeds.Add(_context.CreateEmbedBuilder().Apply(modifier).Build());
         return this;
     }
+    
+    public InteractionReplyBuilder<TInteraction> WithEmbed(EmbedBuilder embedBuilder) {
+        Embeds.Add(embedBuilder.Build());
+        return this;
+    }
 
     public InteractionReplyBuilder<TInteraction> WithEmbeds(params EmbedBuilder[] embedBuilders) {
         foreach (var embed in embedBuilders) {
