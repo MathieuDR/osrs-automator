@@ -12,7 +12,7 @@ public class ShameSubCommandDefinition : SubCommandDefinitionBase<GraveyardRootD
 	public static string LocationOption => "location";
 
 	protected override Task<SlashCommandOptionBuilder> ExtendOptionCommandBuilder(SlashCommandOptionBuilder builder) {
-		builder.AddOption(ShamedOption, ApplicationCommandOptionType.User, "Shame a user that died", true);
+		builder.AddOption(ShamedOption, ApplicationCommandOptionType.String, "Shame a user that died", true);
 		builder.AddOption(LocationOption, ApplicationCommandOptionType.String, "Location of the shame", true, isAutocomplete: true);
 		builder.AddOption(PictureOption, ApplicationCommandOptionType.String, "Picture url of the shame", false);
 		return Task.FromResult(builder);
