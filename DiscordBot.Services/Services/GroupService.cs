@@ -181,7 +181,7 @@ internal class GroupService : RepositoryService, IGroupService {
         if (string.IsNullOrWhiteSpace(name)) {
             title.Append(config.WomGroup.Name);
             title.Append(" - ");
-            title.Append(metric.ToFriendlyNameOrDefault());
+            title.Append(metric.ToDisplayNameOrFriendly());
         } else {
             title.Append(name);
         }

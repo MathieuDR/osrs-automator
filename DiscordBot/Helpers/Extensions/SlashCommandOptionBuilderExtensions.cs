@@ -25,7 +25,7 @@ public static class SlashCommandOptionBuilderExtensions {
 
         for (var i = 0; i < enumOptionsArr.Length; i++) {
             var option = enumOptionsArr[i];
-            var name = option.ToFriendlyNameOrDefault();
+            var name = option.ToEnumMemberOrDefault();
             var value = Unsafe.As<T, int>(ref option);
             builder.AddChoice(name, value);
         }

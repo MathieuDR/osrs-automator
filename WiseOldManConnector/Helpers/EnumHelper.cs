@@ -1,19 +1,45 @@
-﻿using System.Runtime.Serialization;
+﻿using System.ComponentModel.DataAnnotations;
+using System.Reflection;
+using System.Runtime.Serialization;
 using WiseOldManConnector.Models.WiseOldMan.Enums;
 
 namespace WiseOldManConnector.Helpers;
 
 public static class EnumHelper {
-    public static string ToFriendlyNameOrDefault<T>(this T enumVal) {
-        var enumType = typeof(T);
-        var memInfo = enumType.GetMember(enumVal.ToString());
-        var attr = memInfo.FirstOrDefault()?.GetCustomAttributes(false).OfType<EnumMemberAttribute>().FirstOrDefault();
 
-        if (attr != null) {
-            return attr.Value;
-        }
-
-        return enumVal.ToString();
+    /// <summary>
+    /// Get the displayname of an enum value, if not found try EnumMemberAttribute and if not found return the name of the enum
+    /// </summary>
+    /// <param name="enumVal"></param>
+    /// <typeparam name="T"></typeparam>
+    /// <returns></returns>
+    public static string ToDisplayNameOrFriendly<T>(this T enumVal) where T : Enum {
+        var attr = enumVal.GetAttribute<DisplayAttribute>();
+        return attr != null ? attr.Name : enumVal.ToEnumMemberOrDefault();
+    }
+    
+    /// <summary>
+    /// Get the EnumMember attribute of the enum value or the default value if not found
+    /// </summary>
+    /// <param name="enumVal"></param>
+    /// <typeparam name="T"></typeparam>
+    /// <returns></returns>
+    public static string ToEnumMemberOrDefault<T>(this T enumVal) where T : Enum {
+        var attr = enumVal.GetAttribute<EnumMemberAttribute>();
+        return attr != null ? attr.Value : enumVal.ToString();
+    }
+    
+    /// <summary>
+    ///     A generic extension method that aids in reflecting 
+    ///     and retrieving any attribute that is applied to an `Enum`.
+    /// </summary>
+    public static TAttribute GetAttribute<TAttribute>(this Enum enumValue) 
+        where TAttribute : Attribute
+    {
+        return enumValue.GetType()
+            .GetMember(enumValue.ToString())
+            .First()
+            .GetCustomAttribute<TAttribute>();
     }
 
     public static T ToEnum<T>(this string source) {
@@ -27,17 +53,6 @@ public static class EnumHelper {
         }
 
         return default;
-    }
-
-    public static string FriendlyName(this MetricType metricType, bool capitalize = false) {
-        var valName = metricType.ToFriendlyNameOrDefault();
-        valName = valName.Replace('_', ' ');
-
-        if (capitalize) {
-            valName = $"{char.ToUpper(valName.First())}{valName.Substring(1)}";
-        }
-
-        return valName;
     }
 
     public static MetricTypeCategory Category(this MetricType metricType) {

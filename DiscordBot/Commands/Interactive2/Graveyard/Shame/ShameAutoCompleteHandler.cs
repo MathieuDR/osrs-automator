@@ -27,8 +27,8 @@ public class ShameAutoCompleteHandler : AutoCompleteHandlerBase<ShameAutoComplet
 
 		var locations = new List<ShameLocation>() { ShameLocation.Wildy, ShameLocation.Other };
 		
-		var options = metricTypeOptions.Select(x => x.ToFriendlyNameOrDefault()).ToList();
-		options.AddRange(locations.Select(x => x.ToFriendlyNameOrDefault()));
+		var options = metricTypeOptions.Select(x => x.ToDisplayNameOrFriendly()).ToList();
+		options.AddRange(locations.Select(x => x.ToDisplayNameOrFriendly()));
 
 		return options.OrderBy(x=>x).ToArray();
 	}

@@ -9,9 +9,9 @@ public class AchievementToEmbedBuilderConverter : ITypeConverter<Achievement, Em
     public EmbedBuilder Convert(Achievement source, EmbedBuilder destination, ResolutionContext context) {
         destination ??= new EmbedBuilder();
 
-        var metricWomIcon = source.Metric.ToFriendlyNameOrDefault();
+        var metricWomIcon = source.Metric.ToEnumMemberOrDefault();
         var metricWomBackground = source.Metric == MetricType.Combat
-            ? MetricType.Strength.ToFriendlyNameOrDefault()
+            ? MetricType.Strength.ToEnumMemberOrDefault()
             : metricWomIcon;
 
         destination

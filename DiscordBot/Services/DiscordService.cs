@@ -110,7 +110,7 @@ public class DiscordService : IDiscordService {
 
     private string GetMessageForLeaderboard<T>(MetricTypeLeaderboard<T> leaderboard) where T : ILeaderboardMember {
         var builder = new StringBuilder();
-        builder.Append($"**{leaderboard.MetricType.FriendlyName(true)}** - Leaderboard");
+        builder.Append($"**{leaderboard.MetricType.ToDisplayNameOrFriendly()}** - Leaderboard");
 
         if (leaderboard is MetricTypeAndPeriodLeaderboard<T> periodLeaderboard) {
             builder.Append($" for {periodLeaderboard.Period}");
