@@ -83,7 +83,7 @@ public class ShameCommandHandler : ApplicationCommandHandlerBase<ShameCommandReq
 		}
 
 		// If we failed, at least tell em!
-		var failedUsers = failedTasks.Select(t => $"{users[t.i].Mention} ({t.i + 1})");
-		return Result.Fail($"Failed to shame the following users: {string.Join(", ", failedUsers)}");
+		var failedUsers = failedTasks.Select(t => $"{users[t.i].Mention}: {t.Result.Errors.First().Message}").ToList();
+		return Result.Fail($"Failed to shame the following users: {string.Join(", ", failedUsers)}").WithErrors(failedTasks.SelectMany(x=> x.Result.Errors));
 	}
 }
