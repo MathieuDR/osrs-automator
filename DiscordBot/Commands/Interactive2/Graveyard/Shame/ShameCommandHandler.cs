@@ -1,4 +1,5 @@
 using DiscordBot.Commands.Interactive2.Base.Handlers;
+using DiscordBot.Commands.Interactive2.Graveyard.Helpers;
 using DiscordBot.Common.Dtos.Discord;
 using DiscordBot.Common.Models.Enums;
 using Microsoft.Extensions.DependencyInjection;
@@ -30,15 +31,7 @@ public class ShameCommandHandler : ApplicationCommandHandlerBase<ShameCommandReq
 		// Validate URL
 		pictureUrl = !Uri.TryCreate(pictureUrl, UriKind.Absolute, out var pictureUri) ? null : pictureUri.AbsoluteUri;
 
-		var location = ShameLocation.Other;
-		MetricType? metricType = null;
-		if (_metricTypeParses.TryParseToMetricType(locationString, out var metric)) {
-			metricType = metric;
-			location = ShameLocation.MetricType;
-		} else {
-			location = (ShameLocation)Enum.Parse(typeof(ShameLocation), locationString, true);
-		}
-		
+		var (location, metricType) = ShameExtensions.ToLocation(locationString, _metricTypeParses);
 		return Result.Ok((users, location, metricType, pictureUrl));
 	}
 
