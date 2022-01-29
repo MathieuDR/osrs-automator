@@ -10,8 +10,8 @@ public class ShamesSubCommandDefinition : SubCommandDefinitionBase<GraveyardRoot
 	public static string LocationOption => "location";
 
 	protected override Task<SlashCommandOptionBuilder> ExtendOptionCommandBuilder(SlashCommandOptionBuilder builder) {
-		builder.AddOption(ShamedOption, ApplicationCommandOptionType.User, "Shame a user that died", false);
-		builder.AddOption(LocationOption, ApplicationCommandOptionType.String, "Location of the shame", false);
+		builder.AddOption(ShamedOption, ApplicationCommandOptionType.User, "The user that got shamed", false);
+		builder.AddOption(LocationOption, ApplicationCommandOptionType.String, "Where the shame happened", false);
 		return Task.FromResult(builder);
 	}
 
