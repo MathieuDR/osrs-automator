@@ -1,7 +1,7 @@
 using DiscordBot.Common.Models.Enums;
 using WiseOldManConnector.Models.WiseOldMan.Enums;
 
-namespace DiscordBot.Commands.Interactive2.Graveyard.Helpers; 
+namespace DiscordBot.Commands.Interactive2.Graveyard; 
 
 public static class ShameExtensions {
 	public static (ShameLocation shameLocation, MetricType? shameLocationMetric) ToLocation(string input, MetricTypeParser parser) {
