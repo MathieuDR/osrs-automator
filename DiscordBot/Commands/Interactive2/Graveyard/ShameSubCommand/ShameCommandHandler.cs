@@ -1,11 +1,10 @@
 using DiscordBot.Commands.Interactive2.Base.Handlers;
 using DiscordBot.Commands.Interactive2.Graveyard.Helpers;
-using DiscordBot.Common.Dtos.Discord;
 using DiscordBot.Common.Models.Enums;
 using Microsoft.Extensions.DependencyInjection;
 using WiseOldManConnector.Models.WiseOldMan.Enums;
 
-namespace DiscordBot.Commands.Interactive2.Graveyard.Shame;
+namespace DiscordBot.Commands.Interactive2.Graveyard.ShameSubCommand;
 
 public class ShameCommandHandler : ApplicationCommandHandlerBase<ShameCommandRequest> {
 	private readonly IGraveyardService _graveyardService;

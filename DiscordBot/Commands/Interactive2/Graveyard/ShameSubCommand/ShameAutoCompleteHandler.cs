@@ -6,7 +6,7 @@ using Microsoft.Extensions.Options;
 using WiseOldManConnector.Helpers;
 using WiseOldManConnector.Models.WiseOldMan.Enums;
 
-namespace DiscordBot.Commands.Interactive2.Graveyard.Shame;
+namespace DiscordBot.Commands.Interactive2.Graveyard.ShameSubCommand;
 
 public class ShameAutoCompleteHandler : AutoCompleteHandlerBase<ShameAutoCompleteRequest> {
 	public ShameAutoCompleteHandler(IServiceProvider serviceProvider) : base(serviceProvider) {
