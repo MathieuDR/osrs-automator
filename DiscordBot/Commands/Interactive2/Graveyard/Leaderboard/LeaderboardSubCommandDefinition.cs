@@ -10,7 +10,7 @@ public class LeaderboardSubCommandDefinition : SubCommandDefinitionBase<Graveyar
 	public static string LocationOption => "location";
 
 	protected override Task<SlashCommandOptionBuilder> ExtendOptionCommandBuilder(SlashCommandOptionBuilder builder) {
-		builder.AddOption(LocationOption, ApplicationCommandOptionType.String, "Location of the shame", false);
+		builder.AddOption(LocationOption, ApplicationCommandOptionType.String, "Location of the shame", false, isAutocomplete: true);
 		return Task.FromResult(builder);
 	}
 

@@ -1,4 +1,5 @@
 using DiscordBot.Commands.Interactive2.Base.Handlers;
+using DiscordBot.Commands.Interactive2.Graveyard.ShameSubCommand;
 using DiscordBot.Common.Configuration;
 using DiscordBot.Common.Models.Enums;
 using Microsoft.Extensions.DependencyInjection;
@@ -6,10 +7,10 @@ using Microsoft.Extensions.Options;
 using WiseOldManConnector.Helpers;
 using WiseOldManConnector.Models.WiseOldMan.Enums;
 
-namespace DiscordBot.Commands.Interactive2.Graveyard.ShameSubCommand;
+namespace DiscordBot.Commands.Interactive2.Graveyard;
 
-public class ShameAutoCompleteHandler : AutoCompleteHandlerBase<ShameAutoCompleteRequest> {
-	public ShameAutoCompleteHandler(IServiceProvider serviceProvider) : base(serviceProvider) {
+public class ShameLocationAutoCompleteHandler : AutoCompleteHandlerBase<ShameLocationAutoCompleteRequest> {
+	public ShameLocationAutoCompleteHandler(IServiceProvider serviceProvider) : base(serviceProvider) {
 		var synonymsConfiguration = serviceProvider.GetRequiredService<IOptions<MetricSynonymsConfiguration>>().Value;
 		DefaultShameLocations = GetAllShameLocations(synonymsConfiguration);
 	}

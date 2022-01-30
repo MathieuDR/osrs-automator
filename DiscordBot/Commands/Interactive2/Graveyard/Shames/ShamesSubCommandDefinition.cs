@@ -11,7 +11,7 @@ public class ShamesSubCommandDefinition : SubCommandDefinitionBase<GraveyardRoot
 
 	protected override Task<SlashCommandOptionBuilder> ExtendOptionCommandBuilder(SlashCommandOptionBuilder builder) {
 		builder.AddOption(ShamedOption, ApplicationCommandOptionType.User, "The user that got shamed", false);
-		builder.AddOption(LocationOption, ApplicationCommandOptionType.String, "Where the shame happened", false);
+		builder.AddOption(LocationOption, ApplicationCommandOptionType.String, "Where the shame happened", false, isAutocomplete: true);
 		return Task.FromResult(builder);
 	}
 
