@@ -11,7 +11,6 @@ namespace DiscordBot.Commands.Interactive2.Graveyard.ShameSubCommand;
 public class ShameAutoCompleteHandler : AutoCompleteHandlerBase<ShameAutoCompleteRequest> {
 	public ShameAutoCompleteHandler(IServiceProvider serviceProvider) : base(serviceProvider) {
 		var synonymsConfiguration = serviceProvider.GetRequiredService<IOptions<MetricSynonymsConfiguration>>().Value;
-
 		DefaultShameLocations = GetAllShameLocations(synonymsConfiguration);
 	}
 	protected override async Task<Result> DoWork(CancellationToken cancellationToken) {
