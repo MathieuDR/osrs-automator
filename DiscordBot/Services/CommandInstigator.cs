@@ -83,6 +83,7 @@ public class CommandInstigator : ICommandInstigator {
 
         // execute command from definition through mediatr
         try {
+            // TODO Check if authorized!
             return await _mediator.Send(request);
         }catch(Exception e) {
             _logger.LogError(e, "Could not execute command");
