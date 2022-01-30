@@ -62,7 +62,7 @@ public class ShameCommandHandler : ApplicationCommandHandlerBase<ShameCommandReq
 		var tasks = new Task<Result>[users.Count];
 		for (var i = 0; i < users.Count; i++) {
 			var user = users[i];
-			tasks[i] = _graveyardService.Shame(user.ToGuildUserDto(), location, pictureUrl, metricType);
+			tasks[i] = _graveyardService.Shame(user.ToGuildUserDto(), Context.User.ToGuildUserDto(), location, pictureUrl, metricType);
 		}
 
 		await Task.WhenAll(tasks);
