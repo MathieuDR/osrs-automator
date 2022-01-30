@@ -38,7 +38,24 @@ internal class GraveyardService: IGraveyardService {
 		return Task.FromResult(Result.OkIf(repoResult.IsSuccess, "Could not opt in").WithErrors(repoResult.Errors));
 	}
 
-	public Task<Result> OptOut(GuildUser user) => throw new NotImplementedException();
+	public Task<Result> OptOut(GuildUser user) {
+		_logger.LogInformation($"Opting user {user.Username} out");
+		
+		var configurationResult = _graveyardRepository.GetSingle();
+		if (configurationResult.IsFailed || configurationResult.Value == null) {
+			return Task.FromResult(Result.Fail("Could not opt user out")
+				.WithErrors(configurationResult.Errors));
+		}
+		
+		if (configurationResult.Value.OptedInUsers.All(x => x != user.Id)) {
+			return Task.FromResult(Result.Ok());
+		}
+
+		configurationResult.Value.OptedInUsers.Remove(user.Id);
+		var repoResult = _graveyardRepository.Update(configurationResult.Value);
+		return Task.FromResult(Result.OkIf(repoResult.IsSuccess, "Could not opt out").WithErrors(repoResult.Errors));
+	}
+
 	public Task<Result<bool>> IsOptedIn(GuildUser user) => throw new NotImplementedException();
 
 	public Task<Result> Shame(GuildUser shamed, GuildUser shamedBy, ShameLocation location, string imageUrl, MetricType? metricType) => throw new NotImplementedException();
