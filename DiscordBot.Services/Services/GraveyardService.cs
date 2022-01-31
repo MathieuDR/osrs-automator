@@ -16,7 +16,7 @@ internal class GraveyardService: IGraveyardService {
 	private readonly IRepositoryStrategy _repositoryStrategy;
 	private readonly ILogger<GraveyardService> _logger;
 
-	public GraveyardService(IRepositoryStrategy repositoryStrategy, ILogger<GraveyardService> logger, BaseGuildConfigurationService) {
+	public GraveyardService(IRepositoryStrategy repositoryStrategy, ILogger<GraveyardService> logger) {
 		_repositoryStrategy = repositoryStrategy;
 		_logger = logger;
 	}
