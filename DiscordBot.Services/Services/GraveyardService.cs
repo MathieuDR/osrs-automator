@@ -2,6 +2,8 @@ using DiscordBot.Common.Dtos.Discord;
 using DiscordBot.Common.Models.Data;
 using DiscordBot.Common.Models.Enums;
 using DiscordBot.Data.Interfaces;
+using DiscordBot.Data.Strategies;
+using DiscordBot.Services.Helpers;
 using DiscordBot.Services.Interfaces;
 using FluentResults;
 using Microsoft.Extensions.Logging;
@@ -10,18 +12,21 @@ using WiseOldManConnector.Models.WiseOldMan.Enums;
 namespace DiscordBot.Services.Services; 
 
 internal class GraveyardService: IGraveyardService {
-	private readonly IGraveyardRepository _graveyardRepository;
+	//private readonly IGraveyardRepository _graveyardRepository;
+	private readonly IRepositoryStrategy _repositoryStrategy;
 	private readonly ILogger<GraveyardService> _logger;
 
-	public GraveyardService(IGraveyardRepository graveyardRepository, ILogger<GraveyardService> logger) {
-		_graveyardRepository = graveyardRepository;
+	public GraveyardService(IRepositoryStrategy repositoryStrategy, ILogger<GraveyardService> logger, BaseGuildConfigurationService) {
+		_repositoryStrategy = repositoryStrategy;
 		_logger = logger;
 	}
 	
 	public Task<Result> OptIn(GuildUser user) {
 		_logger.LogInformation($"Opting in user {user.Username}");
+		
+		var repository = _repositoryStrategy.GetOrCreateRepository<IGraveyardRepository>(user.GuildId);
 
-		var configurationResult = _graveyardRepository.GetSingle();
+		var configurationResult = repository.GetSingle();
 		if (configurationResult.IsFailed) {
 			return Task.FromResult(configurationResult.ToResult());
 		}
@@ -33,7 +38,7 @@ internal class GraveyardService: IGraveyardService {
 		}
 		
 		configuration.OptedInUsers.Add(user.Id);
-		var repoResult = _graveyardRepository.UpdateOrInsert(configuration);
+		var repoResult = repository.UpdateOrInsert(configuration);
 		
 		return Task.FromResult(Result.OkIf(repoResult.IsSuccess, "Could not opt in").WithErrors(repoResult.Errors));
 	}
@@ -41,7 +46,9 @@ internal class GraveyardService: IGraveyardService {
 	public Task<Result> OptOut(GuildUser user) {
 		_logger.LogInformation($"Opting user {user.Username} out");
 		
-		var configurationResult = _graveyardRepository.GetSingle();
+		var graveyardRepository = _repositoryStrategy.GetOrCreateRepository<IGraveyardRepository>(user.GuildId);
+		
+		var configurationResult = graveyardRepository.GetSingle();
 		if (configurationResult.IsFailed || configurationResult.Value == null) {
 			return Task.FromResult(Result.Fail("Could not opt user out")
 				.WithErrors(configurationResult.Errors));
@@ -52,12 +59,13 @@ internal class GraveyardService: IGraveyardService {
 		}
 
 		configurationResult.Value.OptedInUsers.Remove(user.Id);
-		var repoResult = _graveyardRepository.Update(configurationResult.Value);
+		var repoResult = graveyardRepository.Update(configurationResult.Value);
 		return Task.FromResult(Result.OkIf(repoResult.IsSuccess, "Could not opt out").WithErrors(repoResult.Errors));
 	}
 
 	public Task<Result<bool>> IsOptedIn(GuildUser user) {
-		var configurationResult = _graveyardRepository.GetSingle();
+		var graveyardRepository = _repositoryStrategy.GetOrCreateRepository<IGraveyardRepository>(user.GuildId);
+		var configurationResult = graveyardRepository.GetSingle();
 		
 		if(configurationResult.IsFailed){
 			return Task.FromResult(Result.Fail<bool>("Could not check if user is opted in")
@@ -82,9 +90,15 @@ internal class GraveyardService: IGraveyardService {
 		if (!shamerOptedIn.Value) {
 			return Result.Fail("User that is shaming is not opted in, please opt in to shame.");
 		}
+
+		var configRepo = _repositoryStrategy.GetOrCreateRepository<IGuildConfigRepository>(shamed.GuildId);
+		var configuration = configRepo.GetSingle().Value;
 		
-		var shame = new Shame(location, metricType, imageUrl, shamedBy.Id, DateTimeOffset.Now); //TODO Get offset!
-		return _graveyardRepository.AddShame(shamed.Id, shame);
+		var date = DateTime.UtcNow.GetCorrectDateTimeOffset(configuration.Timezone);
+		
+		var shame = new Shame(location, metricType, imageUrl, shamedBy.Id, date);
+		var graveyardRepository = _repositoryStrategy.GetOrCreateRepository<IGraveyardRepository>(shamed.GuildId);
+		return graveyardRepository.AddShame(shamed.Id, shame);
 
 	}
 
@@ -95,8 +109,9 @@ internal class GraveyardService: IGraveyardService {
 			return Result.Fail("User is not opted in.");
 		}
 		
-		var repositoryResult = location is null ? _graveyardRepository.GetShamesForUser(user.Id) 
-			: _graveyardRepository.GetShamesForUserPerLocation(user.Id, location.Value, metricTypeLocation);
+		var graveyardRepository = _repositoryStrategy.GetOrCreateRepository<IGraveyardRepository>(user.GuildId);
+		var repositoryResult = location is null ? graveyardRepository.GetShamesForUser(user.Id) 
+			: graveyardRepository.GetShamesForUserPerLocation(user.Id, location.Value, metricTypeLocation);
 		
 		if(repositoryResult.IsFailed){
 			return Result.Fail<IEnumerable<Shame>>("Could not get shames")
@@ -107,7 +122,8 @@ internal class GraveyardService: IGraveyardService {
 	}
 
 	public Task<Result<(ulong userId, Shame[] shames)[]>> GetShames(Guild guild, ShameLocation? location, MetricType? metricTypeLocation) {
-		var graveyard = _graveyardRepository.GetSingle();
+		var graveyardRepository = _repositoryStrategy.GetOrCreateRepository<IGraveyardRepository>(guild.GuildId);
+		var graveyard = graveyardRepository.GetSingle();
 		
 		if(graveyard.IsFailed || graveyard.Value is null){
 			return Task.FromResult(Result.Fail<(ulong userId, Shame[] shames)[]>("Could not get shames")
