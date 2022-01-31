@@ -67,7 +67,7 @@ public class ShameCommandHandler : ApplicationCommandHandlerBase<ShameCommandReq
 			sb.AppendLine();
 			sb.AppendLine($"**Hooray {Context.User.Mention},** you're a real hero!");
 			
-			embed.WithSuccess(sb.ToString());
+			embed.WithSuccess(sb.ToString(), "Oh the shame...");
 
 			embed.AddField(f => {
 				f.Name = "Gravestone location";
