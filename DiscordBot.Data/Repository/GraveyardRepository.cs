@@ -69,7 +69,8 @@ public class GraveyardRepository : BaseSingleRecordLiteDbRepository<Graveyard>, 
 			graveyard.Value.Shames.Add(userId, new List<Shame> {shame});
 		}
 		
-		return Result.Ok();
+		// Update graveyard
+		return Update(graveyard.Value);
 	}
 
 	private Result<Graveyard> GetGraveyardOrFail() {
