@@ -80,26 +80,25 @@ internal class GraveyardService: IGraveyardService {
 	}
 
 	public async Task<Result> Shame(GuildUser shamed, GuildUser shamedBy, ShameLocation location, string imageUrl, MetricType? metricType) {
+		var shamerOptedIn = await IsOptedIn(shamedBy);
+		if (!shamerOptedIn.Value) {
+			return Result.Fail("User that is shaming is not opted in, please opt in to shame.");
+		}
+		
 		var isOptedIn = await IsOptedIn(shamed);
 
 		if (!isOptedIn.Value) {
 			return Result.Fail("User that is being shamed is not opted in.");
 		}
 
-		var shamerOptedIn = await IsOptedIn(shamedBy);
-		if (!shamerOptedIn.Value) {
-			return Result.Fail("User that is shaming is not opted in, please opt in to shame.");
-		}
-
 		var configRepo = _repositoryStrategy.GetOrCreateRepository<IGuildConfigRepository>(shamed.GuildId);
 		var configuration = configRepo.GetSingle().Value;
 		
-		var date = DateTime.UtcNow.GetCorrectDateTimeOffset(configuration.Timezone);
+		var date = DateTimeOffset.UtcNow.ToOffset(configuration.Timezone);
 		
 		var shame = new Shame(location, metricType, imageUrl, shamedBy.Id, date);
 		var graveyardRepository = _repositoryStrategy.GetOrCreateRepository<IGraveyardRepository>(shamed.GuildId);
 		return graveyardRepository.AddShame(shamed.Id, shame);
-
 	}
 
 	public async Task<Result<IEnumerable<Shame>>> GetShames(GuildUser user, ShameLocation? location, MetricType? metricTypeLocation) {
