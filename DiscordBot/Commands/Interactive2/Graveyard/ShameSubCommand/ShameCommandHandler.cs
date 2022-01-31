@@ -1,6 +1,8 @@
+using System.Text;
 using DiscordBot.Commands.Interactive2.Base.Handlers;
 using DiscordBot.Common.Models.Enums;
 using Microsoft.Extensions.DependencyInjection;
+using WiseOldManConnector.Helpers;
 using WiseOldManConnector.Models.WiseOldMan.Enums;
 
 namespace DiscordBot.Commands.Interactive2.Graveyard.ShameSubCommand;
@@ -20,7 +22,7 @@ public class ShameCommandHandler : ApplicationCommandHandlerBase<ShameCommandReq
 		var pictureUrl = Context.SubCommandOptions.GetOptionValue<string>(ShameSubCommandDefinition.PictureOption);
 
 		var users = (await shamedUserString.GetUsersFromString(Context)).users.ToList();
-		
+
 		// Validate at least one user
 		if (users.Count == 0) {
 			return Result.Fail("No users found");
@@ -35,29 +37,49 @@ public class ShameCommandHandler : ApplicationCommandHandlerBase<ShameCommandReq
 
 	protected override async Task<Result> DoWork(CancellationToken cancellationToken) {
 		var optionsResult = await GetOptions();
-		if(optionsResult.IsFailed) {
+		if (optionsResult.IsFailed) {
 			return Result.Fail("Could not get command values").WithErrors(optionsResult.Errors);
 		}
-		
+
 		var (users, location, metricType, pictureUrl) = optionsResult.Value;
 
 		var serviceResult = await SendToService(users, location, pictureUrl, metricType);
-		await ReplyAsync(serviceResult);
-		
+		await ReplyAsync(serviceResult, users, location, metricType, pictureUrl);
+
 		return Result.Ok();
 	}
 
-	private async Task ReplyAsync(Result result) {
+	private async Task ReplyAsync(Result result, List<IUser> users, ShameLocation location, MetricType? shameMetricLocation, string pictureUrl) {
 		var embed = Context.CreateEmbedBuilder();
-		if(result.IsFailed) {
-			embed.WithFailure("Something went wrong with getting the shames!").AddField(f => {
+		if (result.IsFailed) {
+			embed.WithFailure("Something went wrong with shaming!").AddField(f => {
 				f.Name = "Error";
 				f.Value = result.Errors.First().Message;
 			});
 		} else {
-			embed.WithSuccess($"Successfully shamed users!{Environment.NewLine}Hooray, you're a hero!");
+			var sb = new StringBuilder();
+			sb.AppendLine("Successfully shamed the following:");
+
+			foreach (var user in users) {
+				sb.AppendLine($"- {user.DisplayName()}");
+			}
+
+			sb.AppendLine();
+			sb.AppendLine($"**Hooray {Context.User.Mention},** you're a real hero!");
+			
+			embed.WithSuccess(sb.ToString());
+
+			embed.AddField(f => {
+				f.Name = "Gravestone location";
+				f.Value = shameMetricLocation is not null ? $"{shameMetricLocation.Value.ToDisplayNameOrFriendly()}" : location.ToDisplayNameOrFriendly();
+				f.IsInline = true;
+			});
+
+			if (!string.IsNullOrEmpty(pictureUrl)) {
+				embed.ImageUrl = pictureUrl;
+			}
 		}
-		
+
 		await Context.CreateReplyBuilder().WithEmbed(embed).RespondAsync();
 	}
 
@@ -78,6 +100,7 @@ public class ShameCommandHandler : ApplicationCommandHandlerBase<ShameCommandReq
 
 		// If we failed, at least tell em!
 		var failedUsers = failedTasks.Select(t => $"{users[t.i].Mention}: {t.Result.Errors.First().Message}").ToList();
-		return Result.Fail($"Failed to shame the following users.{Environment.NewLine}{string.Join(Environment.NewLine, failedUsers)}").WithErrors(failedTasks.SelectMany(x=> x.Result.Errors));
+		return Result.Fail($"Failed to shame the following users.{Environment.NewLine}{string.Join(Environment.NewLine, failedUsers)}")
+			.WithErrors(failedTasks.SelectMany(x => x.Result.Errors));
 	}
 }
