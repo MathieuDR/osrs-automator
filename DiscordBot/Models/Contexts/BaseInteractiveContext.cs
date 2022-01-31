@@ -50,6 +50,11 @@ public abstract class BaseInteractiveContext<T> : BaseInteractiveContext where T
             .WithDescription(description ?? string.Empty)
             .WithCurrentTimestamp();
     }
+    
+    public PageBuilder CreatePageBuilder(EmbedBuilder embedBuilder, string description = null) {
+        return PageBuilder.FromEmbedBuilder(embedBuilder)
+            .WithDescription(description ?? string.Empty);
+    }
 
     public string GetDisplayNameById(ulong user) {
         return Guild.GetUser(user)?.DisplayName();

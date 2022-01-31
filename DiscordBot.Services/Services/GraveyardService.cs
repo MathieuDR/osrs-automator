@@ -90,13 +90,8 @@ internal class GraveyardService: IGraveyardService {
 		if (!isOptedIn.Value) {
 			return Result.Fail("User that is being shamed is not opted in.");
 		}
-
-		var configRepo = _repositoryStrategy.GetOrCreateRepository<IGuildConfigRepository>(shamed.GuildId);
-		var configuration = configRepo.GetSingle().Value;
 		
-		var date = DateTimeOffset.UtcNow.ToOffset(configuration.Timezone);
-		
-		var shame = new Shame(location, metricType, imageUrl, shamedBy.Id, date);
+		var shame = new Shame(location, metricType, imageUrl, shamedBy.Id);
 		var graveyardRepository = _repositoryStrategy.GetOrCreateRepository<IGraveyardRepository>(shamed.GuildId);
 		return graveyardRepository.AddShame(shamed.Id, shame);
 	}
@@ -117,7 +112,7 @@ internal class GraveyardService: IGraveyardService {
 				.WithErrors(repositoryResult.Errors);
 		}
 		
-		return Result.Ok(repositoryResult.Value.AsEnumerable());
+		return Result.Ok(SetTimezone(repositoryResult.Value, user.GuildId));
 	}
 
 	public Task<Result<(ulong userId, Shame[] shames)[]>> GetShames(Guild guild, ShameLocation? location, MetricType? metricTypeLocation) {
@@ -140,7 +135,16 @@ internal class GraveyardService: IGraveyardService {
 			return Task.FromResult(Result.Ok(filteredShames));
 		}
 		
-		var filteredShamesPerLocation = filteredShames.Where(x => x.Item2.Any(y => y.Location == location.Value && (metricTypeLocation is null || y.MetricLocation == metricTypeLocation.Value))).ToArray();
+		var filteredShamesPerLocation = filteredShames
+			.Where(x => x.Item2.Any(y => y.Location == location.Value && (metricTypeLocation is null || y.MetricLocation == metricTypeLocation.Value)))
+			.Select(x=> (x.Key, SetTimezone(x.Item2, guild.Id).ToArray())).ToArray();
 		return Task.FromResult(Result.Ok(filteredShamesPerLocation));
+	}
+
+	private IEnumerable<Shame> SetTimezone(IEnumerable<Shame> shames, ulong guildId) {
+		var configRepo = _repositoryStrategy.GetOrCreateRepository<IGuildConfigRepository>(guildId);
+		var configuration = configRepo.GetSingle().Value;
+
+		return shames.Select(x => x with { ShamedAt = x.ShamedAt.ToOffset(configuration.Timezone)});
 	}
 }
