@@ -95,13 +95,8 @@ internal class GraveyardService: IGraveyardService {
 			return Result.Fail("User is not opted in.");
 		}
 		
-		Result<List<Shame>> repositoryResult;		
-		
-		if (location is null) {
-			repositoryResult = _graveyardRepository.GetShamesForUser(user.Id);
-		} else {
-			repositoryResult = _graveyardRepository.GetShamesForUserPerLocation(user.Id, location.Value, metricTypeLocation);
-		}
+		var repositoryResult = location is null ? _graveyardRepository.GetShamesForUser(user.Id) 
+			: _graveyardRepository.GetShamesForUserPerLocation(user.Id, location.Value, metricTypeLocation);
 		
 		if(repositoryResult.IsFailed){
 			return Result.Fail<IEnumerable<Shame>>("Could not get shames")
