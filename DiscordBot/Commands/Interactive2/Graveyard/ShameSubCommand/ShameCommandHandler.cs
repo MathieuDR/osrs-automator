@@ -42,19 +42,22 @@ public class ShameCommandHandler : ApplicationCommandHandlerBase<ShameCommandReq
 		var (users, location, metricType, pictureUrl) = optionsResult.Value;
 
 		var serviceResult = await SendToService(users, location, pictureUrl, metricType);
-		await ReplyAsync(serviceResult.IsSuccess, users.Count);
+		await ReplyAsync(serviceResult);
 		
-		return serviceResult;
+		return Result.Ok();
 	}
 
-	private async Task ReplyAsync(bool isSuccess, int usersCount) {
+	private async Task ReplyAsync(Result result) {
 		var embed = Context.CreateEmbedBuilder();
-		if (isSuccess) {
-			embed.WithSuccess($"Shamed {usersCount} users!");
+		if(result.IsFailed) {
+			embed.WithFailure("Something went wrong with getting the shames!").AddField(f => {
+				f.Name = "Error";
+				f.Value = result.Errors.First().Message;
+			});
 		} else {
-			embed.WithFailure($"Could not shame {usersCount} users!");
+			embed.WithSuccess($"Successfully shamed users!{Environment.NewLine}Hooray, you're a hero!");
 		}
-
+		
 		await Context.CreateReplyBuilder().WithEmbed(embed).RespondAsync();
 	}
 
@@ -75,6 +78,6 @@ public class ShameCommandHandler : ApplicationCommandHandlerBase<ShameCommandReq
 
 		// If we failed, at least tell em!
 		var failedUsers = failedTasks.Select(t => $"{users[t.i].Mention}: {t.Result.Errors.First().Message}").ToList();
-		return Result.Fail($"Failed to shame the following users: {string.Join(", ", failedUsers)}").WithErrors(failedTasks.SelectMany(x=> x.Result.Errors));
+		return Result.Fail($"Failed to shame the following users.{Environment.NewLine}{string.Join(Environment.NewLine, failedUsers)}").WithErrors(failedTasks.SelectMany(x=> x.Result.Errors));
 	}
 }
