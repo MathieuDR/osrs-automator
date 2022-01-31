@@ -18,7 +18,7 @@ public class LeaderBoardHandler : ApplicationCommandHandlerBase<LeaderboardReque
 		var shames = await _graveyardService.GetShames(Context.Guild.ToGuildDto(), location, metricType);
 		
 		if (shames.IsSuccess) {
-			await PresentLeaderboard(shames.Value.ToArray(), location, metricType);
+			await PresentLeaderboard(shames.Value, location, metricType);
 		} else {
 			await Context.CreateReplyBuilder()
 				.WithEmbed(x =>
@@ -32,7 +32,7 @@ public class LeaderBoardHandler : ApplicationCommandHandlerBase<LeaderboardReque
 		return Result.Ok();
 	}
 
-	private async Task PresentLeaderboard(Shame[] toArray, ShameLocation? location, MetricType? metricType) {
+	private async Task PresentLeaderboard((ulong user, Shame[] shames)[] toArray, ShameLocation? location, MetricType? metricType) {
 		throw new NotImplementedException();
 	}
 
