@@ -1,6 +1,7 @@
 using DiscordBot.Commands.Interactive2.Base.Handlers;
 using DiscordBot.Common.Models.Enums;
 using Microsoft.Extensions.DependencyInjection;
+using WiseOldManConnector.Helpers;
 using WiseOldManConnector.Models.WiseOldMan.Enums;
 
 namespace DiscordBot.Commands.Interactive2.Graveyard.Leaderboard;
@@ -32,8 +33,29 @@ public class LeaderBoardHandler : ApplicationCommandHandlerBase<LeaderboardReque
 		return Result.Ok();
 	}
 
-	private async Task PresentLeaderboard((ulong user, Shame[] shames)[] toArray, ShameLocation? location, MetricType? metricType) {
-		throw new NotImplementedException();
+	private Task PresentLeaderboard((ulong user, Shame[] shames)[] memberShames, ShameLocation? location, MetricType? metricType) {
+		var board = CreateLeaderboard(memberShames, location, metricType);
+
+		_ = Context.CreatePaginatorReplyBuilder()
+			.WithLeaderboard(board)
+			.RespondAsync();
+
+		return Task.CompletedTask;
+	}
+
+	private Models.Leaderboard<int> CreateLeaderboard((ulong user, Shame[] shames)[] memberShames, ShameLocation? location, MetricType? metricType) {
+		var board = new Models.Leaderboard<int>() {
+			Name =  location.HasValue ? metricType.HasValue ? metricType.Value.ToDisplayNameOrFriendly() : location.Value.ToDisplayNameOrFriendly() : "All" + " shame",
+			ScoreFieldName = "Shames"
+		};
+
+		var shamesPerUser = memberShames.OrderBy(x => x.shames.Length).ToArray();
+		for (var i = 0; i < shamesPerUser.Length; i++) {
+			var (user, shames) = shamesPerUser[i];
+			board.Entries.Add(new LeaderboardEntry<int>(Context.Guild.GetUser(user).DisplayName(), shames.Length, i + 1));
+		}
+
+		return board;
 	}
 
 	private (ShameLocation?, MetricType?) GetOptions() {

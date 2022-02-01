@@ -97,6 +97,10 @@ public abstract class BaseInteractiveContext<T> : BaseInteractiveContext where T
     public InteractionReplyBuilder<T> CreateReplyBuilder(bool ephemeral = false) {
         return new InteractionReplyBuilder<T>(this).WithEphemeral(ephemeral);
     }
+    
+    public InteractionPaginatorReplyBuilder<T> CreatePaginatorReplyBuilder(bool ephemeral = false) {
+        return new InteractionPaginatorReplyBuilder<T>(this).WithEphemeral(ephemeral);
+    }
 
     public Task DeferAsync(bool ephemeral = false, RequestOptions options = null) {
         _isDeferred = true;

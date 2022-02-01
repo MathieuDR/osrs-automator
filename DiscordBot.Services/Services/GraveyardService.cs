@@ -136,8 +136,10 @@ internal class GraveyardService: IGraveyardService {
 		}
 		
 		var filteredShamesPerLocation = filteredShames
-			.Where(x => x.Item2.Any(y => y.Location == location.Value && (metricTypeLocation is null || y.MetricLocation == metricTypeLocation.Value)))
+			.Select(x=> (x.Key, x.Item2.Where(y => y.Location == location.Value && (metricTypeLocation is null || y.MetricLocation == metricTypeLocation.Value)).ToArray()))
+			.Where(x => x.Item2.Any())
 			.Select(x=> (x.Key, SetTimezone(x.Item2, guild.Id).ToArray())).ToArray();
+		
 		return Task.FromResult(Result.Ok(filteredShamesPerLocation));
 	}
 

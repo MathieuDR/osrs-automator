@@ -13,7 +13,6 @@ public static class ShameExtensions {
 		return ((ShameLocation)Enum.Parse(typeof(ShameLocation), input, true), null);
 	}
 
-
 	private static EmbedBuilder AddShameToEmbedBuilder(this EmbedBuilder builder, Shame shame, int? index = null, IUser user = null) {
 		// add title
 		builder.WithTitle($"Oh the shame...");
