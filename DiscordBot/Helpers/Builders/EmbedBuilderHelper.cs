@@ -75,6 +75,17 @@ public static class EmbedBuilderHelper {
         return builder;
     }
 
+    public static EmbedBuilder WithSuccess(this EmbedBuilder builder, string description, string title = "Success!") {
+        return builder.WithTitle(title)
+            .WithDescription(description)
+            .WithColor(75,181,67);
+    }
+    
+    public static EmbedBuilder WithFailure(this EmbedBuilder builder, string description, string title = "Failed!") {
+        return builder.WithTitle(title)
+            .WithDescription(description)
+            .WithColor(179,28,28);
+    }
 
     public static EmbedBuilder CreateAuthorFromMessageAuthor(this EmbedBuilder builder, ICommandContext context,
         string url = null,

@@ -82,8 +82,8 @@ internal class GroupConnector : BaseConnecter, IWiseOldManGroupApi {
         var request = GetNewRestRequest("{id}/gained");
 
         request.AddParameter("id", id, ParameterType.UrlSegment);
-        request.AddParameter("metric", metric.ToFriendlyNameOrDefault());
-        request.AddParameter("period", period.ToFriendlyNameOrDefault());
+        request.AddParameter("metric", metric.ToEnumMemberOrDefault());
+        request.AddParameter("period", period.ToEnumMemberOrDefault());
 
         var requestResult = await ExecuteCollectionRequest<WOMGroupDeltaMember>(request);
         var result = GetResponse<DeltaLeaderboard>(requestResult);
@@ -99,8 +99,8 @@ internal class GroupConnector : BaseConnecter, IWiseOldManGroupApi {
         var request = GetNewRestRequest("{id}/gained");
 
         request.AddParameter("id", id, ParameterType.UrlSegment);
-        request.AddParameter("metric", metric.ToFriendlyNameOrDefault());
-        request.AddParameter("period", period.ToFriendlyNameOrDefault());
+        request.AddParameter("metric", metric.ToEnumMemberOrDefault());
+        request.AddParameter("period", period.ToEnumMemberOrDefault());
         AddPaging(request, limit, offset);
 
         var requestResult = await ExecuteCollectionRequest<WOMGroupDeltaMember>(request);
@@ -116,7 +116,7 @@ internal class GroupConnector : BaseConnecter, IWiseOldManGroupApi {
         var request = GetNewRestRequest("{id}/hiscores");
 
         request.AddParameter("id", id, ParameterType.UrlSegment);
-        request.AddParameter("metric", metric.ToFriendlyNameOrDefault());
+        request.AddParameter("metric", metric.ToEnumMemberOrDefault());
 
         var requestResult = await ExecuteCollectionRequest<LeaderboardMember>(request);
         var result = GetResponse<HighscoreLeaderboard>(requestResult);
@@ -136,7 +136,7 @@ internal class GroupConnector : BaseConnecter, IWiseOldManGroupApi {
         var request = GetNewRestRequest("{id}/hiscores");
 
         request.AddParameter("id", id, ParameterType.UrlSegment);
-        request.AddParameter("metric", metric.ToFriendlyNameOrDefault());
+        request.AddParameter("metric", metric.ToEnumMemberOrDefault());
         AddPaging(request, limit, offset);
 
         var requestResult = await ExecuteCollectionRequest<LeaderboardMember>(request);
@@ -156,8 +156,8 @@ internal class GroupConnector : BaseConnecter, IWiseOldManGroupApi {
         var request = GetNewRestRequest("{id}/records");
 
         request.AddParameter("id", id, ParameterType.UrlSegment);
-        request.AddParameter("metric", metric.ToFriendlyNameOrDefault());
-        request.AddParameter("period", period.ToFriendlyNameOrDefault());
+        request.AddParameter("metric", metric.ToEnumMemberOrDefault());
+        request.AddParameter("period", period.ToEnumMemberOrDefault());
 
         var requestResult = await ExecuteCollectionRequest<LeaderboardMember>(request);
         var result = GetResponse<RecordLeaderboard>(requestResult);
@@ -175,8 +175,8 @@ internal class GroupConnector : BaseConnecter, IWiseOldManGroupApi {
         var request = GetNewRestRequest("{id}/records");
 
         request.AddParameter("id", id, ParameterType.UrlSegment);
-        request.AddParameter("metric", metric.ToFriendlyNameOrDefault());
-        request.AddParameter("period", period.ToFriendlyNameOrDefault());
+        request.AddParameter("metric", metric.ToEnumMemberOrDefault());
+        request.AddParameter("period", period.ToEnumMemberOrDefault());
         AddPaging(request, limit, offset);
 
         var requestResult = await ExecuteCollectionRequest<LeaderboardMember>(request);

@@ -24,6 +24,3 @@ public interface IRecordRepository<T> : IRepository where T : BaseRecord, new() 
     public Result Delete(T toDelete);
 }
 
-public interface ISingleRecordRepository<T> : IRecordRepository<T> where T : BaseRecord, new() {
-    public Result<T> GetSingle();
-}

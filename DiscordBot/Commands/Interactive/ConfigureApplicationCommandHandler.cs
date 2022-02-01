@@ -40,7 +40,7 @@ public class ConfigureApplicationCommandHandler : ApplicationCommandHandler {
     }
 
     public override Task<Result> HandleAutocompleteAsync(AutocompleteCommandContext context) {
-        if (context.SubCommand == SetServerSubCommandName && context.CurrentOption == TimeZoneOption) {
+        if (context.SubCommand == SetServerSubCommandName && context.CurrentOptionName == TimeZoneOption) {
             Logger.LogInformation("Searching {tzCount} timezones for the string '{string}'", _timeZones.Count, context.CurrentOptionAsString);
 
             var opts = _timeZones.Where(x => x.Value.ToLowerInvariant().Contains(context.CurrentOptionAsString.ToLowerInvariant()))

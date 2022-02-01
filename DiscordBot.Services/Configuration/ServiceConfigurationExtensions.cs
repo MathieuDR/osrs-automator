@@ -29,7 +29,8 @@ public static partial class ServiceConfigurationExtensions {
             .AddTransient<IOsrsHighscoreService, WiseOldManConnectorService>()
             .AddTransient<ICounterService, CountService>()
             .AddTransient<IAutomatedDropperService, AutomatedDropperService>()
-            .AddTransient<IAuthorizationService, AuthorizationService>();
+            .AddTransient<IAuthorizationService, AuthorizationService>()
+            .AddTransient<IGraveyardService, GraveyardService>();
 
         return serviceCollection;
     }

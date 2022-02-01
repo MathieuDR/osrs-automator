@@ -28,14 +28,14 @@ internal class RecordConnector : BaseConnecter, IWiseOldManRecordApi {
         PlayerType? playerType = null) {
         var request = GetNewRestRequest("/leaderboard");
 
-        request.AddParameter("metric", metric.ToFriendlyNameOrDefault());
+        request.AddParameter("metric", metric.ToEnumMemberOrDefault());
 
         if (playerType.HasValue) {
-            request.AddParameter("playerType", playerType.Value.ToFriendlyNameOrDefault());
+            request.AddParameter("playerType", playerType.Value.ToEnumMemberOrDefault());
         }
 
 
-        request.AddParameter("period", period.ToFriendlyNameOrDefault());
+        request.AddParameter("period", period.ToEnumMemberOrDefault());
         var queryResponse = await ExecuteCollectionRequest<WOMRecord>(request);
         var response = GetResponse<WOMRecord, Record>(queryResponse);
 

@@ -71,7 +71,7 @@ public class AuthorizationConfigurationCommandHandler : ApplicationCommandHandle
 
             var builder = context
                 .CreatePageBuilder(descriptionBuilder.ToString())
-                .WithTitle($"{role.ToFriendlyNameOrDefault()}");
+                .WithTitle($"{role.ToDisplayNameOrFriendly()}");
 
             pages[i] = builder;
         }
@@ -116,7 +116,7 @@ public class AuthorizationConfigurationCommandHandler : ApplicationCommandHandle
 
         Logger.LogInformation("Users to add: {users}", users.Count);
         Logger.LogInformation("roles to add: {roles}", roles.Count);
-        Logger.LogInformation("role: {role}", role.ToFriendlyNameOrDefault());
+        Logger.LogInformation("role: {role}", role.ToDisplayNameOrFriendly());
         Logger.LogInformation("Removing: {removing}", unauthorize);
 
         var result = Result.Ok();

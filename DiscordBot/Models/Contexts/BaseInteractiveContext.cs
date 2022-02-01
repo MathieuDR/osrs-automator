@@ -50,6 +50,11 @@ public abstract class BaseInteractiveContext<T> : BaseInteractiveContext where T
             .WithDescription(description ?? string.Empty)
             .WithCurrentTimestamp();
     }
+    
+    public PageBuilder CreatePageBuilder(EmbedBuilder embedBuilder, string description = null) {
+        return PageBuilder.FromEmbedBuilder(embedBuilder)
+            .WithDescription(description ?? string.Empty);
+    }
 
     public string GetDisplayNameById(ulong user) {
         return Guild.GetUser(user)?.DisplayName();
@@ -91,6 +96,10 @@ public abstract class BaseInteractiveContext<T> : BaseInteractiveContext where T
 
     public InteractionReplyBuilder<T> CreateReplyBuilder(bool ephemeral = false) {
         return new InteractionReplyBuilder<T>(this).WithEphemeral(ephemeral);
+    }
+    
+    public InteractionPaginatorReplyBuilder<T> CreatePaginatorReplyBuilder(bool ephemeral = false) {
+        return new InteractionPaginatorReplyBuilder<T>(this).WithEphemeral(ephemeral);
     }
 
     public Task DeferAsync(bool ephemeral = false, RequestOptions options = null) {

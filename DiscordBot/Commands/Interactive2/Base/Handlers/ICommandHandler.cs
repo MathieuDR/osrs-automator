@@ -22,17 +22,14 @@ public abstract class
         ServiceProvider = serviceProvider;
     }
 
-    public Task<Result> Handle(TRequest request, CancellationToken cancellationToken) {
+    public Task<Result> Handle(TRequest request, CancellationToken cancellationToken = default) {
         // Set context and request
         Context = request.Context;
         Request = request;
         CommandDefinition = GetCommandDefinition();
 
-        // Get options
-        var options = GetOptions();
-
         // Do work
-        return DoWork(options);
+        return DoWork(cancellationToken);
     }
 
     private ICommandDefinition GetCommandDefinition() {
@@ -52,18 +49,16 @@ public abstract class
         throw new Exception("Cannot find generic parameter");
     }
 
-    protected virtual IEnumerable<(string optionName, Type optionType, object? optionValue)> GetOptions() {
-        var opts = CommandDefinition.Options;
-        return opts.Select(x => (x.optionName, x.optionType, (object)null));
-    }
 
-    protected abstract Task<Result> DoWork(IEnumerable<(string optionName, Type optionType, object? optionValue)> options);
+    protected abstract Task<Result> DoWork(CancellationToken cancellationToken);
 }
 
 public abstract class
     ApplicationCommandHandlerBase<TRequest> : CommandHandlerBase<TRequest, ApplicationCommandContext>
     where TRequest : ICommandRequest<ApplicationCommandContext> {
     protected ApplicationCommandHandlerBase(IServiceProvider serviceProvider) : base(serviceProvider) { }
+    
+
 }
 
 public abstract class
