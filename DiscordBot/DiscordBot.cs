@@ -26,7 +26,8 @@ public class DiscordBot : BackgroundService {
 
         await discordTask;
         await schedulerTask;
-
+        
+        _logger.LogInformation("Discord bot is running.");
         await Task.Delay(-1, stoppingToken);
     }
 
@@ -37,27 +38,22 @@ public class DiscordBot : BackgroundService {
     }
 
     private async Task ConfigureDiscord() {
-        _client = _services.GetRequiredService<DiscordSocketClient>();
+        try {
+            _logger.LogInformation("Configuring discord");
+            _client = _services.GetRequiredService<DiscordSocketClient>();
 
-        await _services.GetRequiredService<InteractiveCommandHandlerService>().SetupAsync();
+            await _services.GetRequiredService<InteractiveCommandHandlerService>().SetupAsync();
+            var botConfig = _config.GetSection("Bot").Get<BotConfiguration>();
 
-        var botConfig = _config.GetSection("Bot").Get<BotConfiguration>();
 
-
-        //_client.InteractionCreated += ClientOnInteractionCreated;
-        await _client.LoginAsync(TokenType.Bot, botConfig.Token);
-        await _client.StartAsync();
-    }
-
-    private async Task ClientOnInteractionCreated(SocketInteraction arg) {
-        if (arg is SocketSlashCommand command) {
-            // Let's add a switch statement for the command name so we can handle multiple commands in one event.
-            switch (command.Data.Name) {
-                case "ping":
-                    var handler = _services.GetRequiredService<PingApplicationCommandHandler>();
-                    await handler.HandleCommandAsync(new ApplicationCommandContext(command, _services));
-                    break;
-            }
+            _logger.LogInformation("Logging in");
+            await _client.LoginAsync(TokenType.Bot, botConfig.Token);
+            
+            _logger.LogInformation("Starting discord");
+            await _client.StartAsync();
+        } catch (Exception e) {
+            _logger.LogError("Something went wrong with discord", e);
+            throw;
         }
     }
 

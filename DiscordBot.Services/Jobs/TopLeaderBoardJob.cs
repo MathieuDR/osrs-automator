@@ -25,12 +25,12 @@ public class TopLeaderBoardJob : ConfigurableGuildJob {
 
         try {
             foreach (var metric in metrics) {
-                Logger.LogInformation("Getting top deltas for {metric}", metric);
+                Logger.LogInformation("Getting top hiscores for {metric}", metric);
                 var top = await _osrsHighscoreService.GetLeaderboard(guildConfig.WomGroupId, metric);
                 tops.Add(top);
             }
         } catch (Exception e) {
-            Logger.LogError(e, "Error while getting top delta's");
+            Logger.LogError(e, "Error while getting top hiscores");
             return Result.Fail(new ExceptionalError(e));
         }
 
