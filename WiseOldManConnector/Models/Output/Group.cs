@@ -1,6 +1,4 @@
-﻿using WiseOldManConnector.Interfaces;
-
-namespace WiseOldManConnector.Models.Output;
+﻿namespace WiseOldManConnector.Models.Output;
 
 public class Group : IBaseConnectorOutput {
     public int Id { get; set; }
@@ -12,8 +10,4 @@ public class Group : IBaseConnectorOutput {
     public bool Verified { get; set; }
     public DateTime CreatedAt { get; set; }
     public DateTime UpdatedAt { get; set; }
-}
-
-public class VerificationGroup : Group, IVerifiable {
-    public string VerificationCode { get; set; }
 }
