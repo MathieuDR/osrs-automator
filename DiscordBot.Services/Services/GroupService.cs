@@ -8,6 +8,7 @@ using DiscordBot.Data.Repository;
 using DiscordBot.Data.Strategies;
 using DiscordBot.Services.Helpers;
 using DiscordBot.Services.Interfaces;
+using DiscordBot.Services.Jobs;
 using DiscordBot.Services.Models.Enums;
 using FluentResults;
 using Microsoft.Extensions.Logging;
@@ -160,7 +161,13 @@ internal class GroupService : RepositoryService, IGroupService {
             throw new NullReferenceException("Cannot make a scheduler");
         }
 
-        var t = typeof(GroupService);
+        var t = jobType switch {
+            JobType.GroupUpdate => typeof(AutoUpdateGroupJob),
+            JobType.MonthlyTop => typeof(TopLeaderBoardJob),
+            JobType.MonthlyTopGains => typeof(MonthlyTopDeltasJob),
+            _ => throw new ArgumentOutOfRangeException(nameof(jobType), jobType, null)
+        };
+
 
         var job = JobBuilder.Create(t)
             .WithIdentity(Guid.NewGuid().ToString())

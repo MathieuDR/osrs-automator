@@ -16,6 +16,11 @@ public static class CommandContextExtensions {
         return (T)(valueDictionary.GetOptionValue(optionName) ?? default(T));
     }
     
+    public static T GetOptionValueAsEnum<T>(this DefaultDictionary<string, SocketSlashCommandDataOption> valueDictionary, string optionName) where T: Enum {
+        var value = (long)valueDictionary.GetOptionValue(optionName);
+        return (T)Enum.ToObject(typeof(T), value);
+    }
+    
 
     public static DefaultDictionary<string, T> ToDefaultDictionary<T>(this IReadOnlyCollection<T> options)
         where T : IApplicationCommandInteractionDataOption {
