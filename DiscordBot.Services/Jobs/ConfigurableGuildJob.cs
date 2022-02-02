@@ -24,7 +24,12 @@ public abstract class ConfigurableGuildJob : BaseGuildJob {
         var guildConfiguration = repo.GetSingle().ValueOrDefault;
         ChannelJobConfiguration jobConfiguration = null;
         guildConfiguration?.AutomatedMessagesConfig?.ChannelJobs?.TryGetValue(JobType, out jobConfiguration);
-        return DoWorkForGuildWithContext(guild, guildConfiguration, jobConfiguration);
+
+        if (jobConfiguration is not null) {
+            return DoWorkForGuildWithContext(guild, guildConfiguration, jobConfiguration);    
+        }
+        
+        return Task.FromResult(Result.Ok());
     }
 
     protected abstract Task<Result> DoWorkForGuildWithContext(Guild guild, GuildConfig guildConfig, ChannelJobConfiguration configuration);

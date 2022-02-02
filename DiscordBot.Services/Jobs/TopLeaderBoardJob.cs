@@ -15,7 +15,7 @@ public class TopLeaderBoardJob : ConfigurableGuildJob {
     private readonly IOsrsHighscoreService _osrsHighscoreService;
 
     public TopLeaderBoardJob(ILogger<TopLeaderBoardJob> logger, IDiscordService discordService, IRepositoryStrategy repositoryStrategy,
-        IOsrsHighscoreService osrsHighscoreService) : base(logger, discordService, JobType.MonthlyTopGains, repositoryStrategy) {
+        IOsrsHighscoreService osrsHighscoreService) : base(logger, discordService, JobType.MonthlyTop, repositoryStrategy) {
         _osrsHighscoreService = osrsHighscoreService;
     }
 
