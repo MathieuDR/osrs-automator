@@ -12,6 +12,12 @@ public static class CommandContextExtensions {
         return valueDictionary.GetOption(optionName)?.Value;
     }
 
+    public static T GetOptionValueOrDefault<T>(this DefaultDictionary<string, SocketSlashCommandDataOption> valueDictionary, string optionName,
+        T @default) {
+        var opt = valueDictionary[optionName];
+        return opt != null ? (T)opt.Value : @default;
+    }
+
     public static T GetOptionValue<T>(this DefaultDictionary<string, SocketSlashCommandDataOption> valueDictionary, string optionName) {
         return (T)(valueDictionary.GetOptionValue(optionName) ?? default(T));
     }

@@ -83,15 +83,18 @@ internal class GroupService : RepositoryService, IGroupService {
         await _;
     }
 
-    public Task SetAutomationJobChannel(JobType jobType, GuildUser user, Channel messageChannel) {
+    public Task SetAutomationJobChannel(JobType jobType, GuildUser user, Channel messageChannel, bool enabled) {
         var config = GetGroupConfig(user.GuildId);
 
         //ChannelJobConfiguration setting;
         if (config.AutomatedMessagesConfig.ChannelJobs.ContainsKey(jobType)) {
             var setting = config.AutomatedMessagesConfig.ChannelJobs[jobType];
             setting.ChannelId = messageChannel.Id;
+            setting.IsEnabled = enabled;
         } else {
-            var setting = new ChannelJobConfiguration(user.GuildId, messageChannel.Id);
+            var setting = new ChannelJobConfiguration(user.GuildId, messageChannel.Id) {
+                IsEnabled = enabled
+            };
             config.AutomatedMessagesConfig.ChannelJobs.Add(jobType, setting);
         }
 
@@ -113,10 +116,6 @@ internal class GroupService : RepositoryService, IGroupService {
         var repo = GetRepository<GuildConfigRepository>(guild.Id);
         repo.UpdateOrInsert(config);
         return Task.FromResult(setting.IsEnabled);
-    }
-
-    public Task SetActivationAutomationJob(JobType jobType, bool activated) {
-        throw new NotImplementedException();
     }
 
     public Task<Dictionary<string, string>> GetSettingsDictionary(Guild guild) {

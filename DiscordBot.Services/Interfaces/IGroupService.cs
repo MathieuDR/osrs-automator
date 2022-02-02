@@ -13,9 +13,7 @@ public interface IGroupService {
     public Task<ItemDecorator<Group>> SetGroupForGuild(GuildUser guildUser, int womGroupId, string verificationCode);
     public ValueTask<Result> SetTimeZone(GuildUser guildUser, string key);
     Task SetAutoAdd(GuildUser guildUser, bool autoAdd);
-    Task SetAutomationJobChannel(JobType jobType, GuildUser user, Channel messageChannel);
-    Task<bool> ToggleAutomationJob(JobType jobType, Guild guild);
-    Task SetActivationAutomationJob(JobType jobType, bool activated);
+    Task SetAutomationJobChannel(JobType jobType, GuildUser user, Channel messageChannel, bool enabled);
     Task<Dictionary<string, string>> GetSettingsDictionary(Guild guild);
     Task<ItemDecorator<Leaderboard>> GetGroupLeaderboard(GuildUser guildUser);
     Task<ItemDecorator<Leaderboard>> GetGroupLeaderboard(GuildUser guildUser, MetricType metric, Period period);
