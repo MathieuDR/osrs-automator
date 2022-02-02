@@ -7,15 +7,6 @@ public interface ICommandDefinition {
     public IEnumerable<(String optionName, Type optionType)> Options { get; } 
 }
 
-public interface IRootCommandDefinition : ICommandDefinition {
-    Task<uint> GetCommandBuilderHash();
-    Task<SlashCommandProperties> GetCommandProperties();
-}
-
-public interface ISubCommandDefinition<TParentCommand> : ISubCommandDefinition
-    where TParentCommand : IRootCommandDefinition {
-}
-
 public interface ISubCommandDefinition : ICommandDefinition {
     Task<SlashCommandOptionBuilder> GetOptionBuilder();
 }

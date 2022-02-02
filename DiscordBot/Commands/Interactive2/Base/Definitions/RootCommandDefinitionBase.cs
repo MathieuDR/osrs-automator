@@ -1,52 +1,8 @@
-﻿using System.Text;
+using System.Text;
 using System.Text.Json;
 using HashDepot;
-using Microsoft.Extensions.DependencyInjection;
 
 namespace DiscordBot.Commands.Interactive2.Base.Definitions;
-
-public abstract class CommandDefinitionBase : ICommandDefinition {
-	public CommandDefinitionBase(IServiceProvider serviceProvider) {
-		ServiceProvider = serviceProvider;
-		var loggerFactory = ServiceProvider.GetRequiredService<ILoggerFactory>();
-		Logger = loggerFactory.CreateLogger(GetType());
-	}
-
-	protected ILogger Logger { get; }
-	protected IServiceProvider ServiceProvider { get; }
-	public abstract string Name { get; }
-	public abstract string Description { get; }
-	public IEnumerable<(string optionName, Type optionType)> Options { get; } = new List<(string optionName, Type optionType)>();
-
-    /// <summary>
-    ///     Set options in here with correct type.
-    ///     This will be used in the handlers to automatically get all options
-    /// </summary>
-    /// <returns></returns>
-    protected virtual Task FillOptions() => Task.CompletedTask;
-}
-
-public abstract class SubCommandDefinitionBase<TRoot> : CommandDefinitionBase, ISubCommandDefinition<TRoot> where TRoot : IRootCommandDefinition {
-	protected SubCommandDefinitionBase(IServiceProvider serviceProvider) : base(serviceProvider) { }
-
-	public async Task<SlashCommandOptionBuilder> GetOptionBuilder() {
-		var builder = new SlashCommandOptionBuilder()
-			.WithName(Name)
-			.WithDescription(Description)
-			.WithType(ApplicationCommandOptionType.SubCommand);
-
-		builder = await ExtendOptionCommandBuilder(builder);
-
-		return builder;
-	}
-
-	/// <summary>
-	///     Extend the builder. The Name and description is already set
-	/// </summary>
-	/// <param name="builder">Builder with name and description set</param>
-	/// <returns>Fully build slash command builder</returns>
-	protected abstract Task<SlashCommandOptionBuilder> ExtendOptionCommandBuilder(SlashCommandOptionBuilder builder);
-}
 
 public abstract class RootCommandDefinitionBase : CommandDefinitionBase, IRootCommandDefinition {
 	private readonly IEnumerable<ISubCommandDefinition> _subCommandDefinitions;

@@ -15,14 +15,3 @@ public interface ICommandRequest<out TCommandDefinition, out TContext> : IComman
     where TContext : BaseInteractiveContext
     where TCommandDefinition : ICommandDefinition {
 }
-
-public interface
-    IApplicationCommandRequest<out TCommandDefinition> : ICommandRequest<TCommandDefinition, ApplicationCommandContext>
-    where TCommandDefinition : ICommandDefinition { }
-
-public interface
-    IAutoCompleteCommandRequest<out TCommandDefinition> : ICommandRequest<TCommandDefinition, AutocompleteCommandContext> where TCommandDefinition : ICommandDefinition { }
-
-public interface
-    IMessageComponentCommandRequest<out TCommandDefinition> : ICommandRequest<TCommandDefinition, MessageComponentContext>
-    where TCommandDefinition : ICommandDefinition { }

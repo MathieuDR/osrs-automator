@@ -8,8 +8,3 @@ public class BotConfiguration {
     public string CustomPrefix { get; set; }
     public BotTeamConfiguration TeamConfiguration { get; set; }
 }
-
-public class BotTeamConfiguration {
-    public ulong GuildId { get; set; }
-    public ulong OwnerId { get; set; }
-}

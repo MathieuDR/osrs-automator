@@ -8,20 +8,20 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <ProjectReference Include="..\DiscordBot\DiscordBot.csproj"/>
+        <ProjectReference Include="..\DiscordBot\DiscordBot.csproj" />
     </ItemGroup>
 
     <ItemGroup>
-        <PackageReference Include="Mapster" Version="7.2.0"/>
-        <PackageReference Include="Microsoft.AspNetCore.Mvc.Versioning" Version="5.0.0"/>
-        <PackageReference Include="Microsoft.AspNetCore.Mvc.Versioning.ApiExplorer" Version="5.0.0"/>
-        <PackageReference Include="Serilog.AspNetCore" Version="4.1.0"/>
-        <PackageReference Include="Serilog.Enrichers.AspNetCore" Version="1.0.0"/>
-        <PackageReference Include="Swashbuckle.AspNetCore" Version="6.2.3"/>
+        <PackageReference Include="Mapster" Version="7.2.0" />
+        <PackageReference Include="Microsoft.AspNetCore.Mvc.Versioning" Version="5.0.0" />
+        <PackageReference Include="Microsoft.AspNetCore.Mvc.Versioning.ApiExplorer" Version="5.0.0" />
+        <PackageReference Include="Serilog.AspNetCore" Version="4.1.0" />
+        <PackageReference Include="Serilog.Enrichers.AspNetCore" Version="1.0.0" />
+        <PackageReference Include="Swashbuckle.AspNetCore" Version="6.2.3" />
     </ItemGroup>
 
     <ItemGroup>
-        <_ContentIncludedByDefault Remove="Pages\Shared\MainLayout.razor"/>
-        <_ContentIncludedByDefault Remove="Pages\Shared\NavMenu.razor"/>
+        <_ContentIncludedByDefault Remove="Pages\Shared\MainLayout.razor" />
+        <_ContentIncludedByDefault Remove="Pages\Shared\NavMenu.razor" />
     </ItemGroup>
 </Project>
