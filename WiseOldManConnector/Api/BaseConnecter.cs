@@ -1,5 +1,7 @@
 ﻿using System.Net;
 using AutoMapper;
+using Common.Semaphores;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using RestSharp;
@@ -13,15 +15,17 @@ namespace WiseOldManConnector.Api;
 
 internal abstract class BaseConnecter {
     protected const string BaseUrl = "https://wiseoldman.net/api";
-    protected readonly RestClient Client;
+    private readonly RestClient Client;
     protected readonly IWiseOldManLogger Logger;
     protected readonly Mapper Mapper;
+    protected readonly TimeSpanSemaphore Semaphore;
 
     protected BaseConnecter(IServiceProvider provider) {
         Logger = provider.GetService(typeof(IWiseOldManLogger)) as IWiseOldManLogger;
         Client = new RestClient(BaseUrl);
         Client.UseNewtonsoftJson();
         Mapper = Transformers.Configuration.GetMapper();
+        Semaphore = provider.GetRequiredService<TimeSpanSemaphore>();
     }
 
     protected abstract string Area { get; }
@@ -39,7 +43,8 @@ internal abstract class BaseConnecter {
 
     protected async Task<T> ExecuteRequest<T>(RestRequest request) where T : IResponse {
         LogRequest(request);
-        var result = await Client.ExecuteAsync<T>(request);
+        var result = await Semaphore.RunAsync(() => Client.ExecuteAsync<T>(request));
+        //var result = await Client.ExecuteAsync<T>(request);
         LogResponse(result);
 
         ValidateResponse(result);
@@ -48,7 +53,7 @@ internal abstract class BaseConnecter {
 
     protected async Task<IEnumerable<T>> ExecuteCollectionRequest<T>(RestRequest request) where T : IResponse {
         LogRequest(request);
-        var result = await Client.ExecuteAsync<List<T>>(request);
+        var result = await Semaphore.RunAsync(() => Client.ExecuteAsync<List<T>>(request));
         LogResponse(result);
 
         ValidateResponse(result);

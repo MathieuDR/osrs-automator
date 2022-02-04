@@ -1,3 +1,4 @@
+using Common.Semaphores;
 using DiscordBot.Services.ExternalServices;
 using DiscordBot.Services.Interfaces;
 using DiscordBot.Services.Services;
@@ -30,7 +31,8 @@ public static partial class ServiceConfigurationExtensions {
             .AddTransient<ICounterService, CountService>()
             .AddTransient<IAutomatedDropperService, AutomatedDropperService>()
             .AddTransient<IAuthorizationService, AuthorizationService>()
-            .AddTransient<IGraveyardService, GraveyardService>();
+            .AddTransient<IGraveyardService, GraveyardService>()
+            .AddSingleton(new TimeSpanSemaphore(150, TimeSpan.FromSeconds(5*60+10))); // rate limit to 150 requests per 5 minutes + 10 seconds buffer
 
         return serviceCollection;
     }
