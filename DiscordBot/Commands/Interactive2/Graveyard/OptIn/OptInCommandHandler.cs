@@ -18,7 +18,7 @@ public class OptInCommandHandler: ApplicationCommandHandlerBase<OptInCommandRequ
 		var optingIn = (bool?)enableOption?.Value ?? true;
 
 		Result result = null;
-		var verb = optingIn ? "opted-in" : "opted-out";
+		var verb = optingIn ? "opted in to" : "opted out of";
 		
 		if (optingIn) {
 			result = await _graveyardService.OptIn(user.ToGuildUserDto());
@@ -31,11 +31,9 @@ public class OptInCommandHandler: ApplicationCommandHandlerBase<OptInCommandRequ
 		}
 
 		await Context.CreateReplyBuilder()
-			.WithEmbed(x=> x.WithTitle("Success!")
-				.WithDescription($"Successfully {verb} from the graveyard."))
-			.WithEphemeral()
+			.WithEmbed(x=> x.WithSuccess($"Has {verb} the graveyard!", user.Mention))
 			.RespondAsync();
-		
+
 		return Result.Ok();
 	}
 }
