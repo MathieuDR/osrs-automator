@@ -143,6 +143,18 @@ internal class GraveyardService: IGraveyardService {
 		return Task.FromResult(Result.Ok(filteredShamesPerLocation));
 	}
 
+	public Task<Result<ulong[]>> GetOptedInUsers(Guild guild) {
+		var graveyardRepository = _repositoryStrategy.GetOrCreateRepository<IGraveyardRepository>(guild.GuildId);
+		var graveyardResult = graveyardRepository.GetSingle();
+		
+		if(graveyardResult.IsFailed || graveyardResult.Value is null){
+			return Task.FromResult(Result.Fail<ulong[]>("Could not get shames")
+				.WithErrors(graveyardResult.Errors));
+		}
+		
+		return Task.FromResult(Result.Ok(graveyardResult.Value.OptedInUsers.ToArray()));
+	}
+
 	private IEnumerable<Shame> SetTimezone(IEnumerable<Shame> shames, ulong guildId) {
 		var configRepo = _repositoryStrategy.GetOrCreateRepository<IGuildConfigRepository>(guildId);
 		var configuration = configRepo.GetSingle().Value;
