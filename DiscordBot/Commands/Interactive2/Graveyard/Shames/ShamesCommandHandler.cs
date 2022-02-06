@@ -38,7 +38,7 @@ public class ShamesCommandHandler : ApplicationCommandHandlerBase<ShamesCommandR
 		return Result.Ok();
 	}
 
-	private Task PresentShames(Shame[] shames, IUser shamedUser, ShameLocation? location, MetricType? metricType) {
+	private async Task PresentShames(Shame[] shames, IUser shamedUser, ShameLocation? location, MetricType? metricType) {
 		var sb = new StringBuilder();
 		sb.AppendLine("**Shames for " + shamedUser.Mention + "**");
 		
@@ -51,7 +51,12 @@ public class ShamesCommandHandler : ApplicationCommandHandlerBase<ShamesCommandR
 		
 		sb.AppendLine($": {shames.Length}");
 		
-		
+		// if shames is empty, send a no shame message
+		if (shames.Length == 0) {
+			await Context.CreateReplyBuilder().WithEmbedFrom("Squeaky clean!", sb.ToString()).RespondAsync();
+			return;
+		}
+
 		var pages = shames.Select((s,i) => {
 			_logger.LogInformation("{@shame}", s);
 			return Context.CreatePageBuilder(Context.CreateEmbedBuilder().WithShame(s, i+1, shamedUser));
@@ -60,7 +65,6 @@ public class ShamesCommandHandler : ApplicationCommandHandlerBase<ShamesCommandR
 		var paginator = Context.GetBaseStaticPaginatorBuilder(pages);
 		//_ = Context.DeferAsync();
 		_ = Context.SendPaginator(paginator.Build());
-		return Task.CompletedTask;
 	}
 
 
