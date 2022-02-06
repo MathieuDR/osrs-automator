@@ -49,7 +49,7 @@ public class LeaderBoardHandler : ApplicationCommandHandlerBase<LeaderboardReque
 			ScoreFieldName = "Shames"
 		};
 
-		var shamesPerUser = memberShames.OrderBy(x => x.shames.Length).ToArray();
+		var shamesPerUser = memberShames.OrderByDescending(x => x.shames.Length).ToArray();
 		for (var i = 0; i < shamesPerUser.Length; i++) {
 			var (user, shames) = shamesPerUser[i];
 			board.Entries.Add(new LeaderboardEntry<int>(Context.Guild.GetUser(user).DisplayName(), shames.Length, i + 1));

@@ -128,7 +128,7 @@ internal class GraveyardService: IGraveyardService {
 		
 		// filter shames for people	who are opted in
 		var optedInUsers = graveyard.Value.OptedInUsers;
-		var filteredShames = shamesPerUse.Where(x => optedInUsers.Contains(x.Key)).Select(x => (x.Key, x.Value.ToArray())).OrderByDescending(x=> x.Item2.Length).ToArray();
+		var filteredShames = shamesPerUse.Where(x => optedInUsers.Contains(x.Key)).Select(x => (x.Key, x.Value.ToArray())).ToArray();
 		
 		// filter shames for location
 		if (location is null) {
@@ -138,7 +138,8 @@ internal class GraveyardService: IGraveyardService {
 		var filteredShamesPerLocation = filteredShames
 			.Select(x=> (x.Key, x.Item2.Where(y => y.Location == location.Value && (metricTypeLocation is null || y.MetricLocation == metricTypeLocation.Value)).ToArray()))
 			.Where(x => x.Item2.Any())
-			.Select(x=> (x.Key, SetTimezone(x.Item2, guild.Id).ToArray())).ToArray();
+			.Select(x=> (x.Key, SetTimezone(x.Item2, guild.Id).ToArray()))		
+			.ToArray();
 		
 		return Task.FromResult(Result.Ok(filteredShamesPerLocation));
 	}
