@@ -9,7 +9,7 @@ public class Leaderboard<T> {
 	public string ScoreFieldName { get; set; }
 	public List<LeaderboardEntry<T>> Entries { get; set; } = new List<LeaderboardEntry<T>>();
 
-	public string ToPaddedHeaderString(int rankColumnSize = 5, int nameSize = 20, int scoreSize = 8) {
+	public string ToPaddedHeaderString(int rankColumnSize = 5, int nameSize = 25, int scoreSize = 8) {
 		var sb = new StringBuilder();
 		
 		sb.Append("#, ".PadLeft(rankColumnSize));

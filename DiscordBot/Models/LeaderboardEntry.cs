@@ -15,7 +15,7 @@ public class LeaderboardEntry<T> {
 
 	public override string ToString() => $"{Rank}. {Name} - {Score}";
 
-	public string ToStringWithPadding(int rankColumnSize = 5, int nameSize = 20, int scoreSize = 8) {
+	public string ToStringWithPadding(int rankColumnSize = 5, int nameSize = 25, int scoreSize = 8) {
 		var sb = new StringBuilder();
 		
 		sb.Append($"{Rank.ToString()}, ".PadLeft(rankColumnSize));

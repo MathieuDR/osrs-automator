@@ -32,24 +32,13 @@ public class InteractionPaginatorReplyBuilder<TInteraction> where TInteraction :
 	public InteractionPaginatorReplyBuilder<TInteraction> WithLeaderboard<T>(Models.Leaderboard<T> leaderboard) {
 		// Order leaderboard by rank
 		leaderboard.Entries = leaderboard.Entries.OrderBy(x => x.Rank).ToList();
-
-		var headerString = leaderboard.ToPaddedHeaderString();
+	
+		// prep functions
 		var entryStrings = leaderboard.Entries.Select(x => x.ToStringWithPadding());
-		var chunkedStrings = entryStrings.Chunk(15);
-
-		foreach (var strings in chunkedStrings) {
-			var descriptionBuilder = new StringBuilder();
-
-			descriptionBuilder.AppendLine("```");
-			descriptionBuilder.AppendLine(headerString);
-			strings.ForEach(x => descriptionBuilder.AppendLine(x));
-			descriptionBuilder.AppendLine("```");
-
-			var builder = _context.CreateEmbedBuilder($"{leaderboard.Name} leaderboard", descriptionBuilder.ToString());
-
-			var pageBuilder = PageBuilder.FromEmbedBuilder(builder);
-			Pages.Add(pageBuilder);
-		}
+		//var (header, footer) = AdjustHeaderAndFooter(leaderboard.ToPaddedHeaderString(), null, true);
+		var header = $"```{leaderboard.ToPaddedHeaderString()}";
+		
+		CreatePagesFromLines(entryStrings.ToArray(), 15, header, "```", x => x.WithTitle($"{leaderboard.Name} leaderboard"));
 
 		return this;
 	}
@@ -59,21 +48,24 @@ public class InteractionPaginatorReplyBuilder<TInteraction> where TInteraction :
 		string? footer = null, bool inCodeBlock = false, Action<EmbedBuilder>? modifications = null) {
 		
 		(header, footer) = AdjustHeaderAndFooter(header, footer, inCodeBlock);
-
-		var currentPage = new StringBuilder();
-
-		// append header at start
-		if (header != null) {
-			currentPage.AppendLine(header);
-		}
-
-		CreatePagesFromLines(lines, linesPerPage, header, footer, modifications, currentPage);
+		CreatePagesFromLines(lines, linesPerPage, header, footer, modifications);
 
 		return this;
 	}
 
-	private void CreatePagesFromLines(string[] lines, int linesPerPage, string? header, string? footer, Action<EmbedBuilder>? modifications, StringBuilder currentPage) {
+	private void CreatePagesFromLines(string[] lines, int linesPerPage, string? header, string? footer, Action<EmbedBuilder>? modifications) {
 		int footerSize = footer?.Length ?? 0;
+
+		var currentPage = new StringBuilder();
+		
+		if (footerSize + (header?.Length ?? 0) >= _maxPageLength) {
+			throw new Exception("Header and footer combined are too long");
+		}
+		
+		// append header at start
+		if (header != null) {
+			currentPage.AppendLine(header);
+		}
 		
 		for (var i = 0; i < lines.Length; i++) {
 			var line = lines[i];
@@ -119,16 +111,9 @@ public class InteractionPaginatorReplyBuilder<TInteraction> where TInteraction :
 	}
 
 	private static (string? header, string? footer) AdjustHeaderAndFooter(string? header, string? footer, bool inCodeBlock) {
-		int maxStrSize;
 		if (inCodeBlock) {
 			header = $"{header}{Environment.NewLine}```{Environment.NewLine}";
 			footer = $"{Environment.NewLine}```{Environment.NewLine}{footer}";
-		}
-
-		var footerSize = footer?.Length ?? 0;
-
-		if (footerSize + (header?.Length ?? 0) >= _maxPageLength) {
-			throw new Exception("Header and footer combined are too long");
 		}
 
 		return (header, footer);
