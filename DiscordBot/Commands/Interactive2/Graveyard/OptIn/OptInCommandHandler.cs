@@ -31,7 +31,7 @@ public class OptInCommandHandler: ApplicationCommandHandlerBase<OptInCommandRequ
 		}
 
 		await Context.CreateReplyBuilder()
-			.WithEmbed(x=> x.WithSuccess($"Has {verb} the graveyard!", user.Mention))
+			.WithEmbed(x=> x.WithSuccess($"Has {verb} the graveyard!", user.DisplayName()))
 			.RespondAsync();
 
 		return Result.Ok();
