@@ -1,7 +1,6 @@
 using DiscordBot.Services.Helpers;
 using FluentAssertions;
 using TimeZoneConverter;
-using TimeZoneNames;
 using Xunit;
 using Xunit.Abstractions;
 
