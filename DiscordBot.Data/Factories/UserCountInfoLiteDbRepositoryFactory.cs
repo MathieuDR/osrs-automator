@@ -4,7 +4,7 @@ using Microsoft.Extensions.Logging;
 
 namespace DiscordBot.Data.Factories;
 
-public class UserCountInfoLiteDbRepositoryFactory : BaseLiteDbRepositoryFactory<IUserCountInfoRepository, UserCountInfoRepository> {
+internal class UserCountInfoLiteDbRepositoryFactory : BaseLiteDbRepositoryFactory<IUserCountInfoRepository, UserCountInfoRepository> {
     public UserCountInfoLiteDbRepositoryFactory(ILoggerFactory loggerFactory, LiteDbManager liteDbManager) :
         base(loggerFactory, liteDbManager) { }
 

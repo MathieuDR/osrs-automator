@@ -4,7 +4,7 @@ using Microsoft.Extensions.Logging;
 
 namespace DiscordBot.Data.Factories;
 
-public class GraveyardLiteDbRepositoryFactory : BaseLiteDbRepositoryFactory<IGraveyardRepository, GraveyardRepository> {
+internal class GraveyardLiteDbRepositoryFactory : BaseLiteDbRepositoryFactory<IGraveyardRepository, GraveyardRepository> {
 	public GraveyardLiteDbRepositoryFactory(ILoggerFactory loggerFactory, LiteDbManager liteDbManager) :
 		base(loggerFactory, liteDbManager) { }
 

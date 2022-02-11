@@ -3,7 +3,7 @@ using Microsoft.Extensions.Logging;
 
 namespace DiscordBot.Data.Factories;
 
-public abstract class BaseLiteDbRepositoryFactory<TInterface, TConcrete> : IRepositoryFactory<TInterface>
+internal abstract class BaseLiteDbRepositoryFactory<TInterface, TConcrete> : IRepositoryFactory<TInterface>
     where TInterface : IRepository where TConcrete : TInterface {
     public BaseLiteDbRepositoryFactory(ILoggerFactory loggerFactory, LiteDbManager liteDbManager) {
         LoggerFactory = loggerFactory;

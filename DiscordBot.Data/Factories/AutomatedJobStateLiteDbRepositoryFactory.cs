@@ -4,7 +4,7 @@ using Microsoft.Extensions.Logging;
 
 namespace DiscordBot.Data.Factories;
 
-public class AutomatedJobStateLiteDbRepositoryFactory : BaseLiteDbRepositoryFactory<IAutomatedJobStateRepository, AutomatedJobStateRepository> {
+internal class AutomatedJobStateLiteDbRepositoryFactory : BaseLiteDbRepositoryFactory<IAutomatedJobStateRepository, AutomatedJobStateRepository> {
     public AutomatedJobStateLiteDbRepositoryFactory(ILoggerFactory loggerFactory, LiteDbManager liteDbManager) : base(loggerFactory,
         liteDbManager) { }
 

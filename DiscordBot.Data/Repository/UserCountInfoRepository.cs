@@ -6,7 +6,7 @@ using Microsoft.Extensions.Logging;
 
 namespace DiscordBot.Data.Repository;
 
-public class UserCountInfoRepository : BaseLiteDbRepository<UserCountInfo>, IUserCountInfoRepository {
+internal class UserCountInfoRepository : BaseLiteDbRepository<UserCountInfo>, IUserCountInfoRepository {
     public UserCountInfoRepository(ILogger<UserCountInfoRepository> logger, LiteDatabase database) : base(logger, database) { }
     public override string CollectionName => "guildUserCounts";
 

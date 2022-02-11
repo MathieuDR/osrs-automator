@@ -4,7 +4,7 @@ using Microsoft.Extensions.Logging;
 
 namespace DiscordBot.Data.Factories;
 
-public class RunescapeDropDataRepositoryFactory : BaseLiteDbRepositoryFactory<IRuneScapeDropDataRepository, RuneScapeDropDataRepository> {
+internal class RunescapeDropDataRepositoryFactory : BaseLiteDbRepositoryFactory<IRuneScapeDropDataRepository, RuneScapeDropDataRepository> {
     public RunescapeDropDataRepositoryFactory(ILoggerFactory loggerFactory, LiteDbManager liteDbManager) : base(loggerFactory, liteDbManager) { }
 
     public override bool RequiresGuildId => false;

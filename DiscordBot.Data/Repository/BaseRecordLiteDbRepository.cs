@@ -6,7 +6,7 @@ using Microsoft.Extensions.Logging;
 
 namespace DiscordBot.Data.Repository;
 
-public abstract class BaseRecordLiteDbRepository<T> : IRecordRepository<T> where T : BaseRecord, new() {
+internal abstract class BaseRecordLiteDbRepository<T> : IRecordRepository<T> where T : BaseRecord, new() {
 	public BaseRecordLiteDbRepository(ILogger logger, LiteDatabase database) {
 		Logger = logger;
 		LiteDatabase = database;
