@@ -1,5 +1,4 @@
 using DiscordBot.Common.Models.Enums;
-using WiseOldManConnector.Helpers;
 using WiseOldManConnector.Models.WiseOldMan.Enums;
 
 namespace DiscordBot.Commands.Interactive2.Graveyard; 

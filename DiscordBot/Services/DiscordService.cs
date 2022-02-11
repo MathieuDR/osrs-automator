@@ -1,7 +1,6 @@
 using System.Text;
 using Common.Extensions;
 using DiscordBot.Common.Dtos.Discord;
-using DiscordBot.Common.Models.Decorators;
 using WiseOldManConnector.Helpers;
 
 namespace DiscordBot.Services;

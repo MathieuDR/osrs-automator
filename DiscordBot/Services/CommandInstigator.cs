@@ -1,5 +1,4 @@
-﻿using System.Reflection;
-using Common.Extensions;
+﻿using Common.Extensions;
 using DiscordBot.Commands.Interactive2.Base.Definitions;
 using DiscordBot.Commands.Interactive2.Base.Requests;
 using MediatR;

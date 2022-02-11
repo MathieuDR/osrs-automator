@@ -1,4 +1,3 @@
-using DiscordBot.Commands.Interactive2.Base.Definitions;
 using DiscordBot.Common.Models.Enums;
 using DiscordBot.Data.Interfaces;
 using DiscordBot.Data.Strategies;

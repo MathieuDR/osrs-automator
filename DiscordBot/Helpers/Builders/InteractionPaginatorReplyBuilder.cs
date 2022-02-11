@@ -1,5 +1,4 @@
 using System.Text;
-using Common.Extensions;
 using Fergun.Interactive.Pagination;
 
 namespace DiscordBot.Helpers.Builders;
