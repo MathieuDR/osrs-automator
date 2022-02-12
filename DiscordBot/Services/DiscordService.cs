@@ -106,6 +106,12 @@ public class DiscordService : IDiscordService {
         return Result.Ok();
     }
 
+    public Task<Result> TrackClanFundEvent(ulong guildId, ClanFundEvent clanFundEvent, ulong clanFundsChannelId, long clanFundsTotalFunds) => throw new NotImplementedException();
+
+    public Task<Result> UpdateDonationMessage(ulong guildId, ulong clanFundsDonationLeaderBoardChannel, ulong clanFundsDonationLeaderBoardMessage,
+        IEnumerable<(ulong Player, string PlayerName, long Amount)> topDonations) =>
+        throw new NotImplementedException();
+
 
     private string GetMessageForLeaderboard<T>(MetricTypeLeaderboard<T> leaderboard) where T : ILeaderboardMember {
         var builder = new StringBuilder();

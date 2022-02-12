@@ -12,9 +12,16 @@ public class InitializeFundsSubRequestDefinition : SubCommandDefinitionBase<Fund
 	public static string StartingFunds => "starting-funds";
 	
 	protected override Task<SlashCommandOptionBuilder> ExtendOptionCommandBuilder(SlashCommandOptionBuilder builder) {
-		builder.AddOption(TrackingChannelOption, ApplicationCommandOptionType.Channel,"The channel to track funds in.", true);
-		builder.AddOption(DonationLeaderboardChannelOption, ApplicationCommandOptionType.Channel,"The channel to track the donation leaderboard", true);
-		builder.AddOption(StartingFunds, ApplicationCommandOptionType.Integer,"The starting funds, is 0 or the current funds", false);
+		builder.AddOption(TrackingChannelOption, ApplicationCommandOptionType.Channel,"The channel to track funds in.", true, channelTypes: new List<ChannelType>()
+			{
+				ChannelType.Text
+		});
+		builder.AddOption(DonationLeaderboardChannelOption, ApplicationCommandOptionType.Channel,"The channel to track the donation leaderboard", true, channelTypes: new List<ChannelType>()
+		{
+			ChannelType.Text
+		});
+		
+		builder.AddOption(StartingFunds, ApplicationCommandOptionType.String,"The starting funds, is 0 or the current funds", false);
 		
 		return Task.FromResult(builder);
 	}
