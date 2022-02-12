@@ -115,19 +115,21 @@ public class CommandInstigator : ICommandInstigator {
 
     private Result<ICommandDefinition> GetCommandDefinition<T>(BaseInteractiveContext<T> context) where T : SocketInteraction {
         var commandDefinitions = _commands.Where(x => x.Key.Name == context.Command).ToList();
+        var notFoundError = new Error("Could not find command").WithMetadata("404", true);
 
         // Error handling
         if (commandDefinitions.Count == 0) {
-            return Result.Fail<ICommandDefinition>("Could not find command");
+            return Result.Fail<ICommandDefinition>(notFoundError.CausedBy("No definition found"));
+         
         }
 
         if (commandDefinitions.Count > 1) {
-            return Result.Fail<ICommandDefinition>("Found more then one command");
+            return Result.Fail<ICommandDefinition>(notFoundError.CausedBy("Found more then one command definition"));
         }
 
         if (!string.IsNullOrEmpty(context.SubCommand)) {
             var sub = commandDefinitions.First().Value.FirstOrDefault(x => x.Name == context.SubCommand);
-            return sub == null ? Result.Fail<ICommandDefinition>("Could not find subcommand") : Result.Ok<ICommandDefinition>(sub);
+            return sub == null ? Result.Fail<ICommandDefinition>(notFoundError.CausedBy("Couldn't found subcommand")) : Result.Ok<ICommandDefinition>(sub);
         }
 
         return Result.Ok<ICommandDefinition>(commandDefinitions.First().Key);

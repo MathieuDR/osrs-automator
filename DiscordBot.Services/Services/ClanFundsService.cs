@@ -13,7 +13,7 @@ public class ClanFundsService: BaseService, IClanFundsService {
 	private readonly IDiscordService _discordService;
 
 
-	public ClanFundsService(ILogger logger, IRepositoryStrategy repositoryStrategy, IDiscordService discordService) : base(logger) {
+	public ClanFundsService(ILogger<ClanFundsService> logger, IRepositoryStrategy repositoryStrategy, IDiscordService discordService) : base(logger) {
 		_repositoryStrategy = repositoryStrategy;
 		_discordService = discordService;
 	}

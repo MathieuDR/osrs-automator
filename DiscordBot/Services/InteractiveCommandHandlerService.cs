@@ -95,26 +95,23 @@ public class InteractiveCommandHandlerService {
 
 
 		var result = await _commandInstigator.ExecuteCommandAsync(ctx).ConfigureAwait(false);
-		if (result.IsFailed) {
+		if (result.IsFailed && result.HasError(x=> x.HasMetadataKey("404"))) {
 			result = await _strategy.HandleInteractiveCommand(ctx);
-			// if (stratResult.IsSuccess) {
-			// 	result = stratResult;
-			// }
 		}
 
 		if (result.IsFailed) {
 			var msg = result.CombineMessage();
-
 			if (string.IsNullOrWhiteSpace(msg)) {
 				msg = "Unknown error";
 			}
 
+			var embedBuilder = ctx.CreateEmbedBuilder().WithFailure(msg);
 			_logger.LogWarning("[{ctx}] failed: {msg}", ctx, msg);
 
 			if (ctx.IsDeferred) {
-				await arg.FollowupAsync(msg, ephemeral: true);
+				await arg.FollowupAsync(embed:embedBuilder.Build(), ephemeral: true);
 			} else {
-				await arg.RespondAsync(msg, ephemeral: true);
+				await arg.RespondAsync(embed:embedBuilder.Build(), ephemeral: true);
 			}
 		}
 
