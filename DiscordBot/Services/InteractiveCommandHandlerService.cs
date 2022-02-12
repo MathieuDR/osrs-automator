@@ -144,7 +144,7 @@ public class InteractiveCommandHandlerService {
 			}
 
 			await _client.Rest.CreateGuildCommand(await propertiesTask, GuildId);
-		} catch (ApplicationCommandException e) {
+		} catch (ApplicationException e) {
 			_logger.LogWarning(e, "Cannot register command {name} in the owners guild", handler.Name);
 		} catch (Exception e) {
 			_logger.LogError(e, "Error when creating command");

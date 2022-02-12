@@ -200,7 +200,7 @@ public class CountConfigurationApplicationCommandHandler : ApplicationCommandHan
 
     private async Task<Result> HandleDelete(MessageComponentContext context) {
         IReadOnlyList<CountThreshold> thresholds;
-        var selected = ((SelectMenuComponent)context.InnerContext.Message.Components.First().Components.First()).Options.First(x => x.Default == true)
+        var selected = ((SelectMenuComponent)context.InnerContext.Message.Components.First().Components.First()).Options.First(x => x.IsDefault == true)
             .Value;
 
         try {
