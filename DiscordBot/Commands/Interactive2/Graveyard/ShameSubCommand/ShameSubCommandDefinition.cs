@@ -17,12 +17,4 @@ public class ShameSubCommandDefinition : SubCommandDefinitionBase<GraveyardRootD
 		builder.AddOption(PictureOption, ApplicationCommandOptionType.String, "Picture url of the shame", false);
 		return Task.FromResult(builder);
 	}
-
-	protected override Task FillOptions() {
-		var list = Options.ToList();
-		list.Add((ShamedOption, typeof(string)));
-		list.Add((PictureOption, typeof(string)));
-		list.Add((LocationOption, typeof(string)));
-		return base.FillOptions();
-	}
 }

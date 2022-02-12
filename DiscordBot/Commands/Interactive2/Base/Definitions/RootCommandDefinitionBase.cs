@@ -75,5 +75,5 @@ public abstract class RootCommandDefinitionBase : CommandDefinitionBase, IRootCo
 	/// </summary>
 	/// <param name="builder">Builder with name and description set</param>
 	/// <returns>Fully build slash command builder</returns>
-	protected abstract Task<SlashCommandBuilder> ExtendBaseSlashCommandBuilder(SlashCommandBuilder builder);
+	protected virtual Task<SlashCommandBuilder> ExtendBaseSlashCommandBuilder(SlashCommandBuilder builder) => Task.FromResult(builder);
 }

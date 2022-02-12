@@ -12,10 +12,4 @@ public class OptInSubCommandDefinition : SubCommandDefinitionBase<GraveyardRootD
 		builder.AddOption(EnableOption, ApplicationCommandOptionType.Boolean, "Enable the graveyard.");
 		return Task.FromResult(builder);
 	}
-
-	protected override Task FillOptions() {
-		var opt = Options.ToList();
-		opt.Add((EnableOption, typeof(bool))); 
-		return base.FillOptions();
-	}
 }
