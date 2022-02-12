@@ -9,5 +9,5 @@ public interface IClanFundsService {
 	Task<Result<ClanFunds>> GetClanFund(Guild guild);
 	Task<Result> AddClanFund(Guild guild, ClanFundEvent clanFundEvent);
 	
-	Task<Result> Initialize(Guild guild, Channel trackingChannel, Channel donationChannel, long? currentFunds = null);
+	Task<Result> Initialize(GuildUser guild, Channel trackingChannel, Channel donationChannel, long? currentFunds = null);
 }
