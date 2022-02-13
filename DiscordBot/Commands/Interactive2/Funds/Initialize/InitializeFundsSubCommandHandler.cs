@@ -1,3 +1,4 @@
+using Common.Parsers;
 using DiscordBot.Commands.Interactive2.Base.Handlers;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -27,7 +28,7 @@ public class InitializeFundsSubCommandHandler : ApplicationCommandHandlerBase<In
 		var donationChannel = Context.SubCommandOptions.GetOptionValue<IChannel>(InitializeFundsSubRequestDefinition.DonationLeaderboardChannelOption);
 		var startingFundsAsString = Context.SubCommandOptions.GetOptionValue<string>(InitializeFundsSubRequestDefinition.StartingFunds);
 
-		long? funds = string.IsNullOrWhiteSpace(startingFundsAsString) ? null : startingFundsAsString.ToLong();
+		long? funds = string.IsNullOrWhiteSpace(startingFundsAsString) ? null : NumberParser.ParseToLong(startingFundsAsString); 
 
 		return (trackingChannel, donationChannel, funds, Context.User);
 	}

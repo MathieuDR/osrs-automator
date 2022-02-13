@@ -115,6 +115,18 @@ public class DiscordService : IDiscordService {
             .AddField("Type", clanFundEvent.EventType.ToDisplayNameOrFriendly(), true)
             .AddField("Amount", clanFundEvent.Amount.FormatConditionally(), true);
 
+        string verb = clanFundEvent.EventType switch {
+            ClanFundEventType.Deposit => "From",
+            ClanFundEventType.Withdraw => "To",
+            ClanFundEventType.Donation => "From",
+            ClanFundEventType.Refund => "To",
+            ClanFundEventType.Other => "About",
+            ClanFundEventType.System => "About",
+            _ => "About"
+        };
+        
+        embed.AddField(verb, _client.GetUser(clanFundEvent.PlayerId).DisplayName() ?? clanFundEvent.PlayerName, true);
+
         if (!string.IsNullOrWhiteSpace(clanFundEvent.Reason)) {
             embed.AddField("Reason", clanFundEvent.Reason);
         }

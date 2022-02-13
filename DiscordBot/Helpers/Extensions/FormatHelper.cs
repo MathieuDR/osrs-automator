@@ -1,4 +1,5 @@
 ﻿using System.Globalization;
+using Common.Formatters;
 
 namespace DiscordBot.Helpers.Extensions;
 
@@ -43,56 +44,11 @@ public static class FormatHelper {
     }
 
     public static string FormatNumber(this long number, bool zeroAsStripe = false) {
-        if (zeroAsStripe && number == 0) {
-            return "-";
-        }
-
-        var nfi = (NumberFormatInfo)CultureInfo.InvariantCulture.NumberFormat.Clone();
-        nfi.NumberGroupSeparator = " ";
-        var absValue = Math.Abs(number);
-
-        if (absValue >= 100000000) {
-            return (number / 1000000).ToString("#,0M", nfi);
-        }
-
-        if (absValue >= 10000000) {
-            return (number / 1000000).ToString("0.#", nfi) + "M";
-        }
-
-        if (absValue >= 100000) {
-            return (number / 1000).ToString("#,0K", nfi);
-        }
-
-        if (absValue >= 10000) {
-            return (number / 1000).ToString("0.#", nfi) + "K";
-        }
-
-        return number.ToString("0", nfi);
+        return NumberFormatter.FormatDecimal(number);
     }
 
     public static string FormatConditionally(this long number) {
-        var nfi = (NumberFormatInfo)CultureInfo.InvariantCulture.NumberFormat.Clone();
-        nfi.NumberGroupSeparator = " ";
-
-        var absValue = Math.Abs(number);
-
-        if (absValue >= 100000000) {
-            return (number / 1000000).ToString("+#,0M;-#,0M", nfi);
-        }
-
-        if (absValue >= 10000000) {
-            return (number / 1000000).ToString("+0.#;-0.#", nfi) + "M";
-        }
-
-        if (absValue >= 100000) {
-            return (number / 1000).ToString("+#,0K;-#,0K", nfi);
-        }
-
-        if (absValue >= 10000) {
-            return (number / 1000).ToString("+0.#;-0.#", nfi) + "K";
-        }
-
-        return number.ToString("+#;-#;0", nfi);
+        return NumberFormatter.FormatDecimal(number, true);
     }
 
     public static int ToLevel(this double experience) {

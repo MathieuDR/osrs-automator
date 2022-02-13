@@ -1,3 +1,4 @@
+using Common.Parsers;
 using DiscordBot.Commands.Interactive2.Base.Handlers;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -33,7 +34,7 @@ public class ManageFundsSubCommandHandler: ApplicationCommandHandlerBase<ManageF
 
 	private (IUser from, IUser authority, ClanFundEventType type, long amount, string? reason) GetOptions() {
 		var user = Context.SubCommandOptions.GetOptionValue<IUser>(ManageFundsSubCommandDefinition.Player);
-		var amount = Context.SubCommandOptions.GetOptionValue<string>(ManageFundsSubCommandDefinition.AmountOption).ToLong();
+		var amount = NumberParser.ParseToLong(Context.SubCommandOptions.GetOptionValue<string>(ManageFundsSubCommandDefinition.AmountOption));
 		var reason = Context.SubCommandOptions.GetOptionValue<string>(ManageFundsSubCommandDefinition.Reason);
 		var option = Context.SubCommandOptions.GetOptionValueAsEnum<ClanFundEventType>(ManageFundsSubCommandDefinition.TypeOption);
 		
