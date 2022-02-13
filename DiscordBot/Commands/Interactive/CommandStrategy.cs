@@ -1,30 +1,19 @@
-using Common.Extensions;
-using DiscordBot.Common.Dtos.Discord;
-using DiscordBot.Common.Models.Enums;
-using DiscordBot.Configuration;
-using Microsoft.Extensions.Options;
 
 namespace DiscordBot.Commands.Interactive;
 
 public class CommandStrategy : ICommandStrategy {
-    private readonly IOptions<BotTeamConfiguration> _botTeamConfiguration;
     private readonly IApplicationCommandHandler[] _commands;
-    private readonly IGroupService _groupService;
+    private readonly ICommandAuthorizationService _authorizationService;
 
     private readonly ILogger<CommandStrategy> _logger;
 
-    public CommandStrategy(ILogger<CommandStrategy> logger, IApplicationCommandHandler[] commands, IGroupService groupService,
-        IOptions<BotTeamConfiguration> botTeamConfiguration) {
+    public CommandStrategy(ILogger<CommandStrategy> logger, IApplicationCommandHandler[] commands,ICommandAuthorizationService authorizationService) {
         _logger = logger;
         _commands = commands ?? throw new ArgumentNullException(nameof(commands));
-        _groupService = groupService;
-        _botTeamConfiguration = botTeamConfiguration;
+        _authorizationService = authorizationService;
     }
 
-    public Dictionary<ulong, CommandRoleConfig> GuildConfigs { get; set; } = new();
 
-    private ulong GuildId => _botTeamConfiguration.Value.GuildId;
-    private ulong OwnerId => _botTeamConfiguration.Value.OwnerId;
 
     public async Task<Result> HandleInteractiveCommand(BaseInteractiveContext context) {
         try {
@@ -55,7 +44,7 @@ public class CommandStrategy : ICommandStrategy {
             return Result.Fail(new Error("Could not find proper command handler").WithMetadata("404", true));
         }
 
-        if (!await Authorized(context, command)) {
+        if (!await _authorizationService.IsAuthorized(context, command)) {
             return Result.Fail(new Error("You are not authorized to use this command").WithMetadata("401", true));
         }
 
@@ -70,7 +59,7 @@ public class CommandStrategy : ICommandStrategy {
             return Result.Fail(new Error("Could not find proper command handler").WithMetadata("404", true));
         }
 
-        if (!await Authorized(context, command)) {
+        if (!await _authorizationService.IsAuthorized(context, command)) {
             return Result.Fail(new Error("You are not authorized to use this command").WithMetadata("401", true));
         }
 
@@ -84,7 +73,7 @@ public class CommandStrategy : ICommandStrategy {
             return Result.Fail(new Error("Could not find proper component handler").WithMetadata("404", true));
         }
 
-        if (!await Authorized(context, command)) {
+        if (!await _authorizationService.IsAuthorized(context, command)) {
             return Result.Fail(new Error("You are not authorized to use this command").WithMetadata("401", true));
         }
 
@@ -131,94 +120,5 @@ public class CommandStrategy : ICommandStrategy {
 
     public IEnumerable<(string Name, string Description)> GetCommandDescriptions() {
         return _commands.Select(c => (c.Name, c.Description));
-    }
-
-    public Task ResetCommandRoleConfig(ulong guildId) {
-        GuildConfigs.Remove(guildId);
-        return Task.CompletedTask;
-    }
-
-    private async Task<bool> Authorized<T>(BaseInteractiveContext<T> context, IApplicationCommandHandler applicationCommand)
-        where T : SocketInteraction {
-        var roleRequired = applicationCommand.MinimumAuthorizationRole;
-
-        // Check if authorization is required
-        if (roleRequired == AuthorizationRoles.None) {
-            _logger.LogInformation("No authorization needed for {commandName}", applicationCommand.Name);
-            return true;
-        }
-
-        // Check if user is bot owner
-        if (context.User.Id == OwnerId) {
-            _logger.LogInformation("User is bot owner, executing {commandName}", applicationCommand.Name);
-            return true;
-        }
-
-        // Only owner can currently do this
-        if (roleRequired <= AuthorizationRoles.BotModerator) {
-            _logger.LogInformation("User is not bot owner, not executing {commandName}", applicationCommand.Name);
-            return false;
-        }
-
-        // Check if user is in guild  
-        if (!context.InGuild) {
-            _logger.LogInformation("User is not in guild, not executing {commandName}", applicationCommand.Name);
-            return false;
-        }
-
-        // Check if user is in bot team
-        // if (context.Guild.Id == GuildId) {
-        //     // Do special stuff. Do we actually need this? It's just a normal server you know?
-        //     _logger.LogInformation("User is in bot team guild, not executing {commandName}", applicationCommand.Name);
-        //     return false;
-        // }
-
-        // Check if user is server owner
-        if (context.Guild.OwnerId == context.User.Id) {
-            if (AuthorizationRoles.ClanOwner <= roleRequired) {
-                _logger.LogInformation("User is server owner and has permission to execute {commandName}", applicationCommand.Name);
-                return true;
-            }
-        }
-
-        var config = await GetGuildConfig(context.Guild.ToGuildDto());
-        // Check if user has special permission
-        if (config.UserIds.TryGetValue(context.User.Id, out var userRole)) {
-            if (userRole <= roleRequired) {
-                _logger.LogInformation("User has special permission to execute {commandName}", applicationCommand.Name);
-                return true;
-            }
-        }
-
-        // Check if user has specific role
-        var roleIds = context.GuildUser.Roles.OrderByDescending(x => x.Position).Select(r => r.Id);
-        foreach (var roleId in roleIds) {
-            if (!config.RoleIds.TryGetValue(roleId, out var roleRole)) {
-                continue;
-            }
-
-            if (roleRole <= roleRequired) {
-                _logger.LogInformation("User has role permission to execute {commandName}", applicationCommand.Name);
-                return true;
-            }
-        }
-
-        _logger.LogInformation("User is not authorized to execute {commandName}", applicationCommand.Name);
-        return false;
-    }
-
-    private async ValueTask<CommandRoleConfig> GetGuildConfig(Guild guild) {
-        if (GuildConfigs.TryGetValue(guild.Id, out var guildConfig)) {
-            return guildConfig;
-        }
-
-        var guildConfigResult = await _groupService.GetCommandRoleConfig(guild);
-
-        if (guildConfigResult.IsFailed) {
-            throw new Exception(guildConfigResult.CombineMessage());
-        }
-
-        GuildConfigs.Add(guild.Id, guildConfigResult.Value);
-        return guildConfig;
     }
 }

@@ -1,6 +1,8 @@
 ﻿using Common.Extensions;
 using DiscordBot.Commands.Interactive2.Base.Definitions;
 using DiscordBot.Commands.Interactive2.Base.Requests;
+using DiscordBot.Common.Dtos.Discord;
+using DiscordBot.Common.Models.Enums;
 using MediatR;
 
 namespace DiscordBot.Services;
@@ -9,15 +11,18 @@ public class CommandInstigator : ICommandInstigator {
     private readonly Dictionary<IRootCommandDefinition, ISubCommandDefinition[]> _commands;
     private readonly IMediator _mediator;
     private readonly ILogger<CommandInstigator> _logger;
+    private readonly ICommandAuthorizationService _commandAuthorizationService;
 
     private readonly Dictionary<ICommandDefinition, Dictionary<Type, TypeHelper.ObjectActivator>> _commandRequestsActivators = new();
 
     public CommandInstigator(IMediator mediator,
         ICommandDefinitionProvider commandDefinitionProvider,
-        IEnumerable<Type> requests, ILogger<CommandInstigator> logger) {
+        IEnumerable<Type> requests, ILogger<CommandInstigator> logger,
+        ICommandAuthorizationService commandAuthorizationService) {
         
         _mediator = mediator;
         _logger = logger;
+        _commandAuthorizationService = commandAuthorizationService;
         _commands = GetCommandsFromProvider(commandDefinitionProvider);
         InitializeCommandRequestDictionary(_commands,  requests.ToArray());
     }
@@ -82,13 +87,17 @@ public class CommandInstigator : ICommandInstigator {
 
         // execute command from definition through mediatr
         try {
-            // TODO Check if authorized!
+            if (! await _commandAuthorizationService.IsAuthorized(request, context)) {
+                return Result.Fail(new Error("Not authorized to run this command").WithMetadata("501",true));
+            }
             return await _mediator.Send(request);
         }catch(Exception e) {
             _logger.LogError(e, "Could not execute command");
             return Result.Fail("Could not execute command").WithError(new ExceptionalError(e));
         }
     }
+
+    
 
     public Task<Result> ExecuteCommandAsync(BaseInteractiveContext context) {
         return context switch {
@@ -134,4 +143,6 @@ public class CommandInstigator : ICommandInstigator {
 
         return Result.Ok<ICommandDefinition>(commandDefinitions.First().Key);
     }
+    
+    
 }
