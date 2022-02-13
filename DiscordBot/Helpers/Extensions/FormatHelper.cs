@@ -49,20 +49,21 @@ public static class FormatHelper {
 
         var nfi = (NumberFormatInfo)CultureInfo.InvariantCulture.NumberFormat.Clone();
         nfi.NumberGroupSeparator = " ";
+        var absValue = Math.Abs(number);
 
-        if (number >= 100000000) {
+        if (absValue >= 100000000) {
             return (number / 1000000).ToString("#,0M", nfi);
         }
 
-        if (number >= 10000000) {
+        if (absValue >= 10000000) {
             return (number / 1000000).ToString("0.#", nfi) + "M";
         }
 
-        if (number >= 100000) {
+        if (absValue >= 100000) {
             return (number / 1000).ToString("#,0K", nfi);
         }
 
-        if (number >= 10000) {
+        if (absValue >= 10000) {
             return (number / 1000).ToString("0.#", nfi) + "K";
         }
 
@@ -73,19 +74,21 @@ public static class FormatHelper {
         var nfi = (NumberFormatInfo)CultureInfo.InvariantCulture.NumberFormat.Clone();
         nfi.NumberGroupSeparator = " ";
 
-        if (number >= 100000000) {
+        var absValue = Math.Abs(number);
+
+        if (absValue >= 100000000) {
             return (number / 1000000).ToString("+#,0M;-#,0M", nfi);
         }
 
-        if (number >= 10000000) {
+        if (absValue >= 10000000) {
             return (number / 1000000).ToString("+0.#;-0.#", nfi) + "M";
         }
 
-        if (number >= 100000) {
+        if (absValue >= 100000) {
             return (number / 1000).ToString("+#,0K;-#,0K", nfi);
         }
 
-        if (number >= 10000) {
+        if (absValue >= 10000) {
             return (number / 1000).ToString("+0.#;-0.#", nfi) + "K";
         }
 

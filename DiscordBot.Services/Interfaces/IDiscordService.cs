@@ -13,5 +13,5 @@ public interface IDiscordService {
     Task<Result> SendWomGroupSuccessEmbed(ulong channelId, string message, int groupId, string groupName);
     Task<Result> MessageLeaderboards<T>(ulong channelId, IEnumerable<MetricTypeLeaderboard<T>> leaderboards) where T : ILeaderboardMember;
     Task<Result> TrackClanFundEvent(ulong guildId, ClanFundEvent clanFundEvent, ulong clanFundsChannelId, long clanFundsTotalFunds);
-    Task<Result> UpdateDonationMessage(ulong guildId, ulong clanFundsDonationLeaderBoardChannel, ulong clanFundsDonationLeaderBoardMessage, IEnumerable<(ulong Player, string PlayerName, long Amount)> topDonations);
+    Task<Result<ulong>> UpdateDonationMessage(ulong guildId, ulong clanFundsDonationLeaderBoardChannel, ulong clanFundsDonationLeaderBoardMessage, IEnumerable<(ulong Player, string PlayerName, long Amount)> topDonations);
 }

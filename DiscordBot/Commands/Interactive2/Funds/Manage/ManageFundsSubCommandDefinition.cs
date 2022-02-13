@@ -14,15 +14,15 @@ public class ManageFundsSubCommandDefinition : SubCommandDefinitionBase<FundRoot
 	
 	protected override Task<SlashCommandOptionBuilder> ExtendOptionCommandBuilder(SlashCommandOptionBuilder builder) {
 		builder.AddOption(Player, ApplicationCommandOptionType.User, "The player where the funds came / goes to", true);
-		builder.AddOption(AmountOption, ApplicationCommandOptionType.User, "The amount of funds, can be negative", true);
+		builder.AddOption(AmountOption, ApplicationCommandOptionType.String, "The amount of funds, can be negative", true);
 
 		builder.AddOption(new SlashCommandOptionBuilder()
-			.AddEnumChoices<ClanFundEventType>()
+			.AddEnumChoices<ClanFundEventType>(new [] { ClanFundEventType.Donation, ClanFundEventType.Deposit, ClanFundEventType.Withdraw, ClanFundEventType.Other})
 			.WithName(TypeOption)
 			.WithDescription("Manage Type")
 			.WithRequired(true));
 		
-		builder.AddOption(Reason, ApplicationCommandOptionType.User, "Notes", false);
+		builder.AddOption(Reason, ApplicationCommandOptionType.String, "Notes", false);
 		
 		return Task.FromResult(builder);
 	}

@@ -1,6 +1,8 @@
 namespace DiscordBot.Common.Models.Data;
 
-public record ClanFundEvent {
+public record ClanFundEvent { 
+	public ClanFundEvent() { } // necessary for litedb
+	
 	public ClanFundEvent(ulong playerId, ulong creatorId, string reason, string playerName, long amount, ClanFundEventType eventType) {
 		PlayerId = playerId;
 		CreatorId = creatorId;

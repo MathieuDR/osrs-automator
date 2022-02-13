@@ -51,11 +51,7 @@ public class ClanFundsService: BaseService, IClanFundsService {
 		if(clanFundEvent.Amount == 0) {
 			return Task.FromResult(Result.Fail("The amount must be set"));
 		}
-		
-		if(string.IsNullOrWhiteSpace(clanFundEvent.Reason)) {
-			return Task.FromResult(Result.Fail("The reason must be set"));
-		}
-		
+
 		if(clanFundEvent.PlayerId == 0) {
 			return Task.FromResult(Result.Fail("The player must be set"));
 		}
@@ -80,24 +76,34 @@ public class ClanFundsService: BaseService, IClanFundsService {
 		}
 		
 		// Track the event in discord
-		return TrackEvent(guild, clanFundEvent, clanFunds);
+		return TrackEvent(guild.Id, clanFundEvent, clanFunds);
 	}
 
-	private async Task<Result> TrackEvent(Guild guild, ClanFundEvent clanFundEvent, ClanFunds clanFunds) {
-		var messageResultTask = _discordService.TrackClanFundEvent(guild.Id, clanFundEvent, clanFunds.ChannelId, clanFunds.TotalFunds);
+	private async Task<Result> TrackEvent(ulong guildId, ClanFundEvent clanFundEvent, ClanFunds clanFunds) {
+		var messageResultTask = _discordService.TrackClanFundEvent(guildId, clanFundEvent, clanFunds.ChannelId, clanFunds.TotalFunds);
 		
 		// if it was donation
-		if(clanFundEvent.EventType == ClanFundEventType.Donation) {
-			var updateResult = await UpdateDonations(guild, clanFunds);
-			if(updateResult.IsFailed) {
-				return updateResult;
-			}
+		if (clanFundEvent.EventType != ClanFundEventType.Donation) {
+			return await messageResultTask;
+		}
+
+		var updateResult = await UpdateDonations(guildId, clanFunds);
+		if(updateResult.IsFailed) {
+			return updateResult.ToResult();
+		}
+			
+		var repo = _repositoryStrategy.GetOrCreateRepository<IClanFundsRepository>(guildId);
+		clanFunds = clanFunds with { DonationLeaderBoardMessage = updateResult.Value };
+		var repoUpdate = repo.Update(clanFunds);
+			
+		if(repoUpdate.IsFailed) {
+			return Result.Fail("Could not update repo with message update").WithErrors(repoUpdate.Errors);
 		}
 
 		return await messageResultTask;
 	}
 
-	private async Task<Result> UpdateDonations(Guild guild, ClanFunds clanFunds) {
+	private async Task<Result<ulong>> UpdateDonations(ulong guildId, ClanFunds clanFunds) {
 		// Get top 10 users from donations
 		var topDonations = clanFunds.Events
 			.Where(x=> x.EventType == ClanFundEventType.Donation)
@@ -106,15 +112,15 @@ public class ClanFundsService: BaseService, IClanFundsService {
 			.OrderByDescending(x => x.Amount)
 			.Take(10);
 		
-		return await _discordService.UpdateDonationMessage(guild.Id, clanFunds.DonationLeaderBoardChannel, clanFunds.DonationLeaderBoardMessage, topDonations);
+		return await _discordService.UpdateDonationMessage(guildId, clanFunds.DonationLeaderBoardChannel, clanFunds.DonationLeaderBoardMessage, topDonations);
 	}
 
-	public Task<Result> Initialize(GuildUser user, Channel trackingChannel, Channel donationChannel, long? currentFunds = null) {
+	public async Task<Result> Initialize(GuildUser user, Channel trackingChannel, Channel donationChannel, long? currentFunds = null) {
 		var repo = _repositoryStrategy.GetOrCreateRepository<IClanFundsRepository>(user.GuildId);
 
 		var single = repo.GetSingle();
 		if (single.IsFailed) {
-			return Task.FromResult(Result.Fail("Could not get the clan funds from the repository!"));
+			return Result.Fail("Could not get the clan funds from the repository!");
 		}
 
 		var funds = single.Value ?? new ClanFunds();
@@ -125,10 +131,12 @@ public class ClanFundsService: BaseService, IClanFundsService {
 			if (funds.TotalFunds != currentFunds.Value) {
 				var diff = currentFunds.Value - funds.TotalFunds;
 				funds.Events.Add(new ClanFundEvent(0, user.Id, "Initialization / update", user.Username, diff, ClanFundEventType.System));
+
+				await TrackEvent(user.GuildId, funds.Events.Last(), funds);
 			}
 		}
 		
-		var result = repo.Update(funds);
-		return Task.FromResult(result.IsFailed ? Result.Fail("Could not update the clan funds in the repository!") : Result.Ok());
+		var result = repo.UpdateOrInsert(funds);
+		return result.IsFailed ? Result.Fail("Could not update the clan funds in the repository!") : Result.Ok();
 	}
 }

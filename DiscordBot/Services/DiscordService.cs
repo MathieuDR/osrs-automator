@@ -106,11 +106,64 @@ public class DiscordService : IDiscordService {
         return Result.Ok();
     }
 
-    public Task<Result> TrackClanFundEvent(ulong guildId, ClanFundEvent clanFundEvent, ulong clanFundsChannelId, long clanFundsTotalFunds) => throw new NotImplementedException();
+    public Task<Result> TrackClanFundEvent(ulong guildId, ClanFundEvent clanFundEvent, ulong clanFundsChannelId, long clanFundsTotalFunds) {
+        var channel = _client.GetGuild(guildId).GetTextChannel(clanFundsChannelId);
 
-    public Task<Result> UpdateDonationMessage(ulong guildId, ulong clanFundsDonationLeaderBoardChannel, ulong clanFundsDonationLeaderBoardMessage,
-        IEnumerable<(ulong Player, string PlayerName, long Amount)> topDonations) =>
-        throw new NotImplementedException();
+        var embed = new EmbedBuilder()
+            .AddCommonProperties()
+            .WithTitle($"Clan funds updated")
+            .AddField("Type", clanFundEvent.EventType.ToDisplayNameOrFriendly(), true)
+            .AddField("Amount", clanFundEvent.Amount.FormatConditionally(), true);
+
+        if (!string.IsNullOrWhiteSpace(clanFundEvent.Reason)) {
+            embed.AddField("Reason", clanFundEvent.Reason);
+        }
+        
+        embed.AddField("Total funds", clanFundsTotalFunds.FormatNumber());
+        embed.WithFooter(clanFundEvent.Id.ToString());
+        
+        var author = _client.GetUser(clanFundEvent.CreatorId);
+        embed.WithAuthor($"Authorized by {author.Username}", author.GetAvatarUrl());
+        
+        _ = channel.SendMessageAsync(embed: embed.Build());
+        return Task.FromResult(Result.Ok()); 
+    }
+
+    public async Task<Result<ulong>> UpdateDonationMessage(ulong guildId, ulong clanFundsDonationLeaderBoardChannel, ulong clanFundsDonationLeaderBoardMessage,
+        IEnumerable<(ulong Player, string PlayerName, long Amount)> topDonations) {
+        var donations = topDonations.ToList();
+        var guild = _client.GetGuild(guildId);
+        
+        var leaderboard = new DiscordLeaderBoard<string>() {
+            Name = "Top donations",
+            Description = "Top donations in the clan funds",
+            ScoreFieldName = "Amount",
+            Entries = donations.Select((x,i) => new LeaderboardEntry<string>(guild.GetUser(x.Player)?.DisplayName() ?? x.PlayerName, x.Amount.FormatNumber(), i + 1)).ToList()
+        };
+        
+        // send message
+        var message = await guild.GetTextChannel(clanFundsDonationLeaderBoardChannel).SendMessageAsync(leaderboard.ToMessage(2000));
+
+        if (message.Id != default(ulong)) {
+            await DeleteMessage(guildId, clanFundsDonationLeaderBoardChannel, clanFundsDonationLeaderBoardMessage);
+            return Result.Ok(message.Id);
+        }
+        
+        return Result.Fail("Could not send message / retrieve message id");
+    }
+
+    private async Task DeleteMessage(ulong guildId, ulong channelId, ulong messageId) {
+        // delete old message
+        if (messageId == default) {
+            return;
+        }
+        
+        var channel = _client.GetGuild(guildId).GetTextChannel(channelId);
+        var message = (await channel.GetMessageAsync(messageId)).As<IUserMessage>();
+        if (message != null) {
+            await message.DeleteAsync();
+        }
+    }
 
 
     private string GetMessageForLeaderboard<T>(MetricTypeLeaderboard<T> leaderboard) where T : ILeaderboardMember {
