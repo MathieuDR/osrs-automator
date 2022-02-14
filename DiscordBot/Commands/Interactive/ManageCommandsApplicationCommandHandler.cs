@@ -57,8 +57,6 @@ public class ManageCommandsApplicationCommandHandler : ApplicationCommandHandler
         var guild = GetGuild(context);
 
         var commandInfo = (await _applicationCommandInfoRepository.GetByCommandName(command)).Value;
-        Logger.LogInformation("{@info}", commandInfo);
-
         if (commandInfo is null) {
             try {
                 var commandStrategy = _serviceProvider.GetRequiredService<ICommandStrategy>();

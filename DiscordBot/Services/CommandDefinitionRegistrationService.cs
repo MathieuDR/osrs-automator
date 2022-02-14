@@ -48,7 +48,7 @@ public class CommandDefinitionRegistrationService : ICommandRegistrationService 
 
     public async Task<Result> UpdateCommand(ApplicationCommandInfo applicationCommandInfo) {
         var definitions = _commandDefinitions.FirstOrDefault(x => x.Key.Name == applicationCommandInfo.CommandName);
-        if (definitions.Equals(default(KeyValuePair<IRootCommandDefinition, IEnumerable<ISubCommandDefinition>>))) {
+        if (definitions.Key == null) {
             return await _oldRegistration.UpdateCommand(applicationCommandInfo);
         }
         return await UpdateCommand((rootCommand: definitions.Key, subCommands: definitions.Value), applicationCommandInfo);

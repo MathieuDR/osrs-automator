@@ -2,6 +2,7 @@ using System.Text;
 using Common.Extensions;
 using DiscordBot.Common.Dtos.Discord;
 using WiseOldManConnector.Helpers;
+using Player = DiscordBot.Common.Models.Data.Player;
 
 namespace DiscordBot.Services;
 
@@ -124,8 +125,10 @@ public class DiscordService : IDiscordService {
             ClanFundEventType.System => "About",
             _ => "About"
         };
-        
-        embed.AddField(verb, _client.GetUser(clanFundEvent.PlayerId).DisplayName() ?? clanFundEvent.PlayerName, true);
+
+        if (clanFundEvent.PlayerId > 0) {
+            embed.AddField(verb, _client.GetUser(clanFundEvent.PlayerId)?.DisplayName() ?? clanFundEvent.PlayerName, true);
+        }
 
         if (!string.IsNullOrWhiteSpace(clanFundEvent.Reason)) {
             embed.AddField("Reason", clanFundEvent.Reason);
