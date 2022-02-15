@@ -61,12 +61,12 @@ internal class AutomatedDropperService : RepositoryService, IAutomatedDropperSer
         data = data with { Drops = dropList };
 
         if (drop is not null) {
-            // update recipient
-            if (data.RecipientUsername is null) {
-                data = data with {
-                    RecipientUsername = drop.Recipient.Username, RecipientPlayerType = drop.Recipient.PlayerType
-                };
-            }
+            // // update recipient
+            // if (data.RecipientUsername is null) {
+            //     data = data with {
+            //         RecipientUsername = drop.Recipient.Username, RecipientPlayerType = drop.Recipient.PlayerType
+            //     };
+            // }
 
             var lastDrop = dropList.LastOrDefault();
             if (lastDrop is not null && !string.IsNullOrEmpty(lastDrop.Image) && lastDrop.Item is null) {

@@ -102,7 +102,7 @@ public class AutomatedDropperServiceTests {
         lastUpdated.Drops.First().Image.Should().Be(imageString);
         lastUpdated.Drops.First().Amount.Should().Be(0);
         lastUpdated.Drops.First().Item.Should().Be(null);
-        lastUpdated.RecipientUsername.Should().BeNullOrEmpty();
+        lastUpdated.Drops.First().Recipient.Should().BeEquivalentTo(default(RunescapeDrop.Player));
     }
 
     [Fact]
@@ -174,6 +174,7 @@ public class AutomatedDropperServiceTests {
         lastUpdated.Drops.First().Image.Should().Be(imageString);
         lastUpdated.Drops.First().Amount.Should().Be(drop.Amount);
         lastUpdated.Drops.First().Item.Should().Be(drop.Item);
+        lastUpdated.PlayerDrops.Should().HaveCount(1, "One player drop");
     }
 
     [Fact]
