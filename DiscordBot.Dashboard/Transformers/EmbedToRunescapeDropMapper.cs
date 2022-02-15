@@ -19,7 +19,7 @@ public class EmbedToRunescapeDropMapper : IMapper<Embed, RunescapeDrop> {
 
         destination ??= new RunescapeDrop();
 
-        if (source.Fields is null) {
+        if (source.Fields is null || source.Fields.Count == 0) {
             return Result.Fail("No fields present");
         }
 
@@ -81,6 +81,7 @@ public class EmbedToRunescapeDropMapper : IMapper<Embed, RunescapeDrop> {
         var type = source.Author.Icon switch {
             string a when a.ToLower().Contains("hardcore") => PlayerType.HardcoreIronMan,
             string a when a.ToLower().Contains("ultimate") => PlayerType.UltimateIronMan,
+            string a when a.ToLower().Contains("group") => PlayerType.IronMan,
             string a when a.ToLower().Contains("ironman") => PlayerType.IronMan,
             null => PlayerType.Regular,
             _ => PlayerType.Unknown
