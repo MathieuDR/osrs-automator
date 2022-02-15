@@ -127,7 +127,7 @@ public class DiscordService : IDiscordService {
         };
 
         if (clanFundEvent.PlayerId > 0) {
-            embed.AddField(verb, _client.GetUser(clanFundEvent.PlayerId)?.DisplayName() ?? clanFundEvent.PlayerName, true);
+            embed.AddField(verb, _client.GetGuild(guildId).GetUser(clanFundEvent.PlayerId)?.DisplayName() ?? clanFundEvent.PlayerName ?? _client.GetUser(clanFundEvent.PlayerId)?.DisplayName() ?? "Unknown", true);
         }
 
         if (!string.IsNullOrWhiteSpace(clanFundEvent.Reason)) {
@@ -153,7 +153,7 @@ public class DiscordService : IDiscordService {
             Name = "Top donations",
             Description = "Top donations in the clan funds",
             ScoreFieldName = "Amount",
-            Entries = donations.Select((x,i) => new LeaderboardEntry<string>(guild.GetUser(x.Player)?.DisplayName() ?? x.PlayerName, x.Amount.FormatNumber(), i + 1)).ToList()
+            Entries = donations.Select((x,i) => new LeaderboardEntry<string>(guild.GetUser(x.Player)?.DisplayName() ?? x.PlayerName ?? _client.GetUser(x.Player)?.DisplayName() ?? "Unknown", x.Amount.FormatNumber(), i + 1)).ToList()
         };
         
         // send message
