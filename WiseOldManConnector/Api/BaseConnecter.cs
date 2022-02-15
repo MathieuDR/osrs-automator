@@ -36,9 +36,9 @@ internal abstract class BaseConnecter {
     }
 
 
-    private void LogResponse(IRestResponse response) {
+    private void LogResponse(RestResponse response) {
         Logger?.Log(LogLevel.Information, null, "Response received from Wise Old Man API. [{Resource}, {Content:j}]", response.Content,
-            response.Request.Resource);
+            response.Request?.Resource);
     }
 
     protected async Task<T> ExecuteRequest<T>(RestRequest request) where T : IResponse {
@@ -85,19 +85,19 @@ internal abstract class BaseConnecter {
             resource = $"{resource}/{resourcePath}";
         }
 
-        var request = new RestRequest(resource, DataFormat.Json);
-        request.JsonSerializer = new JsonNetSerializer();
-        return request;
+        return new RestRequest(resource) {
+            RequestFormat = DataFormat.Json
+        };
     }
 
-    private void ValidateResponse<T>(IRestResponse<T> response) {
+    private void ValidateResponse<T>(RestResponse<T> response) {
         if (response == null) {
             // SHOULD NEVER HAPPEN I THINK
             throw new NullReferenceException("We did not receive a response. Please try again later or contact the administration.");
         }
 
         if (response.ErrorException != null) {
-            Logger?.Log(LogLevel.Error, null, "Error for [{Resource}, {Parameters:j}]", response.Request.Resource, response.Request.Parameters);
+            Logger?.Log(LogLevel.Error, null, "Error for [{Resource}, {Parameters:j}]", response.Request?.Resource, response.Request?.Parameters);
             throw new BadRequestException(response.ErrorException.Message, response);
         }
 

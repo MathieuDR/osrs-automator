@@ -122,7 +122,7 @@ public class CompetitionConnectorTests : ConnectorTests {
         var exception = await Assert.ThrowsAsync<BadRequestException>(Act);
 
         Assert.NotEmpty(exception.Message);
-        Assert.Equal("Competition not found.", exception.Message);
+        Assert.Contains("notfound", exception.Message.ToLower());
     }
 
     [Fact]

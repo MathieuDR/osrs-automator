@@ -31,7 +31,7 @@ internal class PlayerConnector : BaseConnecter, IWiseOldManPlayerApi {
 
     public async Task<ConnectorResponse<Player>> Track(string username) {
         var request = GetNewRestRequest("track");
-        request.Method = Method.POST;
+        request.Method = Method.Post;
         username = username.ToLowerInvariant();
         request.AddJsonBody(new { username });
 
@@ -45,7 +45,7 @@ internal class PlayerConnector : BaseConnecter, IWiseOldManPlayerApi {
 
     public async Task<ConnectorResponse<MessageResponse>> Import(string username) {
         var request = GetNewRestRequest("import");
-        request.Method = Method.POST;
+        request.Method = Method.Post;
         request.AddJsonBody(new { username });
 
         var result = await ExecuteRequest<WOMMessageResponse>(request);
@@ -78,7 +78,7 @@ internal class PlayerConnector : BaseConnecter, IWiseOldManPlayerApi {
 
     public async Task<ConnectorResponse<PlayerType>> AssertPlayerType(string username) {
         var request = GetNewRestRequest("/assert-type");
-        request.Method = Method.POST;
+        request.Method = Method.Post;
         request.AddJsonBody(new { username });
 
         var result = await ExecuteRequest<AssertPlayerTypeResponse>(request);
@@ -87,7 +87,7 @@ internal class PlayerConnector : BaseConnecter, IWiseOldManPlayerApi {
 
     public async Task<ConnectorResponse<string>> AssertDisplayName(string username) {
         var request = GetNewRestRequest("/assert-name");
-        request.Method = Method.POST;
+        request.Method = Method.Post;
         request.AddJsonBody(new { username });
 
         var result = await ExecuteRequest<AssertDisplayNameResponse>(request);
@@ -267,7 +267,7 @@ internal class PlayerConnector : BaseConnecter, IWiseOldManPlayerApi {
     public async Task<ConnectorResponse<Player>> View(string username) {
         var request = GetNewRestRequest("username/{username}");
         request.AddParameter("username", username, ParameterType.UrlSegment);
-        request.Method = Method.GET;
+        request.Method = Method.Get;
 
         var result = await ExecuteRequest<PlayerResponse>(request);
         return GetResponse<Player>(result);
