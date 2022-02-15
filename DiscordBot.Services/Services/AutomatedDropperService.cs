@@ -94,7 +94,7 @@ internal class AutomatedDropperService : RepositoryService, IAutomatedDropperSer
         RunescapeDrop toUpdate;
 
         var lastDrop = drops.LastOrDefault();
-        if (lastDrop is null) {
+        if (lastDrop is null || !string.IsNullOrEmpty(lastDrop.Image)) {
             toUpdate = new RunescapeDrop(image);
             drops.Add(toUpdate);
             return Result.Ok(toUpdate);
