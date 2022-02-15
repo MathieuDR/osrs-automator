@@ -8,7 +8,7 @@ using WiseOldManConnector.Models.WiseOldMan.Enums;
 
 namespace DiscordBot.Data.Repository; 
 
-public class GraveyardRepository : BaseSingleRecordLiteDbRepository<Graveyard>, IGraveyardRepository{
+internal class GraveyardRepository : BaseSingleRecordLiteDbRepository<Graveyard>, IGraveyardRepository{
 	public GraveyardRepository(ILogger logger, LiteDatabase database) : base(logger, database) { }
 	public override string CollectionName => "graveyard";
 	

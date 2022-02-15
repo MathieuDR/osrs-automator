@@ -1,4 +1,3 @@
-using System.Text;
 using DiscordBot.Common.Models.Enums;
 using DiscordBot.Data;
 

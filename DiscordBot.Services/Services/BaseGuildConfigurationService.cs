@@ -1,6 +1,6 @@
 using DiscordBot.Common.Dtos.Discord;
 using DiscordBot.Common.Models.Data;
-using DiscordBot.Data.Repository;
+using DiscordBot.Data.Interfaces;
 using DiscordBot.Data.Strategies;
 using FluentResults;
 using Microsoft.Extensions.Logging;
@@ -13,7 +13,7 @@ internal abstract class BaseGuildConfigurationService : RepositoryService {
 
 
 	protected Result SaveGuildConfig(GuildConfig guildConfig) {
-		var repo = GetRepository<GuildConfigRepository>(guildConfig.GuildId);
+		var repo = GetRepository<IGuildConfigRepository>(guildConfig.GuildId);
 		return repo.UpdateOrInsert(guildConfig);
 	}
 
@@ -26,7 +26,7 @@ internal abstract class BaseGuildConfigurationService : RepositoryService {
 	}
 
 	protected GuildConfig GetGuildConfig(ulong guildId) {
-		var repo = GetRepository<GuildConfigRepository>(guildId);
+		var repo = GetRepository<IGuildConfigRepository>(guildId);
 		return repo.GetSingle().Value;
 	}
 }

@@ -6,7 +6,7 @@ using Microsoft.Extensions.Logging;
 
 namespace DiscordBot.Data.Repository;
 
-public class PlayerRepository : BaseLiteDbRepository<Player>, IPlayerRepository {
+internal class PlayerRepository : BaseLiteDbRepository<Player>, IPlayerRepository {
     public PlayerRepository(ILogger<PlayerRepository> logger, LiteDatabase database) : base(logger, database) { }
 
     public override string CollectionName => "players";

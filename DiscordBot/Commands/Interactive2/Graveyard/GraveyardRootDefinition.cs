@@ -8,6 +8,4 @@ public class GraveyardRootDefinition : RootCommandDefinitionBase {
 
 	public override string Name => "graveyard";
 	public override string Description => "Graveyard of shame commands";
-
-	protected override Task<SlashCommandBuilder> ExtendBaseSlashCommandBuilder(SlashCommandBuilder builder) => Task.FromResult(builder);
 }

@@ -62,6 +62,7 @@ public static class ConfigurationExtensions {
 
 	private static IServiceCollection AddDiscordCommands(this IServiceCollection serviceCollection) {
 		return serviceCollection
+			.AddSingleton<ICommandAuthorizationService, CommandAuthorizationService>()
 			.AddSingleton<PingApplicationCommandHandler>()
 			.AddSingleton<ManageCommandsApplicationCommandHandler>()
 			.AddSingleton<CountApplicationCommandHandler>()
@@ -81,7 +82,8 @@ public static class ConfigurationExtensions {
 					x.GetRequiredService<ConfigureApplicationCommandHandler>(),
 					x.GetRequiredService<CreateCompetitionCommandHandler>(),
 					x.GetRequiredService<AuthorizationConfigurationCommandHandler>()
-				}, x.GetRequiredService<IGroupService>(), x.GetRequiredService<IOptions<BotTeamConfiguration>>()));
+				}, 
+				x.GetRequiredService<ICommandAuthorizationService>()));
 	}
 
 	private static IServiceCollection AddConfiguration(this IServiceCollection serviceCollection,
@@ -117,7 +119,8 @@ public static class ConfigurationExtensions {
 			x.GetRequiredService<IMediator>(),
 			x.GetRequiredService<ICommandDefinitionProvider>(), 
 			assemblyTypes.GetConcreteClassFromType(typeof(ICommandRequest<>)),
-			x.GetRequiredService<ILogger<CommandInstigator>>()));
+			x.GetRequiredService<ILogger<CommandInstigator>>(),
+			x.GetRequiredService<ICommandAuthorizationService>()));
 
 		// Add RegistrationService
 		serviceCollection.AddTransient<ICommandRegistrationService, CommandRegistrationService>()

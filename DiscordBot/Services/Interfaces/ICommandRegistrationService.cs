@@ -1,5 +1,3 @@
-using DiscordBot.Commands.Interactive;
-
 namespace DiscordBot.Services.Interfaces;
 
 public interface ICommandRegistrationService {

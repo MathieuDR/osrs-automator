@@ -1,4 +1,3 @@
-using DiscordBot.Commands.Interactive;
 using DiscordBot.Configuration;
 using DiscordBot.Services;
 using Microsoft.Extensions.Configuration;

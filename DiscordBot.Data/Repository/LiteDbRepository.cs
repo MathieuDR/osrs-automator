@@ -7,7 +7,7 @@ using Serilog.Context;
 
 namespace DiscordBot.Data.Repository;
 
-public class LiteDbRepository : IDiscordBotRepository {
+internal class LiteDbRepository : IDiscordBotRepository {
     protected const string PlayerCollectionName = "players";
     protected const string GuildConfigurationCollectionName = "guildConfig";
     protected const string GuildEventCollectionName = "guildEvents";

@@ -12,10 +12,4 @@ public class LeaderboardSubCommandDefinition : SubCommandDefinitionBase<Graveyar
 		builder.AddOption(LocationOption, ApplicationCommandOptionType.String, "Location of the shame", false, isAutocomplete: true);
 		return Task.FromResult(builder);
 	}
-
-	protected override Task FillOptions() {
-		var list = Options.ToList();
-		list.Add((LocationOption, typeof(string)));
-		return base.FillOptions();
-	}
 }

@@ -1,4 +1,3 @@
-using DiscordBot.Common.Models.Data;
 using TimeZoneConverter;
 
 namespace DiscordBot.Services.Helpers; 

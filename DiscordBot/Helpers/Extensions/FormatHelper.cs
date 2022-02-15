@@ -1,4 +1,5 @@
 ﻿using System.Globalization;
+using Common.Formatters;
 
 namespace DiscordBot.Helpers.Extensions;
 
@@ -30,10 +31,6 @@ public static class FormatHelper {
         return FormatNumber((double)metric.Rank);
     }
 
-    // public static string FormatNumber(this double number, bool zeroAsStripe = false) {
-    //     return FormatNumber((long) number, zeroAsStripe);
-    // }
-
     public static string FormatNumber(this double number, bool zeroAsStripe = false) {
         if (number >= 1) {
             return FormatNumber((long)number);
@@ -46,58 +43,12 @@ public static class FormatHelper {
         return $"{number - (number - (int)number)}:{TimeSpan.FromHours(number - (int)number).ToString(@"mm")}";
     }
 
-    // public static string FormatConditionally(this int number, bool zeroAsStripe = false) {
-    //     return FormatConditionally((long) number);
-    // }
-
     public static string FormatNumber(this long number, bool zeroAsStripe = false) {
-        if (zeroAsStripe && number == 0) {
-            return "-";
-        }
-
-        var nfi = (NumberFormatInfo)CultureInfo.InvariantCulture.NumberFormat.Clone();
-        nfi.NumberGroupSeparator = " ";
-
-        if (number >= 100000000) {
-            return (number / 1000000).ToString("#,0M", nfi);
-        }
-
-        if (number >= 10000000) {
-            return (number / 1000000).ToString("0.#", nfi) + "M";
-        }
-
-        if (number >= 100000) {
-            return (number / 1000).ToString("#,0K", nfi);
-        }
-
-        if (number >= 10000) {
-            return (number / 1000).ToString("0.#", nfi) + "K";
-        }
-
-        return number.ToString("0", nfi);
+        return NumberFormatter.FormatDecimal(number);
     }
 
     public static string FormatConditionally(this long number) {
-        var nfi = (NumberFormatInfo)CultureInfo.InvariantCulture.NumberFormat.Clone();
-        nfi.NumberGroupSeparator = " ";
-
-        if (number >= 100000000) {
-            return (number / 1000000).ToString("+#,0M;-#,0M", nfi);
-        }
-
-        if (number >= 10000000) {
-            return (number / 1000000).ToString("+0.#;-0.#", nfi) + "M";
-        }
-
-        if (number >= 100000) {
-            return (number / 1000).ToString("+#,0K;-#,0K", nfi);
-        }
-
-        if (number >= 10000) {
-            return (number / 1000).ToString("+0.#;-0.#", nfi) + "K";
-        }
-
-        return number.ToString("+#;-#;0", nfi);
+        return NumberFormatter.FormatDecimal(number, true);
     }
 
     public static int ToLevel(this double experience) {

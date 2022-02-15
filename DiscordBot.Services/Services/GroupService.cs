@@ -4,7 +4,6 @@ using DiscordBot.Common.Models.Data;
 using DiscordBot.Common.Models.Decorators;
 using DiscordBot.Common.Models.Enums;
 using DiscordBot.Data.Interfaces;
-using DiscordBot.Data.Repository;
 using DiscordBot.Data.Strategies;
 using DiscordBot.Services.Helpers;
 using DiscordBot.Services.Interfaces;
@@ -45,7 +44,7 @@ internal class GroupService : RepositoryService, IGroupService {
             throw new Exception("Group does not exist.");
         }
 
-        var repo = GetRepository<GuildConfigRepository>(guildUser.GuildId);
+        var repo = GetRepository<IGuildConfigRepository>(guildUser.GuildId);
         var config = repo.GetSingle().Value ?? new GuildConfig(guildUser.GuildId, guildUser.Id);
 
         config.WomVerificationCode = verificationCode;
@@ -59,13 +58,13 @@ internal class GroupService : RepositoryService, IGroupService {
     public ValueTask<Result> SetTimeZone(GuildUser guildUser, string key) {
         GuildConfig config = GetGroupConfig(guildUser.GuildId);
         config.Timezone = key;
-        var repo = GetRepository<GuildConfigRepository>(guildUser.GuildId);
+        var repo = GetRepository<IGuildConfigRepository>(guildUser.GuildId);
         repo.Update(config);
         return ValueTask.FromResult(Result.Ok());
     }
 
     public async Task SetAutoAdd(GuildUser guildUser, bool autoAdd) {
-        var repo = GetRepository<GuildConfigRepository>(guildUser.GuildId);
+        var repo = GetRepository<IGuildConfigRepository>(guildUser.GuildId);
         var config = GetGroupConfig(guildUser.GuildId);
         if (config.WomGroupId <= 0) {
             throw new Exception("No Wise Old Man set for this server.");
@@ -98,7 +97,7 @@ internal class GroupService : RepositoryService, IGroupService {
             config.AutomatedMessagesConfig.ChannelJobs.Add(jobType, setting);
         }
 
-        var repo = GetRepository<GuildConfigRepository>(user.GuildId);
+        var repo = GetRepository<IGuildConfigRepository>(user.GuildId);
         repo.UpdateOrInsert(config);
         return Task.CompletedTask;
     }
@@ -113,7 +112,7 @@ internal class GroupService : RepositoryService, IGroupService {
 
         var setting = config.AutomatedMessagesConfig.ChannelJobs[jobType];
         setting.IsEnabled = !setting.IsEnabled;
-        var repo = GetRepository<GuildConfigRepository>(guild.Id);
+        var repo = GetRepository<IGuildConfigRepository>(guild.Id);
         repo.UpdateOrInsert(config);
         return Task.FromResult(setting.IsEnabled);
     }
@@ -199,7 +198,7 @@ internal class GroupService : RepositoryService, IGroupService {
             var groupMembers = (await _groupApi.GetMembers(config.WomGroupId)).Data.ToList();
             config.WomGroup.Members = groupMembers;
 
-            var repo = RepositoryStrategy.GetOrCreateRepository<GuildConfigRepository>(config.GuildId);
+            var repo = RepositoryStrategy.GetOrCreateRepository<IGuildConfigRepository>(config.GuildId);
             var updateResult = repo.Update(config);
 
 
@@ -260,7 +259,7 @@ internal class GroupService : RepositoryService, IGroupService {
     }
 
     private GuildConfig GetGroupConfig(ulong guildId, bool validate = true) {
-        var repo = GetRepository<GuildConfigRepository>(guildId);
+        var repo = GetRepository<IGuildConfigRepository>(guildId);
         var result = repo.GetSingle().Value;
         if (validate) {
             if (result == null) {

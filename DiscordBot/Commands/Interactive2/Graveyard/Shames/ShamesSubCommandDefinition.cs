@@ -14,12 +14,4 @@ public class ShamesSubCommandDefinition : SubCommandDefinitionBase<GraveyardRoot
 		builder.AddOption(LocationOption, ApplicationCommandOptionType.String, "Where the shame happened", false, isAutocomplete: true);
 		return Task.FromResult(builder);
 	}
-
-	protected override Task FillOptions() {
-		var list = Options.ToList();
-		list.Add((ShamedOption, typeof(string)));
-		list.Add((LocationOption, typeof(string)));
-
-		return base.FillOptions();
-	}
 }

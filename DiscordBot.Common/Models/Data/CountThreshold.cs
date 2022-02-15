@@ -1,5 +1,3 @@
-using LiteDB;
-
 namespace DiscordBot.Common.Models.Data;
 
 public class CountThreshold {

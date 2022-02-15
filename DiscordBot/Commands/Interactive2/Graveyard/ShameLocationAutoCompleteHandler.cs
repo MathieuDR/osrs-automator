@@ -1,5 +1,4 @@
 using DiscordBot.Commands.Interactive2.Base.Handlers;
-using DiscordBot.Commands.Interactive2.Graveyard.ShameSubCommand;
 using DiscordBot.Common.Configuration;
 using DiscordBot.Common.Models.Enums;
 using Microsoft.Extensions.DependencyInjection;

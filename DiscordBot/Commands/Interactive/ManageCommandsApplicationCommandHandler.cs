@@ -1,4 +1,3 @@
-using DiscordBot.Commands.Interactive2.Base.Definitions;
 using DiscordBot.Common.Models.Enums;
 using DiscordBot.Data.Interfaces;
 using DiscordBot.Data.Strategies;
@@ -58,8 +57,6 @@ public class ManageCommandsApplicationCommandHandler : ApplicationCommandHandler
         var guild = GetGuild(context);
 
         var commandInfo = (await _applicationCommandInfoRepository.GetByCommandName(command)).Value;
-        Logger.LogInformation("{@info}", commandInfo);
-
         if (commandInfo is null) {
             try {
                 var commandStrategy = _serviceProvider.GetRequiredService<ICommandStrategy>();

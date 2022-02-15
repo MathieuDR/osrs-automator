@@ -10,6 +10,7 @@ public abstract class BaseInteractiveContext {
     public abstract string Command { get; }
     public abstract string SubCommand { get; }
     public abstract string SubCommandGroup { get; }
+    public abstract EmbedBuilder CreateEmbedBuilder(string title = null, string content = null);
 }
 
 public abstract class BaseInteractiveContext<T> : BaseInteractiveContext where T : SocketInteraction {
@@ -116,7 +117,7 @@ public abstract class BaseInteractiveContext<T> : BaseInteractiveContext where T
         RequestOptions options = null,
         MessageComponent component = null) {
         _isDeferred = true;
-        return InnerContext.RespondAsync(text, embeds?.ToArray(), isTts, ephemeral, allowedMentions, options, component);
+        return InnerContext.RespondAsync(text, embeds?.ToArray(), isTts, ephemeral, allowedMentions, component, options: options);
     }
 
     public Task<RestFollowupMessage> FollowupAsync(
@@ -127,10 +128,10 @@ public abstract class BaseInteractiveContext<T> : BaseInteractiveContext where T
         AllowedMentions allowedMentions = null,
         RequestOptions options = null,
         MessageComponent component = null) {
-        return InnerContext.FollowupAsync(text, embeds?.ToArray(), isTts, ephemeral, allowedMentions, options, component);
+        return InnerContext.FollowupAsync(text, embeds?.ToArray(), isTts, ephemeral, allowedMentions, component, options: options);
     }
 
-    public EmbedBuilder CreateEmbedBuilder(string title = null, string content = null) {
+    public override EmbedBuilder CreateEmbedBuilder(string title = null, string content = null) {
         return new EmbedBuilder()
             .WithColor(GuildUser.GetHighestRole()?.Color ?? 0x7000FB)
             .WithMessageAuthorFooter(User)

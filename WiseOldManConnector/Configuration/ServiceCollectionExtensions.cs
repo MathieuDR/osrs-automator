@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+﻿using Common.Semaphores;
+using Microsoft.Extensions.DependencyInjection;
 using WiseOldManConnector.Api;
 using WiseOldManConnector.Interfaces;
 
@@ -11,6 +12,7 @@ public static class ServiceCollectionExtensions {
         services.AddTransient<IWiseOldManGroupApi, GroupConnector>();
         services.AddTransient<IWiseOldManCompetitionApi, CompetitionConnector>();
         services.AddTransient<IWiseOldManNameApi, NameConnector>();
+        services.AddSingleton(new TimeSpanSemaphore(150, TimeSpan.FromSeconds(5*60+10))); // rate limit to 150 requests per 5 minutes + 10 seconds buffer
         return services;
     }
 }

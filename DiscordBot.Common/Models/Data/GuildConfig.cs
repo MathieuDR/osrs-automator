@@ -1,5 +1,4 @@
 ﻿using DiscordBot.Common.Models.Data.Base;
-using LiteDB;
 using WiseOldManConnector.Models.Output;
 
 namespace DiscordBot.Common.Models.Data;

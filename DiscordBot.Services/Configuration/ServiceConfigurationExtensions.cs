@@ -32,7 +32,7 @@ public static partial class ServiceConfigurationExtensions {
             .AddTransient<IAutomatedDropperService, AutomatedDropperService>()
             .AddTransient<IAuthorizationService, AuthorizationService>()
             .AddTransient<IGraveyardService, GraveyardService>()
-            .AddSingleton(new TimeSpanSemaphore(150, TimeSpan.FromSeconds(5*60+10))); // rate limit to 150 requests per 5 minutes + 10 seconds buffer
+            .AddTransient<IClanFundsService, ClanFundsService>();
 
         return serviceCollection;
     }

@@ -43,8 +43,8 @@ public class LeaderBoardHandler : ApplicationCommandHandlerBase<LeaderboardReque
 		return Task.CompletedTask;
 	}
 
-	private Models.Leaderboard<int> CreateLeaderboard((ulong user, Shame[] shames)[] memberShames, ShameLocation? location, MetricType? metricType) {
-		var board = new Models.Leaderboard<int>() {
+	private Models.DiscordLeaderBoard<int> CreateLeaderboard((ulong user, Shame[] shames)[] memberShames, ShameLocation? location, MetricType? metricType) {
+		var board = new Models.DiscordLeaderBoard<int>() {
 			Name =  location.HasValue ? metricType.HasValue ? metricType.Value.ToDisplayNameOrFriendly() : location.Value.ToDisplayNameOrFriendly() : "All" + " shame",
 			ScoreFieldName = "Shames"
 		};

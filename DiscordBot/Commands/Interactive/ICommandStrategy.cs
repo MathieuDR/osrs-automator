@@ -15,5 +15,4 @@ public interface ICommandStrategy {
     /// <returns>Name, Description of commands</returns>
     public IEnumerable<(string Name, string Description)> GetCommandDescriptions();
 
-    public Task ResetCommandRoleConfig(ulong guildId);
 }

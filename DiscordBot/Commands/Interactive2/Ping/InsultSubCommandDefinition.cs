@@ -12,12 +12,5 @@ public class InsultSubCommandDefinition : SubCommandDefinitionBase<PingRootComma
 		return Task.FromResult(builder);
 	}
 
-	protected override Task FillOptions() {
-		var optionList = Options.ToList();
-		optionList.Add((VariantOption, typeof(bool)));
-        
-		return base.FillOptions();
-	}
-
 	public InsultSubCommandDefinition(IServiceProvider serviceProvider) : base(serviceProvider) { }
 }

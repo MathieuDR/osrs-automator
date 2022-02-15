@@ -1,5 +1,4 @@
 using System.Text;
-using Common.Extensions;
 using Fergun.Interactive.Pagination;
 
 namespace DiscordBot.Helpers.Builders;
@@ -29,16 +28,16 @@ public class InteractionPaginatorReplyBuilder<TInteraction> where TInteraction :
 		return this;
 	}
 
-	public InteractionPaginatorReplyBuilder<TInteraction> WithLeaderboard<T>(Models.Leaderboard<T> leaderboard) {
+	public InteractionPaginatorReplyBuilder<TInteraction> WithLeaderboard<T>(Models.DiscordLeaderBoard<T> discordLeaderBoard) {
 		// Order leaderboard by rank
-		leaderboard.Entries = leaderboard.Entries.OrderBy(x => x.Rank).ToList();
+		discordLeaderBoard.Entries = discordLeaderBoard.Entries.OrderBy(x => x.Rank).ToList();
 	
 		// prep functions
-		var entryStrings = leaderboard.Entries.Select(x => x.ToStringWithPadding());
+		var entryStrings = discordLeaderBoard.Entries.Select(x => x.ToStringWithPadding());
 		//var (header, footer) = AdjustHeaderAndFooter(leaderboard.ToPaddedHeaderString(), null, true);
-		var header = $"```{leaderboard.ToPaddedHeaderString()}";
+		var header = $"```{discordLeaderBoard.ToPaddedHeaderString()}";
 		
-		CreatePagesFromLines(entryStrings.ToArray(), 15, header, "```", x => x.WithTitle($"{leaderboard.Name} leaderboard"));
+		CreatePagesFromLines(entryStrings.ToArray(), 15, header, "```", x => x.WithTitle($"{discordLeaderBoard.Name} leaderboard"));
 
 		return this;
 	}

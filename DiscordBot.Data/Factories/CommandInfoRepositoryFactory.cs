@@ -4,7 +4,7 @@ using Microsoft.Extensions.Logging;
 
 namespace DiscordBot.Data.Factories;
 
-public class CommandInfoRepositoryFactory : BaseLiteDbRepositoryFactory<IApplicationCommandInfoRepository, ApplicationCommandInfoRepository> {
+internal class CommandInfoRepositoryFactory : BaseLiteDbRepositoryFactory<IApplicationCommandInfoRepository, ApplicationCommandInfoRepository> {
     public CommandInfoRepositoryFactory(ILoggerFactory loggerFactory, LiteDbManager liteDbManager) : base(loggerFactory, liteDbManager) { }
 
     public override bool RequiresGuildId => false;

@@ -1,7 +1,8 @@
-﻿using System.Reflection;
-using Common.Extensions;
+﻿using Common.Extensions;
 using DiscordBot.Commands.Interactive2.Base.Definitions;
 using DiscordBot.Commands.Interactive2.Base.Requests;
+using DiscordBot.Common.Dtos.Discord;
+using DiscordBot.Common.Models.Enums;
 using MediatR;
 
 namespace DiscordBot.Services;
@@ -10,15 +11,18 @@ public class CommandInstigator : ICommandInstigator {
     private readonly Dictionary<IRootCommandDefinition, ISubCommandDefinition[]> _commands;
     private readonly IMediator _mediator;
     private readonly ILogger<CommandInstigator> _logger;
+    private readonly ICommandAuthorizationService _commandAuthorizationService;
 
     private readonly Dictionary<ICommandDefinition, Dictionary<Type, TypeHelper.ObjectActivator>> _commandRequestsActivators = new();
 
     public CommandInstigator(IMediator mediator,
         ICommandDefinitionProvider commandDefinitionProvider,
-        IEnumerable<Type> requests, ILogger<CommandInstigator> logger) {
+        IEnumerable<Type> requests, ILogger<CommandInstigator> logger,
+        ICommandAuthorizationService commandAuthorizationService) {
         
         _mediator = mediator;
         _logger = logger;
+        _commandAuthorizationService = commandAuthorizationService;
         _commands = GetCommandsFromProvider(commandDefinitionProvider);
         InitializeCommandRequestDictionary(_commands,  requests.ToArray());
     }
@@ -83,13 +87,17 @@ public class CommandInstigator : ICommandInstigator {
 
         // execute command from definition through mediatr
         try {
-            // TODO Check if authorized!
+            if (! await _commandAuthorizationService.IsAuthorized(request, context)) {
+                return Result.Fail(new Error("Not authorized to run this command").WithMetadata("501",true));
+            }
             return await _mediator.Send(request);
         }catch(Exception e) {
             _logger.LogError(e, "Could not execute command");
             return Result.Fail("Could not execute command").WithError(new ExceptionalError(e));
         }
     }
+
+    
 
     public Task<Result> ExecuteCommandAsync(BaseInteractiveContext context) {
         return context switch {
@@ -116,21 +124,25 @@ public class CommandInstigator : ICommandInstigator {
 
     private Result<ICommandDefinition> GetCommandDefinition<T>(BaseInteractiveContext<T> context) where T : SocketInteraction {
         var commandDefinitions = _commands.Where(x => x.Key.Name == context.Command).ToList();
+        var notFoundError = new Error("Could not find command").WithMetadata("404", true);
 
         // Error handling
         if (commandDefinitions.Count == 0) {
-            return Result.Fail<ICommandDefinition>("Could not find command");
+            return Result.Fail<ICommandDefinition>(notFoundError.CausedBy("No definition found"));
+         
         }
 
         if (commandDefinitions.Count > 1) {
-            return Result.Fail<ICommandDefinition>("Found more then one command");
+            return Result.Fail<ICommandDefinition>(notFoundError.CausedBy("Found more then one command definition"));
         }
 
         if (!string.IsNullOrEmpty(context.SubCommand)) {
             var sub = commandDefinitions.First().Value.FirstOrDefault(x => x.Name == context.SubCommand);
-            return sub == null ? Result.Fail<ICommandDefinition>("Could not find subcommand") : Result.Ok<ICommandDefinition>(sub);
+            return sub == null ? Result.Fail<ICommandDefinition>(notFoundError.CausedBy("Couldn't found subcommand")) : Result.Ok<ICommandDefinition>(sub);
         }
 
         return Result.Ok<ICommandDefinition>(commandDefinitions.First().Key);
     }
+    
+    
 }

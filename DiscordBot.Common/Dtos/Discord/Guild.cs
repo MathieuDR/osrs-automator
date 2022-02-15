@@ -1,5 +1,3 @@
-using DiscordBot.Common.Models.Data;
-
 namespace DiscordBot.Common.Dtos.Discord;
 
 public class Guild : GuildEntity {
