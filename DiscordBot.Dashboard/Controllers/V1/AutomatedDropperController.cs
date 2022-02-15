@@ -1,3 +1,4 @@
+using Common.Extensions;
 using Dashboard.Binders;
 using Dashboard.Models.ApiRequests.DiscordEmbed;
 using Dashboard.Transformers;
@@ -31,6 +32,7 @@ public class AutomatedDropperController : Controller {
         _logger.LogInformation("Received drop");
         var dropResult = GetDrop(bodyEmbeds, formEmbeds);
         if (dropResult.IsFailed) {
+            _logger.LogError("Error with receiving result: {0}",dropResult.CombineMessage());
             BadRequest(dropResult.Errors.FirstOrDefault());
         }
 
