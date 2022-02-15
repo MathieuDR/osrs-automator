@@ -13,6 +13,7 @@
 
     <ItemGroup>
         <PackageReference Include="Mapster" Version="7.2.0" />
+        <PackageReference Include="MathieuDR.Common" Version="1.2.1" />
         <PackageReference Include="Microsoft.AspNetCore.Mvc.Versioning" Version="5.0.0" />
         <PackageReference Include="Microsoft.AspNetCore.Mvc.Versioning.ApiExplorer" Version="5.0.0" />
         <PackageReference Include="Serilog.AspNetCore" Version="4.1.0" />
@@ -23,5 +24,25 @@
     <ItemGroup>
         <_ContentIncludedByDefault Remove="Pages\Shared\MainLayout.razor" />
         <_ContentIncludedByDefault Remove="Pages\Shared\NavMenu.razor" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <Compile Remove="logs\**" />
+      <Compile Remove="db\**" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <EmbeddedResource Remove="logs\**" />
+      <EmbeddedResource Remove="db\**" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <None Remove="logs\**" />
+      <None Remove="db\**" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <Content Remove="logs\**" />
+      <Content Remove="db\**" />
     </ItemGroup>
 </Project>

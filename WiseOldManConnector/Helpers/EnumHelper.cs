@@ -155,7 +155,8 @@ public static class EnumHelper {
             MetricType.Vorkath,
             MetricType.Wintertodt,
             MetricType.Zalcano,
-            MetricType.Zulrah
+            MetricType.Zulrah,
+            MetricType.Nex
         };
     }
 

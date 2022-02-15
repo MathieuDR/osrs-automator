@@ -42,6 +42,8 @@ internal static class Configuration {
 
             //cfg.CreateMap<WOMCompetition, Competition>().ConvertUsing<WOMCompetitionToParticipantsCollectionConverter>();
 
+            
+            
             cfg.CreateMap<WOMCompetition, IEnumerable<CompetitionParticipant>>()
                 .ConvertUsing<WOMCompetitionToParticipantsCollectionConverter>();
 

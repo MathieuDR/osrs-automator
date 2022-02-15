@@ -29,7 +29,7 @@ internal class NameConnector : BaseConnecter, IWiseOldManNameApi {
 
     public async Task<ConnectorResponse<NameChange>> Request(string oldUsername, string newUsername) {
         var request = GetNewRestRequest();
-        request.Method = Method.POST;
+        request.Method = Method.Post;
         request.AddJsonBody(new {
             oldName = oldUsername,
             newName = newUsername
@@ -41,7 +41,7 @@ internal class NameConnector : BaseConnecter, IWiseOldManNameApi {
 
     public async Task<ConnectorCollectionResponse<NameChange>> Request(IEnumerable<Tuple<string, string>> items) {
         var request = GetNewRestRequest();
-        request.Method = Method.POST;
+        request.Method = Method.Post;
 
         request.AddJsonBody(items.Select(x => new {
             oldName = x.Item1,

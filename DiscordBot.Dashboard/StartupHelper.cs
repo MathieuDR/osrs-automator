@@ -51,7 +51,7 @@ public static class StartupHelper {
         });
 
         services
-            .AddDiscordBot(configuration)
+            .AddDiscordBot(configuration, typeof(DiscordBot.DiscordBot))
             .UseLiteDbRepositories(configuration)
             .AddWiseOldManApi()
             .AddDiscordBotServices()

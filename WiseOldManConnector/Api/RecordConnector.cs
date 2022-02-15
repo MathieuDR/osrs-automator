@@ -1,4 +1,5 @@
-﻿using WiseOldManConnector.Helpers;
+﻿using RestSharp;
+using WiseOldManConnector.Helpers;
 using WiseOldManConnector.Interfaces;
 using WiseOldManConnector.Models;
 using WiseOldManConnector.Models.API.Responses;
@@ -27,15 +28,14 @@ internal class RecordConnector : BaseConnecter, IWiseOldManRecordApi {
     private async Task<ConnectorCollectionResponse<Record>> QueryRecords(MetricType metric, Period period,
         PlayerType? playerType = null) {
         var request = GetNewRestRequest("/leaderboard");
-
-        request.AddParameter("metric", metric.ToEnumMemberOrDefault());
+        
+        request.AddOrUpdateParameter("metric", metric.ToEnumMemberOrDefault());
 
         if (playerType.HasValue) {
-            request.AddParameter("playerType", playerType.Value.ToEnumMemberOrDefault());
+            request.AddOrUpdateParameter("playerType", playerType.Value.ToEnumMemberOrDefault());
         }
 
-
-        request.AddParameter("period", period.ToEnumMemberOrDefault());
+        request.AddOrUpdateParameter("period", period.ToEnumMemberOrDefault());
         var queryResponse = await ExecuteCollectionRequest<WOMRecord>(request);
         var response = GetResponse<WOMRecord, Record>(queryResponse);
 

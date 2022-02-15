@@ -220,7 +220,7 @@ internal class GroupConnector : BaseConnecter, IWiseOldManGroupApi {
 
     public async Task<ConnectorResponse<VerificationGroup>> Create(CreateGroupRequest request) {
         var restRequest = GetNewRestRequest();
-        restRequest.Method = Method.POST;
+        restRequest.Method = Method.Post;
         restRequest.AddJsonBody(request);
 
         var restResult = await ExecuteRequest<GroupCreateResponse>(restRequest);
@@ -230,7 +230,7 @@ internal class GroupConnector : BaseConnecter, IWiseOldManGroupApi {
     public async Task<ConnectorResponse<Group>> Edit(int id, EditGroupRequest request) {
         var restRequest = GetNewRestRequest("{id}");
         restRequest.AddParameter("id", id, ParameterType.UrlSegment);
-        restRequest.Method = Method.PUT;
+        restRequest.Method = Method.Put;
         restRequest.AddJsonBody(request);
 
         var restResult = await ExecuteRequest<GroupEditResponse>(restRequest);
@@ -240,7 +240,7 @@ internal class GroupConnector : BaseConnecter, IWiseOldManGroupApi {
     public async Task<ConnectorResponse<MessageResponse>> Delete(int id, string verificationCode) {
         var restRequest = GetNewRestRequest("{id}");
         restRequest.AddParameter("id", id, ParameterType.UrlSegment);
-        restRequest.Method = Method.DELETE;
+        restRequest.Method = Method.Delete;
         restRequest.AddJsonBody(new { verificationCode });
 
         var restResult = await ExecuteRequest<WOMMessageResponse>(restRequest);
@@ -250,7 +250,7 @@ internal class GroupConnector : BaseConnecter, IWiseOldManGroupApi {
     public async Task<ConnectorResponse<Group>> AddMembers(int id, string verificationCode, IEnumerable<MemberRequest> members) {
         var restRequest = GetNewRestRequest("{id}/add-members");
         restRequest.AddParameter("id", id, ParameterType.UrlSegment);
-        restRequest.Method = Method.POST;
+        restRequest.Method = Method.Post;
         restRequest.AddJsonBody(new {
             verificationCode, members
         });
@@ -271,7 +271,7 @@ internal class GroupConnector : BaseConnecter, IWiseOldManGroupApi {
     public async Task<ConnectorResponse<MessageResponse>> Update(int id, string verificationCode) {
         var restRequest = GetNewRestRequest("{id}/update-all");
         restRequest.AddParameter("id", id, ParameterType.UrlSegment);
-        restRequest.Method = Method.POST;
+        restRequest.Method = Method.Post;
 
         restRequest.AddJsonBody(new {
             verificationCode

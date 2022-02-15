@@ -347,5 +347,9 @@ public enum MetricType {
 
     [EnumMember(Value = "theatre_of_blood_hard_mode")]
     [Display(Name = "Theatre of Blood Hard Mode")]
-    TheatreOfBloodHardMode
+    TheatreOfBloodHardMode,
+    
+    [EnumMember(Value = "nex")]
+    [Display(Name = "Nex")]
+    Nex
 }

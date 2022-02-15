@@ -24,7 +24,7 @@ public static partial class ServiceConfigurationExtensions {
 
     private static IServiceCollection AddServices(this IServiceCollection serviceCollection) {
         serviceCollection
-            .AddTransient<ICollectionLogItemProvider, CollectionLogItemProvider>()
+            .AddSingleton<ICollectionLogItemProvider, CollectionLogItemProvider>()
             .AddTransient<IPlayerService, PlayerService>()
             .AddTransient<IGroupService, GroupService>()
             .AddTransient<IOsrsHighscoreService, WiseOldManConnectorService>()

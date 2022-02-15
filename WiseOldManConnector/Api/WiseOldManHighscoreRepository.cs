@@ -97,7 +97,7 @@ namespace WiseOldManConnector.Api {
             var request = new RestRequest($"{PlayersBase}/{{id}}/records", DataFormat.Json);
 
             request.AddParameter("id", id, ParameterType.UrlSegment);
-            request.Method = Method.GET;
+            request.Method = Method.Get;
 
             if (metric.HasValue) {
                 request.AddParameter("metric", metric.GetEnumValueNameOrDefault()?.ToLowerInvariant());

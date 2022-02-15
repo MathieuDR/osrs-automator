@@ -6,10 +6,10 @@ namespace WiseOldManConnector.Models.Output.Exceptions;
 public abstract class ApiException : Exception {
     protected ApiException() { }
 
-    protected ApiException(string wiseOldManMessage, string resource, HttpStatusCode statusCode, List<Parameter> parameters) :
+    protected ApiException(string wiseOldManMessage, string resource, HttpStatusCode statusCode, ParametersCollection parameters) :
         this(wiseOldManMessage, resource, statusCode, parameters, null) { }
 
-    protected ApiException(string wiseOldManMessage, string resource, HttpStatusCode statusCode, List<Parameter> parameters,
+    protected ApiException(string wiseOldManMessage, string resource, HttpStatusCode statusCode, ParametersCollection parameters,
         Exception innerException) : base(wiseOldManMessage, innerException) {
         Resource = resource;
         Parameters = parameters;
@@ -17,14 +17,14 @@ public abstract class ApiException : Exception {
         StatusCode = statusCode;
     }
 
-    protected ApiException(string wiseOldManMessage, IRestResponse response) : this(wiseOldManMessage,
-        response.Request.Resource, response.StatusCode, response.Request.Parameters) { }
+    protected ApiException(string wiseOldManMessage, RestResponse response) : this(wiseOldManMessage,
+        response.Request?.Resource, response.StatusCode, response.Request.Parameters) { }
 
-    protected ApiException(string wiseOldManMessage, IRestResponse response, Exception innerException) : this(
+    protected ApiException(string wiseOldManMessage, RestResponse response, Exception innerException) : this(
         wiseOldManMessage, response.Request.Resource, response.StatusCode, response.Request.Parameters, innerException) { }
 
     public string WiseOldManMessage { get; set; }
     public string Resource { get; set; }
-    public List<Parameter> Parameters { get; set; }
+    public ParametersCollection Parameters { get; set; }
     public HttpStatusCode StatusCode { get; set; }
 }

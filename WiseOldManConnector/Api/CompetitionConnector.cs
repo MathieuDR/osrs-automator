@@ -72,7 +72,7 @@ internal class CompetitionConnector : BaseConnecter, IWiseOldManCompetitionApi {
 
     public async Task<ConnectorResponse<Competition>> Create(CreateCompetitionRequest request) {
         var webRequest = GetNewRestRequest();
-        webRequest.Method = Method.POST;
+        webRequest.Method = Method.Post;
         webRequest.AddJsonBody(request);
 
         var result = await ExecuteRequest<WOMCompetition>(webRequest);

@@ -21,5 +21,9 @@ public enum PlayerType {
 
     [EnumMember(Value = "ultimate")]
     [Display(Name = "Ultimate Ironman")]
-    UltimateIronMan
+    UltimateIronMan,
+    
+    [EnumMember(Value = "group_ironman")]
+    [Display(Name = "Group Ironman")]
+    GroupIronMan,
 }

@@ -52,7 +52,7 @@ public class NameConnectorTests : BaseConnectorTests {
 
         Assert.NotNull(exception);
         Assert.NotEmpty(exception.Message);
-        Assert.Contains("invalid new name.", exception.Message.ToLowerInvariant());
+        Assert.Contains("badrequest", exception.Message.ToLowerInvariant());
     }
 
 

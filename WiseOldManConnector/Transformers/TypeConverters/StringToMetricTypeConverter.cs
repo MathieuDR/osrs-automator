@@ -105,6 +105,7 @@ internal class StringToMetricTypeConverter : ITypeConverter<string, MetricType> 
             "combat" => MetricType.Combat,
             "ehb" => MetricType.EffectiveHoursBossing,
             "ehp" => MetricType.EffectiveHoursPlaying,
+            "nex" => MetricType.Nex,
             _ => throw new ArgumentOutOfRangeException(nameof(source), source, null)
         };
 
