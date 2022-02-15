@@ -12,6 +12,8 @@ namespace DiscordBot.Services.Services;
 
 internal class AutomatedDropperService : RepositoryService, IAutomatedDropperService {
     private readonly ISchedulerFactory _schedulerFactory;
+    private readonly int _clueWaitTimeInSeconds = 60;
+    private readonly int _waitTimeInSeconds = 10;
 
     public AutomatedDropperService(ILogger<AutomatedDropperService> logger, IRepositoryStrategy repositoryStrategy,
         ISchedulerFactory schedulerFactory) : base(logger, repositoryStrategy) {
@@ -163,7 +165,7 @@ internal class AutomatedDropperService : RepositoryService, IAutomatedDropperSer
     }
 
     private ITrigger CreateTriggerByDrop(RunescapeDrop drop) {
-        var waitTimeInSeconds = drop?.Item?.Name is not null && drop.Source.Name.ToLowerInvariant().Contains("clue") ? 60 : 10;
+        var waitTimeInSeconds = drop?.Item?.Name is not null && drop.Source.Name.ToLowerInvariant().Contains("clue") ? _clueWaitTimeInSeconds : _waitTimeInSeconds;
 
         var trigger = TriggerBuilder.Create()
             .WithIdentity(Guid.NewGuid().ToString())
