@@ -10,17 +10,17 @@ internal class RuneScapeDropDataRepository : BaseRecordLiteDbRepository<Runescap
     public RuneScapeDropDataRepository(ILogger<RuneScapeDropDataRepository> logger, LiteDatabase database) : base(logger, database) { }
     public override string CollectionName => "RunescapeDropRecords";
 
-    public Result<bool> HasActiveDrop(Guid endpoint) {
+    public Result<bool> HasActiveDrop(ulong endpoint) {
         return Result.Ok(GetCollection()
             .Count(d => !d.IsHandled && d.Endpoint == endpoint) > 0);
     }
 
-    public Result<RunescapeDropData> GetActive(Guid endpoint) {
+    public Result<RunescapeDropData> GetActive(ulong endpoint) {
         return Result.Ok(GetCollection()
             .FindOne(d => !d.IsHandled && d.Endpoint == endpoint));
     }
 
-    public Result CloseActive(Guid endpoint) {
+    public Result CloseActive(ulong endpoint) {
         var item = GetActive(endpoint).Value;
         item = item with { IsHandled = true };
         return Update(item);

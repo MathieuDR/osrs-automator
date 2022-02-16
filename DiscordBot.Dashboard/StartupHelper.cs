@@ -1,3 +1,4 @@
+using Dashboard.Binders.RouteConstraints;
 using Dashboard.Configuration;
 using Dashboard.Configuration.Options;
 using Dashboard.InputFormatters;
@@ -26,6 +27,10 @@ public static class StartupHelper {
         services.AddRazorPages();
         services.AddServerSideBlazor();
         services.AddMvc(options => { options.InputFormatters.Add(new BypassFormDataInputFormatter()); });
+        services.Configure<RouteOptions>(options =>
+        {
+            options.ConstraintMap.Add(UlongRouteConstraint.UlongRouteConstraintName, typeof(UlongRouteConstraint));
+        });
         services.AddApiVersioning(options => {
             options.AssumeDefaultVersionWhenUnspecified = true;
             options.DefaultApiVersion = new ApiVersion(apiOptions.VersionMajor, apiOptions.VersionMinor);

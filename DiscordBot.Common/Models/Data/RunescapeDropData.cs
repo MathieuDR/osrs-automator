@@ -6,7 +6,7 @@ using WiseOldManConnector.Models.WiseOldMan.Enums;
 namespace DiscordBot.Common.Models.Data;
 
 public record RunescapeDropData : BaseRecord {
-    public Guid Endpoint { get; init; }
+    public ulong Endpoint { get; init; }
     public IEnumerable<RunescapeDrop> Drops { get; init; } = Array.Empty<RunescapeDrop>();
     public bool IsHandled { get; init; }
     public int TotalValue => Drops.Sum(x => x.TotalValue);

@@ -24,11 +24,16 @@ public class AutomatedDropperController : Controller {
         _dropperService = dropperService;
     }
 
-    [HttpPost("dropper/{endpoint:guid}")]
+    [HttpPost("dropper/{id:required}")]
     public async Task<IActionResult> Get([FromBody] EmbedCollection bodyEmbeds,
         [ModelBinder(BinderType = typeof(JsonModelBinder))]
         EmbedCollection formEmbeds,
-        [FromForm] IFormFile file, [FromRoute] Guid endpoint) {
+        [FromForm] IFormFile file, [FromRoute] string id) {
+
+        if (!ulong.TryParse(id, out var endpoint)) {
+            BadRequest("Invalid endpoint");
+        }
+        
         _logger.LogInformation("Received drop");
         var dropResult = GetDrop(bodyEmbeds, formEmbeds);
         if (dropResult.IsFailed) {

@@ -22,7 +22,7 @@ public class HandleRunescapeDropJob : RepositoryJob {
     }
 
     protected override async Task<Result> DoWork() {
-        var endpoint = Context.MergedJobDataMap.GetGuidValue("endpoint");
+        var endpoint = (ulong)Context.MergedJobDataMap.GetLongValue("endpoint");
         var repo = RepositoryStrategy.GetOrCreateRepository<IRuneScapeDropDataRepository>();
         var data = repo.GetActive(endpoint).Value;
 
@@ -72,7 +72,7 @@ public class HandleRunescapeDropJob : RepositoryJob {
         return data with { Drops = drops };
     }
 
-    private async Task<Result<bool>> HandleMessagesForGuilds(Guid endpoint, RunescapeDropData data, List<ulong> guildIds) {
+    private async Task<Result<bool>> HandleMessagesForGuilds(ulong endpoint, RunescapeDropData data, List<ulong> guildIds) {
         var errors = new List<IError>();
         var sentAnyMessages = false;
 
@@ -94,8 +94,8 @@ public class HandleRunescapeDropJob : RepositoryJob {
             }
 
             foreach (var channelConfiguration in configurationResult.Value.EnabledChannels) {
-                var filteredDada = await FilterData(data, channelConfiguration);
-                sentAnyMessages = sentAnyMessages || SendData(guildId, channelConfiguration.Channel, filteredDada);
+                var filterData = await FilterData(data, channelConfiguration);
+                sentAnyMessages = sentAnyMessages || SendData(guildId, channelConfiguration.Channel, filterData);
             }
 
             messagedGuilds.Add(guildId);
@@ -113,7 +113,7 @@ public class HandleRunescapeDropJob : RepositoryJob {
         return true;
     }
 
-    private IEnumerable<ulong> GetGuildIdsForEndpoint(Guid endpoint) {
+    private IEnumerable<ulong> GetGuildIdsForEndpoint(ulong endpoint) {
         return new ulong[] { 403539795944538122 };
     }
 

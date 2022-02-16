@@ -20,7 +20,7 @@ internal class AutomatedDropperService : RepositoryService, IAutomatedDropperSer
         _schedulerFactory = schedulerFactory;
     }
 
-    public async Task<Result> HandleDropRequest(Guid endpoint, RunescapeDrop drop, string base64Image) {
+    public async Task<Result> HandleDropRequest(ulong endpoint, RunescapeDrop drop, string base64Image) {
         if (drop is null && string.IsNullOrEmpty(base64Image)) {
             return Result.Fail("No new information");
         }
@@ -50,7 +50,7 @@ internal class AutomatedDropperService : RepositoryService, IAutomatedDropperSer
         return Result.Ok();
     }
 
-    private Result<RunescapeDrop> SaveDropData(Guid endpoint, RunescapeDrop drop, string base64Image) {
+    private Result<RunescapeDrop> SaveDropData(ulong endpoint, RunescapeDrop drop, string base64Image) {
         var repo = RepositoryStrategy.GetOrCreateRepository<IRuneScapeDropDataRepository>();
 
         var activeRecordResult = repo.GetActive(endpoint);
@@ -108,7 +108,7 @@ internal class AutomatedDropperService : RepositoryService, IAutomatedDropperSer
         return Result.Ok(toUpdate);
     }
 
-    private Result IsValidEndpoint(Guid userId) {
+    private Result IsValidEndpoint(ulong userId) {
         return Result.Ok();
     }
 
@@ -117,7 +117,7 @@ internal class AutomatedDropperService : RepositoryService, IAutomatedDropperSer
         return schedulers.FirstOrDefault() ?? await _schedulerFactory.GetScheduler();
     }
 
-    private async Task<Result> ScheduleJob(Guid endpoint, RunescapeDrop drop) {
+    private async Task<Result> ScheduleJob(ulong endpoint, RunescapeDrop drop) {
         try {
             var scheduler = await GetScheduler();
             var jobKey = CreateJobKeyByEndpoint(endpoint);
@@ -153,7 +153,7 @@ internal class AutomatedDropperService : RepositoryService, IAutomatedDropperSer
         return Result.Ok();
     }
 
-    private IJobDetail CreateJobWithKey(Guid endpoint, JobKey jobKey) {
+    private IJobDetail CreateJobWithKey(ulong endpoint, JobKey jobKey) {
         var result = JobBuilder.Create<HandleRunescapeDropJob>()
             .WithIdentity(jobKey)
             .WithDescription("Handling of runescape drop, received through an API request")
@@ -175,7 +175,7 @@ internal class AutomatedDropperService : RepositoryService, IAutomatedDropperSer
         return trigger;
     }
 
-    private JobKey CreateJobKeyByEndpoint(Guid endpoint) {
+    private JobKey CreateJobKeyByEndpoint(ulong endpoint) {
         return new JobKey(endpoint.ToString(), "automated-dropper");
     }
 }

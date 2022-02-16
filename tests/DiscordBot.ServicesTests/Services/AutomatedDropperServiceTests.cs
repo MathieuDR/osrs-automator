@@ -66,7 +66,8 @@ public class AutomatedDropperServiceTests {
         schedulerFactory.GetAllSchedulers().Returns(new Collection<IScheduler> {
             scheduler
         });
-        var guid = Guid.NewGuid();
+        // random ulong;
+        var guid = ulong.MaxValue;
         var imageString = Convert.ToBase64String(Encoding.UTF8.GetBytes("ImageString"));
 
         RunescapeDropData lastUpdated = null;
