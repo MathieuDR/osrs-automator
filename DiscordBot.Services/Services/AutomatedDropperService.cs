@@ -1,5 +1,8 @@
+using DiscordBot.Common.Dtos.Discord;
 using DiscordBot.Common.Dtos.Runescape;
+using DiscordBot.Common.Identities;
 using DiscordBot.Common.Models.Data;
+using DiscordBot.Common.Models.Data.Drops;
 using DiscordBot.Data.Interfaces;
 using DiscordBot.Data.Strategies;
 using DiscordBot.Services.Interfaces;
@@ -20,7 +23,11 @@ internal class AutomatedDropperService : RepositoryService, IAutomatedDropperSer
         _schedulerFactory = schedulerFactory;
     }
 
-    public async Task<Result> HandleDropRequest(ulong endpoint, RunescapeDrop drop, string base64Image) {
+    public Task<Result<string>> RequestUrl(GuildUser user) {
+        throw new NotImplementedException();
+    }
+
+    public async Task<Result> HandleDropRequest(DiscordUserId endpoint, RunescapeDrop drop, string base64Image) {
         if (drop is null && string.IsNullOrEmpty(base64Image)) {
             return Result.Fail("No new information");
         }
@@ -28,14 +35,14 @@ internal class AutomatedDropperService : RepositoryService, IAutomatedDropperSer
         //Check user Id
         var allowedCheckResult = IsValidEndpoint(endpoint);
         if (allowedCheckResult.IsFailed) {
-            Logger.LogInformation("Not allowed endpoint: {endpoint}", endpoint);
+            Logger.LogInformation("Not allowed endpoint: {endpoint}", endpoint.ToString());
             return allowedCheckResult;
         }
 
         //Save to DB
         var saveInformationResult = SaveDropData(endpoint, drop, base64Image);
         if (saveInformationResult.IsFailed) {
-            Logger.LogWarning("Could not save drop with endpoint {endpoint}, data: {@drop} and {verb} image", endpoint, drop,
+            Logger.LogWarning("Could not save drop with endpoint {endpoint}, data: {@drop} and {verb} image", endpoint.ToString(), drop,
                 string.IsNullOrEmpty(base64Image) ? "without" : "with");
             return saveInformationResult.ToResult();
         }
@@ -43,7 +50,7 @@ internal class AutomatedDropperService : RepositoryService, IAutomatedDropperSer
         //Schedule job
         var schedulingResult = await ScheduleJob(endpoint, saveInformationResult.Value);
         if (schedulingResult.IsFailed) {
-            Logger.LogWarning("Could not schedule job with id {endpoint}", endpoint);
+            Logger.LogWarning("Could not schedule job with id {endpoint}", endpoint.ToString());
             return schedulingResult;
         }
 
@@ -54,7 +61,7 @@ internal class AutomatedDropperService : RepositoryService, IAutomatedDropperSer
         var repo = RepositoryStrategy.GetOrCreateRepository<IRuneScapeDropDataRepository>();
 
         var activeRecordResult = repo.GetActive(endpoint);
-        var data = activeRecordResult.ValueOrDefault ?? new RunescapeDropData { Endpoint = endpoint };
+        var data = activeRecordResult.ValueOrDefault ?? new RunescapeDropData { UserId = endpoint };
 
         // Update list reference
         var dropList = data.Drops.ToList();
@@ -108,7 +115,7 @@ internal class AutomatedDropperService : RepositoryService, IAutomatedDropperSer
         return Result.Ok(toUpdate);
     }
 
-    private Result IsValidEndpoint(ulong userId) {
+    private Result IsValidEndpoint(DiscordUserId userId) {
         return Result.Ok();
     }
 
@@ -117,7 +124,7 @@ internal class AutomatedDropperService : RepositoryService, IAutomatedDropperSer
         return schedulers.FirstOrDefault() ?? await _schedulerFactory.GetScheduler();
     }
 
-    private async Task<Result> ScheduleJob(ulong endpoint, RunescapeDrop drop) {
+    private async Task<Result> ScheduleJob(DiscordUserId endpoint, RunescapeDrop drop) {
         try {
             var scheduler = await GetScheduler();
             var jobKey = CreateJobKeyByEndpoint(endpoint);
@@ -153,7 +160,7 @@ internal class AutomatedDropperService : RepositoryService, IAutomatedDropperSer
         return Result.Ok();
     }
 
-    private IJobDetail CreateJobWithKey(ulong endpoint, JobKey jobKey) {
+    private IJobDetail CreateJobWithKey(DiscordUserId endpoint, JobKey jobKey) {
         var result = JobBuilder.Create<HandleRunescapeDropJob>()
             .WithIdentity(jobKey)
             .WithDescription("Handling of runescape drop, received through an API request")
@@ -175,7 +182,7 @@ internal class AutomatedDropperService : RepositoryService, IAutomatedDropperSer
         return trigger;
     }
 
-    private JobKey CreateJobKeyByEndpoint(ulong endpoint) {
+    private JobKey CreateJobKeyByEndpoint(DiscordUserId endpoint) {
         return new JobKey(endpoint.ToString(), "automated-dropper");
     }
 }

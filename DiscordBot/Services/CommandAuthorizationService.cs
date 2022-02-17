@@ -2,6 +2,8 @@ using Common.Extensions;
 using DiscordBot.Commands.Interactive;
 using DiscordBot.Commands.Interactive2.Base.Requests;
 using DiscordBot.Common.Dtos.Discord;
+using DiscordBot.Common.Identities;
+using DiscordBot.Common.Models.Data.Configuration;
 using DiscordBot.Common.Models.Enums;
 using DiscordBot.Configuration;
 using Microsoft.Extensions.Options;
@@ -19,10 +21,10 @@ public class CommandAuthorizationService : ICommandAuthorizationService {
         _botTeamConfiguration = botTeamConfiguration;
     }
     
-    private ulong GuildId => _botTeamConfiguration.Value.GuildId;
-    private ulong OwnerId => _botTeamConfiguration.Value.OwnerId;
+    private DiscordGuildId GuildId => _botTeamConfiguration.Value.GuildId;
+    private DiscordUserId OwnerId => _botTeamConfiguration.Value.OwnerId;
     
-    private Dictionary<ulong, (CommandRoleConfig config, DateTime stored)> GuildConfigs { get; set; } = new();
+    private Dictionary<DiscordGuildId, (CommandRoleConfig config, DateTime stored)> GuildConfigs { get; set; } = new();
 	
 	public async ValueTask<bool> IsAuthorized<T>(ICommandRequest<BaseInteractiveContext<T>> request, BaseInteractiveContext<T> context) 
         where T : SocketInteraction 
@@ -40,7 +42,7 @@ public class CommandAuthorizationService : ICommandAuthorizationService {
         }
 
         // Check if user is bot owner
-        if (context.User.Id == OwnerId) {
+        if (context.User.GetUserId() == OwnerId) {
             _logger.LogInformation("User is bot owner, executing {commandName}", commandName);
             return true;
         }
@@ -74,7 +76,7 @@ public class CommandAuthorizationService : ICommandAuthorizationService {
 
         var config = await GetGuildConfig(context.Guild.ToGuildDto());
         // Check if user has special permission
-        if (config.UserIds.TryGetValue(context.User.Id, out var userRole)) {
+        if (config.UserIds.TryGetValue(context.User.GetUserId(), out var userRole)) {
             if (userRole <= roleRequired) {
                 _logger.LogInformation("User has special permission to execute {commandName}", commandName);
                 return true;
@@ -82,7 +84,7 @@ public class CommandAuthorizationService : ICommandAuthorizationService {
         }
 
         // Check if user has specific role
-        var roleIds = context.GuildUser.Roles.OrderByDescending(x => x.Position).Select(r => r.Id);
+        var roleIds = context.GuildUser.Roles.OrderByDescending(x => x.Position).Select(r => r.GetRoleId());
         foreach (var roleId in roleIds) {
             if (!config.RoleIds.TryGetValue(roleId, out var roleRole)) {
                 continue;

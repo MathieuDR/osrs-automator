@@ -1,13 +1,13 @@
 ﻿using DiscordBot.Common.Models.Data.Base;
 
-namespace DiscordBot.Common.Models.Data;
+namespace DiscordBot.Common.Models.Data.PlayerManagement;
 
 public class Player : BaseGuildModel {
     public Player() { }
 
-    public Player(ulong guildId, ulong discordId) : base(guildId, discordId) { }
+    public Player(DiscordGuildId guildId, DiscordUserId creatorId) : base(guildId, creatorId) { }
 
-    public ulong DiscordId => CreatedByDiscordId;
+    public DiscordUserId DiscordUserId => CreatedByDiscordId;
     public int WiseOldManDefaultPlayerId { get; set; }
     public string DefaultPlayerUsername { get; set; }
     public string Nickname { get; set; }

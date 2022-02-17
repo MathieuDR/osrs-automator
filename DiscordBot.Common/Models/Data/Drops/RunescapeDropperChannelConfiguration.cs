@@ -1,4 +1,4 @@
-namespace DiscordBot.Common.Models.Data;
+namespace DiscordBot.Common.Models.Data.Drops;
 
 public record RunescapeDropperChannelConfiguration {
 	public bool WhiteListEnabled { get; init; }
@@ -9,5 +9,5 @@ public record RunescapeDropperChannelConfiguration {
 	public int MinimumValue { get; init; }
 	public int MinRarity { get; init; }
 	public bool OrOperator { get; init; }
-	public ulong Channel { get; init; }
+	public DiscordChannelId Channel { get; init; }
 }

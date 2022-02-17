@@ -1,16 +1,16 @@
 using DiscordBot.Common.Models.Data.Base;
 
-namespace DiscordBot.Common.Models.Data;
+namespace DiscordBot.Common.Models.Data.ClanFunds;
 
 public record ClanFunds : BaseGuildRecord {
 	// channel with clan fund tracking
-	public ulong ChannelId { get; init; }
+	public DiscordChannelId ChannelId { get; init; }
 
 	// channel with donation tracking
-	public ulong DonationLeaderBoardChannel { get; init; }
+	public DiscordChannelId DonationLeaderBoardChannel { get; init; }
 	
 	// message Id for donation leaderboard
-	public ulong DonationLeaderBoardMessage { get; init; }
+	public DiscordMessageId DonationLeaderBoardMessage { get; init; }
 
 	// list of fund events
 	public List<ClanFundEvent> Events { get; init; } = new();

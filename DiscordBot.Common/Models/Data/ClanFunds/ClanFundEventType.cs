@@ -1,6 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 
-namespace DiscordBot.Common.Models.Data;
+namespace DiscordBot.Common.Models.Data.ClanFunds;
 
 public enum ClanFundEventType {
 	// fund event types

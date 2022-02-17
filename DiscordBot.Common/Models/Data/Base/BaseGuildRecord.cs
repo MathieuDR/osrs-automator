@@ -3,11 +3,11 @@ namespace DiscordBot.Common.Models.Data.Base;
 public record BaseGuildRecord : BaseRecord {
 	public BaseGuildRecord() { }
 
-	public BaseGuildRecord(ulong guildId, ulong discordId) {
+	public BaseGuildRecord(DiscordGuildId guildId, DiscordUserId userId) {
 		GuildId = guildId;
-		CreatedById = discordId;
+		CreatedById = userId;
 	}
 
-	public ulong GuildId { get; init; }
-	public ulong CreatedById { get; init; }
+	public DiscordGuildId GuildId { get; init; }
+	public DiscordUserId CreatedById { get; init; }
 }

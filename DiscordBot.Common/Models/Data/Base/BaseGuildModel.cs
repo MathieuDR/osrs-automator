@@ -3,9 +3,9 @@
 public class BaseGuildModel : BaseModel {
     public BaseGuildModel() { }
 
-    public BaseGuildModel(ulong guildId, ulong discordId) : base(discordId) {
+    public BaseGuildModel(DiscordGuildId guildId, DiscordUserId creatorId) : base(creatorId) {
         GuildId = guildId;
     }
 
-    public ulong GuildId { get; set; }
+    public DiscordGuildId GuildId { get; set; }
 }

@@ -1,13 +1,12 @@
-using DiscordBot.Common.Dtos.Discord;
 using DiscordBot.Common.Models.Data.Base;
 
-namespace DiscordBot.Common.Models.Data;
+namespace DiscordBot.Common.Models.Data.Drops;
 
 public record RunescapeDropperGuildConfiguration : BaseGuildRecord {
     public RunescapeDropperGuildConfiguration() { }
-    public RunescapeDropperGuildConfiguration(ulong guildId, ulong discordId) : base(guildId, discordId) { }
+    public RunescapeDropperGuildConfiguration(DiscordGuildId guildId, DiscordUserId userId) : base(guildId, userId) { }
 
     public IEnumerable<RunescapeDropperChannelConfiguration> EnabledChannels { get; init; }
 
-    public IEnumerable<ulong> DisabledEndpoints { get; set; }
+    public IEnumerable<DiscordUserId> DisabledUsers { get; set; }
 }

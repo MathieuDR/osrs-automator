@@ -1,4 +1,5 @@
 using DiscordBot.Common.Models.Data;
+using DiscordBot.Common.Models.Data.Drops;
 using DiscordBot.Data.Interfaces;
 using FluentResults;
 using LiteDB;
@@ -12,12 +13,12 @@ internal class RuneScapeDropDataRepository : BaseRecordLiteDbRepository<Runescap
 
     public Result<bool> HasActiveDrop(ulong endpoint) {
         return Result.Ok(GetCollection()
-            .Count(d => !d.IsHandled && d.Endpoint == endpoint) > 0);
+            .Count(d => !d.IsHandled && d.UserId == endpoint) > 0);
     }
 
     public Result<RunescapeDropData> GetActive(ulong endpoint) {
         return Result.Ok(GetCollection()
-            .FindOne(d => !d.IsHandled && d.Endpoint == endpoint));
+            .FindOne(d => !d.IsHandled && d.UserId == endpoint));
     }
 
     public Result CloseActive(ulong endpoint) {

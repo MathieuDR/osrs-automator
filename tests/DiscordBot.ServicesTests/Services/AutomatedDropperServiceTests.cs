@@ -4,6 +4,7 @@ using AutoBogus;
 using Bogus;
 using DiscordBot.Common.Dtos.Runescape;
 using DiscordBot.Common.Models.Data;
+using DiscordBot.Common.Models.Data.Drops;
 using DiscordBot.Data.Interfaces;
 using DiscordBot.Data.Strategies;
 using DiscordBot.Services.Services;
@@ -98,7 +99,7 @@ public class AutomatedDropperServiceTests {
         //Assert
         firstRun.IsSuccess.Should().BeTrue(string.Join(", ", firstRun.Errors));
         lastUpdated.Should().NotBeNull();
-        lastUpdated.Endpoint.Should().Be(guid);
+        lastUpdated.UserId.Should().Be(guid);
         lastUpdated.Drops.Should().HaveCount(1, "We sent one drop info");
         lastUpdated.Drops.First().Image.Should().Be(imageString);
         lastUpdated.Drops.First().Amount.Should().Be(0);
@@ -170,7 +171,7 @@ public class AutomatedDropperServiceTests {
         firstRun.IsSuccess.Should().BeTrue(string.Join(", ", firstRun.Errors));
         secondRun.IsSuccess.Should().BeTrue(string.Join(", ", secondRun.Errors));
         lastUpdated.Should().NotBeNull();
-        lastUpdated.Endpoint.Should().Be(guid);
+        lastUpdated.UserId.Should().Be(guid);
         lastUpdated.Drops.Should().HaveCount(1, "We sent one drop info");
         lastUpdated.Drops.First().Image.Should().Be(imageString);
         lastUpdated.Drops.First().Amount.Should().Be(drop.Amount);
@@ -221,7 +222,7 @@ public class AutomatedDropperServiceTests {
         firstRun.IsSuccess.Should().BeTrue(string.Join(", ", firstRun.Errors));
         secondRun.IsSuccess.Should().BeTrue(string.Join(", ", secondRun.Errors));
         lastUpdated.Should().NotBeNull();
-        lastUpdated.Endpoint.Should().Be(guid);
+        lastUpdated.UserId.Should().Be(guid);
         lastUpdated.Drops.Should().HaveCount(1, "We sent one drop info");
         lastUpdated.Drops.First().Image.Should().Be(imageString);
         lastUpdated.Drops.First().Amount.Should().Be(drop.Amount);

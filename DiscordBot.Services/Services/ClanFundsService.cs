@@ -1,5 +1,7 @@
 using DiscordBot.Common.Dtos.Discord;
+using DiscordBot.Common.Identities;
 using DiscordBot.Common.Models.Data;
+using DiscordBot.Common.Models.Data.ClanFunds;
 using DiscordBot.Data.Interfaces;
 using DiscordBot.Data.Strategies;
 using DiscordBot.Services.Interfaces;
@@ -79,7 +81,7 @@ public class ClanFundsService: BaseService, IClanFundsService {
 		return TrackEvent(guild.Id, clanFundEvent, clanFunds);
 	}
 
-	private async Task<Result> TrackEvent(ulong guildId, ClanFundEvent clanFundEvent, ClanFunds clanFunds) {
+	private async Task<Result> TrackEvent(DiscordGuildId guildId, ClanFundEvent clanFundEvent, ClanFunds clanFunds) {
 		var messageResultTask = _discordService.TrackClanFundEvent(guildId, clanFundEvent, clanFunds.ChannelId, clanFunds.TotalFunds);
 		
 		// if it was donation
@@ -103,7 +105,7 @@ public class ClanFundsService: BaseService, IClanFundsService {
 		return await messageResultTask;
 	}
 
-	private async Task<Result<ulong>> UpdateDonations(ulong guildId, ClanFunds clanFunds) {
+	private async Task<Result<DiscordMessageId>> UpdateDonations(DiscordGuildId guildId, ClanFunds clanFunds) {
 		// Get top 10 users from donations
 		var topDonations = clanFunds.Events
 			.Where(x=> x.EventType == ClanFundEventType.Donation)

@@ -1,11 +1,11 @@
 using DiscordBot.Common.Models.Data.Base;
 
-namespace DiscordBot.Common.Models.Data;
+namespace DiscordBot.Common.Models.Data.Counting;
 
 public class UserCountInfo : BaseModel {
     public UserCountInfo() { }
-    public UserCountInfo(ulong userId) : base(userId) { }
-    public ulong DiscordId { get; set; }
+    public UserCountInfo(DiscordUserId userId) : base(userId) { }
+    public DiscordUserId DiscordId { get; set; }
 
     public int CurrentCount => CountHistory.Sum(x => x.Additive);
 

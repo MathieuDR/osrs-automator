@@ -1,4 +1,7 @@
 ﻿using DiscordBot.Common.Models.Data;
+using DiscordBot.Common.Models.Data.Configuration;
+using DiscordBot.Common.Models.Data.Counting;
+using DiscordBot.Common.Models.Data.PlayerManagement;
 using DiscordBot.Data.Interfaces;
 using DiscordBot.Data.Repository.Migrations;
 using LiteDB;
@@ -77,7 +80,7 @@ internal class LiteDbRepository : IDiscordBotRepository {
             }
         }
 
-        return GetPlayerById(guildId, player.DiscordId);
+        return GetPlayerById(guildId, player.DiscordUserId);
     }
 
     public GuildConfig CreateOrUpdateGroupConfig(GuildConfig config) {
@@ -199,13 +202,13 @@ internal class LiteDbRepository : IDiscordBotRepository {
             }
         }
 
-        return GetPlayerById(guildId, player.DiscordId);
+        return GetPlayerById(guildId, player.DiscordUserId);
     }
 
     public Player GetPlayerById(ulong guildId, ulong id) {
         lock (GetGuildLock(guildId)) {
             using (LiteDatabase = GetDatabase(guildId)) {
-                return GetPlayerQuery(LiteDatabase).Where(p => p.DiscordId == id).FirstOrDefault();
+                return GetPlayerQuery(LiteDatabase).Where(p => p.DiscordUserId == id).FirstOrDefault();
             }
         }
     }

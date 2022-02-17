@@ -1,8 +1,11 @@
 using System.Text;
 using Common.Extensions;
 using DiscordBot.Common.Dtos.Discord;
+using DiscordBot.Common.Identities;
+using DiscordBot.Common.Models.Data.ClanFunds;
+using DiscordBot.Common.Models.Data.Drops;
 using WiseOldManConnector.Helpers;
-using Player = DiscordBot.Common.Models.Data.Player;
+using Player = DiscordBot.Common.Models.Data.PlayerManagement.Player;
 
 namespace DiscordBot.Services;
 
@@ -30,7 +33,7 @@ public class DiscordService : IDiscordService {
         return Result.Ok();
     }
 
-    public async Task<Result> PrintRunescapeDataDrop(RunescapeDropData data, ulong guildId, ulong channelId) {
+    public async Task<Result> PrintRunescapeDataDrop(RunescapeDropData data, DiscordGuildId guildId, DiscordChannelId channelId) {
         var imagesArr = data.DistinctImages.ToArray();
 
         var channel = _client.GetGuild(guildId).GetTextChannel(channelId);
@@ -55,7 +58,7 @@ public class DiscordService : IDiscordService {
         return Task.FromResult(result);
     }
 
-    public async Task<Result> SendFailedEmbed(ulong channelId, string message, Guid traceId) {
+    public async Task<Result> SendFailedEmbed(DiscordChannelId channelId, string message, Guid traceId) {
         EmbedBuilder builder = new EmbedBuilder();
 
         builder
@@ -66,7 +69,7 @@ public class DiscordService : IDiscordService {
         return await SendEmbed(channelId, builder);
     }
 
-    public async Task<Result> SendWomGroupSuccessEmbed(ulong channelId, string message, int groupId, string groupName) {
+    public async Task<Result> SendWomGroupSuccessEmbed(DiscordChannelId channelId, string message, int groupId, string groupName) {
         EmbedBuilder builder = new EmbedBuilder();
 
         builder
@@ -77,7 +80,7 @@ public class DiscordService : IDiscordService {
         return await SendEmbed(channelId, builder);
     }
     
-    private async Task<Result> SendEmbed(ulong channelId, EmbedBuilder builder) {
+    private async Task<Result> SendEmbed(DiscordChannelId channelId, EmbedBuilder builder) {
         var channel = await _client.GetChannelAsync(channelId);
         
         if(channel is ISocketMessageChannel socketChannel) {
@@ -89,7 +92,7 @@ public class DiscordService : IDiscordService {
     }
 
 
-    public async Task<Result> MessageLeaderboards<T>(ulong channelId, IEnumerable<MetricTypeLeaderboard<T>> leaderboards)
+    public async Task<Result> MessageLeaderboards<T>(DiscordChannelId channelId, IEnumerable<MetricTypeLeaderboard<T>> leaderboards)
         where T : ILeaderboardMember {
         var channelTask = _client.GetChannelAsync(channelId);
         var metricMessages = leaderboards.Select(leaderboard => GetMessageForLeaderboard(leaderboard)).ToList();
@@ -107,7 +110,7 @@ public class DiscordService : IDiscordService {
         return Result.Ok();
     }
 
-    public Task<Result> TrackClanFundEvent(ulong guildId, ClanFundEvent clanFundEvent, ulong clanFundsChannelId, long clanFundsTotalFunds) {
+    public Task<Result> TrackClanFundEvent(DiscordGuildId guildId, ClanFundEvent clanFundEvent, DiscordChannelId clanFundsChannelId, long clanFundsTotalFunds) {
         var channel = _client.GetGuild(guildId).GetTextChannel(clanFundsChannelId);
 
         var embed = new EmbedBuilder()
@@ -144,8 +147,8 @@ public class DiscordService : IDiscordService {
         return Task.FromResult(Result.Ok()); 
     }
 
-    public async Task<Result<ulong>> UpdateDonationMessage(ulong guildId, ulong clanFundsDonationLeaderBoardChannel, ulong clanFundsDonationLeaderBoardMessage,
-        IEnumerable<(ulong Player, string PlayerName, long Amount)> topDonations) {
+    public async Task<Result<DiscordMessageId>> UpdateDonationMessage(DiscordGuildId guildId, DiscordChannelId clanFundsDonationLeaderBoardChannel, DiscordMessageId clanFundsDonationLeaderBoardMessage,
+        IEnumerable<(DiscordUserId Player, string PlayerName, long Amount)> topDonations) {
         var donations = topDonations.ToList();
         var guild = _client.GetGuild(guildId);
         
@@ -161,13 +164,13 @@ public class DiscordService : IDiscordService {
 
         if (message.Id != default(ulong)) {
             await DeleteMessage(guildId, clanFundsDonationLeaderBoardChannel, clanFundsDonationLeaderBoardMessage);
-            return Result.Ok(message.Id);
+            return Result.Ok(message.GetMessageId());
         }
         
         return Result.Fail("Could not send message / retrieve message id");
     }
 
-    private async Task DeleteMessage(ulong guildId, ulong channelId, ulong messageId) {
+    private async Task DeleteMessage(DiscordGuildId guildId, DiscordChannelId channelId, DiscordMessageId messageId) {
         // delete old message
         if (messageId == default) {
             return;

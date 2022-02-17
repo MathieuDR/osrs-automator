@@ -1,9 +1,9 @@
 using LiteDB;
 
-namespace DiscordBot.Common.Models.Data;
+namespace DiscordBot.Common.Models.Data.Counting;
 
 public class CountConfig {
-    public ulong OutputChannelId { get; set; }
+    public DiscordChannelId OutputChannelId { get; set; }
 
     // public for litedb
     [BsonField("Thresholds")]

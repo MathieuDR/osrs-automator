@@ -10,7 +10,7 @@ public class BaseModel {
         CreatedOn = DateTime.Now;
     }
 
-    public BaseModel(ulong userId) : this() {
+    public BaseModel(DiscordUserId userId) : this() {
         CreatedByDiscordId = userId;
     }
 
@@ -18,7 +18,7 @@ public class BaseModel {
     [BsonId]
     public ObjectId _id { get; set; }
 
-    public ulong CreatedByDiscordId { get; set; }
+    public DiscordUserId CreatedByDiscordId { get; set; }
     public DateTime CreatedOn { get; set; }
 
     public virtual void IsValid() {

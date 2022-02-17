@@ -1,4 +1,5 @@
 using DiscordBot.Common.Models.Data;
+using DiscordBot.Common.Models.Data.Graveyard;
 using DiscordBot.Common.Models.Enums;
 using FluentResults;
 using WiseOldManConnector.Models.WiseOldMan.Enums;

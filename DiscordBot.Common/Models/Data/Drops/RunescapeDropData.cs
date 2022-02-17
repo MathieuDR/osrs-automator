@@ -1,12 +1,12 @@
 using DiscordBot.Common.Dtos.Runescape;
 using DiscordBot.Common.Models.Data.Base;
 using LiteDB;
-using WiseOldManConnector.Models.WiseOldMan.Enums;
 
-namespace DiscordBot.Common.Models.Data;
+namespace DiscordBot.Common.Models.Data.Drops;
 
 public record RunescapeDropData : BaseRecord {
-    public ulong Endpoint { get; init; }
+	public DiscordUserId UserId { get; init; }
+	public DiscordUserId Endpoint => UserId;
     public IEnumerable<RunescapeDrop> Drops { get; init; } = Array.Empty<RunescapeDrop>();
     public bool IsHandled { get; init; }
     public int TotalValue => Drops.Sum(x => x.TotalValue);

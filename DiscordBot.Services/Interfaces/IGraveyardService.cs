@@ -1,5 +1,7 @@
 using DiscordBot.Common.Dtos.Discord;
+using DiscordBot.Common.Identities;
 using DiscordBot.Common.Models.Data;
+using DiscordBot.Common.Models.Data.Graveyard;
 using DiscordBot.Common.Models.Enums;
 using FluentResults;
 using WiseOldManConnector.Models.WiseOldMan.Enums;
@@ -12,6 +14,6 @@ public interface IGraveyardService {
 	Task<Result<bool>> IsOptedIn(GuildUser user);
 	Task<Result> Shame(GuildUser shamed, GuildUser shamedBy, ShameLocation location, string imageUrl, MetricType? metricType);
 	Task<Result<IEnumerable<Shame>>> GetShames(GuildUser user, ShameLocation? location, MetricType? metricTypeLocation);
-	Task<Result<(ulong userId, Shame[] shames)[]>> GetShames(Guild guild, ShameLocation? location, MetricType? metricTypeLocation);
-	Task<Result<ulong[]>> GetOptedInUsers(Guild guild);
+	Task<Result<(DiscordUserId userId, Shame[] shames)[]>> GetShames(Guild guild, ShameLocation? location, MetricType? metricTypeLocation);
+	Task<Result<DiscordUserId[]>> GetOptedInUsers(Guild guild);
 }

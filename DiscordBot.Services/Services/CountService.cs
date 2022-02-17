@@ -1,5 +1,7 @@
 using DiscordBot.Common.Dtos.Discord;
 using DiscordBot.Common.Models.Data;
+using DiscordBot.Common.Models.Data.Configuration;
+using DiscordBot.Common.Models.Data.Counting;
 using DiscordBot.Data.Interfaces;
 using DiscordBot.Data.Strategies;
 using DiscordBot.Services.Interfaces;

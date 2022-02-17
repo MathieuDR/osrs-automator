@@ -1,4 +1,5 @@
 using DiscordBot.Common.Models.Data;
+using DiscordBot.Common.Models.Data.Counting;
 using FluentResults;
 
 namespace DiscordBot.Data.Interfaces;

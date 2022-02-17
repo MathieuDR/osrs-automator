@@ -1,6 +1,7 @@
 using Common.Extensions;
 using Discord.Net;
 using DiscordBot.Commands.Interactive;
+using DiscordBot.Common.Identities;
 using DiscordBot.Configuration;
 using DiscordBot.Data.Interfaces;
 using Microsoft.Extensions.DependencyInjection;
@@ -41,7 +42,7 @@ public class InteractiveCommandHandlerService {
 		client.InteractionCreated += OnInteraction;
 	}
 
-	private ulong GuildId => _botTeamConfiguration.Value.GuildId;
+	private DiscordGuildId OwnerGuildId => _botTeamConfiguration.Value.GuildId;
 
 	public async Task SetupAsync() {
 		if (_client.ConnectionState != ConnectionState.Connected) {
@@ -132,7 +133,7 @@ public class InteractiveCommandHandlerService {
 
 	private async Task RegisterCommandForOwnersGuild(IApplicationCommandHandler handler) {
 		var propertiesTask = handler.GetCommandProperties();
-		var commands = await _client.GetGuild(GuildId).GetApplicationCommandsAsync();
+		var commands = await _client.GetGuild(OwnerGuildId).GetApplicationCommandsAsync();
 
 		try {
 			var existing = commands.FirstOrDefault(x => x.Name == handler.Name && x.IsGlobalCommand == false);
@@ -140,7 +141,7 @@ public class InteractiveCommandHandlerService {
 				await existing.DeleteAsync();
 			}
 
-			await _client.Rest.CreateGuildCommand(await propertiesTask, GuildId);
+			await _client.Rest.CreateGuildCommand(await propertiesTask, OwnerGuildId);
 		} catch (ApplicationException e) {
 			_logger.LogWarning(e, "Cannot register command {name} in the owners guild", handler.Name);
 		} catch (Exception e) {

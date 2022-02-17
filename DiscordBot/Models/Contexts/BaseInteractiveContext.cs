@@ -1,4 +1,5 @@
 using Common.Extensions;
+using DiscordBot.Common.Identities;
 using Fergun.Interactive.Pagination;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -57,12 +58,12 @@ public abstract class BaseInteractiveContext<T> : BaseInteractiveContext where T
             .WithDescription(description ?? string.Empty);
     }
 
-    public string GetDisplayNameById(ulong user) {
+    public string GetDisplayNameById(DiscordUserId user) {
         return Guild.GetUser(user)?.DisplayName();
     }
 
     public string GetDisplayNameById(IGuildUser user) {
-        return GetDisplayNameById(user.Id);
+        return GetDisplayNameById(user.GetUserId());
     }
 
     public StaticPaginatorBuilder GetBaseStaticPaginatorBuilder(IEnumerable<PageBuilder> pageBuilders) {

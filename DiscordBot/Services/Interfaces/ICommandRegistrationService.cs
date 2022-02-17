@@ -1,3 +1,5 @@
+using DiscordBot.Common.Models.Data.Configuration;
+
 namespace DiscordBot.Services.Interfaces;
 
 public interface ICommandRegistrationService {

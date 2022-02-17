@@ -2,14 +2,14 @@ using DiscordBot.Common.Models.Enums;
 using WiseOldManConnector.Helpers;
 using WiseOldManConnector.Models.WiseOldMan.Enums;
 
-namespace DiscordBot.Common.Models.Data;
+namespace DiscordBot.Common.Models.Data.Graveyard;
 
 public record Shame {
 	public Shame() {
 		Id = Guid.NewGuid();
 	}
 	
-	public Shame(ShameLocation location, MetricType? metricLocation, string imageUrl, ulong userId, DateTimeOffset? shamedAt = null) : this() {
+	public Shame(ShameLocation location, MetricType? metricLocation, string imageUrl, DiscordUserId userId, DateTimeOffset? shamedAt = null) : this() {
 		Location = location;
 		MetricLocation = metricLocation;
 		ImageUrl = imageUrl;
@@ -22,7 +22,7 @@ public record Shame {
 	public DateTimeOffset ShamedAt { get; init; }
 	public ShameLocation Location { get; init; }
 	public MetricType? MetricLocation { get; init; }
-	public ulong ShamedBy { get; init; }
+	public DiscordUserId ShamedBy { get; init; }
 	public string ImageUrl { get; init; }
 
 	public string ShameLocationAsString => MetricLocation is not null ? MetricLocation.Value.ToDisplayNameOrFriendly() : Location.ToDisplayNameOrFriendly();

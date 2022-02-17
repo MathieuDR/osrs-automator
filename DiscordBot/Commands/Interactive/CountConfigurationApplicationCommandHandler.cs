@@ -1,5 +1,7 @@
 using System.Text;
 using Common.Extensions;
+using DiscordBot.Common.Identities;
+using DiscordBot.Common.Models.Data.Counting;
 using DiscordBot.Common.Models.Enums;
 
 namespace DiscordBot.Commands.Interactive;
@@ -76,11 +78,11 @@ public class CountConfigurationApplicationCommandHandler : ApplicationCommandHan
 
     private async Task<Result> ViewHandler(ApplicationCommandContext context) {
         IReadOnlyList<CountThreshold> thresholds;
-        ulong channelId;
+        DiscordChannelId channelId;
 
         try {
-            thresholds = await _counterService.GetThresholds(context.Guild.Id);
-            channelId = await _counterService.GetChannelForGuild(context.Guild.Id);
+            thresholds = await _counterService.GetThresholds(context.Guild.GetGuildId());
+            channelId = await _counterService.GetChannelForGuild(context.Guild.GetGuildId());
         } catch (Exception e) {
             return Result.Fail(new ExceptionalError(e));
         }
@@ -204,8 +206,8 @@ public class CountConfigurationApplicationCommandHandler : ApplicationCommandHan
             .Value;
 
         try {
-            await _counterService.RemoveThreshold(context.Guild.Id, int.Parse(selected));
-            thresholds = await _counterService.GetThresholds(context.Guild.Id);
+            await _counterService.RemoveThreshold(context.Guild.GetGuildId(), int.Parse(selected));
+            thresholds = await _counterService.GetThresholds(context.Guild.GetGuildId());
         } catch (Exception e) {
             return Result.Fail(new ExceptionalError(e));
         }

@@ -1,4 +1,5 @@
 using System.Text;
+using DiscordBot.Common.Models.Data.Counting;
 using DiscordBot.Common.Models.Enums;
 
 namespace DiscordBot.Commands.Interactive;
@@ -115,8 +116,8 @@ public class CountApplicationCommandHandler : ApplicationCommandHandler {
 
     private async Task HandleNewCount(ApplicationCommandContext context, int startCount, int newCount, IGuildUser user) {
         try {
-            var thresholds = await _counterService.GetThresholds(user.GuildId);
-            var channelId = await _counterService.GetChannelForGuild(user.GuildId);
+            var thresholds = await _counterService.GetThresholds(user.GetGuildId());
+            var channelId = await _counterService.GetChannelForGuild(user.GetGuildId());
 
             if (!(context.Guild.GetChannel(channelId) is ISocketMessageChannel channel)) {
                 return;

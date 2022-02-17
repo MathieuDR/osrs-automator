@@ -1,4 +1,5 @@
 ﻿using Discord.Commands;
+using DiscordBot.Common.Identities;
 
 namespace DiscordBot.Helpers.Extensions;
 
@@ -173,15 +174,15 @@ public static class DiscordHelper {
         return (users.Distinct(), remainingRolesArgs);
     }
 
-    public static string ToChannel(this ulong id) {
+    public static string ToChannel(this DiscordChannelId id) {
         return $"<#{id}>";
     }
 
-    public static string ToRole(this ulong id) {
+    public static string ToRole(this DiscordRoleId id) {
         return $"<@&{id}>";
     }
 
-    public static string ToUser(this ulong id) {
+    public static string ToUser(this DiscordUserId id) {
         return $"<@{id}>";
     }
 
