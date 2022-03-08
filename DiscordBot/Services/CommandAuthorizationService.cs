@@ -103,6 +103,9 @@ public class CommandAuthorizationService : ICommandAuthorizationService {
             if(guildConfig.stored.AddHours(3) > DateTime.UtcNow) {
                 return guildConfig.config;
             }
+            
+            // Cache is expired delete it
+            GuildConfigs.Remove(guild.Id);
         }
 
         var guildConfigResult = await _groupService.GetCommandRoleConfig(guild);
