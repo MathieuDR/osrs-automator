@@ -14,4 +14,5 @@ public interface IGraveyardService {
 	Task<Result<IEnumerable<Shame>>> GetShames(GuildUser user, ShameLocation? location, MetricType? metricTypeLocation);
 	Task<Result<(ulong userId, Shame[] shames)[]>> GetShames(Guild guild, ShameLocation? location, MetricType? metricTypeLocation);
 	Task<Result<ulong[]>> GetOptedInUsers(Guild guild);
+	Task<Result> RemoveShame(GuildUser user, Guid id);
 }

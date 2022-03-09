@@ -176,5 +176,7 @@ public class BaseInteractionReplyBuilder<TInteraction> : IInteractionReplyBuilde
 			embed.WithFailure("Stuff went wrong!");
 			_failureEmbedModifications?.Invoke(embed, Result);
 		}
+
+		Embeds.Add(embed.Build());
 	}
 }
