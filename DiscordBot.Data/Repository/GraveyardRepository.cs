@@ -73,6 +73,29 @@ internal class GraveyardRepository : BaseSingleRecordLiteDbRepository<Graveyard>
 		return Update(graveyard.Value);
 	}
 
+	public Result RemoveShame(ulong userId, Guid shameId) {
+		var graveyard = GetGraveyardOrFail();
+		
+		if (graveyard.IsFailed) {
+			return graveyard.ToResult();
+		}
+		
+		if (!graveyard.Value.Shames.ContainsKey(userId)) {
+			return Result.Fail("No shames for user");
+		}
+
+		// select shame
+		var shame = graveyard.Value.Shames[userId].FirstOrDefault(s => s.Id == shameId);
+
+		// remove shame
+		if (shame is null) {
+			return Result.Fail($"Shame with id {shameId} not found");
+		}
+
+		graveyard.Value.Shames[userId].Remove(shame);
+		return Update(graveyard.Value);
+	}
+
 	private Result<Graveyard> GetGraveyardOrFail() {
 		var graveyard = GetSingle();
 		if (graveyard.IsFailed) {
