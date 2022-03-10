@@ -18,7 +18,7 @@ internal class LiteDbRepository : IDiscordBotRepository {
     protected const string GuildJobStateCollectionName = "guildJobState";
     protected const string GuildUserCountsCollectionName = "guildUserCounts";
     private readonly object _dbLock = new();
-    private readonly Dictionary<ulong, object> _guildLocks = new();
+    private readonly Dictionary<DiscordGuildId, object> _guildLocks = new();
     private readonly ILogger _logger;
     private readonly MigrationManager _migrationManager;
 

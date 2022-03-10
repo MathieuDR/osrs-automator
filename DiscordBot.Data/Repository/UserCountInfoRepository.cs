@@ -11,7 +11,7 @@ internal class UserCountInfoRepository : BaseLiteDbRepository<UserCountInfo>, IU
     public UserCountInfoRepository(ILogger<UserCountInfoRepository> logger, LiteDatabase database) : base(logger, database) { }
     public override string CollectionName => "guildUserCounts";
 
-    public Result<UserCountInfo> GetByDiscordUserId(ulong id) {
+    public Result<UserCountInfo> GetByDiscordUserId(DiscordUserId id) {
         return Result.Ok(GetCollection().FindOne(x => x.DiscordId == id));
     }
 }

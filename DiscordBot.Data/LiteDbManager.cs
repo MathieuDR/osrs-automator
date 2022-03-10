@@ -10,7 +10,7 @@ namespace DiscordBot.Data;
 public class LiteDbManager: IDisposable {
     private readonly object _commonLock = new();
     private readonly object _createLock = new();
-    private readonly Dictionary<ulong, LiteDatabase> _databases = new();
+    private readonly Dictionary<DiscordGuildId, LiteDatabase> _databases = new();
     private readonly ILogger<LiteDbManager> _logger;
     private readonly MigrationManager _manager;
     private readonly LiteDbOptions _options;
