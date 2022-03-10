@@ -59,7 +59,7 @@ public abstract class BaseInteractiveContext<T> : BaseInteractiveContext where T
     }
 
     public string GetDisplayNameById(DiscordUserId user) {
-        return Guild.GetUser(user)?.DisplayName();
+        return Guild.GetUser(user.UlongValue)?.DisplayName();
     }
 
     public string GetDisplayNameById(IGuildUser user) {

@@ -12,7 +12,7 @@ internal class PlayerRepository : BaseLiteDbRepository<Player>, IPlayerRepositor
 
     public override string CollectionName => "players";
 
-    public Result<Player> GetByDiscordId(ulong id) {
+    public Result<Player> GetByDiscordId(DiscordUserId id) {
         return Result.Ok(GetCollection()
             .FindOne(p => p.DiscordUserId == id));
     }

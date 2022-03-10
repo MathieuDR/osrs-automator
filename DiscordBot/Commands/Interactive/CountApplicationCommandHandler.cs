@@ -119,7 +119,7 @@ public class CountApplicationCommandHandler : ApplicationCommandHandler {
             var thresholds = await _counterService.GetThresholds(user.GetGuildId());
             var channelId = await _counterService.GetChannelForGuild(user.GetGuildId());
 
-            if (!(context.Guild.GetChannel(channelId) is ISocketMessageChannel channel)) {
+            if (!(context.Guild.GetChannel(channelId.UlongValue) is ISocketMessageChannel channel)) {
                 return;
             }
 
@@ -129,7 +129,7 @@ public class CountApplicationCommandHandler : ApplicationCommandHandler {
                 if (startCount < thresholdThreshold && newCount >= thresholdThreshold) {
                     // Hit it
                     await channel.SendMessageAsync($"{threshold.Name} hit for <@{user.Id}>!");
-                    if (threshold.GivenRoleId.HasValue && context.Guild.GetRole(threshold.GivenRoleId.Value) is IRole role) {
+                    if (threshold.GivenRoleId.HasValue && context.Guild.GetRole(threshold.GivenRoleId.Value.UlongValue) is IRole role) {
                         await user.AddRoleAsync(role);
                     }
                 }
@@ -138,7 +138,7 @@ public class CountApplicationCommandHandler : ApplicationCommandHandler {
                     // Remove it
                     await channel.SendMessageAsync($"<@{user.Id}> has not sufficient points anymore for {threshold.Name}");
 
-                    if (threshold.GivenRoleId.HasValue && context.Guild.GetRole(threshold.GivenRoleId.Value) is IRole role) {
+                    if (threshold.GivenRoleId.HasValue && context.Guild.GetRole(threshold.GivenRoleId.Value.UlongValue) is IRole role) {
                         await user.RemoveRoleAsync(role);
                     }
                 }

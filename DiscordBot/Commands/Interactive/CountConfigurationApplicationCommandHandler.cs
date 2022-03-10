@@ -139,7 +139,7 @@ public class CountConfigurationApplicationCommandHandler : ApplicationCommandHan
         noMentionBuilder.Append(", ");
         var mentionBuilder = new StringBuilder(noMentionBuilder.ToString());
 
-        var roleTemp = context.Guild.GetRole(threshold.GivenRoleId.Value)?.Name ?? "deleted role";
+        var roleTemp = context.Guild.GetRole(threshold.GivenRoleId.Value.UlongValue)?.Name ?? "deleted role";
         noMentionBuilder.Append(roleTemp);
 
         roleTemp = threshold.GivenRoleId.Value.ToRole();

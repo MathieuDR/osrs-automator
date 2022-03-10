@@ -55,8 +55,7 @@ internal class LiteDbRepository : IDiscordBotRepository {
         }
     }
 
-    public Player CoupleOsrsPlayerToGuild(DiscordGuildId guildId, ulong discordUserId,
-        WiseOldManConnector.Models.Output.Player womPlayer) {
+    public Player CoupleOsrsPlayerToGuild(DiscordGuildId guildId, DiscordUserId discordUserId, WiseOldManConnector.Models.Output.Player womPlayer) {
         var player = GetPlayerById(guildId, discordUserId);
         if (player == null) {
             player = new Player(guildId, discordUserId);
@@ -157,7 +156,8 @@ internal class LiteDbRepository : IDiscordBotRepository {
         return GetAutomatedJobState(jobState.GuildId);
     }
 
-    public UserCountInfo GetCountInfoByUserId(DiscordGuildId guildId, ulong userId) {
+
+    public UserCountInfo GetCountInfoByUserId(DiscordGuildId guildId, DiscordUserId userId) {
         lock (GetGuildLock(guildId)) {
             using (LiteDatabase = GetDatabase(guildId)) {
                 return GetCountQuery(LiteDatabase).Where(c => c.DiscordId == userId).FirstOrDefault();
@@ -205,7 +205,7 @@ internal class LiteDbRepository : IDiscordBotRepository {
         return GetPlayerById(guildId, player.DiscordUserId);
     }
 
-    public Player GetPlayerById(DiscordGuildId guildId, ulong id) {
+    public Player GetPlayerById(DiscordGuildId guildId, DiscordUserId id) {
         lock (GetGuildLock(guildId)) {
             using (LiteDatabase = GetDatabase(guildId)) {
                 return GetPlayerQuery(LiteDatabase).Where(p => p.DiscordUserId == id).FirstOrDefault();

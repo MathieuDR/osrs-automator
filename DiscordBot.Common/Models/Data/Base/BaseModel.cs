@@ -22,7 +22,7 @@ public class BaseModel {
     public DateTime CreatedOn { get; set; }
 
     public virtual void IsValid() {
-        if (CreatedByDiscordId <= 0) {
+        if (CreatedByDiscordId != DiscordUserId.Empty) {
             ValidationDictionary.Add(nameof(CreatedByDiscordId), "created by Id must be higher then 0");
         }
 

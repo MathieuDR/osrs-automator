@@ -133,7 +133,7 @@ public class InteractiveCommandHandlerService {
 
 	private async Task RegisterCommandForOwnersGuild(IApplicationCommandHandler handler) {
 		var propertiesTask = handler.GetCommandProperties();
-		var commands = await _client.GetGuild(OwnerGuildId).GetApplicationCommandsAsync();
+		var commands = await _client.GetGuild(OwnerGuildId.UlongValue).GetApplicationCommandsAsync();
 
 		try {
 			var existing = commands.FirstOrDefault(x => x.Name == handler.Name && x.IsGlobalCommand == false);
@@ -141,7 +141,7 @@ public class InteractiveCommandHandlerService {
 				await existing.DeleteAsync();
 			}
 
-			await _client.Rest.CreateGuildCommand(await propertiesTask, OwnerGuildId);
+			await _client.Rest.CreateGuildCommand(await propertiesTask, OwnerGuildId.UlongValue);
 		} catch (ApplicationException e) {
 			_logger.LogWarning(e, "Cannot register command {name} in the owners guild", handler.Name);
 		} catch (Exception e) {

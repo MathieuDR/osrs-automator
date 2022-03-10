@@ -54,7 +54,7 @@ public class LeaderBoardHandler : ApplicationCommandHandlerBase<LeaderboardReque
 		var shamesPerUser = memberShames.OrderByDescending(x => x.shames.Length).ToArray();
 		for (var i = 0; i < shamesPerUser.Length; i++) {
 			var (user, shames) = shamesPerUser[i];
-			board.Entries.Add(new LeaderboardEntry<int>(Context.Guild.GetUser(user).DisplayName(), shames.Length, i + 1));
+			board.Entries.Add(new LeaderboardEntry<int>(Context.Guild.GetUser(user.UlongValue).DisplayName(), shames.Length, i + 1));
 		}
 
 		return board;

@@ -26,11 +26,11 @@ public record ClanFunds : BaseGuildRecord {
 		Events.Where(x => x.EventType == ClanFundEventType.Donation).OrderByDescending(x => x.Amount).FirstOrDefault();
 
 	// calculate total donation of player
-	public long TotalDonationOfPlayer(ulong playerId) =>
+	public long TotalDonationOfPlayer(DiscordUserId playerId) =>
 		Events.Where(x => x.EventType == ClanFundEventType.Donation && x.PlayerId == playerId).Sum(x => x.Amount);
 
 	// calculate total donation of multiple players
-	public long TotalDonationOfPlayers(List<ulong> playerIds) =>
+	public long TotalDonationOfPlayers(List<DiscordUserId> playerIds) =>
 		Events.Where(x => x.EventType == ClanFundEventType.Donation && playerIds.Contains(x.PlayerId)).Sum(x => x.Amount);
 	
 	// calculate total refunds
