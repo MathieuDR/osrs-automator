@@ -1,4 +1,5 @@
 using DiscordBot.Common.Dtos.Discord;
+using DiscordBot.Common.Identities;
 using DiscordBot.Common.Models.Data;
 using DiscordBot.Common.Models.Data.Graveyard;
 using DiscordBot.Common.Models.Enums;
@@ -116,12 +117,12 @@ internal class GraveyardService : IGraveyardService {
 		return Result.Ok(SetTimezone(repositoryResult.Value, user.GuildId));
 	}
 
-	public Task<Result<(ulong userId, Shame[] shames)[]>> GetShames(Guild guild, ShameLocation? location, MetricType? metricTypeLocation) {
+	public Task<Result<(DiscordUserId userId, Shame[] shames)[]>> GetShames(Guild guild, ShameLocation? location, MetricType? metricTypeLocation) {
 		var graveyardRepository = _repositoryStrategy.GetOrCreateRepository<IGraveyardRepository>(guild.GuildId);
 		var graveyard = graveyardRepository.GetSingle();
 		
 		if(graveyard.IsFailed || graveyard.Value is null){
-			return Task.FromResult(Result.Fail<(ulong userId, Shame[] shames)[]>("Could not get shames")
+			return Task.FromResult(Result.Fail<(DiscordUserId userId, Shame[] shames)[]>("Could not get shames")
 				.WithErrors(graveyard.Errors));
 		}
 
@@ -145,12 +146,12 @@ internal class GraveyardService : IGraveyardService {
 		return Task.FromResult(Result.Ok(filteredShamesPerLocation));
 	}
 
-	public Task<Result<ulong[]>> GetOptedInUsers(Guild guild) {
+	public Task<Result<DiscordUserId[]>> GetOptedInUsers(Guild guild) {
 		var graveyardRepository = _repositoryStrategy.GetOrCreateRepository<IGraveyardRepository>(guild.GuildId);
 		var graveyardResult = graveyardRepository.GetSingle();
 		
 		if(graveyardResult.IsFailed || graveyardResult.Value is null){
-			return Task.FromResult(Result.Fail<ulong[]>("Could not get shames")
+			return Task.FromResult(Result.Fail<DiscordUserId[]>("Could not get shames")
 				.WithErrors(graveyardResult.Errors));
 		}
 		
@@ -164,7 +165,7 @@ internal class GraveyardService : IGraveyardService {
 		return Task.FromResult(repository.RemoveShame(user.Id, id));
 	}
 
-	private IEnumerable<Shame> SetTimezone(IEnumerable<Shame> shames, ulong guildId) {
+	private IEnumerable<Shame> SetTimezone(IEnumerable<Shame> shames, DiscordGuildId guildId) {
 		var configRepo = _repositoryStrategy.GetOrCreateRepository<IGuildConfigRepository>(guildId);
 		var configuration = configRepo.GetSingle().Value;
 

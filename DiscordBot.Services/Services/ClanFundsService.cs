@@ -46,7 +46,7 @@ public class ClanFundsService: BaseService, IClanFundsService {
 			return Task.FromResult(Result.Fail("The clan fund event is null!"));
 		}
 		
-		if(clanFundEvent.CreatorId == 0) {
+		if(clanFundEvent.CreatorId == DiscordUserId.Empty) {
 			return Task.FromResult(Result.Fail("The creator must be set"));
 		}
 		
@@ -54,7 +54,7 @@ public class ClanFundsService: BaseService, IClanFundsService {
 			return Task.FromResult(Result.Fail("The amount must be set"));
 		}
 
-		if(clanFundEvent.PlayerId == 0) {
+		if(clanFundEvent.PlayerId == DiscordUserId.Empty) {
 			return Task.FromResult(Result.Fail("The player must be set"));
 		}
 		
@@ -132,7 +132,7 @@ public class ClanFundsService: BaseService, IClanFundsService {
 		if (currentFunds.HasValue) {
 			if (funds.TotalFunds != currentFunds.Value) {
 				var diff = currentFunds.Value - funds.TotalFunds;
-				funds.Events.Add(new ClanFundEvent(0, user.Id, "Initialization / update", user.Username, diff, ClanFundEventType.System));
+				funds.Events.Add(new ClanFundEvent(DiscordUserId.Empty, user.Id, "Initialization / update", user.Username, diff, ClanFundEventType.System));
 
 				await TrackEvent(user.GuildId, funds.Events.Last(), funds);
 			}

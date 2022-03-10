@@ -1,4 +1,5 @@
 using DiscordBot.Common.Dtos.Discord;
+using DiscordBot.Common.Identities;
 using DiscordBot.Common.Models.Data;
 using DiscordBot.Common.Models.Data.Configuration;
 using DiscordBot.Data.Interfaces;
@@ -26,7 +27,7 @@ internal abstract class BaseGuildConfigurationService : RepositoryService {
 		return GetGuildConfig(guild.Id);
 	}
 
-	protected GuildConfig GetGuildConfig(ulong guildId) {
+	protected GuildConfig GetGuildConfig(DiscordGuildId guildId) {
 		var repo = GetRepository<IGuildConfigRepository>(guildId);
 		return repo.GetSingle().Value;
 	}

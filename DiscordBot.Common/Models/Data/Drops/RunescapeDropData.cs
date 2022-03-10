@@ -15,7 +15,7 @@ public record RunescapeDropData : BaseRecord {
     [BsonIgnore]
     public IEnumerable<string> DistinctImages => Drops.Select(x => x.Image).Distinct();
     
-    public IEnumerable<ulong> GuildsMessaged { get; set; }
+    public IEnumerable<DiscordGuildId> GuildsMessaged { get; set; }
 
     public IEnumerable<(RunescapeDrop.Player player, IEnumerable<RunescapeDrop> drops, int geValue, int haValue)> PlayerDrops =>
 	    Drops

@@ -57,7 +57,7 @@ internal class AutomatedDropperService : RepositoryService, IAutomatedDropperSer
         return Result.Ok();
     }
 
-    private Result<RunescapeDrop> SaveDropData(ulong endpoint, RunescapeDrop drop, string base64Image) {
+    private Result<RunescapeDrop> SaveDropData(DiscordUserId endpoint, RunescapeDrop drop, string base64Image) {
         var repo = RepositoryStrategy.GetOrCreateRepository<IRuneScapeDropDataRepository>();
 
         var activeRecordResult = repo.GetActive(endpoint);
@@ -165,7 +165,7 @@ internal class AutomatedDropperService : RepositoryService, IAutomatedDropperSer
             .WithIdentity(jobKey)
             .WithDescription("Handling of runescape drop, received through an API request")
             .RequestRecovery()
-            .UsingJobData("endpoint", endpoint)
+            .UsingJobData("endpoint", endpoint.Value)
             .Build();
 
         return result;

@@ -1,5 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using DiscordBot.Common.Dtos.Discord;
+using DiscordBot.Common.Identities;
 using DiscordBot.Common.Models.Decorators;
 using DiscordBot.Data.Interfaces;
 using DiscordBot.Data.Strategies;
@@ -147,7 +148,7 @@ internal class PlayerService : RepositoryService, IPlayerService {
         return players.Any(p => p.Id == id);
     }
 
-    private bool IsIdCoupledInServer(ulong guildId, int id) {
+    private bool IsIdCoupledInServer(DiscordGuildId guildId, int id) {
         var repo = GetRepository<IPlayerRepository>(guildId);
         return repo.GetPlayerByOsrsAccount(id) != null;
     }
@@ -221,7 +222,7 @@ internal class PlayerService : RepositoryService, IPlayerService {
         }
     }
 
-    private void UpdateExistingPlayerOsrsAccount(ulong guildId, Common.Models.Data.PlayerManagement.Player toUpdate, Player osrsPlayer) {
+    private void UpdateExistingPlayerOsrsAccount(DiscordGuildId guildId, Common.Models.Data.PlayerManagement.Player toUpdate, Player osrsPlayer) {
         var old = toUpdate.CoupledOsrsAccounts.Find(p => p.Id == osrsPlayer.Id);
         toUpdate.CoupledOsrsAccounts.Remove(old);
         toUpdate.CoupledOsrsAccounts.Add(osrsPlayer);
