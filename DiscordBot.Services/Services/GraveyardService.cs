@@ -12,7 +12,7 @@ using WiseOldManConnector.Models.WiseOldMan.Enums;
 
 namespace DiscordBot.Services.Services; 
 
-internal class GraveyardService: IGraveyardService {
+internal class GraveyardService : IGraveyardService {
 	//private readonly IGraveyardRepository _graveyardRepository;
 	private readonly IRepositoryStrategy _repositoryStrategy;
 	private readonly ILogger<GraveyardService> _logger;
@@ -155,6 +155,13 @@ internal class GraveyardService: IGraveyardService {
 		}
 		
 		return Task.FromResult(Result.Ok(graveyardResult.Value.OptedInUsers.ToArray()));
+	}
+
+	public Task<Result> RemoveShame(GuildUser user, Guid id) {
+		_logger.LogInformation("Removing shame {id} for user {user} ({userId})", id, user.Username, user.Id);
+		
+		var repository = _repositoryStrategy.GetOrCreateRepository<IGraveyardRepository>(user.GuildId);
+		return Task.FromResult(repository.RemoveShame(user.Id, id));
 	}
 
 	private IEnumerable<Shame> SetTimezone(IEnumerable<Shame> shames, ulong guildId) {

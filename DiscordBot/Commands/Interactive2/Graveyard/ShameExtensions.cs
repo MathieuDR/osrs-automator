@@ -40,6 +40,9 @@ public static class ShameExtensions {
 		
 		//add timestamp
 		builder.AddField("Timestamp", shame.ShamedAt.ToString("dd/MM/yyyy HH:mm:ss"), true);
+		
+		//add id
+		builder.AddField("Id", shame.Id.ToString());
 
 		return builder;
 	}

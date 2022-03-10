@@ -96,8 +96,8 @@ public abstract class BaseInteractiveContext<T> : BaseInteractiveContext where T
             resetTimeoutOnInput, cancellationToken);
     }
 
-    public InteractionReplyBuilder<T> CreateReplyBuilder(bool ephemeral = false) {
-        return new InteractionReplyBuilder<T>(this).WithEphemeral(ephemeral);
+    public IInteractionReplyBuilder<T> CreateReplyBuilder(bool ephemeral = false) {
+        return new BaseInteractionReplyBuilder<T>(this).WithEphemeral(ephemeral) as IInteractionReplyBuilder<T>;
     }
     
     public InteractionPaginatorReplyBuilder<T> CreatePaginatorReplyBuilder(bool ephemeral = false) {

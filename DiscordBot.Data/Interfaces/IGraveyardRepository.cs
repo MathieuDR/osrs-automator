@@ -11,4 +11,5 @@ public interface IGraveyardRepository : ISingleRecordRepository<Graveyard> {
 	public Result<Dictionary<ulong, List<Shame>>> GetShamesPerLocation(ShameLocation location, MetricType? metricTypeLocation = null);
 	public Result<List<Shame>> GetShamesForUserPerLocation(ulong userId, ShameLocation location, MetricType? metricTypeLocation = null);
 	public Result AddShame(ulong userId, Shame shame);
+	public Result RemoveShame(ulong userId, Guid shameId);
 }
