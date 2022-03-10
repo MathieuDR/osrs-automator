@@ -34,7 +34,7 @@ internal class LiteDbRepository : IDiscordBotRepository {
 
     public BsonMapper BsonMapper { get; set; }
 
-    public Player GetPlayerByOsrsAccount(ulong guildId, int womId) {
+    public Player GetPlayerByOsrsAccount(DiscordGuildId guildId, int womId) {
         lock (GetGuildLock(guildId)) {
             using (LiteDatabase = GetDatabase(guildId)) {
                 return GetPlayerQuery(LiteDatabase)
@@ -44,7 +44,7 @@ internal class LiteDbRepository : IDiscordBotRepository {
         }
     }
 
-    public Player GetPlayerByOsrsAccount(ulong guildId, string username) {
+    public Player GetPlayerByOsrsAccount(DiscordGuildId guildId, string username) {
         username = username.ToLowerInvariant();
         lock (GetGuildLock(guildId)) {
             using (LiteDatabase = GetDatabase(guildId)) {
@@ -55,7 +55,7 @@ internal class LiteDbRepository : IDiscordBotRepository {
         }
     }
 
-    public Player CoupleOsrsPlayerToGuild(ulong guildId, ulong discordUserId,
+    public Player CoupleOsrsPlayerToGuild(DiscordGuildId guildId, ulong discordUserId,
         WiseOldManConnector.Models.Output.Player womPlayer) {
         var player = GetPlayerById(guildId, discordUserId);
         if (player == null) {
@@ -70,7 +70,7 @@ internal class LiteDbRepository : IDiscordBotRepository {
         return UpdateOrInsertPlayerForGuild(guildId, player);
     }
 
-    public Player InsertPlayerForGuild(ulong guildId, Player player) {
+    public Player InsertPlayerForGuild(DiscordGuildId guildId, Player player) {
         player.IsValid();
 
         lock (GetGuildLock(guildId)) {
@@ -112,7 +112,7 @@ internal class LiteDbRepository : IDiscordBotRepository {
         return GetGroupConfig(config.GuildId);
     }
 
-    public GuildConfig GetGroupConfig(ulong guildId) {
+    public GuildConfig GetGroupConfig(DiscordGuildId guildId) {
         lock (GetGuildLock(guildId)) {
             using (LiteDatabase = GetDatabase(guildId)) {
                 return GetGroupConfigQuery(LiteDatabase).Where(p => p.GuildId == guildId).FirstOrDefault();
@@ -120,7 +120,7 @@ internal class LiteDbRepository : IDiscordBotRepository {
         }
     }
 
-    public IEnumerable<Player> GetAllPlayersForGuild(in ulong guildId) {
+    public IEnumerable<Player> GetAllPlayersForGuild(in DiscordGuildId guildId) {
         lock (GetGuildLock(guildId)) {
             using (LiteDatabase = GetDatabase(guildId)) {
                 return GetPlayerQuery(LiteDatabase).ToList();
@@ -128,7 +128,7 @@ internal class LiteDbRepository : IDiscordBotRepository {
         }
     }
 
-    public AutomatedJobState GetAutomatedJobState(ulong guildId) {
+    public AutomatedJobState GetAutomatedJobState(DiscordGuildId guildId) {
         lock (GetGuildLock(guildId)) {
             using (LiteDatabase = GetDatabase(guildId)) {
                 var collection = LiteDatabase.GetCollection<AutomatedJobState>(GuildJobStateCollectionName);
@@ -142,7 +142,7 @@ internal class LiteDbRepository : IDiscordBotRepository {
         }
     }
 
-    public AutomatedJobState CreateOrUpdateAutomatedJobState(ulong guildId, AutomatedJobState jobState) {
+    public AutomatedJobState CreateOrUpdateAutomatedJobState(DiscordGuildId guildId, AutomatedJobState jobState) {
         if (jobState._id == null) {
             return InsertAutomatedJobState(jobState);
         }
@@ -157,7 +157,7 @@ internal class LiteDbRepository : IDiscordBotRepository {
         return GetAutomatedJobState(jobState.GuildId);
     }
 
-    public UserCountInfo GetCountInfoByUserId(ulong guildId, ulong userId) {
+    public UserCountInfo GetCountInfoByUserId(DiscordGuildId guildId, ulong userId) {
         lock (GetGuildLock(guildId)) {
             using (LiteDatabase = GetDatabase(guildId)) {
                 return GetCountQuery(LiteDatabase).Where(c => c.DiscordId == userId).FirstOrDefault();
@@ -165,7 +165,7 @@ internal class LiteDbRepository : IDiscordBotRepository {
         }
     }
 
-    public UserCountInfo UpdateOrInsertUserCountInfoForGuid(ulong guildId, UserCountInfo countInfo) {
+    public UserCountInfo UpdateOrInsertUserCountInfoForGuid(DiscordGuildId guildId, UserCountInfo countInfo) {
         if (countInfo._id == null) {
             return InsertUserCountInfoForGuid(guildId, countInfo);
         }
@@ -181,7 +181,7 @@ internal class LiteDbRepository : IDiscordBotRepository {
         return GetCountInfoByUserId(guildId, countInfo.DiscordId);
     }
 
-    public IEnumerable<UserCountInfo> GetAllUserCountInfos(ulong guildId) {
+    public IEnumerable<UserCountInfo> GetAllUserCountInfos(DiscordGuildId guildId) {
         lock (GetGuildLock(guildId)) {
             using (LiteDatabase = GetDatabase(guildId)) {
                 return GetCountQuery(LiteDatabase).ToList();
@@ -189,7 +189,7 @@ internal class LiteDbRepository : IDiscordBotRepository {
         }
     }
 
-    public Player UpdateOrInsertPlayerForGuild(ulong guildId, Player player) {
+    public Player UpdateOrInsertPlayerForGuild(DiscordGuildId guildId, Player player) {
         if (player._id == null) {
             return InsertPlayerForGuild(guildId, player);
         }
@@ -205,7 +205,7 @@ internal class LiteDbRepository : IDiscordBotRepository {
         return GetPlayerById(guildId, player.DiscordUserId);
     }
 
-    public Player GetPlayerById(ulong guildId, ulong id) {
+    public Player GetPlayerById(DiscordGuildId guildId, ulong id) {
         lock (GetGuildLock(guildId)) {
             using (LiteDatabase = GetDatabase(guildId)) {
                 return GetPlayerQuery(LiteDatabase).Where(p => p.DiscordUserId == id).FirstOrDefault();
@@ -213,7 +213,7 @@ internal class LiteDbRepository : IDiscordBotRepository {
         }
     }
 
-    public IEnumerable<Player> GetPlayersForGuild(ulong guildId) {
+    public IEnumerable<Player> GetPlayersForGuild(DiscordGuildId guildId) {
         lock (GetGuildLock(guildId)) {
             using (LiteDatabase = GetDatabase(guildId)) {
                 return GetPlayerQuery(LiteDatabase).ToList();
@@ -233,7 +233,7 @@ internal class LiteDbRepository : IDiscordBotRepository {
     }
 
 
-    private LiteDatabase GetDatabase(ulong guildId) {
+    private LiteDatabase GetDatabase(DiscordGuildId guildId) {
         return GetDatabase(GetGuildFileName(guildId));
     }
 
@@ -247,7 +247,7 @@ internal class LiteDbRepository : IDiscordBotRepository {
         return liteDatabase;
     }
 
-    private UserCountInfo InsertUserCountInfoForGuid(ulong guildId, UserCountInfo countInfo) {
+    private UserCountInfo InsertUserCountInfoForGuid(DiscordGuildId guildId, UserCountInfo countInfo) {
         lock (GetGuildLock(guildId)) {
             using (LiteDatabase = GetDatabase(guildId)) {
                 var collection = LiteDatabase.GetCollection<UserCountInfo>(GuildUserCountsCollectionName);
@@ -258,11 +258,11 @@ internal class LiteDbRepository : IDiscordBotRepository {
         return GetCountInfoByUserId(guildId, countInfo.DiscordId);
     }
 
-    private string GetGuildFileName(ulong guildId) {
+    private string GetGuildFileName(DiscordGuildId guildId) {
         return $"{guildId}_{FileName}";
     }
 
-    private object GetGuildLock(ulong guildId) {
+    private object GetGuildLock(DiscordGuildId guildId) {
         if (_guildLocks.ContainsKey(guildId)) {
             return _guildLocks[guildId];
         }

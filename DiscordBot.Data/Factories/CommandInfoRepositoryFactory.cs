@@ -9,7 +9,7 @@ internal class CommandInfoRepositoryFactory : BaseLiteDbRepositoryFactory<IAppli
 
     public override bool RequiresGuildId => false;
 
-    public override IApplicationCommandInfoRepository Create(ulong guildId) {
+    public override IApplicationCommandInfoRepository Create(DiscordGuildId guildId) {
         throw new NotImplementedException();
     }
 

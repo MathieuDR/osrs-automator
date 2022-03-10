@@ -28,7 +28,7 @@ public class LiteDbManager: IDisposable {
         return $"{_options.PathPrefix}{identifier}_{_options.FileSuffix}.db";
     }
 
-    private string GetGuildFileName(ulong guildId) {
+    private string GetGuildFileName(DiscordGuildId guildId) {
         return CreateConnectionString(guildId.ToString());
     }
 
@@ -39,7 +39,7 @@ public class LiteDbManager: IDisposable {
         }
     }
 
-    public LiteDatabase GetDatabase(ulong guildId) {
+    public LiteDatabase GetDatabase(DiscordGuildId guildId) {
         lock (_createLock) {
             _logger.LogTrace("Requesting LiteDb for {guild}", guildId);
 

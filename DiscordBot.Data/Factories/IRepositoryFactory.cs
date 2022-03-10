@@ -4,7 +4,7 @@ namespace DiscordBot.Data.Factories;
 
 public interface IRepositoryFactory {
     bool AppliesTo(Type type, bool requiresGuildId);
-    public IRepository Create(ulong guildId);
+    public IRepository Create(DiscordGuildId guildId);
     public IRepository Create();
 }
 

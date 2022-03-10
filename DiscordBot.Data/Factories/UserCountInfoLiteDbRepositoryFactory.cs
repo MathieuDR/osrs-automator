@@ -10,7 +10,7 @@ internal class UserCountInfoLiteDbRepositoryFactory : BaseLiteDbRepositoryFactor
 
     public override bool RequiresGuildId => true;
 
-    public override IUserCountInfoRepository Create(ulong guildId) {
+    public override IUserCountInfoRepository Create(DiscordGuildId guildId) {
         return new UserCountInfoRepository(GetLogger(), LiteDbManager.GetDatabase(guildId));
     }
 
