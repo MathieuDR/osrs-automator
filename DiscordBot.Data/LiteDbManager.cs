@@ -1,3 +1,6 @@
+using System.Collections;
+using System.Diagnostics;
+using DiscordBot.Common.Dtos.Discord;
 using DiscordBot.Data.Configuration;
 using DiscordBot.Data.Repository.Migrations;
 using LiteDB;
@@ -20,6 +23,37 @@ public class LiteDbManager: IDisposable {
         _logger = logger;
         _manager = manager;
         _options = options.Value;
+        
+        BsonMapper = BsonMapper.Global;
+        BsonMapper.RegisterType(id => id.Value, bson => new DiscordUserId(bson.AsInt64));
+        BsonMapper.RegisterType(id => id.Value, bson => new DiscordGuildId(bson.AsInt64));
+        BsonMapper.RegisterType(id => id.Value, bson => new DiscordChannelId(bson.AsInt64));
+        BsonMapper.RegisterType(id => id.Value, bson => new DiscordMessageId(bson.AsInt64));
+        BsonMapper.RegisterType(id => id.Value, bson => new DiscordRoleId(bson.AsInt64));
+    }
+    
+    public static void AddDictMapper<TIdentity, TObject>(Func<ulong, TIdentity> ctor) where TIdentity : new() {
+        BsonMapper.Global.RegisterType(
+            dictionary => {
+                var bsonDocument = new BsonDocument();
+                foreach (TIdentity key in dictionary.Keys as IEnumerable) {
+                    var obj = dictionary[key];
+                    var name = key.ToString();
+                    Debug.Assert(name != null, nameof(name) + " != null");
+                    bsonDocument[name] = BsonMapper.Global.Serialize(typeof(TObject), obj);
+                }
+
+                return bsonDocument;
+            }, value => {
+                var dict = new Dictionary<TIdentity, TObject>();
+                foreach (var element in value.AsDocument.GetElements()) {
+                    var userId = ulong.Parse(element.Key);
+                    var obj = BsonMapper.Global.Deserialize<TObject>(element.Value);
+                    dict.Add(ctor(userId), obj);
+                }
+
+                return dict;
+            });
     }
 
     public BsonMapper BsonMapper { get; set; }
