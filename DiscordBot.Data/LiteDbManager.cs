@@ -1,6 +1,8 @@
 using System.Collections;
 using System.Diagnostics;
 using DiscordBot.Common.Dtos.Discord;
+using DiscordBot.Common.Models.Data.Graveyard;
+using DiscordBot.Common.Models.Enums;
 using DiscordBot.Data.Configuration;
 using DiscordBot.Data.Repository.Migrations;
 using LiteDB;
@@ -24,12 +26,20 @@ public class LiteDbManager: IDisposable {
         _manager = manager;
         _options = options.Value;
         
+        AddMappers();
+    }
+
+    private void AddMappers() {
         BsonMapper = BsonMapper.Global;
         BsonMapper.RegisterType(id => id.Value, bson => new DiscordUserId(bson.AsInt64));
         BsonMapper.RegisterType(id => id.Value, bson => new DiscordGuildId(bson.AsInt64));
         BsonMapper.RegisterType(id => id.Value, bson => new DiscordChannelId(bson.AsInt64));
         BsonMapper.RegisterType(id => id.Value, bson => new DiscordMessageId(bson.AsInt64));
         BsonMapper.RegisterType(id => id.Value, bson => new DiscordRoleId(bson.AsInt64));
+        
+        AddDictMapper<DiscordRoleId, AuthorizationRoles>(x=> new DiscordRoleId(x));
+        AddDictMapper<DiscordUserId, AuthorizationRoles>(x=> new DiscordUserId(x));
+        AddDictMapper<DiscordUserId, List<Shame>>(x=> new DiscordUserId(x));
     }
     
     public static void AddDictMapper<TIdentity, TObject>(Func<ulong, TIdentity> ctor) where TIdentity : new() {
