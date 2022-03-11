@@ -69,7 +69,7 @@ public class AutomatedDropperServiceTests {
             scheduler
         });
         // random ulong;
-        var endpoint = new DiscordUserId(ulong.MaxValue);
+        var endpoint = EndpointId.New();
         var imageString = Convert.ToBase64String(Encoding.UTF8.GetBytes("ImageString"));
 
         RunescapeDropData lastUpdated = null;
@@ -100,7 +100,7 @@ public class AutomatedDropperServiceTests {
         //Assert
         firstRun.IsSuccess.Should().BeTrue(string.Join(", ", firstRun.Errors));
         lastUpdated.Should().NotBeNull();
-        lastUpdated.UserId.Should().Be(endpoint);
+        lastUpdated.Endpoint.Should().Be(endpoint);
         lastUpdated.Drops.Should().HaveCount(1, "We sent one drop info");
         lastUpdated.Drops.First().Image.Should().Be(imageString);
         lastUpdated.Drops.First().Amount.Should().Be(0);
@@ -140,7 +140,7 @@ public class AutomatedDropperServiceTests {
             scheduler
         });
         
-        var endpoint = new DiscordUserId(ulong.MaxValue);
+        var endpoint = EndpointId.New();
         var imageString = Convert.ToBase64String(Encoding.UTF8.GetBytes("ImageString"));
 
         RunescapeDropData lastUpdated = null;
@@ -173,7 +173,7 @@ public class AutomatedDropperServiceTests {
         firstRun.IsSuccess.Should().BeTrue(string.Join(", ", firstRun.Errors));
         secondRun.IsSuccess.Should().BeTrue(string.Join(", ", secondRun.Errors));
         lastUpdated.Should().NotBeNull();
-        lastUpdated.UserId.Should().Be(endpoint);
+        lastUpdated.Endpoint.Should().Be(endpoint);
         lastUpdated.Drops.Should().HaveCount(1, "We sent one drop info");
         lastUpdated.Drops.First().Image.Should().Be(imageString);
         lastUpdated.Drops.First().Amount.Should().Be(drop.Amount);
@@ -192,7 +192,7 @@ public class AutomatedDropperServiceTests {
             scheduler
         });
         
-        var endpoint = new DiscordUserId(ulong.MaxValue);
+        var endpoint = EndpointId.New();
         var imageString = Convert.ToBase64String(Encoding.UTF8.GetBytes("ImageString"));
 
         RunescapeDropData lastUpdated = null;
@@ -225,7 +225,7 @@ public class AutomatedDropperServiceTests {
         firstRun.IsSuccess.Should().BeTrue(string.Join(", ", firstRun.Errors));
         secondRun.IsSuccess.Should().BeTrue(string.Join(", ", secondRun.Errors));
         lastUpdated.Should().NotBeNull();
-        lastUpdated.UserId.Should().Be(endpoint);
+        lastUpdated.Endpoint.Should().Be(endpoint);
         lastUpdated.Drops.Should().HaveCount(1, "We sent one drop info");
         lastUpdated.Drops.First().Image.Should().Be(imageString);
         lastUpdated.Drops.First().Amount.Should().Be(drop.Amount);
@@ -243,7 +243,8 @@ public class AutomatedDropperServiceTests {
             scheduler
         });
         
-        var endpoint = new DiscordUserId(ulong.MaxValue);
+        var endpoint = EndpointId.New();
+        var userId = DiscordUserId.Empty;
         RunescapeDropData lastUpdated = null;
         repo.GetActive(Arg.Is(endpoint)).Returns(Result.Ok<RunescapeDropData>(null));
         scheduler.CheckExists(Arg.Any<JobKey>()).Returns(false);
@@ -256,7 +257,7 @@ public class AutomatedDropperServiceTests {
         _ = await sut.HandleDropRequest(endpoint, drop, null);
 
         //Assert
-        scheduler.Received(1).ScheduleJob(Arg.Is<IJobDetail>(x => x.Key.Name == endpoint.ToString()), Arg.Any<ITrigger>());
+        scheduler.Received(1).ScheduleJob(Arg.Is<IJobDetail>(x => x.Key.Name == userId.ToString()), Arg.Any<ITrigger>());
     }
 
     [Fact]
@@ -270,7 +271,7 @@ public class AutomatedDropperServiceTests {
             scheduler
         });
         
-        var endpoint = new DiscordUserId(ulong.MaxValue);
+        var endpoint = EndpointId.New();
         RunescapeDropData lastUpdated = null;
         repo.GetActive(Arg.Is(endpoint)).Returns(Result.Ok<RunescapeDropData>(null));
         repo.UpdateOrInsert(Arg.Do<RunescapeDropData>(a => {
@@ -313,7 +314,7 @@ public class AutomatedDropperServiceTests {
             scheduler
         });
         
-        var endpoint = new DiscordUserId(ulong.MaxValue);
+        var endpoint = EndpointId.New();
         RunescapeDropData lastUpdated = null;
         repo.GetActive(Arg.Is(endpoint)).Returns(Result.Ok<RunescapeDropData>(null));
 
@@ -342,7 +343,7 @@ public class AutomatedDropperServiceTests {
             scheduler
         });
         
-        var endpoint = new DiscordUserId(ulong.MaxValue);
+        var endpoint = EndpointId.New();
         RunescapeDropData lastUpdated = null;
         repo.GetActive(Arg.Is(endpoint)).Returns(Result.Ok<RunescapeDropData>(null));
 

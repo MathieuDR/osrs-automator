@@ -12,6 +12,9 @@ public partial struct DiscordUserId {
 	public ulong UlongValue => (ulong)Value;
 }
 
+[StronglyTypedId(StronglyTypedIdBackingType.Guid)]
+public partial struct EndpointId { }
+
 [StronglyTypedId]
 public partial struct DiscordGuildId {
 	public DiscordGuildId(ulong value) : this((long)value) { }

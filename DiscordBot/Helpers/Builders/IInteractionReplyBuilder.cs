@@ -22,4 +22,5 @@ public interface IInteractionReplyBuilder<TInteraction> : IBaseInteractionReplyB
 	IInteractionReplyBuilder<TInteraction> WithButtons(params ButtonBuilder[] buttons);
 	IInteractionReplyBuilder<TInteraction> WithSelectMenu(SelectMenuBuilder menu);
 	IResultInteractionReplyBuilder<TInteraction> FromResult(Result result);
+	IResultInteractionReplyBuilder<TInteraction> FromResult<T>(Result<T> result);
 }

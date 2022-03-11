@@ -7,5 +7,5 @@ namespace DiscordBot.Services.Interfaces;
 
 public interface IAutomatedDropperService {
     public Task<Result<string>> RequestUrl(GuildUser user);
-    public Task<Result> HandleDropRequest(DiscordUserId userId, RunescapeDrop drop, string base64Image);
+    public Task<Result> HandleDropRequest(EndpointId endpointId, RunescapeDrop drop, string base64Image);
 }

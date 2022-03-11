@@ -6,7 +6,7 @@ namespace DiscordBot.Common.Models.Data.Drops;
 
 public record RunescapeDropData : BaseRecord {
 	public DiscordUserId UserId { get; init; }
-	public DiscordUserId Endpoint => UserId;
+	public EndpointId Endpoint { get; init; }
     public IEnumerable<RunescapeDrop> Drops { get; init; } = Array.Empty<RunescapeDrop>();
     public bool IsHandled { get; init; }
     public int TotalValue => Drops.Sum(x => x.TotalValue);

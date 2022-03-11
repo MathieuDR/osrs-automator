@@ -88,7 +88,7 @@ public class HandleRunescapeDropJob : RepositoryJob {
                 continue;
             }
 
-            var repo = RepositoryStrategy.GetOrCreateRepository<IRunescapeDropperGuidConfigurationRepository>(guildId);
+            var repo = RepositoryStrategy.GetOrCreateRepository<IRunescapeDropperGuildConfigurationRepository>(guildId);
             var configurationResult = repo.GetSingle();
             if (configurationResult.IsFailed) {
                 errors.AddRange(configurationResult.Errors);

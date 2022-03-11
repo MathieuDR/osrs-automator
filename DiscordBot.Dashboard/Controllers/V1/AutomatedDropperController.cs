@@ -30,7 +30,7 @@ public class AutomatedDropperController : Controller {
 		[ModelBinder(BinderType = typeof(JsonModelBinder))]
 		EmbedCollection formEmbeds,
 		[FromForm] IFormFile? file, [FromRoute] string id) {
-		if (!ulong.TryParse(id, out var endpoint)) {
+		if (!Guid.TryParse(id, out var endpoint)) {
 			BadRequest("Invalid endpoint");
 		}
 
@@ -46,7 +46,7 @@ public class AutomatedDropperController : Controller {
 			image = await ToBase64String(file);
 		}
 
-		_ = _dropperService.HandleDropRequest(new DiscordUserId(endpoint), dropResult.Value, image);
+		_ = _dropperService.HandleDropRequest(new EndpointId(endpoint), dropResult.Value, image);
 
 		return Ok();
 	}

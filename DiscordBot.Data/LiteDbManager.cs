@@ -40,6 +40,7 @@ public class LiteDbManager: IDisposable {
         AddDictMapper<DiscordRoleId, AuthorizationRoles>(x=> new DiscordRoleId(x));
         AddDictMapper<DiscordUserId, AuthorizationRoles>(x=> new DiscordUserId(x));
         AddDictMapper<DiscordUserId, List<Shame>>(x=> new DiscordUserId(x));
+        AddDictMapper<DiscordUserId, EndpointId>(x=> new DiscordUserId(x));
     }
     
     public static void AddDictMapper<TIdentity, TObject>(Func<ulong, TIdentity> ctor) where TIdentity : new() {
