@@ -12,6 +12,7 @@ public record Shame {
 		ImageUrl = imageUrl;
 		ShamedBy = userId;
 		ShamedAt = shamedAt ?? DateTimeOffset.UtcNow;
+		Id = Guid.NewGuid();
 	}
 
 	[Obsolete("Only for LiteDB")]
