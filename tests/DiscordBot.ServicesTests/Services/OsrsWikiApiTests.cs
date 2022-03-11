@@ -6,7 +6,7 @@ using Xunit;
 
 namespace DiscordBot.ServicesTests.Services;
 
-public class OsrsWikiApeTests {
+public class OsrsWikiApiTests {
     [Fact]
     public async Task OsrsWikiShouldReturnPageWithContent() {
         var serviceCollection = new ServiceCollection();
