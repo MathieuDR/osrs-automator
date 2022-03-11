@@ -28,23 +28,44 @@ public class TestModelWithDictionary {
 	public Dictionary<DiscordUserId, List<TestModel>> Dictionary { get; set; }
 }
 
+public class TestModelWithList {
+	[BsonId]
+	public ObjectId Id { get; set; }
+
+	public List<DiscordUserId> List { get; set; }
+}
+
+
+
 public class IdentityTests : IDisposable {
 	protected LiteDbManager _dbManager;
+	private IOptions<LiteDbOptions> _options;
 
 	public IdentityTests() {
 		var managerMock = Substitute.For<MigrationManager>(NullLoggerFactory.Instance);
 		var logger = new NullLogger<LiteDbManager>();
-		var options = Options.Create(new LiteDbOptions {
+		_options = Options.Create(new LiteDbOptions {
 			FileSuffix = "db",
-			PathPrefix = "tests-"
+			PathPrefix = $"tests-{Guid.NewGuid()}-"
 		});
 		
+		var files = Directory.GetFiles(".", "tests-*.db");
+		foreach (var file in files) {
+			File.Delete(file);
+		}
+		
 		LiteDbManager.AddDictMapper<DiscordUserId, List<TestModel>>(arg => new DiscordUserId(arg));
-		_dbManager = new LiteDbManager(logger, options, managerMock);
+		_dbManager = new LiteDbManager(logger, _options, managerMock);
 	}
 
 	public void Dispose() {
 		_dbManager.Dispose();
+		
+		// Delete the database file that starts with the path prefix
+		var files = Directory.GetFiles(".", _options.Value.PathPrefix+"*.db");
+		foreach (var file in files) {
+			File.Delete(file);
+		}
 	}
 
 	[Fact]
@@ -86,6 +107,7 @@ public class IdentityTests : IDisposable {
 
 		//Act
 		var coll = db.GetCollection<TestModel>("Models");
+		coll.Insert(model);
 		var read = coll.Find(x => x.UserId == model.UserId).FirstOrDefault();
 
 		//Assert
@@ -154,10 +176,57 @@ public class IdentityTests : IDisposable {
 
 		//Act
 		var coll = db.GetCollection<TestModelWithDictionary>("Dicts");
+		coll.Insert(toWrite);
 		var read = coll.FindAll().FirstOrDefault();
 
 		//Assert
 		read.Should().NotBeNull();
 		read.Should().BeEquivalentTo(toWrite, opts => opts.Excluding(x => x.Id));
+	}
+
+	[Fact]
+	public void Reading_ShouldBeSuccessful_WhenWritingAListOfIdentities() {
+		//Arrange
+		using var db = _dbManager.GetDatabase(new DiscordGuildId(10));
+		var list = new List<DiscordUserId>(){
+			new DiscordUserId(513512),
+			new DiscordUserId(5139512),
+			new DiscordUserId(3131)
+		};
+
+		//Act
+		var coll = db.GetCollection<TestModelWithList>("Ids");
+		var written = coll.Insert(new TestModelWithList {
+			List = list
+		});
+
+		//Assert
+		written.Should().NotBe(default);
+	}
+	
+	[Fact]
+	public void Reading_ShouldBeSuccessful_WhenReadingAListOfIdentities() {
+		//Arrange
+		using var db = _dbManager.GetDatabase(new DiscordGuildId(10));
+		var list = new List<DiscordUserId>(){
+			new(513512),
+			new(5139512),
+			new(3131)
+		};
+		var model = new TestModelWithList {
+			List = list
+		};
+
+		//Act
+		var coll = db.GetCollection<TestModelWithList>("Ids");
+		coll.Insert(new TestModelWithList {
+			List = list
+		});
+		var result = coll.FindAll().FirstOrDefault();
+
+		//Assert
+		result.Should().NotBeNull();
+		result.Should().BeEquivalentTo(model, opts => opts.Excluding(x => x.Id));
+		
 	}
 }
