@@ -70,12 +70,13 @@ public class AutomatedDropperServiceTests {
         });
         // random ulong;
         var endpoint = EndpointId.New();
+        var userId = DiscordUserId.Empty;
         var imageString = Convert.ToBase64String(Encoding.UTF8.GetBytes("ImageString"));
 
         RunescapeDropData lastUpdated = null;
-        repo.GetActive(Arg.Is(endpoint)).Returns(Result.Ok<RunescapeDropData>(null));
+        repo.GetActive(Arg.Is(userId)).Returns(Result.Ok<RunescapeDropData>(null));
         repo.UpdateOrInsert(Arg.Do<RunescapeDropData>(a => {
-            repo.GetActive(Arg.Is(endpoint)).Returns(Result.Ok(a));
+            repo.GetActive(Arg.Is(userId)).Returns(Result.Ok(a));
             lastUpdated = a;
         }));
 
@@ -141,12 +142,13 @@ public class AutomatedDropperServiceTests {
         });
         
         var endpoint = EndpointId.New();
+        var userId = DiscordUserId.Empty;
         var imageString = Convert.ToBase64String(Encoding.UTF8.GetBytes("ImageString"));
 
         RunescapeDropData lastUpdated = null;
-        repo.GetActive(Arg.Is(endpoint)).Returns(Result.Ok<RunescapeDropData>(null));
+        repo.GetActive(Arg.Is(userId)).Returns(Result.Ok<RunescapeDropData>(null));
         repo.UpdateOrInsert(Arg.Do<RunescapeDropData>(a => {
-            repo.GetActive(Arg.Is(endpoint)).Returns(Result.Ok(a));
+            repo.GetActive(Arg.Is(userId)).Returns(Result.Ok(a));
             lastUpdated = a;
         }));
 
@@ -193,12 +195,13 @@ public class AutomatedDropperServiceTests {
         });
         
         var endpoint = EndpointId.New();
+        var userId = DiscordUserId.Empty;
         var imageString = Convert.ToBase64String(Encoding.UTF8.GetBytes("ImageString"));
 
         RunescapeDropData lastUpdated = null;
-        repo.GetActive(Arg.Is(endpoint)).Returns(Result.Ok<RunescapeDropData>(null));
+        repo.GetActive(Arg.Is(userId)).Returns(Result.Ok<RunescapeDropData>(null));
         repo.UpdateOrInsert(Arg.Do<RunescapeDropData>(a => {
-            repo.GetActive(Arg.Is(endpoint)).Returns(Result.Ok(a));
+            repo.GetActive(Arg.Is(userId)).Returns(Result.Ok(a));
             lastUpdated = a;
         }));
 
@@ -246,7 +249,7 @@ public class AutomatedDropperServiceTests {
         var endpoint = EndpointId.New();
         var userId = DiscordUserId.Empty;
         RunescapeDropData lastUpdated = null;
-        repo.GetActive(Arg.Is(endpoint)).Returns(Result.Ok<RunescapeDropData>(null));
+        repo.GetActive(Arg.Is(userId)).Returns(Result.Ok<RunescapeDropData>(null));
         scheduler.CheckExists(Arg.Any<JobKey>()).Returns(false);
 
         var sut = new AutomatedDropperService(Substitute.For<ILogger<AutomatedDropperService>>(),
@@ -272,10 +275,11 @@ public class AutomatedDropperServiceTests {
         });
         
         var endpoint = EndpointId.New();
+        var userId = DiscordUserId.Empty;
         RunescapeDropData lastUpdated = null;
-        repo.GetActive(Arg.Is(endpoint)).Returns(Result.Ok<RunescapeDropData>(null));
+        repo.GetActive(Arg.Is(userId)).Returns(Result.Ok<RunescapeDropData>(null));
         repo.UpdateOrInsert(Arg.Do<RunescapeDropData>(a => {
-            repo.GetActive(Arg.Is(endpoint)).Returns(Result.Ok(a));
+            repo.GetActive(Arg.Is(userId)).Returns(Result.Ok(a));
             lastUpdated = a;
         }));
 
@@ -313,10 +317,11 @@ public class AutomatedDropperServiceTests {
         schedulerFactory.GetAllSchedulers().Returns(new Collection<IScheduler> {
             scheduler
         });
-        
+
         var endpoint = EndpointId.New();
+        var userId = DiscordUserId.Empty;
         RunescapeDropData lastUpdated = null;
-        repo.GetActive(Arg.Is(endpoint)).Returns(Result.Ok<RunescapeDropData>(null));
+        repo.GetActive(Arg.Is(userId)).Returns(Result.Ok<RunescapeDropData>(null));
 
 
         scheduler.CheckExists(Arg.Any<JobKey>()).Returns(false);
@@ -344,8 +349,9 @@ public class AutomatedDropperServiceTests {
         });
         
         var endpoint = EndpointId.New();
+        var userId = DiscordUserId.Empty;
         RunescapeDropData lastUpdated = null;
-        repo.GetActive(Arg.Is(endpoint)).Returns(Result.Ok<RunescapeDropData>(null));
+        repo.GetActive(Arg.Is(userId)).Returns(Result.Ok<RunescapeDropData>(null));
 
 
         scheduler.CheckExists(Arg.Any<JobKey>()).Returns(false);
@@ -358,6 +364,6 @@ public class AutomatedDropperServiceTests {
         var firstRun = await sut.HandleDropRequest(endpoint, drop, null);
 
         //Assert
-        repo.Received(1).GetActive(Arg.Is(endpoint));
+        repo.Received(1).GetActive(Arg.Is(userId));
     }
 }

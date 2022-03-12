@@ -121,7 +121,7 @@ internal class AutomatedDropperService : RepositoryService, IAutomatedDropperSer
     private Result<RunescapeDrop> SaveDropData(EndpointId endpoint, DiscordUserId userId, RunescapeDrop drop, string base64Image) {
         var repo = RepositoryStrategy.GetOrCreateRepository<IRuneScapeDropDataRepository>();
 
-        var activeRecordResult = repo.GetActive(endpoint);
+        var activeRecordResult = repo.GetActive(userId);
         var data = activeRecordResult.ValueOrDefault ?? new RunescapeDropData { UserId = userId, Endpoint = endpoint};
 
         // Update list reference
