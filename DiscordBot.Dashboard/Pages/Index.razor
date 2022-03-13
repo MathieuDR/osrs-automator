@@ -1,0 +1,122 @@
+@page "/"
+@using DiscordBot.Services.Interfaces
+@using DiscordBot.Common.Dtos.Discord
+@using DiscordBot.Common.Helpers.Extensions
+
+<PageHeader>
+    Automator Dashboard
+</PageHeader>
+
+<Row>
+    <Column>
+        <Heading Size="HeadingSize.Is2">
+            Guilds
+        </Heading>
+    </Column>
+</Row>
+<Row>
+    <Column>
+        <ListGroup Mode="ListGroupMode.Selectable" SelectedItemChanged="OnGuildChange">
+            @foreach (var guild in Guilds) {
+                <ListGroupItem Name="@guild.Id.ToString()">
+                    @guild.Name
+                </ListGroupItem>
+            }
+        </ListGroup>
+    </Column>
+</Row>
+
+<Row Padding="Padding.Is2.OnY">
+    <Column>
+        <Heading Size="HeadingSize.Is2">
+            Channels
+        </Heading>
+    </Column>
+</Row>
+@if (Channels is not null && Channels.Keys.Count > 0) {
+    <Row>
+        <Column>
+            <Accordion>
+                @for(var i = 0; i < Channels.Keys.Count; i++) {
+                    var (key, value) = Channels.ElementAt(i);
+                    var index = i;
+                    <Collapse Visible="@ChannelOpened[index]">
+                        <CollapseHeader>
+                            <Heading Size="HeadingSize.Is3">
+                                <Button Clicked="@(() => ChannelOpened[index] = !ChannelOpened[index])">
+                                    @key.Name
+                                </Button>
+                            </Heading>
+                        </CollapseHeader>
+                        <CollapseBody>
+                            <ListGroup Mode="ListGroupMode.Selectable" Flush>
+                                @foreach (var channel in value) {
+                                    <ListGroupItem Name="@channel.Id.ToString()">
+                                        <Div>
+                                            <Span Margin="Margin.Is2.FromEnd">
+                                                @if (channel.IsTextChannel) {
+                                                    <Icon Name="IconName.Comment"/>
+                                                } else if (channel.IsVoiceChannel) {
+                                                    <Icon Name="IconName.Phone"/>
+                                                }
+                                            </Span>
+                                            <Span>
+                                                @channel.Name
+                                            </Span>
+                                        </Div>
+                                    </ListGroupItem>
+                                }
+                            </ListGroup>
+                        </CollapseBody>
+                    </Collapse>
+                }
+            </Accordion>
+        </Column>
+    </Row>
+}
+
+
+@code {
+    [Inject]
+    private IDiscordService DiscordService { get; init; }
+
+    [Inject]
+    private INotificationService NotificationService { get; set; }
+
+    protected override async Task OnInitializedAsync() {
+        Guilds = (await DiscordService.GetGuilds()).Value.ToArray();
+        SelectedGuild = Guilds.FirstOrDefault();
+
+        await UpdateGuildChannels();
+        await base.OnInitializedAsync();
+    }
+
+    private Guild[] Guilds = Array.Empty<Guild>();
+    private Guild? SelectedGuild = null;
+    private Channel? SelectedChannel = null;
+    private bool[] ChannelOpened = Array.Empty<bool>();
+    private Dictionary<Channel, IEnumerable<Channel>>? Channels = null;
+
+
+    private async Task OnGuildChange(string newGuild) {
+        var guildId = long.Parse(newGuild);
+        var newSelectedGuild = Guilds.FirstOrDefault(g => g.Id.Value == guildId);
+        if (newSelectedGuild is null) {
+            _ = NotificationService.Error("Could not find guild with id " + guildId);
+        }
+
+        SelectedGuild = newSelectedGuild;
+        await UpdateGuildChannels();
+    }
+
+    private async Task UpdateGuildChannels() {
+        if (SelectedGuild is null) {
+            _ = NotificationService.Error("Could not get channels, no guild selected");
+        }
+
+        Channels = (await DiscordService.GetNestedChannelsForGuild(SelectedGuild.Id)).Value;
+        ChannelOpened = new bool[Channels.Count];
+        SelectedChannel = Channels.FirstOrDefault(x=> x.Value.Any()).Value.FirstOrDefault();
+    }
+
+}

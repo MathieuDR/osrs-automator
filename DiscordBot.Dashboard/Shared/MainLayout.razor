@@ -1,15 +1,19 @@
 ﻿@inherits LayoutComponentBase
 
-<PageTitle>DiscordBot.Dashboard</PageTitle>
-
-<div class="page">
-    <div class="sidebar">
-        <NavMenu/>
-    </div>
-
-    <main>
-        <article class="content px-4">
-            @Body
-        </article>
-    </main>
-</div>
+<Layout Sider>
+    <LayoutSider>
+        <LayoutSiderContent>
+            <SideMenu />
+        </LayoutSiderContent>
+    </LayoutSider>
+    <Layout>
+        <LayoutHeader Fixed>
+            <TopMenu />
+        </LayoutHeader>
+        <LayoutContent Padding="Padding.Is4.OnX.Is4.OnY">
+            <Container Fluid>
+                @Body
+            </Container>
+        </LayoutContent>
+    </Layout>
+</Layout>

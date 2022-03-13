@@ -1,0 +1,13 @@
+@namespace DiscordBot.Components
+
+<Row>
+    <Column ColumnSize="ColumnSize.Is12">
+        <Heading Size="HeadingSize.Is1">
+            @ChildContent
+        </Heading>
+    </Column>
+</Row>
+
+@code {
+    [Parameter] public RenderFragment ChildContent { get; set; }
+}

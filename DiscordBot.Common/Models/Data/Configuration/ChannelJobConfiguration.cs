@@ -12,7 +12,7 @@ public class ChannelJobConfiguration {
 		ChannelId = channelId;
 		IsEnabled = isEnabled;
 	}
-    
+
 	public bool IsEnabled { get; set; }
 	public DiscordChannelId ChannelId { get; set; }
 	public DiscordGuildId GuildId { get; set; }

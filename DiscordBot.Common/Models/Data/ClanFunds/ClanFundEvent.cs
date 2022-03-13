@@ -1,9 +1,10 @@
 namespace DiscordBot.Common.Models.Data.ClanFunds;
 
-public record ClanFundEvent { 
+public record ClanFundEvent {
 	public ClanFundEvent() { } // necessary for litedb
-	
-	public ClanFundEvent(DiscordUserId playerId, DiscordUserId creatorId, string reason, string playerName, long amount, ClanFundEventType eventType) {
+
+	public ClanFundEvent(DiscordUserId playerId, DiscordUserId creatorId, string reason, string playerName, long amount,
+		ClanFundEventType eventType) {
 		PlayerId = playerId;
 		CreatorId = creatorId;
 		Reason = reason;
@@ -17,10 +18,10 @@ public record ClanFundEvent {
 
 	// Id of player
 	public DiscordUserId PlayerId { get; init; }
-	
+
 	// id of creator
 	public DiscordUserId CreatorId { get; init; }
-	
+
 	// reason of event
 	public string Reason { get; init; }
 
@@ -28,7 +29,7 @@ public record ClanFundEvent {
 	public string PlayerName { get; init; }
 
 	// Amount of money
-	public long Amount { get; init; } = 0;
+	public long Amount { get; init; }
 
 	// Type of event
 	public ClanFundEventType EventType { get; init; }

@@ -1,6 +1,7 @@
 using System.Text;
 using Common.Extensions;
 using DiscordBot.Common.Dtos.Discord;
+using DiscordBot.Common.Helpers.Extensions;
 using DiscordBot.Common.Identities;
 using DiscordBot.Common.Models.Data.ClanFunds;
 using DiscordBot.Common.Models.Data.Drops;
@@ -53,9 +54,19 @@ public class DiscordService : IDiscordService {
         return Result.Ok();
     }
 
-    public Task<Result<IEnumerable<Guild>>> GetAllGuilds() {
+    public Task<Result<IEnumerable<Guild>>> GetGuilds() {
         var result = Result.Ok(_client.Guilds.Select(x=>x.ToGuildDto()));
         return Task.FromResult(result);
+    }
+
+    public Task<Result<IEnumerable<Channel>>> GetChannelsForGuild(DiscordGuildId guildId) {
+        var result = _client.GetGuild(guildId.UlongValue).Channels.Select(x => x.ToChannelDto());
+        return Task.FromResult(Result.Ok(result));
+    }
+    
+    public Task<Result<Dictionary<Channel, IEnumerable<Channel>>>>GetNestedChannelsForGuild(DiscordGuildId guildId) {
+        var result = _client.GetGuild(guildId.UlongValue).Channels.Select(x => x.ToChannelDto());
+        return Task.FromResult(Result.Ok(result.NestChannels()));
     }
 
     public async Task<Result> SendFailedEmbed(DiscordChannelId channelId, string message, Guid traceId) {

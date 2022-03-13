@@ -11,7 +11,9 @@ namespace DiscordBot.Services.Interfaces;
 public interface IDiscordService {
     Task<Result> SetUsername(GuildUser user, string nickname);
     Task<Result> PrintRunescapeDataDrop(RunescapeDropData data, DiscordGuildId guildId, DiscordChannelId channelId);
-    Task<Result<IEnumerable<Guild>>> GetAllGuilds();
+    Task<Result<IEnumerable<Guild>>> GetGuilds();
+    Task<Result<IEnumerable<Channel>>> GetChannelsForGuild(DiscordGuildId guildId);
+    Task<Result<Dictionary<Channel, IEnumerable<Channel>>>> GetNestedChannelsForGuild(DiscordGuildId guildId);
     Task<Result> SendFailedEmbed(DiscordChannelId channelId, string message, Guid traceId);
     Task<Result> SendWomGroupSuccessEmbed(DiscordChannelId channelId, string message, int groupId, string groupName);
     Task<Result> MessageLeaderboards<T>(DiscordChannelId channelId, IEnumerable<MetricTypeLeaderboard<T>> leaderboards) where T : ILeaderboardMember;

@@ -7,23 +7,23 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <Compile Remove="Api\WiseOldManHighscoreRepository.cs" />
+        <Compile Remove="Api\WiseOldManHighscoreRepository.cs"/>
     </ItemGroup>
 
     <ItemGroup>
-        <None Include="Api\WiseOldManHighscoreRepository.cs" />
+        <None Include="Api\WiseOldManHighscoreRepository.cs"/>
     </ItemGroup>
 
     <ItemGroup>
-        <PackageReference Include="AutoMapper" Version="11.0.1" />
-        <PackageReference Include="MathieuDR.Common" Version="1.2.1" />
-        <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="6.0.0" />
-        <PackageReference Include="Microsoft.Extensions.Logging" Version="6.0.0" />
-        <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="6.0.1" />
-        <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
-        <PackageReference Include="RestSharp" Version="107.3.0" />
-        <PackageReference Include="RestSharp.Serializers.NewtonsoftJson" Version="107.3.0" />
-        <PackageReference Include="System.ComponentModel.Annotations" Version="5.0.0" />
+        <PackageReference Include="AutoMapper" Version="11.0.1"/>
+        <PackageReference Include="MathieuDR.Common" Version="1.2.1"/>
+        <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="6.0.0"/>
+        <PackageReference Include="Microsoft.Extensions.Logging" Version="6.0.0"/>
+        <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="6.0.1"/>
+        <PackageReference Include="Newtonsoft.Json" Version="13.0.1"/>
+        <PackageReference Include="RestSharp" Version="107.3.0"/>
+        <PackageReference Include="RestSharp.Serializers.NewtonsoftJson" Version="107.3.0"/>
+        <PackageReference Include="System.ComponentModel.Annotations" Version="5.0.0"/>
     </ItemGroup>
 
     <ItemGroup>

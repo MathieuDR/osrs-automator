@@ -16,9 +16,7 @@ public record Shame {
 	}
 
 	[Obsolete("Only for LiteDB")]
-	public Shame() {
-		
-	}
+	public Shame() { }
 
 	public Guid Id { get; init; }
 	public DateTimeOffset ShamedAt { get; init; }
@@ -28,5 +26,6 @@ public record Shame {
 	public string ImageUrl { get; init; }
 
 	[BsonIgnore]
-	public string ShameLocationAsString => MetricLocation is not null ? MetricLocation.Value.ToDisplayNameOrFriendly() : Location.ToDisplayNameOrFriendly();
+	public string ShameLocationAsString =>
+		MetricLocation is not null ? MetricLocation.Value.ToDisplayNameOrFriendly() : Location.ToDisplayNameOrFriendly();
 }

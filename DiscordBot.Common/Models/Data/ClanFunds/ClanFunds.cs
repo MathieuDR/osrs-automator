@@ -8,7 +8,7 @@ public record ClanFunds : BaseGuildRecord {
 
 	// channel with donation tracking
 	public DiscordChannelId DonationLeaderBoardChannel { get; init; }
-	
+
 	// message Id for donation leaderboard
 	public DiscordMessageId DonationLeaderBoardMessage { get; init; }
 
@@ -25,6 +25,9 @@ public record ClanFunds : BaseGuildRecord {
 	public ClanFundEvent HighestDonation =>
 		Events.Where(x => x.EventType == ClanFundEventType.Donation).OrderByDescending(x => x.Amount).FirstOrDefault();
 
+	// calculate total refunds
+	public long TotalRefunds => Events.Where(x => x.EventType == ClanFundEventType.Refund).Sum(x => x.Amount);
+
 	// calculate total donation of player
 	public long TotalDonationOfPlayer(DiscordUserId playerId) =>
 		Events.Where(x => x.EventType == ClanFundEventType.Donation && x.PlayerId == playerId).Sum(x => x.Amount);
@@ -32,7 +35,4 @@ public record ClanFunds : BaseGuildRecord {
 	// calculate total donation of multiple players
 	public long TotalDonationOfPlayers(List<DiscordUserId> playerIds) =>
 		Events.Where(x => x.EventType == ClanFundEventType.Donation && playerIds.Contains(x.PlayerId)).Sum(x => x.Amount);
-	
-	// calculate total refunds
-	public long TotalRefunds => Events.Where(x => x.EventType == ClanFundEventType.Refund).Sum(x => x.Amount);
 }

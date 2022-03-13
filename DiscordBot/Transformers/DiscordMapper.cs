@@ -53,9 +53,31 @@ public static class DiscordMapper {
     }
 
     public static Channel ToChannelDto(this IGuildChannel channel) {
+        if (channel is INestedChannel nested) {
+            
+        }
         return new Channel() {
             Id =  new DiscordChannelId(channel.Id),
             Name = channel.Name,
+            IsTextChannel = channel is ITextChannel,
+            IsVoiceChannel = channel is IVoiceChannel,
+            IsCategoryChannel = channel is ICategoryChannel,
+            Order = channel.Position,
+            Category = channel is INestedChannel nestedChannel ? 
+                nestedChannel.CategoryId.HasValue ? new DiscordChannelId(nestedChannel.CategoryId.Value)
+                : DiscordChannelId.Empty :  DiscordChannelId.Empty,
+            Guild = channel.Guild.ToGuildDto(),
+        };
+    }
+    
+    public static Channel ToChannelDto(this ICategoryChannel channel) {
+        return new Channel() {
+            Id = new DiscordChannelId(channel.Id),
+            Name = channel.Name,
+            IsTextChannel = false,
+            IsVoiceChannel = false,
+            IsCategoryChannel = true,
+            Order = channel.Position,
             Guild = channel.Guild.ToGuildDto()
         };
     }
@@ -65,7 +87,13 @@ public static class DiscordMapper {
             Id = new DiscordChannelId(channel.Id),
             Name = channel.Name,
             IsTextChannel = true,
-            Guild = channel.Guild.ToGuildDto()
+            IsVoiceChannel = false,
+            IsCategoryChannel = false,
+            Guild = channel.Guild.ToGuildDto(),
+            Order = channel.Position,
+            Category = channel is INestedChannel nestedChannel ? 
+                nestedChannel.CategoryId.HasValue ? new DiscordChannelId(nestedChannel.CategoryId.Value)
+                : DiscordChannelId.Empty :  DiscordChannelId.Empty,
         };
     }
 
@@ -75,6 +103,8 @@ public static class DiscordMapper {
             RecipientId = new DiscordUserId(channel.Recipient.Id),
             Name = channel.Name,
             IsTextChannel = true,
+            IsVoiceChannel = false,
+            IsCategoryChannel = false,
             IsDMChannel = true
         };
     }

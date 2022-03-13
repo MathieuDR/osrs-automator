@@ -1,3 +1,6 @@
+using Blazorise;
+using Blazorise.Bootstrap5;
+using Blazorise.Icons.FontAwesome;
 using Dashboard.Binders.RouteConstraints;
 using Dashboard.Configuration;
 using Dashboard.Configuration.Options;
@@ -26,6 +29,10 @@ public static class StartupHelper {
         var apiOptions = GetApiOptions(configuration);
         services.AddRazorPages();
         services.AddServerSideBlazor();
+        services.AddBlazorise(options => { });
+        services.AddFontAwesomeIcons();
+        services.AddBootstrap5Providers();
+        services.AddBootstrap5Components();
         services.AddMvc(options => { options.InputFormatters.Add(new BypassFormDataInputFormatter()); });
         services.Configure<RouteOptions>(options =>
         {
