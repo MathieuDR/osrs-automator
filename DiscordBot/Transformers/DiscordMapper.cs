@@ -8,7 +8,9 @@ public static class DiscordMapper {
         return new GuildUser {
             Id = new DiscordUserId(user.Id),
             Username = user.DisplayName(),
-            GuildId = new DiscordGuildId(user.GuildId)
+            GuildId = new DiscordGuildId(user.GuildId),
+            IsBot = user.IsBot,
+            RoleIds = user.RoleIds.Select(x=> new DiscordRoleId(x)).ToList()
         };
     }
 

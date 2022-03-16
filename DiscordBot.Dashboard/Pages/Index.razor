@@ -75,6 +75,38 @@
     </Row>
 }
 
+<Row Padding="Padding.Is2.OnY">
+    <Column>
+        <Heading Size="HeadingSize.Is2">
+            Users
+        </Heading>
+    </Column>
+</Row>
+@if (Users.Any()) {
+    <Row>
+        <Column>
+            <ListGroup>
+                @foreach (var value in Users) {
+                    <ListGroupItem Name="@value.Id.ToString()">
+                        <Div>
+                            <Span Margin="Margin.Is2.FromEnd">
+                                @if (value.IsBot) {
+                                    <Icon Name="IconName.Server"/>
+                                } else  {
+                                    <Icon Name="IconName.User"/>
+                                }
+                            </Span>
+                            <Span>
+                                @value.Username
+                            </Span>
+                        </Div>
+                    </ListGroupItem>
+                }
+            </ListGroup>
+        </Column>
+    </Row>
+}
+
 
 @code {
     [Inject]
@@ -85,9 +117,15 @@
 
     protected override async Task OnInitializedAsync() {
         Guilds = (await DiscordService.GetGuilds()).Value.ToArray();
+        if (!Guilds.Any()) {
+            await base.OnInitializedAsync();
+            return;
+        }
+        
         SelectedGuild = Guilds.FirstOrDefault();
 
         await UpdateGuildChannels();
+        await UpdateUsers();
         await base.OnInitializedAsync();
     }
 
@@ -96,6 +134,7 @@
     private Channel? SelectedChannel = null;
     private bool[] ChannelOpened = Array.Empty<bool>();
     private Dictionary<Channel, IEnumerable<Channel>>? Channels = null;
+    private List<GuildUser> Users = new List<GuildUser>();
 
 
     private async Task OnGuildChange(string newGuild) {
@@ -107,6 +146,16 @@
 
         SelectedGuild = newSelectedGuild;
         await UpdateGuildChannels();
+        await UpdateUsers();
+    }
+
+    private async Task UpdateUsers() {
+        if (SelectedChannel is null) {
+            _ = NotificationService.Error("Could not get users, no guild selected");
+        }
+        
+        var usersResult = await DiscordService.GetUsers(SelectedGuild.Id);
+        Users = usersResult.Value.ToList();
     }
 
     private async Task UpdateGuildChannels() {

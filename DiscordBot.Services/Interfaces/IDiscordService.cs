@@ -19,4 +19,5 @@ public interface IDiscordService {
     Task<Result> MessageLeaderboards<T>(DiscordChannelId channelId, IEnumerable<MetricTypeLeaderboard<T>> leaderboards) where T : ILeaderboardMember;
     Task<Result> TrackClanFundEvent(DiscordGuildId guildId, ClanFundEvent clanFundEvent, DiscordChannelId clanFundsChannelId, long clanFundsTotalFunds);
     Task<Result<DiscordMessageId>> UpdateDonationMessage(DiscordGuildId guildId, DiscordChannelId clanFundsDonationLeaderBoardChannel, DiscordMessageId clanFundsDonationLeaderBoardMessage, IEnumerable<(DiscordUserId Player, string PlayerName, long Amount)> topDonations);
+    Task<Result<IEnumerable<GuildUser>>> GetUsers(DiscordGuildId guildId);
 }

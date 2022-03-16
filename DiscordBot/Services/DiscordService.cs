@@ -68,6 +68,11 @@ public class DiscordService : IDiscordService {
         var result = _client.GetGuild(guildId.UlongValue).Channels.Select(x => x.ToChannelDto());
         return Task.FromResult(Result.Ok(result.NestChannels()));
     }
+    
+    public Task<Result<IEnumerable<GuildUser>>> GetUsers(DiscordGuildId guildId) {
+        var result = _client.GetGuild(guildId.UlongValue).Users.Select(x => x.ToGuildUserDto());
+        return Task.FromResult(Result.Ok(result));
+    }
 
     public async Task<Result> SendFailedEmbed(DiscordChannelId channelId, string message, Guid traceId) {
         EmbedBuilder builder = new EmbedBuilder();
