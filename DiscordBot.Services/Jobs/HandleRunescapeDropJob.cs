@@ -74,7 +74,7 @@ public class HandleRunescapeDropJob : RepositoryJob {
         return data with { Drops = drops };
     }
 
-    private async Task<Result<bool>> HandleMessagesForGuilds(DiscordUserId endpoint, RunescapeDropData data, List<DiscordGuildId> guildIds) {
+    private async Task<Result<bool>> HandleMessagesForGuilds(DiscordUserId discordUserId, RunescapeDropData data, List<DiscordGuildId> guildIds) {
         var errors = new List<IError>();
         var sentAnyMessages = false;
 
@@ -95,9 +95,11 @@ public class HandleRunescapeDropJob : RepositoryJob {
                 continue;
             }
 
-            foreach (var channelConfiguration in configurationResult.Value.EnabledChannels) {
-                var filterData = await FilterData(data, channelConfiguration);
-                sentAnyMessages = sentAnyMessages || SendData(guildId, channelConfiguration.Channel, filterData);
+            foreach (var channelConfiguration in configurationResult.Value.ChannelConfigurations) {
+                foreach (var configuration in channelConfiguration.Value) {
+                    var filterData = await FilterData(data, configuration);
+                    sentAnyMessages = sentAnyMessages || SendData(guildId, channelConfiguration.Key, filterData);   
+                }
             }
 
             messagedGuilds.Add(guildId);
@@ -107,7 +109,7 @@ public class HandleRunescapeDropJob : RepositoryJob {
     }
 
     private bool SendData(DiscordGuildId guildId, DiscordChannelId channelId, RunescapeDropData toSendData) {
-        if (toSendData is null) {
+        if (toSendData is null || toSendData.Drops is null || !toSendData.Drops.Any()) {
             return false;
         }
 
@@ -119,45 +121,45 @@ public class HandleRunescapeDropJob : RepositoryJob {
         return new DiscordGuildId[] { new (403539795944538122) };
     }
 
-    private async Task<RunescapeDropData> FilterData(RunescapeDropData data, RunescapeDropperChannelConfiguration configuration) {
+    private async Task<RunescapeDropData> FilterData(RunescapeDropData data, DropperConfiguration configuration) {
         if (data.Drops.Any(x => x.IsPet)) {
             return data with { };
         }
 
         var filtered = new List<RunescapeDrop>();
 
-        if (configuration.WhiteListEnabled) {
-            // If it's enabled.
-            // Only use whitelist
-            filtered = data.Drops.Where(x => configuration.WhiteListedItems.Contains(x.Item?.Name)).ToList();
-            return data with { Drops = filtered };
-        }
-
-        var drops = data.Drops.ToList();
-        var collectionLogItems = (await _collectionLogItemProvider.GetCollectionLogItemNames()).Value.Select(x => x.ToLowerInvariant()).ToList();
-
-        for (var i = 0; i < drops.Count; i++) {
-            var drop = drops[i];
-            var itemName = drop.Item?.Name.ToLowerInvariant();
-
-            if (configuration.BlackListedItems.Contains(itemName)) {
-                // Blacklisted.
-                // We do not want it
-                continue;
-            }
-
-            var maxValue = Math.Max(drop.TotalValue, drop.TotalHaValue);
-
-            if (configuration.UseCollectionLogExceptions && collectionLogItems.Contains(itemName)) {
-                filtered.Add(drop);
-                continue;
-            }
-
-            if (configuration.MinimumValue <= maxValue && configuration.MinRarity <= drop.Rarity || configuration.OrOperator &&
-                (configuration.MinimumValue <= maxValue || configuration.MinRarity <= drop.Rarity)) {
-                filtered.Add(drop);
-            }
-        }
+        // if (configuration.HasWhiteListedItems) {
+        //     // If it's enabled.
+        //     // Only use whitelist
+        //     filtered = data.Drops.Where(x => configuration.WhiteListedItems.Contains(x.Item?.Name)).ToList();
+        //     return data with { Drops = filtered };
+        // }
+        //
+        // var drops = data.Drops.ToList();
+        // var collectionLogItems = (await _collectionLogItemProvider.GetCollectionLogItemNames()).Value.Select(x => x.ToLowerInvariant()).ToList();
+        //
+        // for (var i = 0; i < drops.Count; i++) {
+        //     var drop = drops[i];
+        //     var itemName = drop.Item?.Name.ToLowerInvariant();
+        //
+        //     if (configuration.BlackListedItems.Contains(itemName)) {
+        //         // Blacklisted.
+        //         // We do not want it
+        //         continue;
+        //     }
+        //
+        //     var maxValue = Math.Max(drop.TotalValue, drop.TotalHaValue);
+        //
+        //     if (configuration.UseCollectionLogExceptions && collectionLogItems.Contains(itemName)) {
+        //         filtered.Add(drop);
+        //         continue;
+        //     }
+        //
+        //     if (configuration.MinimumValue <= maxValue && configuration.MinRarity <= drop.Rarity || configuration.OrOperator &&
+        //         (configuration.MinimumValue <= maxValue || configuration.MinRarity <= drop.Rarity)) {
+        //         filtered.Add(drop);
+        //     }
+        // }
 
         return data with { Drops = filtered };
     }

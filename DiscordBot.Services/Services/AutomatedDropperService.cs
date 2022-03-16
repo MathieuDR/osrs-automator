@@ -58,7 +58,7 @@ internal class AutomatedDropperService : RepositoryService, IAutomatedDropperSer
         return Result.Ok(CreateEndpointUri(endpoint));
     }
 
-    private Result SaveGuildConfiguration(RunescapeDropperGuildConfiguration guildConfiguration) {
+    private Result SaveGuildConfiguration(DropperGuildConfiguration guildConfiguration) {
         var repo = RepositoryStrategy.GetOrCreateRepository<IRunescapeDropperGuildConfigurationRepository>(guildConfiguration.GuildId);
         return repo.UpdateOrInsert(guildConfiguration);
     }
@@ -69,7 +69,7 @@ internal class AutomatedDropperService : RepositoryService, IAutomatedDropperSer
         return uri.ToString();
     }
 
-    private Result<RunescapeDropperGuildConfiguration> GetGuildConfiguration(DiscordGuildId guildId, DiscordUserId requestingUser) {
+    private Result<DropperGuildConfiguration> GetGuildConfiguration(DiscordGuildId guildId, DiscordUserId requestingUser) {
         var repo = RepositoryStrategy.GetOrCreateRepository<IRunescapeDropperGuildConfigurationRepository>(guildId);
         var result = repo.GetSingle();
 
@@ -79,7 +79,7 @@ internal class AutomatedDropperService : RepositoryService, IAutomatedDropperSer
 
         if (result.Value is null) {
             // TODO: Remvo the create
-            return Result.Ok(new RunescapeDropperGuildConfiguration(guildId, requestingUser));
+            return Result.Ok(new DropperGuildConfiguration(guildId, requestingUser));
             return Result.Fail("No RunescapeDropperGuildConfiguration found");
         }
         
