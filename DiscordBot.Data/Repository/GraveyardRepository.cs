@@ -79,20 +79,57 @@ internal class GraveyardRepository : BaseSingleRecordLiteDbRepository<Graveyard>
 		if (graveyard.IsFailed) {
 			return graveyard.ToResult();
 		}
+
+		var shameResult = GetShame(graveyard.Value, userId, shameId);
+		if(shameResult.IsFailed) {
+			return shameResult.ToResult();
+		}
+
+		graveyard.Value.Shames[userId].Remove(shameResult.Value);
+		return Update(graveyard.Value);
+	}
+
+	public Result<Shame> GetShameById(ulong userId, Guid shameId) {
+		var graveyard = GetGraveyardOrFail();
 		
-		if (!graveyard.Value.Shames.ContainsKey(userId)) {
+		if (graveyard.IsFailed) {
+			return graveyard.ToResult();
+		}
+
+		return GetShame(graveyard.Value, userId, shameId);
+	}
+
+	private Result<Shame> GetShame(Graveyard graveyard, ulong userId, Guid shameId) {
+		if (!graveyard.Shames.ContainsKey(userId)) {
 			return Result.Fail("No shames for user");
 		}
 
 		// select shame
-		var shame = graveyard.Value.Shames[userId].FirstOrDefault(s => s.Id == shameId);
+		var shame = graveyard.Shames[userId].FirstOrDefault(s => s.Id == shameId);
 
 		// remove shame
 		if (shame is null) {
 			return Result.Fail($"Shame with id {shameId} not found");
 		}
 
-		graveyard.Value.Shames[userId].Remove(shame);
+		return Result.Ok(shame);
+	}
+
+	public Result UpdateShame(ulong shamedId, Guid shameId, Shame shame) {
+		var graveyard = GetGraveyardOrFail();
+		
+		if (graveyard.IsFailed) {
+			return graveyard.ToResult();
+		}
+		
+		if (!graveyard.Value.Shames.ContainsKey(shamedId)) {
+			return Result.Fail("No shames for user");
+		}
+
+		// select shame
+		var originalShame = graveyard.Value.Shames[shamedId].FirstOrDefault(s => s.Id == shameId);
+		graveyard.Value.Shames[shamedId].Remove(originalShame);
+		graveyard.Value.Shames[shamedId].Add(shame);
 		return Update(graveyard.Value);
 	}
 
