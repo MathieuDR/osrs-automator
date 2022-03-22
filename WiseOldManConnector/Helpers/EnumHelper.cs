@@ -136,6 +136,7 @@ public static class EnumHelper {
             MetricType.Kreearra,
             MetricType.KrilTsutsaroth,
             MetricType.Mimic,
+            MetricType.Nex,
             MetricType.Nightmare,
             MetricType.PhosanisNightmare,
             MetricType.Obor,
@@ -155,8 +156,7 @@ public static class EnumHelper {
             MetricType.Vorkath,
             MetricType.Wintertodt,
             MetricType.Zalcano,
-            MetricType.Zulrah,
-            MetricType.Nex
+            MetricType.Zulrah
         };
     }
 
