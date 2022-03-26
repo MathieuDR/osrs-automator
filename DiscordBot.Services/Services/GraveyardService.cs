@@ -98,6 +98,34 @@ internal class GraveyardService : IGraveyardService {
 		return graveyardRepository.AddShame(shamed.Id, shame);
 	}
 
+	public Task<Result> UpdateShameLocation(GuildUser shamed, Guid shameId, ShameLocation location, MetricType? metricType) {
+		var repository = _repositoryStrategy.GetOrCreateRepository<IGraveyardRepository>(shamed.GuildId);
+		var shameResult = repository.GetShameById(shamed.Id, shameId);
+		
+		if(shameResult.IsFailed){
+			return Task.FromResult(Result.Fail("Could not update shame location")
+				.WithErrors(shameResult.Errors));
+		}
+		
+		var shame = shameResult.Value;
+		shame = shame with { Location = location, MetricLocation = metricType};
+		return Task.FromResult(repository.UpdateShame(shamed.Id, shameId, shame));
+	}
+
+	public Task<Result> UpdateShameImage(GuildUser shamed, Guid shameId, string imageUrl) {
+		var repository = _repositoryStrategy.GetOrCreateRepository<IGraveyardRepository>(shamed.GuildId);
+		var shameResult = repository.GetShameById(shamed.Id, shameId);
+		
+		if(shameResult.IsFailed){
+			return Task.FromResult(Result.Fail("Could not update shame location")
+				.WithErrors(shameResult.Errors));
+		}
+		
+		var shame = shameResult.Value;
+		shame = shame with { ImageUrl = imageUrl};
+		return Task.FromResult(repository.UpdateShame(shamed.Id, shameId, shame));
+	}
+
 	public async Task<Result<IEnumerable<Shame>>> GetShames(GuildUser user, ShameLocation? location, MetricType? metricTypeLocation) {
 		var isOptedIn = await IsOptedIn(user);
 

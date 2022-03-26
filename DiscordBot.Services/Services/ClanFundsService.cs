@@ -112,7 +112,7 @@ public class ClanFundsService: BaseService, IClanFundsService {
 			.GroupBy(x=> x.PlayerId, x=>x)
 			.Select(x=> (Player: x.Key, PlayerName: x.Last().PlayerName, Amount: x.Sum( y => y.Amount)))
 			.OrderByDescending(x => x.Amount)
-			.Take(10);
+			.Take(50);
 		
 		return await _discordService.UpdateDonationMessage(guildId, clanFunds.DonationLeaderBoardChannel, clanFunds.DonationLeaderBoardMessage, topDonations);
 	}

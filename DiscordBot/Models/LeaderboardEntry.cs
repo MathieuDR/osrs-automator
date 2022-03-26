@@ -20,7 +20,7 @@ public class LeaderboardEntry<T> {
 		
 		sb.Append($"{Rank.ToString()}, ".PadLeft(rankColumnSize));
 		sb.Append($"{Name.PadRight(nameSize)}");
-		sb.Append($"{Score.ToString().PadLeft(scoreSize)}");
+		sb.Append($"{Score.ToString()?.PadLeft(scoreSize)}");
 		
 		return sb.ToString();
 	}

@@ -11,4 +11,6 @@ public interface IGraveyardRepository : ISingleRecordRepository<Graveyard> {
 	public Result<List<Shame>> GetShamesForUserPerLocation(DiscordUserId userId, ShameLocation location, MetricType? metricTypeLocation = null);
 	public Result AddShame(DiscordUserId userId, Shame shame);
 	public Result RemoveShame(DiscordUserId userId, Guid shameId);
+	public Result<Shame> GetShameById(ulong userId, Guid shameId);
+	Result UpdateShame(ulong shamedId, Guid shameId, Shame shame);
 }
