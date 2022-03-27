@@ -1,7 +1,7 @@
 using System.Text.Json;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 
-namespace Dashboard.Binders;
+namespace DiscordBot.Dashboard.Binders;
 
 public class JsonModelBinder : IModelBinder {
 	public Task BindModelAsync(ModelBindingContext bindingContext) {

@@ -1,0 +1,35 @@
+@page "/dropper/settings"
+
+<PageHeader>
+    Automated dropper settings
+</PageHeader>
+
+<Row>
+    <Column>
+        <Heading Size="HeadingSize.Is2">
+            Default settings
+        </Heading>
+    </Column>
+</Row>
+<Row>
+    <Column>
+        <Paragraph>
+            These settings are the default. <br />
+            You will be able to 'inherit' these settings on any specific dropper.
+        </Paragraph>
+        <Paragraph>
+            A common use case would be to set the default settings to general 'rules' for all droppers. For example you might want to set the default rarity and value.
+            If you want to diverge from these defaults, you can set these settings on the specific dropper.
+        </Paragraph>
+    </Column>
+</Row>
+
+<Row>
+    <Column>
+        <DropperConfiguration />
+    </Column>
+</Row>
+
+@code {
+    
+}

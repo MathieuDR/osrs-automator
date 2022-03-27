@@ -3,7 +3,7 @@ using Microsoft.Extensions.Options;
 using Microsoft.OpenApi.Models;
 using Swashbuckle.AspNetCore.SwaggerGen;
 
-namespace Dashboard.Configuration.Options;
+namespace DiscordBot.Dashboard.Configuration.Options;
 
 /// <summary>
 ///     Configures the Swagger generation options.

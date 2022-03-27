@@ -1,0 +1,23 @@
+<Row>
+    <Column>
+        <Heading Size="HeadingSize.Is4">Configuration</Heading>
+    </Column>
+</Row>
+<Row>
+    <Column>
+        <Fields>
+            <Field>
+                <FieldLabel>Guild</FieldLabel>
+                <GuildSelector @bind-DiscordGuildId="SelectedGuild" />
+            </Field>
+        </Fields>
+    </Column>
+</Row>
+
+@SelectedGuild.Value
+
+
+
+@code {
+    public DiscordGuildId SelectedGuild { get; set; }
+}

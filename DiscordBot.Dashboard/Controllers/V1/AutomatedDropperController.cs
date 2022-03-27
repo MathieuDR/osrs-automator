@@ -1,14 +1,14 @@
 using Common.Extensions;
-using Dashboard.Binders;
-using Dashboard.Models.ApiRequests.DiscordEmbed;
-using Dashboard.Transformers;
 using DiscordBot.Common.Dtos.Runescape;
 using DiscordBot.Common.Identities;
+using DiscordBot.Dashboard.Binders;
+using DiscordBot.Dashboard.Models.ApiRequests.DiscordEmbed;
+using DiscordBot.Dashboard.Transformers;
 using DiscordBot.Services.Interfaces;
 using FluentResults;
 using Microsoft.AspNetCore.Mvc;
 
-namespace Dashboard.Controllers.V1;
+namespace DiscordBot.Dashboard.Controllers.V1;
 
 [ApiController]
 [ApiVersion("1.0")]

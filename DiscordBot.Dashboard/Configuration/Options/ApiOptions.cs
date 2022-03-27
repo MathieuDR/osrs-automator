@@ -1,4 +1,4 @@
-namespace Dashboard.Configuration.Options;
+namespace DiscordBot.Dashboard.Configuration.Options;
 
 public class ApiOptions {
 	public int VersionMajor { get; set; }

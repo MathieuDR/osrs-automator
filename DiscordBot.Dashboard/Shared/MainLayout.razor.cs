@@ -1,7 +1,7 @@
 using Blazorise.Localization;
 using Microsoft.AspNetCore.Components;
 
-namespace Dashboard.Shared;
+namespace DiscordBot.Dashboard.Shared;
 
 public partial class MainLayout {
     protected override async Task OnInitializedAsync() {

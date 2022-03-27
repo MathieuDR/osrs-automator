@@ -1,0 +1,50 @@
+
+
+
+
+<Select TValue="long" SelectedValue="@MyValue" SelectedValueChanged="@OnSelectedValueChanged">
+    <SelectItem Disabled>Please select a server</SelectItem>
+    @foreach (var guild in Guilds) {
+        <SelectItem Value="@guild.Id.Value">
+            @guild.Name (@guild.Id.Value)
+        </SelectItem>
+    }
+</Select>
+
+SelectedValue: @MyValue
+
+@code {
+    [Inject]
+    public IDiscordWebService DiscordWebService { get; set; }
+
+    public List<Guild> Guilds { get; set; } = new();
+
+    [Parameter] public DiscordGuildId DiscordGuildId { get; set; }
+
+    [Parameter]
+    public EventCallback<DiscordGuildId> DiscordGuildIdChanged { get; set; }
+
+    public long MyValue { get; set; }
+    
+    Task OnSelectedValueChanged( long value )
+    {
+        MyValue = value;
+        Console.WriteLine( MyValue );
+        DiscordGuildIdChanged.InvokeAsync(new DiscordGuildId(value));
+
+        return Task.CompletedTask;
+    }
+    
+    
+    protected override async Task OnInitializedAsync() {
+        var guilds = await DiscordWebService.GetGuilds();
+        if (guilds.IsSuccess) {
+            Guilds = guilds.Value.ToList();
+        }
+        
+        await base.OnInitializedAsync();
+    }
+
+  
+
+}

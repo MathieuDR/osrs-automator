@@ -7,13 +7,13 @@ using Quartz;
 
 namespace DiscordBot;
 
-public class DiscordBot : BackgroundService {
+public class Bot : BackgroundService {
     private readonly IConfiguration _config;
-    private readonly ILogger<DiscordBot> _logger;
+    private readonly ILogger<Bot> _logger;
     private readonly IServiceProvider _services;
     private DiscordSocketClient _client;
 
-    public DiscordBot(IConfiguration config, IServiceProvider services, ILogger<DiscordBot> logger) {
+    public Bot(IConfiguration config, IServiceProvider services, ILogger<Bot> logger) {
         _config = config;
         _services = services;
         _logger = logger;

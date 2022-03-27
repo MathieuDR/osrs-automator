@@ -1,6 +1,6 @@
 using System.Text.Json.Serialization;
 
-namespace Dashboard.Models.ApiRequests.DiscordEmbed;
+namespace DiscordBot.Dashboard.Models.ApiRequests.DiscordEmbed;
 
 public class Embed {
 	[JsonPropertyName("thumbnail")]

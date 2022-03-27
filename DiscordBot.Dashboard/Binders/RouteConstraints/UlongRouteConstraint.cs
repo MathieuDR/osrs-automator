@@ -1,4 +1,4 @@
-namespace Dashboard.Binders.RouteConstraints;
+namespace DiscordBot.Dashboard.Binders.RouteConstraints;
 
 public class UlongRouteConstraint : IRouteConstraint {
 	public static string UlongRouteConstraintName = "ulong";

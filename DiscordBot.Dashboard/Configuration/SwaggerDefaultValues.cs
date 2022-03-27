@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.Mvc.ApiExplorer;
 using Microsoft.OpenApi.Models;
 using Swashbuckle.AspNetCore.SwaggerGen;
 
-namespace Dashboard.Configuration;
+namespace DiscordBot.Dashboard.Configuration;
 
 /// <summary>
 ///     Represents the Swagger/Swashbuckle operation filter used to document the implicit API version parameter.

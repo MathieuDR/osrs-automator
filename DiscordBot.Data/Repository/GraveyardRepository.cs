@@ -90,7 +90,7 @@ internal class GraveyardRepository : BaseSingleRecordLiteDbRepository<Graveyard>
 		return Update(graveyard.Value);
 	}
 
-	public Result<Shame> GetShameById(ulong userId, Guid shameId) {
+	public Result<Shame> GetShameById(DiscordUserId userId, Guid shameId) {
 		var graveyard = GetGraveyardOrFail();
 		
 		if (graveyard.IsFailed) {
@@ -100,7 +100,7 @@ internal class GraveyardRepository : BaseSingleRecordLiteDbRepository<Graveyard>
 		return GetShame(graveyard.Value, userId, shameId);
 	}
 
-	private Result<Shame> GetShame(Graveyard graveyard, ulong userId, Guid shameId) {
+	private Result<Shame> GetShame(Graveyard graveyard, DiscordUserId userId, Guid shameId) {
 		if (!graveyard.Shames.ContainsKey(userId)) {
 			return Result.Fail("No shames for user");
 		}
@@ -116,7 +116,7 @@ internal class GraveyardRepository : BaseSingleRecordLiteDbRepository<Graveyard>
 		return Result.Ok(shame);
 	}
 
-	public Result UpdateShame(ulong shamedId, Guid shameId, Shame shame) {
+	public Result UpdateShame(DiscordUserId shamedId, Guid shameId, Shame shame) {
 		var graveyard = GetGraveyardOrFail();
 		
 		if (graveyard.IsFailed) {

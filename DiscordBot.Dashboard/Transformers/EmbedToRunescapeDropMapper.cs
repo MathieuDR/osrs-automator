@@ -1,10 +1,10 @@
 using System.Text.RegularExpressions;
-using Dashboard.Models.ApiRequests.DiscordEmbed;
 using DiscordBot.Common.Dtos.Runescape;
+using DiscordBot.Dashboard.Models.ApiRequests.DiscordEmbed;
 using FluentResults;
 using WiseOldManConnector.Models.WiseOldMan.Enums;
 
-namespace Dashboard.Transformers;
+namespace DiscordBot.Dashboard.Transformers;
 
 public class EmbedToRunescapeDropMapper : IMapper<Embed, RunescapeDrop> {
     public Result<RunescapeDrop> Map(Embed source) {
