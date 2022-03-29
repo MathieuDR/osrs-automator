@@ -6,6 +6,20 @@
 
 <Row>
     <Column>
+        <Column>
+                <Fields>
+                    <Field>
+                        <FieldLabel>Server</FieldLabel>
+                        <GuildSelector @bind-DiscordGuildId="SelectedGuild" />
+                    </Field>
+                </Fields>
+            </Column>
+    </Column>
+</Row>
+
+
+<Row>
+    <Column>
         <Heading Size="HeadingSize.Is2">
             Default settings
         </Heading>
@@ -30,6 +44,20 @@
     </Column>
 </Row>
 
+<Button Color="Color.Primary" Clicked="@ResetCache">Reset Cache</Button>
+
+
 @code {
+    public DiscordGuildId SelectedGuild { get; set; }
     
+    [Inject]
+    public ICachedDiscordService CachedDiscordService { get; set; }
+    
+    [Inject]
+    public INotificationService NotificationService { get; set; }
+    
+    public void ResetCache() {
+         _ = CachedDiscordService.ResetCache();
+        NotificationService.Success("Cache reset!");
+    }
 }

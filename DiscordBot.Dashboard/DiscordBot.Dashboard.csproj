@@ -22,58 +22,11 @@
         <PackageReference Include="Serilog.Enrichers.AspNetCore" Version="1.0.0" />
         <PackageReference Include="Swashbuckle.AspNetCore" Version="6.3.0" />
     </ItemGroup>
-
+    
     <ItemGroup>
-        <_ContentIncludedByDefault Remove="Pages\Shared\MainLayout.razor" />
-        <_ContentIncludedByDefault Remove="Pages\Shared\NavMenu.razor" />
-        <_ContentIncludedByDefault Remove="wwwroot\css\bootstrap\bootstrap.min.css" />
-        <_ContentIncludedByDefault Remove="wwwroot\css\bootstrap\bootstrap.min.css.map" />
-    </ItemGroup>
-
-    <ItemGroup>
-        <Compile Remove="logs\**" />
-        <Compile Remove="db\**" />
-    </ItemGroup>
-
-    <ItemGroup>
-        <EmbeddedResource Remove="logs\**" />
-        <EmbeddedResource Remove="db\**" />
-    </ItemGroup>
-
-    <ItemGroup>
-        <None Remove="logs\**" />
-        <None Remove="db\**" />
-    </ItemGroup>
-
-    <ItemGroup>
-        <Content Remove="logs\**" />
-        <Content Remove="db\**" />
-        <Content Remove="Pages\TreeViewPage.razor" />
-        <Content Remove="Pages\TreeItemPage.razor" />
-        <Content Remove="Pages\ToolbarPage.razor" />
-        <Content Remove="Pages\TextFieldPage.razor" />
-        <Content Remove="Pages\TextAreaPage.razor" />
-        <Content Remove="Pages\SwitchPage.razor" />
-        <Content Remove="Pages\SliderPage.razor" />
-        <Content Remove="Pages\SliderLabelPage.razor" />
-        <Content Remove="Pages\SelectPage.razor" />
-        <Content Remove="Pages\RawEventHandlers.razor" />
-        <Content Remove="Pages\RadioPage.razor" />
-        <Content Remove="Pages\ProgressRingPage.razor" />
-        <Content Remove="Pages\NumberFieldPage.razor" />
-        <Content Remove="Pages\MenuItemPage.razor" />
-        <Content Remove="Pages\ListboxOptionPage.razor" />
-        <Content Remove="Pages\HorizontalScrollPage.razor" />
-        <Content Remove="Pages\FlipperPage.razor" />
-        <Content Remove="Pages\DialogPage.razor" />
-        <Content Remove="Pages\ComponentBindings.razor" />
-        <Content Remove="Pages\CheckboxPage.razor" />
-        <Content Remove="Pages\CardPage.razor" />
-        <Content Remove="Pages\BreadcrumbPage.razor" />
-        <Content Remove="Pages\BreadcrumbItemPage.razor" />
-        <Content Remove="Pages\BadgePage.razor" />
-        <Content Remove="Pages\AnchoredRegionPage.razor" />
-        <Content Remove="Pages\AccordionPage.razor" />
+        <Watch Include="wwroot\scripts\*.js" />
+        <Watch Include="wwroot\css\*.css" />
+        <Watch Include="**\*.razor" />
     </ItemGroup>
 
     <ItemGroup>

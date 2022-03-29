@@ -71,7 +71,7 @@ public static class StartupHelper {
             .ConfigureQuartz(configuration);
 
         services.AddTransient<IMapper<Embed, RunescapeDrop>, EmbedToRunescapeDropMapper>();
-        services.AddSingleton<IDiscordWebService, CachedDiscordWebService>();
+        services.AddSingleton<ICachedDiscordService, CachedCachedDiscordService>();
     }
 
     public static void ConfigurePipeline(IApplicationBuilder app, IWebHostEnvironment env,

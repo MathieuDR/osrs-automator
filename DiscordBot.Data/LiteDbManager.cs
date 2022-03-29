@@ -99,6 +99,7 @@ public class LiteDbManager: IDisposable {
     }
 
     private LiteDatabase CreateDatabase(string connectionString) {
+        CreateDirectory(connectionString);
         var liteDatabase = new LiteDatabase(connectionString, BsonMapper);
 
         using (LogContext.PushProperty("db", connectionString)) {
@@ -106,6 +107,13 @@ public class LiteDbManager: IDisposable {
         }
 
         return liteDatabase;
+    }
+
+    private static void CreateDirectory(string connectionString) {
+        var path = Path.GetDirectoryName(connectionString);
+        if (path is not null && !Directory.Exists(path)) {
+            Directory.CreateDirectory(path);
+        }
     }
 
     public void ClearDb() {

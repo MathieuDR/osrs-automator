@@ -7,7 +7,7 @@ using Microsoft.Extensions.Primitives;
 
 namespace DiscordBot.Dashboard.Services;
 
-public interface IDiscordWebService {
+public interface ICachedDiscordService {
 	public Task<Result<IEnumerable<Channel>>> GetOrderedTextChannels(DiscordGuildId guildId);
 	public Task<Result<Dictionary<Channel, IEnumerable<Channel>>>> GetNestedChannels(DiscordGuildId guildId);
 	public Task<Result<Dictionary<Channel, IEnumerable<Channel>>>> GetNestedTextChannels(DiscordGuildId guildId);
@@ -16,14 +16,14 @@ public interface IDiscordWebService {
 	public Result ResetCache(DiscordGuildId guildId);
 }
 
-public class CachedDiscordWebService : IDiscordWebService {
+public class CachedCachedDiscordService : ICachedDiscordService {
 	private readonly TimeSpan _cacheExpiration = TimeSpan.FromHours(1);
 	private readonly IDiscordService _discordService;
 	private readonly IMemoryCache _memoryCache;
 	private readonly Dictionary<DiscordGuildId, CancellationTokenSource> _resetCacheTokens = new();
 
 
-	public CachedDiscordWebService(IDiscordService discordService, IMemoryCache memoryCache) {
+	public CachedCachedDiscordService(IDiscordService discordService, IMemoryCache memoryCache) {
 		_discordService = discordService;
 		_memoryCache = memoryCache;
 	}

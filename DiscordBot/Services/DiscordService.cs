@@ -55,6 +55,10 @@ public class DiscordService : IDiscordService {
     }
 
     public Task<Result<IEnumerable<Guild>>> GetGuilds() {
+        if(_client.ConnectionState != ConnectionState.Connected) {
+            return Task.FromResult(Result.Fail<IEnumerable<Guild>>("Client is not connected"));
+        }
+        
         var result = Result.Ok(_client.Guilds.Select(x=>x.ToGuildDto()));
         return Task.FromResult(result);
     }

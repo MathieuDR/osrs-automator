@@ -1,9 +1,5 @@
-
-
-
-
-<Select TValue="long" SelectedValue="@MyValue" SelectedValueChanged="@OnSelectedValueChanged">
-    <SelectItem Disabled>Please select a server</SelectItem>
+<Select TValue="long" SelectedValueChanged="@OnSelectedValueChanged">
+    <SelectItem Disabled>@FirstOption</SelectItem>
     @foreach (var guild in Guilds) {
         <SelectItem Value="@guild.Id.Value">
             @guild.Name (@guild.Id.Value)
@@ -11,40 +7,43 @@
     }
 </Select>
 
-SelectedValue: @MyValue
-
 @code {
     [Inject]
-    public IDiscordWebService DiscordWebService { get; set; }
+    public ICachedDiscordService CachedDiscordService { get; set; }
 
     public List<Guild> Guilds { get; set; } = new();
 
     [Parameter] public DiscordGuildId DiscordGuildId { get; set; }
 
-    [Parameter]
-    public EventCallback<DiscordGuildId> DiscordGuildIdChanged { get; set; }
+    [Parameter] public EventCallback<DiscordGuildId> DiscordGuildIdChanged { get; set; }
 
-    public long MyValue { get; set; }
-    
-    Task OnSelectedValueChanged( long value )
-    {
-        MyValue = value;
-        Console.WriteLine( MyValue );
-        DiscordGuildIdChanged.InvokeAsync(new DiscordGuildId(value));
+    public string FirstOption { get; set; } = "Loading...";
 
+
+    Task OnSelectedValueChanged( long value ) {
+        DiscordGuildId = new DiscordGuildId(value);
+        DiscordGuildIdChanged.InvokeAsync(DiscordGuildId);
         return Task.CompletedTask;
+    }
+
+    private async Task GetGuilds(int retries = 0) {
+        var guilds = await CachedDiscordService.GetGuilds();
+        if (guilds.IsSuccess) {
+            Guilds = guilds.Value.ToList();
+            FirstOption = "Please select a server";
+        } else {
+            if (retries < 3) {
+                await Task.Delay(1000);
+                await GetGuilds(retries + 1);
+            } else {
+                FirstOption = "Failed to load servers";
+            }
+        }
     }
     
     
     protected override async Task OnInitializedAsync() {
-        var guilds = await DiscordWebService.GetGuilds();
-        if (guilds.IsSuccess) {
-            Guilds = guilds.Value.ToList();
-        }
-        
+        await GetGuilds();
         await base.OnInitializedAsync();
     }
-
-  
-
 }
