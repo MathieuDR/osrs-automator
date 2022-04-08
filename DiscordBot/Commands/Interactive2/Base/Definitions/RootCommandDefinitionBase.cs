@@ -41,6 +41,10 @@ public abstract class RootCommandDefinitionBase : CommandDefinitionBase, IRootCo
 			throw new ArgumentException("Command name must be lowercase");
 		}
 
+		if (builder.Options is null) {
+			return;
+		}
+
 		foreach (var option in builder.Options) {
 			ValidateOption(option);
 		}

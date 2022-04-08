@@ -37,6 +37,10 @@ public abstract class
 			// Instantiate a object of the generic type
 			// Use activator instead of a compiled lambda.
 			// We can improve this by creating a singleton service that holds all the activators.
+			if (typeof(IRootCommandDefinition).IsAssignableFrom(genericType)) {
+				return Activator.CreateInstance(genericType, ServiceProvider, Array.Empty<ISubCommandDefinition>()).As<ICommandDefinition>();	
+			}
+			
 			return Activator.CreateInstance(genericType, ServiceProvider).As<ICommandDefinition>();
 		}
 
