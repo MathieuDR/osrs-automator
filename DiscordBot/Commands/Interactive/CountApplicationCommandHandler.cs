@@ -62,6 +62,7 @@ public class CountApplicationCommandHandler : ApplicationCommandHandler {
     #region add
 
     private async Task<Result> AddHandler(ApplicationCommandContext context) {
+        await context.DeferAsync();
         var (additive, usersString, reason) = GetAddParameters(context);
         var users = (await usersString.GetUsersFromString(context)).users.ToList();
 
@@ -78,8 +79,7 @@ public class CountApplicationCommandHandler : ApplicationCommandHandler {
         var embed = CreateAddEmbed(context, users, additive, descriptionBuilder);
 
         await Task.WhenAll(tasks);
-        await context.RespondAsync(embeds: new[] { embed.Build() }, ephemeral: false);
-
+        await context.FollowupAsync(embeds: new[] { embed.Build() }, ephemeral: false);
         return Result.Ok();
     }
 
