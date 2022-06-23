@@ -1,4 +1,7 @@
 @page "/dropper/settings"
+@using DiscordBot.Common.Models.Data.Drops
+@using DiscordBot.Dashboard.Extensions
+@using DiscordBot.Dashboard.Models
 
 <PageHeader>
     Automated dropper settings
@@ -10,7 +13,7 @@
                 <Fields>
                     <Field>
                         <FieldLabel>Server</FieldLabel>
-                        <GuildSelector @bind-DiscordGuildId="SelectedGuild" />
+                        <GuildSelector DiscordGuildChanged="OnDiscordGuildChange" />
                     </Field>
                 </Fields>
             </Column>
@@ -18,46 +21,68 @@
 </Row>
 
 
-<Row>
+
+@if (SelectedGuild is null || SelectedGuild is default(Guild)) {
+    <Row>
+        <Paragraph>Please select a server.</Paragraph>
+    </Row>
+} else {
+    <DropperGuildConfigurationComponent Guild="SelectedGuild" Configuration="GuildConfiguration" />
+}
+
+<Row Margin="Margin.Is2.FromTop">
     <Column>
-        <Heading Size="HeadingSize.Is2">
-            Default settings
-        </Heading>
+        <Button Color="Color.Primary" Clicked="@SaveConfiguration">Save</Button>
+    </Column>
+    
+    <Column>
+        <Button Color="Color.Primary" Clicked="@ResetCache">Reset Cache</Button>
     </Column>
 </Row>
-<Row>
-    <Column>
-        <Paragraph>
-            These settings are the default. <br />
-            You will be able to 'inherit' these settings on any specific dropper.
-        </Paragraph>
-        <Paragraph>
-            A common use case would be to set the default settings to general 'rules' for all droppers. For example you might want to set the default rarity and value.
-            If you want to diverge from these defaults, you can set these settings on the specific dropper.
-        </Paragraph>
-    </Column>
-</Row>
-
-<Row>
-    <Column>
-        <DropperConfiguration />
-    </Column>
-</Row>
-
-<Button Color="Color.Primary" Clicked="@ResetCache">Reset Cache</Button>
-
 
 @code {
-    public DiscordGuildId SelectedGuild { get; set; }
-    
+    public Guild? SelectedGuild { get; set; }
+
     [Inject]
     public ICachedDiscordService CachedDiscordService { get; set; }
     
     [Inject]
     public INotificationService NotificationService { get; set; }
     
+    [Inject]
+    public IAutomatedDropperService AutomatedDropperService { get; set; }
+
+    public DropperGuildConfigurationModel? GuildConfiguration;
+    private DropperGuildConfiguration? _guildConfiguration;
+
     public void ResetCache() {
          _ = CachedDiscordService.ResetCache();
         NotificationService.Success("Cache reset!");
     }
+
+    private async Task OnDiscordGuildChange(Guild guild) {
+        SelectedGuild = guild;
+        var result = await AutomatedDropperService.GetGuildConfiguration(guild);
+        if (result.IsFailed) {
+            _ = NotificationService.Error("Cannot get guild configuration");
+        }
+
+        GuildConfiguration = result.Value.ToRequest();
+        _guildConfiguration = result.Value;
+    }
+
+    private async Task SaveConfiguration() {
+        if (GuildConfiguration is null || _guildConfiguration is null) {
+            _ = NotificationService.Error("Oh boy, something went wrong. \nThere is no configuration!");
+        }
+        
+        var result = await AutomatedDropperService.SaveGuildConfiguration(GuildConfiguration!.ToRecord(_guildConfiguration!));
+        
+        if (result.IsFailed) {
+            _ = NotificationService.Error("Couldn't save the guild configuration");
+        }
+
+        _ = NotificationService.Success("Saved!");
+    }
+
 }

@@ -14,6 +14,7 @@ public interface ICachedDiscordService {
 	public Task<Result<IEnumerable<Guild>>> GetGuilds();
 	public Result ResetCache();
 	public Result ResetCache(DiscordGuildId guildId);
+	public Task<Result<IEnumerable<GuildUser>>> GetUsers(DiscordGuildId guildId);
 }
 
 public class CachedCachedDiscordService : ICachedDiscordService {
@@ -39,9 +40,7 @@ public class CachedCachedDiscordService : ICachedDiscordService {
 		return Result.Ok(result);
 	}
 
-	public async Task<Result<Dictionary<Channel, IEnumerable<Channel>>>> GetNestedChannels(DiscordGuildId guildId) {
-		return await GetFromCache(guildId, "nestedChannels", () => _discordService.GetNestedChannelsForGuild(guildId));
-	}
+	public async Task<Result<Dictionary<Channel, IEnumerable<Channel>>>> GetNestedChannels(DiscordGuildId guildId) => await GetFromCache(guildId, "nestedChannels", () => _discordService.GetNestedChannelsForGuild(guildId));
 
 	public async Task<Result<Dictionary<Channel, IEnumerable<Channel>>>> GetNestedTextChannels(DiscordGuildId guildId) {
 		var nestedChannels = await GetNestedChannels(guildId);
@@ -54,9 +53,9 @@ public class CachedCachedDiscordService : ICachedDiscordService {
 		return Result.Ok(result);
 	}
 
-	public async Task<Result<IEnumerable<Guild>>> GetGuilds() {
-		return await GetFromCache("guilds", async () => await _discordService.GetGuilds());
-	}
+	public async Task<Result<IEnumerable<Guild>>> GetGuilds() => await GetFromCache("guilds", async () => await _discordService.GetGuilds());
+
+	public async Task<Result<IEnumerable<GuildUser>>> GetUsers(DiscordGuildId guildId) => await GetFromCache(guildId, "users", async () => await _discordService.GetUsers(guildId));
 
 
 	public Result ResetCache() {

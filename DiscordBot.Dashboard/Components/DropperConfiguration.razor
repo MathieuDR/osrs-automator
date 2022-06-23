@@ -1,13 +1,62 @@
-<Row>
-    <Column>
-        <Heading Size="HeadingSize.Is4">Configuration</Heading>
-    </Column>
-</Row>
-<Row>
-    
-</Row>
+@if (GuildId == DiscordGuildId.Empty) {
+    <Row>
+        <Paragraph>Please select a server.</Paragraph>
+    </Row>
+} else {
+    <Row>
+        <Column>
+            <Heading Size="HeadingSize.Is4"><Text TextWeight="TextWeight.Bold">@GuildName</Text> configuration</Heading>
+        </Column>
+    </Row>
 
+    <Row>
+        <Column ColumnSize="ColumnSize.Is12">
+            <Heading Size="HeadingSize.Is5">General</Heading>
+        </Column>
+
+        <Column ColumnSize="ColumnSize.Is12">
+            <Fields>
+                <Field>
+                    <Switch TValue="bool">Enable</Switch>
+                </Field>
+            </Fields>
+        </Column>
+    </Row>
+}
 
 @code {
-    public DiscordGuildId SelectedGuild { get; set; }
+    [Inject]
+    private INotificationService NotificationService { get; set; }
+    
+    [Inject]
+    public ICachedDiscordService CachedDiscordService { get; set; }
+
+    public IReadOnlyCollection<Guild> Guilds { get; set; } = new List<Guild>().AsReadOnly();
+    
+    [Parameter]
+    public DiscordGuildId GuildId { get; set; }
+
+    public string GuildName => Guilds.FirstOrDefault(x => x.Id == GuildId)?.Name ?? "Unknown" ;
+
+    
+    private async Task GetGuilds(int retries = 0) {
+        var guilds = await CachedDiscordService.GetGuilds();
+        if (guilds.IsSuccess) {
+            Guilds = guilds.Value.ToList();
+        } else {
+            if (retries < 3) {
+                await Task.Delay(1000);
+                await GetGuilds(retries + 1);
+            } else {
+                await NotificationService.Error("Could not load guilds");
+            }
+        }
+    }
+    
+    
+    protected override async Task OnInitializedAsync() {
+        await GetGuilds();
+        await base.OnInitializedAsync();
+    }
+
 }

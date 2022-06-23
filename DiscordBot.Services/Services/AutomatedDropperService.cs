@@ -58,6 +58,15 @@ internal class AutomatedDropperService : RepositoryService, IAutomatedDropperSer
         return Result.Ok(CreateEndpointUri(endpoint));
     }
 
+    public Task<Result<DropperGuildConfiguration>> GetGuildConfiguration(Guild guild) =>
+        Task.FromResult(GetGuildConfiguration(guild.Id, DiscordUserId.Empty));
+
+    Task<Result> IAutomatedDropperService.SaveGuildConfiguration(DropperGuildConfiguration configuration) {
+        var repo = RepositoryStrategy.GetOrCreateRepository<IRunescapeDropperGuildConfigurationRepository>(configuration.GuildId);
+        var r= repo.UpdateOrInsert(configuration);
+        return Task.FromResult<Result>(r);
+    }
+
     private Result SaveGuildConfiguration(DropperGuildConfiguration guildConfiguration) {
         var repo = RepositoryStrategy.GetOrCreateRepository<IRunescapeDropperGuildConfigurationRepository>(guildConfiguration.GuildId);
         return repo.UpdateOrInsert(guildConfiguration);

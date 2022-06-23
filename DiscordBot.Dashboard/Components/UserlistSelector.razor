@@ -1,0 +1,89 @@
+@if (loaded) {
+    <Column ColumnSize="ColumnSize.Is12">
+        <Field>
+            <FieldLabel>Disable users</FieldLabel>
+            <Autocomplete TItem="GuildUser"
+                          TValue="GuildUser"
+                          Data="@Users"
+                          TextField="@((user) => user.Username)"
+                          ValueField="@(user => user)"
+                          Placeholder="Search user..."
+                          Filter="AutocompleteFilter.Contains"
+                          @bind-SelectedTexts="multipleSelectionTexts"
+                          SelectedValuesChanged="OnListChanged"
+                          SelectedValues="multipleSelectionData"
+                          Multiple>
+
+                <NotFoundContent> Sorry... @context was not found!</NotFoundContent>
+            </Autocomplete>
+        </Field>
+    </Column>
+} else {
+    <Column ColumnSize="ColumnSize.Is12">
+        <Paragraph>Still loading.</Paragraph>
+    </Column>
+}
+
+@code {
+    bool loaded = false;
+
+    public List<GuildUser> multipleSelectionData = new();
+    public List<string> multipleSelectionTexts = new();
+
+    [Inject]
+    public ILogger<UserlistSelector> Logger { get; set; }
+
+    [Inject]
+    public ICachedDiscordService DiscordService { get; set; }
+
+    [Inject]
+    public INotificationService NotificationService { get; set; }
+
+    [Parameter]
+    public Guild Guild { get; set; }
+
+    [Parameter]
+    public IReadOnlyList<GuildUser> SelectedUsers { get; set; } = new List<GuildUser>();
+
+    [Parameter]
+    public EventCallback<IReadOnlyList<GuildUser>> SelectedUsersChanged { get; set; }
+
+    public List<GuildUser> Users { get; private set; } = new ();
+
+    private async Task GetUsers(int retries = 0) {
+        var userResult = await DiscordService.GetUsers(Guild.Id);
+        if (userResult.IsSuccess) {
+            var pool = userResult.Value
+                .Where(x => !x.IsBot)
+                .ToList();
+            
+            Users.Clear();
+            Users.AddRange(pool);
+    
+            loaded = true;
+        } else {
+            if (retries < 3) {
+                await Task.Delay(1000);
+                await GetUsers(retries + 1);
+            } else {
+                await NotificationService.Error($"Could not retrieve users for guild {Guild.Name} ({Guild.Id}).");
+            }
+        }
+    }
+
+    protected override async Task OnParametersSetAsync() {
+    // Can be null, but shouldn't be since it's blazor component lifecycle.
+        if (Guild is not null) {
+            await GetUsers();
+        }
+
+        await base.OnParametersSetAsync();
+    }
+
+    private void OnListChanged(List<GuildUser> obj) {
+        multipleSelectionData = obj;
+        SelectedUsers = obj;
+        SelectedUsersChanged.InvokeAsync(obj.AsReadOnly());
+    }
+
+}
