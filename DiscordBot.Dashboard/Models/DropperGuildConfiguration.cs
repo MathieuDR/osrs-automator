@@ -1,3 +1,4 @@
+using DiscordBot.Common.Dtos.Discord;
 using DiscordBot.Common.Identities;
 using WiseOldManConnector.Models.WiseOldMan.Enums;
 

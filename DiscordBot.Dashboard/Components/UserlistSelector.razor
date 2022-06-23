@@ -3,15 +3,15 @@
         <Field>
             <FieldLabel>Disable users</FieldLabel>
             <Autocomplete TItem="GuildUser"
-                          TValue="GuildUser"
+                          TValue="DiscordUserId"
                           Data="@Users"
                           TextField="@((user) => user.Username)"
-                          ValueField="@(user => user)"
+                          ValueField="@(user => user.Id)"
                           Placeholder="Search user..."
                           Filter="AutocompleteFilter.Contains"
                           @bind-SelectedTexts="multipleSelectionTexts"
                           SelectedValuesChanged="OnListChanged"
-                          SelectedValues="multipleSelectionData"
+                          SelectedValues="SelectedUsers"
                           Multiple>
 
                 <NotFoundContent> Sorry... @context was not found!</NotFoundContent>
@@ -27,7 +27,6 @@
 @code {
     bool loaded = false;
 
-    public List<GuildUser> multipleSelectionData = new();
     public List<string> multipleSelectionTexts = new();
 
     [Inject]
@@ -43,10 +42,10 @@
     public Guild Guild { get; set; }
 
     [Parameter]
-    public IReadOnlyList<GuildUser> SelectedUsers { get; set; } = new List<GuildUser>();
+    public List<DiscordUserId> SelectedUsers { get; set; } = new List<DiscordUserId>();
 
     [Parameter]
-    public EventCallback<IReadOnlyList<GuildUser>> SelectedUsersChanged { get; set; }
+    public EventCallback<List<DiscordUserId>> SelectedUsersChanged { get; set; }
 
     public List<GuildUser> Users { get; private set; } = new ();
 
@@ -59,7 +58,7 @@
             
             Users.Clear();
             Users.AddRange(pool);
-    
+
             loaded = true;
         } else {
             if (retries < 3) {
@@ -71,6 +70,12 @@
         }
     }
 
+    public override Task SetParametersAsync(ParameterView parameters) {
+        multipleSelectionTexts.Clear();
+        SelectedUsers.Clear();
+        return base.SetParametersAsync(parameters);
+    }
+
     protected override async Task OnParametersSetAsync() {
     // Can be null, but shouldn't be since it's blazor component lifecycle.
         if (Guild is not null) {
@@ -80,10 +85,8 @@
         await base.OnParametersSetAsync();
     }
 
-    private void OnListChanged(List<GuildUser> obj) {
-        multipleSelectionData = obj;
-        SelectedUsers = obj;
-        SelectedUsersChanged.InvokeAsync(obj.AsReadOnly());
+    private void OnListChanged(List<DiscordUserId> obj) {
+        SelectedUsersChanged.InvokeAsync(obj);
     }
 
 }
