@@ -12,10 +12,10 @@
     </ItemGroup>
 
     <ItemGroup>
-        <PackageReference Include="Blazorise" Version="1.0.1" />
-        <PackageReference Include="Blazorise.Components" Version="1.0.1" />
-        <PackageReference Include="Blazorise.Icons.FontAwesome" Version="1.0.1" />
-        <PackageReference Include="Microsoft.AspNetCore.Components.Web" Version="6.0.1" />
+        <PackageReference Include="Blazorise" Version="1.0.5" />
+        <PackageReference Include="Blazorise.Components" Version="1.0.5" />
+        <PackageReference Include="Blazorise.Icons.FontAwesome" Version="1.0.5" />
+        <PackageReference Include="Microsoft.AspNetCore.Components.Web" Version="6.0.6" />
     </ItemGroup>
 
 </Project>

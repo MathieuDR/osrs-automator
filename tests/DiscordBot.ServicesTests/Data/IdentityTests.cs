@@ -1,5 +1,3 @@
-using System.Collections;
-using System.Diagnostics;
 using DiscordBot.Common.Identities;
 using DiscordBot.Data;
 using DiscordBot.Data.Configuration;

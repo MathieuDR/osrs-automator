@@ -1,6 +1,6 @@
-using Common.Parsers;
 using DiscordBot.Common.Models.Enums;
 using DiscordBot.Services.Models.Enums;
+using MathieuDR.Common.Parsers;
 
 namespace DiscordBot.Commands.Interactive;
 

@@ -1,4 +1,3 @@
-using DiscordBot.Common.Models.Data;
 using DiscordBot.Common.Models.Data.Configuration;
 using DiscordBot.Common.Models.Enums;
 using FluentResults;

@@ -1,4 +1,3 @@
-using Common.Extensions;
 using DiscordBot.Common.Dtos.Runescape;
 using DiscordBot.Common.Identities;
 using DiscordBot.Dashboard.Binders;
@@ -6,6 +5,7 @@ using DiscordBot.Dashboard.Models.ApiRequests.DiscordEmbed;
 using DiscordBot.Dashboard.Transformers;
 using DiscordBot.Services.Interfaces;
 using FluentResults;
+using MathieuDR.Common.Extensions;
 using Microsoft.AspNetCore.Mvc;
 
 namespace DiscordBot.Dashboard.Controllers.V1;

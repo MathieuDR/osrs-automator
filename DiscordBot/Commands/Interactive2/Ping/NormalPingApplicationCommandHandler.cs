@@ -1,5 +1,3 @@
-using DiscordBot.Commands.Interactive2.Base.Handlers;
-
 namespace DiscordBot.Commands.Interactive2.Ping;
 
 public class NormalPingApplicationCommandHandler : ApplicationCommandHandlerBase<NormalPingCommandRequest> {

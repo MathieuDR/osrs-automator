@@ -1,4 +1,3 @@
-using System.Diagnostics.Contracts;
 using DiscordBot.Common.Models.Enums;
 using Microsoft.Extensions.DependencyInjection;
 using WiseOldManConnector.Models.WiseOldMan.Enums;

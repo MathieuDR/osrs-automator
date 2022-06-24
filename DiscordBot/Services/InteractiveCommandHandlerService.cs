@@ -1,9 +1,8 @@
-using Common.Extensions;
-using Discord.Net;
 using DiscordBot.Commands.Interactive;
 using DiscordBot.Common.Identities;
 using DiscordBot.Configuration;
 using DiscordBot.Data.Interfaces;
+using MathieuDR.Common.Extensions;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 

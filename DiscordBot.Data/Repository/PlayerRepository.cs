@@ -1,4 +1,3 @@
-using DiscordBot.Common.Models.Data;
 using DiscordBot.Common.Models.Data.PlayerManagement;
 using DiscordBot.Data.Interfaces;
 using FluentResults;

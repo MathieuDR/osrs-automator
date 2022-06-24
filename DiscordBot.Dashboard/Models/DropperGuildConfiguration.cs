@@ -1,11 +1,9 @@
-using DiscordBot.Common.Dtos.Discord;
 using DiscordBot.Common.Identities;
 using WiseOldManConnector.Models.WiseOldMan.Enums;
 
 namespace DiscordBot.Dashboard.Models; 
 
 public class DropperGuildConfigurationModel {
-    public DiscordGuildId GuildId { get; set; }
     public bool IsEnabled { get; set; }
     public List<DiscordUserId> DisabledUsers { get; set; }
     public DropperConfigurationRequest BaseConfiguration { get; set; }

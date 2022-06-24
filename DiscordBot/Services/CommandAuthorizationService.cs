@@ -1,11 +1,10 @@
-using Common.Extensions;
 using DiscordBot.Commands.Interactive;
-using DiscordBot.Commands.Interactive2.Base.Requests;
 using DiscordBot.Common.Dtos.Discord;
 using DiscordBot.Common.Identities;
 using DiscordBot.Common.Models.Data.Configuration;
 using DiscordBot.Common.Models.Enums;
 using DiscordBot.Configuration;
+using MathieuDR.Common.Extensions;
 using Microsoft.Extensions.Options;
 
 namespace DiscordBot.Services;

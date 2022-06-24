@@ -1,4 +1,3 @@
-using DiscordBot.Commands.Interactive2.Base.Definitions;
 using DiscordBot.Common.Models.Data.ClanFunds;
 
 namespace DiscordBot.Commands.Interactive2.Funds.Manage; 

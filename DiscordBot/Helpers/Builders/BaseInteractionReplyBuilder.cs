@@ -1,5 +1,5 @@
 using System.Text;
-using Common.Extensions;
+using MathieuDR.Common.Extensions;
 
 namespace DiscordBot.Helpers.Builders;
 

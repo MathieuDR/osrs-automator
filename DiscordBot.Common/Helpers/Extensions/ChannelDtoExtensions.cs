@@ -1,4 +1,3 @@
-using System.Diagnostics;
 using DiscordBot.Common.Dtos.Discord;
 
 namespace DiscordBot.Common.Helpers.Extensions;

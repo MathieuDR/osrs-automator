@@ -1,5 +1,4 @@
 using DiscordBot.Common.Models.Data.Base;
-using WiseOldManConnector.Models.WiseOldMan.Enums;
 
 namespace DiscordBot.Common.Models.Data.Drops;
 

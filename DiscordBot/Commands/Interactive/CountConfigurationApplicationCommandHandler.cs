@@ -1,8 +1,8 @@
 using System.Text;
-using Common.Extensions;
 using DiscordBot.Common.Identities;
 using DiscordBot.Common.Models.Data.Counting;
 using DiscordBot.Common.Models.Enums;
+using MathieuDR.Common.Extensions;
 
 namespace DiscordBot.Commands.Interactive;
 

@@ -1,4 +1,3 @@
-using DiscordBot.Commands.Interactive2.Base.Handlers;
 using DiscordBot.Common.Identities;
 using DiscordBot.Common.Models.Data.Graveyard;
 using DiscordBot.Common.Models.Enums;

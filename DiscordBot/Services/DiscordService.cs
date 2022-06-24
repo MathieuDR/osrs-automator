@@ -1,12 +1,11 @@
 using System.Text;
-using Common.Extensions;
 using DiscordBot.Common.Dtos.Discord;
 using DiscordBot.Common.Helpers.Extensions;
 using DiscordBot.Common.Identities;
 using DiscordBot.Common.Models.Data.ClanFunds;
 using DiscordBot.Common.Models.Data.Drops;
+using MathieuDR.Common.Extensions;
 using WiseOldManConnector.Helpers;
-using Player = DiscordBot.Common.Models.Data.PlayerManagement.Player;
 
 namespace DiscordBot.Services;
 

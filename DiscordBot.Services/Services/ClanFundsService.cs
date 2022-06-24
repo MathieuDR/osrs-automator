@@ -1,6 +1,5 @@
 using DiscordBot.Common.Dtos.Discord;
 using DiscordBot.Common.Identities;
-using DiscordBot.Common.Models.Data;
 using DiscordBot.Common.Models.Data.ClanFunds;
 using DiscordBot.Data.Interfaces;
 using DiscordBot.Data.Strategies;

@@ -1,7 +1,6 @@
 ﻿using System.Text;
 using DiscordBot.Common.Dtos.Discord;
 using DiscordBot.Common.Identities;
-using DiscordBot.Common.Models.Data;
 using DiscordBot.Common.Models.Data.Configuration;
 using DiscordBot.Common.Models.Decorators;
 using DiscordBot.Common.Models.Enums;

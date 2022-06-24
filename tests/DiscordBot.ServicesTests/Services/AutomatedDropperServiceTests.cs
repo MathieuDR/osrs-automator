@@ -4,7 +4,6 @@ using AutoBogus;
 using Bogus;
 using DiscordBot.Common.Dtos.Runescape;
 using DiscordBot.Common.Identities;
-using DiscordBot.Common.Models.Data;
 using DiscordBot.Common.Models.Data.Drops;
 using DiscordBot.Data.Interfaces;
 using DiscordBot.Data.Strategies;

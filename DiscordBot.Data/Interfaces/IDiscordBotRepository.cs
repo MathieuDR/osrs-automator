@@ -1,6 +1,4 @@
-﻿using DiscordBot.Common.Identities;
-using DiscordBot.Common.Models.Data;
-using DiscordBot.Common.Models.Data.Configuration;
+﻿using DiscordBot.Common.Models.Data.Configuration;
 using DiscordBot.Common.Models.Data.Counting;
 using DiscordBot.Common.Models.Data.PlayerManagement;
 using OsrsPlayer = WiseOldManConnector.Models.Output.Player;

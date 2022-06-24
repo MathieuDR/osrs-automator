@@ -1,6 +1,5 @@
 using DiscordBot.Common.Dtos.Discord;
 using DiscordBot.Common.Identities;
-using DiscordBot.Common.Models.Data;
 using DiscordBot.Common.Models.Data.Graveyard;
 using DiscordBot.Common.Models.Enums;
 using DiscordBot.Data.Interfaces;

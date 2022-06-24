@@ -1,10 +1,10 @@
 @if (loaded) {
     <Column ColumnSize="ColumnSize.Is12">
         <Field>
-            <FieldLabel>Disable users</FieldLabel>
+            <FieldLabel>@FieldName</FieldLabel>
             <Autocomplete TItem="GuildUser"
                           TValue="DiscordUserId"
-                          Data="@Users"
+                          Data="@Pool"
                           TextField="@((user) => user.Username)"
                           ValueField="@(user => user.Id)"
                           Placeholder="Search user..."
@@ -27,6 +27,9 @@
 @code {
     bool loaded = false;
 
+    [Parameter]
+    public string FieldName { get; set; } = "Selected users";
+
     public List<string> multipleSelectionTexts = new();
 
     [Inject]
@@ -39,7 +42,7 @@
     public INotificationService NotificationService { get; set; }
 
     [Parameter]
-    public Guild Guild { get; set; }
+    public Guild? Guild { get; set; }
 
     [Parameter]
     public List<DiscordUserId> SelectedUsers { get; set; } = new List<DiscordUserId>();
@@ -47,18 +50,18 @@
     [Parameter]
     public EventCallback<List<DiscordUserId>> SelectedUsersChanged { get; set; }
 
-    public List<GuildUser> Users { get; private set; } = new ();
+    [Parameter]
+    public List<GuildUser>? Users { get; set; }
+    
+    public List<GuildUser> Pool { get; private set; } = new ();
 
     private async Task GetUsers(int retries = 0) {
         var userResult = await DiscordService.GetUsers(Guild.Id);
         if (userResult.IsSuccess) {
-            var pool = userResult.Value
+            Logger.LogInformation("Setting users through guild");
+            UpdatePool(userResult.Value
                 .Where(x => !x.IsBot)
-                .ToList();
-            
-            Users.Clear();
-            Users.AddRange(pool);
-
+                .ToList());
             loaded = true;
         } else {
             if (retries < 3) {
@@ -70,16 +73,40 @@
         }
     }
 
-    public override Task SetParametersAsync(ParameterView parameters) {
-        multipleSelectionTexts.Clear();
+    private void UpdatePool(List<GuildUser> newUsers) {
+
+        var toKeep = newUsers.Where(x => SelectedUsers.Contains(x.Id)).ToList();
+        
         SelectedUsers.Clear();
-        return base.SetParametersAsync(parameters);
+        SelectedUsers.AddRange(toKeep.Select(x=>x.Id));
+        multipleSelectionTexts.Clear();
+        multipleSelectionTexts.AddRange(toKeep.Select(x=>x.Username));
+        
+        Pool.Clear();
+        Pool.AddRange(newUsers);
+    }
+
+    // public override Task SetParametersAsync(ParameterView parameters) {
+    //     multipleSelectionTexts.Clear();
+    //     SelectedUsers.Clear();
+    //     return base.SetParametersAsync(parameters);
+    // }
+
+    protected override void OnInitialized() {
+        Logger.LogInformation("Initting");
+        base.OnInitialized();
     }
 
     protected override async Task OnParametersSetAsync() {
     // Can be null, but shouldn't be since it's blazor component lifecycle.
-        if (Guild is not null) {
+        if (Users is not null && Users.Count > 0) {
+            Logger.LogInformation("Setting users through list");
+            UpdatePool(Users);
+            loaded = true;
+        }else if (Guild is not null) {
             await GetUsers();
+        } else {
+            _ = NotificationService.Error("We need a guild or a list of users.");
         }
 
         await base.OnParametersSetAsync();

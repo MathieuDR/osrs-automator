@@ -1,5 +1,5 @@
-using Common.Parsers;
 using FluentAssertions;
+using MathieuDR.Common.Parsers;
 using Xunit;
 
 namespace DiscordBot.ServicesTests.Parser;

@@ -1,6 +1,6 @@
-using Common.Extensions;
 using DiscordBot.Common.Identities;
 using Fergun.Interactive.Pagination;
+using MathieuDR.Common.Extensions;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace DiscordBot.Models.Contexts;
