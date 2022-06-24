@@ -126,7 +126,6 @@
     }
 
     protected override async Task OnParametersSetAsync() {
-        Logger.LogInformation("Setting prams in component");
         var userResult = await CachedDiscordService.GetUsers(Guild.Id);
         if (userResult.IsFailed) {
             _ = NotificationService.Error("Cannot get the users.");

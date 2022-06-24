@@ -58,7 +58,6 @@
     private async Task GetUsers(int retries = 0) {
         var userResult = await DiscordService.GetUsers(Guild.Id);
         if (userResult.IsSuccess) {
-            Logger.LogInformation("Setting users through guild");
             UpdatePool(userResult.Value
                 .Where(x => !x.IsBot)
                 .ToList());
@@ -86,21 +85,9 @@
         Pool.AddRange(newUsers);
     }
 
-    // public override Task SetParametersAsync(ParameterView parameters) {
-    //     multipleSelectionTexts.Clear();
-    //     SelectedUsers.Clear();
-    //     return base.SetParametersAsync(parameters);
-    // }
-
-    protected override void OnInitialized() {
-        Logger.LogInformation("Initting");
-        base.OnInitialized();
-    }
-
     protected override async Task OnParametersSetAsync() {
     // Can be null, but shouldn't be since it's blazor component lifecycle.
         if (Users is not null && Users.Count > 0) {
-            Logger.LogInformation("Setting users through list");
             UpdatePool(Users);
             loaded = true;
         }else if (Guild is not null) {
