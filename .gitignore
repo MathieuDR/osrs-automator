@@ -439,3 +439,10 @@ $RECYCLE.BIN/
 /appsettings.debug.json
 /appsettings.Development.json
 /.sonarqube
+
+### Svelte ###
+# gitignore template for the SvelteKit, frontend web component framework
+# website: https://kit.svelte.dev/
+
+.svelte-kit/
+package
