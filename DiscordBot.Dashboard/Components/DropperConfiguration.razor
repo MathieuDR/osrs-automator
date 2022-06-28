@@ -3,7 +3,7 @@
 
     <Row>
         <Column>
-            <Heading Size="HeadingSize.Is4"><Text TextWeight="TextWeight.Bold">owee</Text> configuration</Heading>
+            <Heading Size="HeadingSize.Is4"><Text TextWeight="TextWeight.Bold">@Name</Text> configuration</Heading>
         </Column>
     </Row>
 
@@ -15,7 +15,7 @@
     <Column ColumnSize="ColumnSize.Is12">
         <Fields>
             <Field>
-                <Switch TValue="bool">Enabled</Switch>
+                <Switch TValue="bool" @bind-Checked="Model.IsEnabled">Enabled</Switch>
             </Field>
         </Fields>
     </Column>
@@ -31,7 +31,7 @@
             <Switch TValue="bool" @bind-Checked="isUserWhiteList">Is whitelist</Switch>
         </Field>
    
-        <UserlistSelector Users="@Users" FieldName="@UserListType"/>
+        <UserlistSelector Users="@Users" FieldName="@UserListType" SelectedUsers="selectedUsers" SelectedUsersChanged="ChangeListedUsers"/>
     </Column>
 </Row>
 
@@ -50,10 +50,15 @@
         
     [Parameter]
     public List<GuildUser> Users { get; set; }
+    
+    [Parameter]
+    public string Name { get; set; }
 
     public string UserListType => isUserWhiteList ? "Whitelisted users" :"Blacklisted users";
 
     public bool isUserWhiteList = false;
+
+    public List<DiscordUserId> selectedUsers;
 
 
     protected override Task OnParametersSetAsync() {
@@ -65,11 +70,24 @@
             if (Users is null || Users.Count == 0) {
                 throw new ArgumentException("No users", nameof(Users));
             }
+
+            isUserWhiteList = Model.WhiteListedUsers.Any();
+            selectedUsers = isUserWhiteList ? Model.WhiteListedUsers : Model.BlackListedUsers;
         } catch (ArgumentException e) {
             _ = NotificationService.Error("Something went wrong. Please contact the admin");
             Logger.LogError(e, "Param set on dropperconfig");
         }
         return base.OnParametersSetAsync();
+    }
+
+    private void ChangeListedUsers(List<DiscordUserId> obj) {
+        if (isUserWhiteList) {
+            Model.WhiteListedUsers = obj;
+            Model.BlackListedUsers = new ();
+        } else {
+            Model.WhiteListedUsers = new();
+            Model.BlackListedUsers = obj;
+        }
     }
 
 }

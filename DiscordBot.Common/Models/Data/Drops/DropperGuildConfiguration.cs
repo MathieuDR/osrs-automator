@@ -8,7 +8,7 @@ public record DropperGuildConfiguration : BaseGuildRecord {
 
 	public bool IsEnabled { get; init; }
 	public IEnumerable<DiscordUserId> DisabledUsers { get; init; } = new List<DiscordUserId>();
-	public DropperConfiguration MasterConfiguration { get; init; }
-	public Dictionary<DiscordChannelId, List<DropperConfiguration>> ChannelConfigurations { get; init; }
+	public DropperConfiguration MasterConfiguration { get; init; } = new();
+	public Dictionary<DiscordChannelId, List<DropperConfiguration>> ChannelConfigurations { get; init; } = new();
 	public Dictionary<DiscordUserId, EndpointId> UserEndpoints { get; set; } = new();
 }

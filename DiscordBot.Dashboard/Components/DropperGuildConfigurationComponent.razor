@@ -56,14 +56,14 @@
                     </Row>
                 </Column>
                 <Column>
-                    <DropperConfiguration Users="Users" Model="defaultConfig"/>
+                    <DropperConfiguration Users="Users" Model="Configuration.BaseConfiguration" Name="Default"/>
                 </Column>
             </CollapseBody>
         </Collapse>
         <Collapse Visible="@channelVisible">
             <CollapseHeader>
                 <Heading Size="HeadingSize.Is5">
-                    <Button Clicked="@(() => channelVisible = !channelVisible)">Default settingss</Button>
+                    <Button Clicked="@(() => channelVisible = !channelVisible)">Channel </Button>
                 </Heading>
             </CollapseHeader>
             <CollapseBody>
@@ -76,16 +76,7 @@
                         </Column>
                     </Row>
                     <Row>
-                        <Column>
-                            <Paragraph>
-                                These settings are the default. <br />
-                                You will be able to 'inherit' these settings on any specific dropper.
-                            </Paragraph>
-                            <Paragraph>
-                                A common use case would be to set the default settings to general 'rules' for all droppers. For example you might want to set the default rarity and value.
-                                If you want to diverge from these defaults, you can set these settings on the specific dropper.
-                            </Paragraph>
-                        </Column>
+                        <ExtendedChannelSelector Guild="Guild" FieldName="Channels" Channels="_channels"></ExtendedChannelSelector>
                     </Row>
                 </Column>
                 <Column>
@@ -115,6 +106,7 @@
     [Inject] ILogger<DropperGuildConfigurationComponent> Logger { get; set; }
 
     List<DiscordUserId> _userIds = new();
+    List<ExtendedChannel> _channels;
 
 
     DropperConfigurationRequest defaultConfig = new DropperConfigurationRequest();
@@ -126,12 +118,23 @@
     }
 
     protected override async Task OnParametersSetAsync() {
+        var channelsResultTask = CachedDiscordService.GetOrderedTextChannels(Guild.Id);
         var userResult = await CachedDiscordService.GetUsers(Guild.Id);
         if (userResult.IsFailed) {
             _ = NotificationService.Error("Cannot get the users.");
         }
 
         Users = userResult.Value.ToList();
+        var channelsResult = await channelsResultTask;
+
+        if (channelsResult.IsFailed) {
+            _ = NotificationService.Error("Cannot get the channels.");
+        }
+        _channels = channelsResult.Value.Select(x => {
+            var hasConfig = Configuration.ChannelConfigurations.ContainsKey(x.Id);
+            return new ExtendedChannel(x, false, !hasConfig);
+        }).ToList();
+        
         await base.OnParametersSetAsync();
     }
 
