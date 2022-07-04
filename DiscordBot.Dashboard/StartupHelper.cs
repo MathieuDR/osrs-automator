@@ -1,7 +1,5 @@
-using Blazorise;
-using Blazorise.Bootstrap5;
-using Blazorise.Icons.FontAwesome;
-using DiscordBot.Common.Dtos.Runescape;
+    using System.Globalization;
+    using DiscordBot.Common.Dtos.Runescape;
 using DiscordBot.Configuration;
 using DiscordBot.Dashboard.Binders.RouteConstraints;
 using DiscordBot.Dashboard.Configuration;
@@ -12,11 +10,16 @@ using DiscordBot.Dashboard.Services;
 using DiscordBot.Dashboard.Transformers;
 using DiscordBot.Data.Configuration;
 using DiscordBot.Services.Configuration;
-using Microsoft.AspNetCore.Mvc;
+    using Microsoft.AspNetCore.Authentication;
+    using Microsoft.AspNetCore.Authentication.Cookies;
+    using Microsoft.AspNetCore.Authentication.JwtBearer;
+    using Microsoft.AspNetCore.Authorization;
+    using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ApiExplorer;
 using Microsoft.Extensions.Options;
 using Microsoft.OpenApi.Models;
-using Swashbuckle.AspNetCore.SwaggerGen;
+    using Serilog;
+    using Swashbuckle.AspNetCore.SwaggerGen;
 using WiseOldManConnector.Configuration;
 
 namespace DiscordBot.Dashboard;
@@ -25,25 +28,30 @@ public static class StartupHelper {
     private static ApiOptions GetApiOptions(IConfiguration configuration) {
         return configuration.GetSection("WebApp").GetSection("Api").Get<ApiOptions>();
     }
+    
+    private static OAuthOptions GetOAuthOptions(IConfiguration configuration) {
+        return configuration.GetSection("WebApp").GetSection("OAuth").Get<OAuthOptions>();
+    }
 
     public static void ConfigureServices(IServiceCollection services, IConfiguration configuration) {
         var apiOptions = GetApiOptions(configuration);
-        services.AddRazorPages();
-        services.AddServerSideBlazor();
-        services.AddBlazorise(options => { });
-        services.AddFontAwesomeIcons();
-        services.AddBootstrap5Providers();
-        services.AddBootstrap5Components();
+        var oauthOpts = GetOAuthOptions(configuration);
+        
+        services.AddDiscordOauth(oauthOpts);
+
         services.AddMvc(options => { options.InputFormatters.Add(new BypassFormDataInputFormatter()); });
         services.Configure<RouteOptions>(options =>
         {
             options.ConstraintMap.Add(UlongRouteConstraint.UlongRouteConstraintName, typeof(UlongRouteConstraint));
         });
+        
         services.AddApiVersioning(options => {
             options.AssumeDefaultVersionWhenUnspecified = true;
             options.DefaultApiVersion = new ApiVersion(apiOptions.VersionMajor, apiOptions.VersionMinor);
             options.ReportApiVersions = true;
         });
+
+        
 
         services.AddVersionedApiExplorer(
             options => {
@@ -62,7 +70,7 @@ public static class StartupHelper {
             options.OperationFilter<SwaggerDefaultValues>();
             options.SwaggerDoc(apiOptions.Version, new OpenApiInfo { Title = apiOptions.Description, Version = apiOptions.Version });
         });
-
+        
         services
             .AddDiscordBot(configuration, typeof(global::DiscordBot.Bot))
             .UseLiteDbRepositories(configuration)
@@ -74,6 +82,36 @@ public static class StartupHelper {
         services.AddSingleton<ICachedDiscordService, CachedCachedDiscordService>();
     }
 
+
+    private static void AddDiscordOauth(this IServiceCollection services, OAuthOptions opts) {
+        services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+            .AddJwtBearer()
+            .AddDiscord(o => {
+            o.Prompt = "consent";
+            o.Scope.Add("guilds");
+            o.Scope.Add("guilds.members.read");
+            o.Scope.Add("identify");
+            o.ClientId = opts.ClientId;
+            o.ClientSecret = opts.ClientSecret;
+            o.ReturnUrlParameter = opts.RedirectUrl;
+            
+            Log.Information("Opts: {@opts}",opts);
+            
+            o.ClaimActions.MapCustomJson("urn:discord:avatar:url", user =>
+                string.Format(
+                    CultureInfo.InvariantCulture,
+                    "https://cdn.discordapp.com/avatars/{0}/{1}.{2}",
+                    user.GetString("id"),
+                    user.GetString("avatar"),
+                    user.GetString("avatar")!.StartsWith("a_") ? "gif" : "png"));
+        });
+        
+        services.AddAuthorization(options =>
+        {
+            options.DefaultPolicy = new AuthorizationPolicyBuilder().RequireAuthenticatedUser().Build();
+        });
+    }
+
     public static void ConfigurePipeline(IApplicationBuilder app, IWebHostEnvironment env,
         IApiVersionDescriptionProvider apiVersionDescriptionProvider, IConfiguration configuration) {
         if (env.IsDevelopment()) {
@@ -83,15 +121,17 @@ public static class StartupHelper {
         }
 
         ConfigureSwagger(app, apiVersionDescriptionProvider, GetApiOptions(configuration));
-
+        
+        
         app.UseStaticFiles();
-
         app.UseRouting();
+        
+        app.UseAuthentication();
+        app.UseAuthorization();
 
+    
         app.UseEndpoints(endpoints => {
             endpoints.MapControllers();
-            endpoints.MapBlazorHub();
-            endpoints.MapFallbackToPage("/_Host");
         });
     }
 

@@ -7,8 +7,8 @@ public class Author {
 	public string Name { get; set; }
 
 	[JsonPropertyName("url")]
-	public string Url { get; set; }
+	public string? Url { get; set; }
 
 	[JsonPropertyName("icon_url")]
-	public string Icon { get; set; }
+	public string? Icon { get; set; }
 }

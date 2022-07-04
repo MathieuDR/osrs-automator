@@ -8,3 +8,9 @@ public class ApiOptions {
 	public string Description { get; set; }
 	public string UIEndpointSuffix { get; set; }
 }
+
+public class OAuthOptions {
+	public string ClientId { get; set; }
+	public string ClientSecret { get; set; }
+	public string RedirectUrl { get; set; }
+}
