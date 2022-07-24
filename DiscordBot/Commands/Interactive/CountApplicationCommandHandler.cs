@@ -115,7 +115,7 @@ public class CountApplicationCommandHandler : ApplicationCommandHandler {
 
     private async Task HandleNewCount(ApplicationCommandContext context, int startCount, int newCount, IGuildUser user) {
         try {
-            var thresholds = await _counterService.GetThresholds(user.GuildId);
+            var thresholds = (await _counterService.GetThresholds(user.GuildId)).OrderBy(x=>x.Threshold);
             var channelId = await _counterService.GetChannelForGuild(user.GuildId);
 
             if (!(context.Guild.GetChannel(channelId) is ISocketMessageChannel channel)) {
@@ -142,8 +142,9 @@ public class CountApplicationCommandHandler : ApplicationCommandHandler {
                     }
                 }
             }
-        } catch (Exception) {
+        } catch (Exception e) {
             // ignored
+            Logger.LogError(e, "Could not handle new count");
         }
     }
 
