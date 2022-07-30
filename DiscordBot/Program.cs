@@ -17,7 +17,7 @@ internal class Program {
         
         try {
             Log.Logger.Information("Starting!");
-            var bot = new DiscordBot(config, services, services.GetRequiredService<ILogger<DiscordBot>>());
+            var bot = new Bot(config, services, services.GetRequiredService<ILogger<Bot>>());
             await bot.Run(new CancellationToken());
             await Task.Delay(-1);
         } catch (Exception e) {

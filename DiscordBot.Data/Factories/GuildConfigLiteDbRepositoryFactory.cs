@@ -9,7 +9,7 @@ internal class GuildConfigLiteDbRepositoryFactory : BaseLiteDbRepositoryFactory<
 
     public override bool RequiresGuildId => true;
 
-    public override IGuildConfigRepository Create(ulong guildId) {
+    public override IGuildConfigRepository Create(DiscordGuildId guildId) {
         return new GuildConfigRepository(GetLogger(), LiteDbManager.GetDatabase(guildId));
     }
 

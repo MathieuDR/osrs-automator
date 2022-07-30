@@ -1,5 +1,5 @@
-using Common.Parsers;
-using DiscordBot.Commands.Interactive2.Base.Handlers;
+using DiscordBot.Common.Models.Data.ClanFunds;
+using MathieuDR.Common.Parsers;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace DiscordBot.Commands.Interactive2.Funds.Manage;
@@ -19,7 +19,7 @@ public class ManageFundsSubCommandHandler: ApplicationCommandHandlerBase<ManageF
 			}
 		}
 
-		var fundEvent = new ClanFundEvent(user.Id, authority.Id, reason, user.Username, amount, type);
+		var fundEvent = new ClanFundEvent(user.GetUserId(), authority.GetUserId(), reason, user.Username, amount, type);
 		var result = await _clanFundsService.AddClanFund(Context.Guild.ToGuildDto(), fundEvent);
 
 		if (result.IsSuccess) {

@@ -1,6 +1,8 @@
 using System.Text;
-using Common.Extensions;
+using DiscordBot.Common.Identities;
+using DiscordBot.Common.Models.Data.Counting;
 using DiscordBot.Common.Models.Enums;
+using MathieuDR.Common.Extensions;
 
 namespace DiscordBot.Commands.Interactive;
 
@@ -76,11 +78,11 @@ public class CountConfigurationApplicationCommandHandler : ApplicationCommandHan
 
     private async Task<Result> ViewHandler(ApplicationCommandContext context) {
         IReadOnlyList<CountThreshold> thresholds;
-        ulong channelId;
+        DiscordChannelId channelId;
 
         try {
-            thresholds = await _counterService.GetThresholds(context.Guild.Id);
-            channelId = await _counterService.GetChannelForGuild(context.Guild.Id);
+            thresholds = await _counterService.GetThresholds(context.Guild.GetGuildId());
+            channelId = await _counterService.GetChannelForGuild(context.Guild.GetGuildId());
         } catch (Exception e) {
             return Result.Fail(new ExceptionalError(e));
         }
@@ -137,7 +139,7 @@ public class CountConfigurationApplicationCommandHandler : ApplicationCommandHan
         noMentionBuilder.Append(", ");
         var mentionBuilder = new StringBuilder(noMentionBuilder.ToString());
 
-        var roleTemp = context.Guild.GetRole(threshold.GivenRoleId.Value)?.Name ?? "deleted role";
+        var roleTemp = context.Guild.GetRole(threshold.GivenRoleId.Value.UlongValue)?.Name ?? "deleted role";
         noMentionBuilder.Append(roleTemp);
 
         roleTemp = threshold.GivenRoleId.Value.ToRole();
@@ -204,8 +206,8 @@ public class CountConfigurationApplicationCommandHandler : ApplicationCommandHan
             .Value;
 
         try {
-            await _counterService.RemoveThreshold(context.Guild.Id, int.Parse(selected));
-            thresholds = await _counterService.GetThresholds(context.Guild.Id);
+            await _counterService.RemoveThreshold(context.Guild.GetGuildId(), int.Parse(selected));
+            thresholds = await _counterService.GetThresholds(context.Guild.GetGuildId());
         } catch (Exception e) {
             return Result.Fail(new ExceptionalError(e));
         }

@@ -1,10 +1,15 @@
-using Dashboard.Configuration;
-using Dashboard.Configuration.Options;
-using Dashboard.InputFormatters;
-using Dashboard.Models.ApiRequests.DiscordEmbed;
-using Dashboard.Transformers;
+using Blazorise;
+using Blazorise.Bootstrap5;
+using Blazorise.Icons.FontAwesome;
 using DiscordBot.Common.Dtos.Runescape;
 using DiscordBot.Configuration;
+using DiscordBot.Dashboard.Binders.RouteConstraints;
+using DiscordBot.Dashboard.Configuration;
+using DiscordBot.Dashboard.Configuration.Options;
+using DiscordBot.Dashboard.InputFormatters;
+using DiscordBot.Dashboard.Models.ApiRequests.DiscordEmbed;
+using DiscordBot.Dashboard.Services;
+using DiscordBot.Dashboard.Transformers;
 using DiscordBot.Data.Configuration;
 using DiscordBot.Services.Configuration;
 using Microsoft.AspNetCore.Mvc;
@@ -14,7 +19,7 @@ using Microsoft.OpenApi.Models;
 using Swashbuckle.AspNetCore.SwaggerGen;
 using WiseOldManConnector.Configuration;
 
-namespace Dashboard;
+namespace DiscordBot.Dashboard;
 
 public static class StartupHelper {
     private static ApiOptions GetApiOptions(IConfiguration configuration) {
@@ -25,7 +30,15 @@ public static class StartupHelper {
         var apiOptions = GetApiOptions(configuration);
         services.AddRazorPages();
         services.AddServerSideBlazor();
+        services.AddBlazorise(options => { });
+        services.AddFontAwesomeIcons();
+        services.AddBootstrap5Providers();
+        services.AddBootstrap5Components();
         services.AddMvc(options => { options.InputFormatters.Add(new BypassFormDataInputFormatter()); });
+        services.Configure<RouteOptions>(options =>
+        {
+            options.ConstraintMap.Add(UlongRouteConstraint.UlongRouteConstraintName, typeof(UlongRouteConstraint));
+        });
         services.AddApiVersioning(options => {
             options.AssumeDefaultVersionWhenUnspecified = true;
             options.DefaultApiVersion = new ApiVersion(apiOptions.VersionMajor, apiOptions.VersionMinor);
@@ -51,13 +64,14 @@ public static class StartupHelper {
         });
 
         services
-            .AddDiscordBot(configuration, typeof(DiscordBot.DiscordBot))
+            .AddDiscordBot(configuration, typeof(global::DiscordBot.Bot))
             .UseLiteDbRepositories(configuration)
             .AddWiseOldManApi()
             .AddDiscordBotServices()
             .ConfigureQuartz(configuration);
 
         services.AddTransient<IMapper<Embed, RunescapeDrop>, EmbedToRunescapeDropMapper>();
+        services.AddSingleton<ICachedDiscordService, CachedCachedDiscordService>();
     }
 
     public static void ConfigurePipeline(IApplicationBuilder app, IWebHostEnvironment env,

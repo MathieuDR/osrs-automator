@@ -1,6 +1,6 @@
 using System.Text;
-using Common.Extensions;
 using DiscordBot.Common.Models.Enums;
+using MathieuDR.Common.Extensions;
 using WiseOldManConnector.Helpers;
 
 namespace DiscordBot.Commands.Interactive;

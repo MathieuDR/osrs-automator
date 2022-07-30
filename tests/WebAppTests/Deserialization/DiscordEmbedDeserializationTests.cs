@@ -1,5 +1,5 @@
 using System.Text.Json;
-using Dashboard.Models.ApiRequests.DiscordEmbed;
+using DiscordBot.Dashboard.Models.ApiRequests.DiscordEmbed;
 using FluentAssertions;
 using WebAppTests.Resources.EmbedJsons;
 using Xunit;

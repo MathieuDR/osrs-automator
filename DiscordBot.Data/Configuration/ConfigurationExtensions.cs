@@ -22,6 +22,8 @@ public static class ConfigurationExtensions {
             .AddTransient(x => x.GetRequiredService<RunescapeDropDataRepositoryFactory>().Create())
             .AddTransient<GraveyardLiteDbRepositoryFactory>()
             .AddTransient<ClanFundsLiteDbRepositoryFactory>()
+            .AddTransient<ClanFundsLiteDbRepositoryFactory>()
+            .AddTransient<RunescapeDropperGuildConfigurationRepositoryFactory>()
             .AddSingleton<IRepositoryStrategy>(x =>
                 new RepositoryStrategy(new IRepositoryFactory[] {
                     x.GetRequiredService<PlayerLiteDbRepositoryFactory>(),
@@ -32,6 +34,7 @@ public static class ConfigurationExtensions {
                     x.GetRequiredService<CommandInfoRepositoryFactory>(),
                     x.GetRequiredService<GraveyardLiteDbRepositoryFactory>(),
                     x.GetRequiredService<ClanFundsLiteDbRepositoryFactory>(),
+                    x.GetRequiredService<RunescapeDropperGuildConfigurationRepositoryFactory>()
                 }))
             .AddOptions<LiteDbOptions>()
             .Configure<IConfiguration>((options, configuration1) => configuration.GetSection(LiteDbOptions.SectionName).Bind(options));

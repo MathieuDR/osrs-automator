@@ -1,8 +1,4 @@
-﻿using Common.Extensions;
-using DiscordBot.Commands.Interactive2.Base.Definitions;
-using DiscordBot.Commands.Interactive2.Base.Requests;
-using DiscordBot.Common.Dtos.Discord;
-using DiscordBot.Common.Models.Enums;
+﻿using MathieuDR.Common.Extensions;
 using MediatR;
 
 namespace DiscordBot.Services;

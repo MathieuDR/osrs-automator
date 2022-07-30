@@ -10,7 +10,7 @@ internal class ClanFundsLiteDbRepositoryFactory : BaseLiteDbRepositoryFactory<IC
 
 	public override bool RequiresGuildId => true;
 
-	public override IClanFundsRepository Create(ulong guildId) {
+	public override IClanFundsRepository Create(DiscordGuildId guildId) {
 		return new ClanFundsRepository(GetLogger(), LiteDbManager.GetDatabase(guildId));
 	}
 

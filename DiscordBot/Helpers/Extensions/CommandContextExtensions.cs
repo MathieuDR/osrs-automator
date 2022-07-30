@@ -1,4 +1,4 @@
-using Common;
+using MathieuDR.Common;
 
 namespace DiscordBot.Helpers.Extensions;
 

@@ -1,5 +1,7 @@
 using DiscordBot.Common.Dtos.Discord;
-using DiscordBot.Common.Models.Data;
+using DiscordBot.Common.Identities;
+using DiscordBot.Common.Models.Data.Configuration;
+using DiscordBot.Common.Models.Data.Counting;
 using DiscordBot.Data.Interfaces;
 using DiscordBot.Data.Strategies;
 using DiscordBot.Services.Interfaces;
@@ -66,7 +68,7 @@ internal class CountService : RepositoryService, ICounterService {
         return Task.FromResult(result);
     }
 
-    public Task<bool> RemoveThreshold(ulong guildId, int index) {
+    public Task<bool> RemoveThreshold(DiscordGuildId guildId, int index) {
         var config = GetGroupConfigWithValidCountConfig(guildId);
         var result = config.CountConfig.RemoveAtIndex(index);
 
@@ -78,12 +80,12 @@ internal class CountService : RepositoryService, ICounterService {
         return Task.FromResult(result);
     }
 
-    public Task<IReadOnlyList<CountThreshold>> GetThresholds(ulong guildId) {
+    public Task<IReadOnlyList<CountThreshold>> GetThresholds(DiscordGuildId guildId) {
         var config = GetGroupConfigWithValidCountConfig(guildId);
         return Task.FromResult(config.CountConfig.Thresholds);
     }
 
-    public Task<ulong> GetChannelForGuild(ulong guildId) {
+    public Task<DiscordChannelId> GetChannelForGuild(DiscordGuildId guildId) {
         var config = GetGroupConfigWithValidCountConfig(guildId);
         return Task.FromResult(config.CountConfig.OutputChannelId);
     }
@@ -96,7 +98,7 @@ internal class CountService : RepositoryService, ICounterService {
         return result;
     }
 
-    private GuildConfig GetGroupConfigWithValidCountConfig(ulong guildId) {
+    private GuildConfig GetGroupConfigWithValidCountConfig(DiscordGuildId guildId) {
         var config = GetGroupConfig(guildId);
 
         if (config.CountConfig is null) {
@@ -106,7 +108,7 @@ internal class CountService : RepositoryService, ICounterService {
         return config;
     }
 
-    private GuildConfig GetGroupConfig(ulong guildId, bool validate = true) {
+    private GuildConfig GetGroupConfig(DiscordGuildId guildId, bool validate = true) {
         var repo = GetRepository<IGuildConfigRepository>(guildId);
         var result = repo.GetSingle().Value;
 

@@ -13,7 +13,7 @@ public abstract class BaseGuildJob : BaseJob {
     protected IDiscordService DiscordService { get; }
 
     protected override async Task<Result> DoWork() {
-        var guildsResult = await DiscordService.GetAllGuilds();
+        var guildsResult = await DiscordService.GetGuilds();
         if (guildsResult.IsFailed) {
             return guildsResult.ToResult();
         }

@@ -1,6 +1,6 @@
 ﻿using System.Net;
 using AutoMapper;
-using Common.Semaphores;
+using MathieuDR.Common.Semaphores;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;

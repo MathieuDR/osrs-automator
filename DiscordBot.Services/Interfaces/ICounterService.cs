@@ -1,5 +1,6 @@
 using DiscordBot.Common.Dtos.Discord;
-using DiscordBot.Common.Models.Data;
+using DiscordBot.Common.Identities;
+using DiscordBot.Common.Models.Data.Counting;
 
 namespace DiscordBot.Services.Interfaces;
 
@@ -10,7 +11,7 @@ public interface ICounterService {
     List<UserCountInfo> TopCounts(Guild contextGuild, int quantity);
     Task<bool> SetChannelForCounts(GuildUser user, Channel outputChannel);
     Task<bool> CreateThreshold(GuildUser creator, int count, string name, Role role = null);
-    Task<bool> RemoveThreshold(ulong guildId, int index);
-    Task<IReadOnlyList<CountThreshold>> GetThresholds(ulong guildId);
-    Task<ulong> GetChannelForGuild(ulong guildId);
+    Task<bool> RemoveThreshold(DiscordGuildId guildId, int index);
+    Task<IReadOnlyList<CountThreshold>> GetThresholds(DiscordGuildId guildId);
+    Task<DiscordChannelId> GetChannelForGuild(DiscordGuildId guildId);
 }
