@@ -175,7 +175,7 @@ public class DiscordService : IDiscordService {
             Name = "Top donations",
             Description = "Top donations in the clan funds",
             ScoreFieldName = "Amount",
-            Entries = donations.Select((x,i) => new LeaderboardEntry<string>(guild.GetUser(x.Player)?.DisplayName() ?? x.PlayerName ?? _client.GetUser(x.Player)?.DisplayName() ?? "Unknown", x.Amount.FormatNumber(), i + 1)).ToList()
+            Entries = donations.Select((x,i) => new LeaderboardEntry<string>(guild.GetUser(x.Player.UlongValue)?.DisplayName() ?? x.PlayerName ?? _client.GetUser(x.Player.UlongValue)?.DisplayName() ?? "Unknown", x.Amount.FormatNumber(), i + 1)).ToList()
         };
         
         // send message
