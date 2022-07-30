@@ -1,4 +1,3 @@
-using DiscordBot.Commands.Interactive2.Base.Handlers;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace DiscordBot.Commands.Interactive2.Graveyard.OptIn;

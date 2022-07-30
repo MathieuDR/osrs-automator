@@ -1,4 +1,3 @@
-using Common.Semaphores;
 using DiscordBot.Services.ExternalServices;
 using DiscordBot.Services.Interfaces;
 using DiscordBot.Services.Services;

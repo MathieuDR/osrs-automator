@@ -1,5 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using DiscordBot.Common.Dtos.Discord;
+using DiscordBot.Common.Identities;
 using DiscordBot.Common.Models.Decorators;
 using DiscordBot.Data.Interfaces;
 using DiscordBot.Data.Strategies;
@@ -25,7 +26,7 @@ internal class PlayerService : RepositoryService, IPlayerService {
         string proposedOsrsName) {
         proposedOsrsName = proposedOsrsName.ToLowerInvariant();
         var repo = GetRepository<IPlayerRepository>(user.GuildId);
-        var discordUserPlayer = repo.GetByDiscordId(user.Id).Value ?? new Common.Models.Data.Player(user.GuildId, user.Id);
+        var discordUserPlayer = repo.GetByDiscordId(user.Id).Value ?? new Common.Models.Data.PlayerManagement.Player(user.GuildId, user.Id);
 
         CheckIfPlayerIsAlreadyCoupled(user, proposedOsrsName, discordUserPlayer);
 
@@ -147,12 +148,12 @@ internal class PlayerService : RepositoryService, IPlayerService {
         return players.Any(p => p.Id == id);
     }
 
-    private bool IsIdCoupledInServer(ulong guildId, int id) {
+    private bool IsIdCoupledInServer(DiscordGuildId guildId, int id) {
         var repo = GetRepository<IPlayerRepository>(guildId);
         return repo.GetPlayerByOsrsAccount(id) != null;
     }
 
-    public async Task<string> SetDefaultAccount(GuildUser discordUser, Player osrsPlayer, Common.Models.Data.Player player) {
+    public async Task<string> SetDefaultAccount(GuildUser discordUser, Player osrsPlayer, Common.Models.Data.PlayerManagement.Player player) {
         if (player == null) {
             player = GetPlayerConfigurationOrThrowException(discordUser);
         }
@@ -173,14 +174,14 @@ internal class PlayerService : RepositoryService, IPlayerService {
         return player.DefaultPlayerUsername;
     }
 
-    private async Task EnforceUsername(GuildUser user, Common.Models.Data.Player playerConfig) {
+    private async Task EnforceUsername(GuildUser user, Common.Models.Data.PlayerManagement.Player playerConfig) {
         if (playerConfig.EnforceNameTemplate && !string.IsNullOrWhiteSpace(playerConfig.DefaultPlayerUsername) &&
             !string.IsNullOrWhiteSpace(playerConfig.Nickname)) {
             var result = await _discordService.SetUsername(user, $"{playerConfig.DefaultPlayerUsername} ({playerConfig.Nickname})");
         }
     }
 
-    private Common.Models.Data.Player GetPlayerConfigurationOrThrowException(GuildUser user) {
+    private Common.Models.Data.PlayerManagement.Player GetPlayerConfigurationOrThrowException(GuildUser user) {
         var repo = GetRepository<IPlayerRepository>(user.GuildId);
         var config = repo.GetByDiscordId(user.Id).Value;
 
@@ -191,7 +192,7 @@ internal class PlayerService : RepositoryService, IPlayerService {
         return config;
     }
 
-    private async Task AddNewOsrsAccount(GuildUser discordUser, Common.Models.Data.Player player, Player osrsPlayer) {
+    private async Task AddNewOsrsAccount(GuildUser discordUser, Common.Models.Data.PlayerManagement.Player player, Player osrsPlayer) {
         // New account
         player.CoupledOsrsAccounts.Add(osrsPlayer);
 
@@ -210,7 +211,7 @@ internal class PlayerService : RepositoryService, IPlayerService {
         }
     }
 
-    private void CheckIfPlayerIsAlreadyCoupled(GuildUser discordUser, string proposedOsrsName, Common.Models.Data.Player player) {
+    private void CheckIfPlayerIsAlreadyCoupled(GuildUser discordUser, string proposedOsrsName, Common.Models.Data.PlayerManagement.Player player) {
         if (player.CoupledOsrsAccounts.Any(p => p.Username == proposedOsrsName)) {
             throw new ValidationException($"User {proposedOsrsName} is already coupled to you.");
         }
@@ -221,7 +222,7 @@ internal class PlayerService : RepositoryService, IPlayerService {
         }
     }
 
-    private void UpdateExistingPlayerOsrsAccount(ulong guildId, Common.Models.Data.Player toUpdate, Player osrsPlayer) {
+    private void UpdateExistingPlayerOsrsAccount(DiscordGuildId guildId, Common.Models.Data.PlayerManagement.Player toUpdate, Player osrsPlayer) {
         var old = toUpdate.CoupledOsrsAccounts.Find(p => p.Id == osrsPlayer.Id);
         toUpdate.CoupledOsrsAccounts.Remove(old);
         toUpdate.CoupledOsrsAccounts.Add(osrsPlayer);

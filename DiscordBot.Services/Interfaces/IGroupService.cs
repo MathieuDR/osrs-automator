@@ -1,5 +1,5 @@
 ﻿using DiscordBot.Common.Dtos.Discord;
-using DiscordBot.Common.Models.Data;
+using DiscordBot.Common.Models.Data.Configuration;
 using DiscordBot.Common.Models.Decorators;
 using DiscordBot.Common.Models.Enums;
 using DiscordBot.Services.Models.Enums;

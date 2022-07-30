@@ -1,5 +1,3 @@
-using DiscordBot.Commands.Interactive2.Base.Definitions;
-
 namespace DiscordBot.Services.Interfaces;
 
 public interface ICommandDefinitionProvider {

@@ -1,4 +1,3 @@
-using DiscordBot.Commands.Interactive2.Base.Requests;
 using DiscordBot.Commands.Interactive2.Graveyard.Edit;
 using DiscordBot.Commands.Interactive2.Graveyard.Leaderboard;
 using DiscordBot.Commands.Interactive2.Graveyard.Shames;

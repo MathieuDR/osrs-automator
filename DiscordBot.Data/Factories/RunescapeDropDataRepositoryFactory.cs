@@ -9,7 +9,7 @@ internal class RunescapeDropDataRepositoryFactory : BaseLiteDbRepositoryFactory<
 
     public override bool RequiresGuildId => false;
 
-    public override IRuneScapeDropDataRepository Create(ulong guildId) {
+    public override IRuneScapeDropDataRepository Create(DiscordGuildId guildId) {
         throw new NotImplementedException();
     }
 

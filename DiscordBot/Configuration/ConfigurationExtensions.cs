@@ -1,6 +1,5 @@
 using Discord.Commands;
 using DiscordBot.Commands.Interactive;
-using DiscordBot.Commands.Interactive2.Base.Requests;
 using DiscordBot.Common.Configuration;
 using DiscordBot.Data.Interfaces;
 using DiscordBot.Services;
@@ -8,7 +7,6 @@ using DiscordBot.Services.Services;
 using MediatR;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Options;
 using Serilog;
 using WiseOldManConnector.Interfaces;
 

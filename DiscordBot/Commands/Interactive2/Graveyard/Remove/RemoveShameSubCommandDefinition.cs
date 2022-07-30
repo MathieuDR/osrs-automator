@@ -1,5 +1,3 @@
-using DiscordBot.Commands.Interactive2.Base.Definitions;
-
 namespace DiscordBot.Commands.Interactive2.Graveyard.Remove; 
 
 public class RemoveShameSubCommandDefinition : SubCommandDefinitionBase<GraveyardRootDefinition>{

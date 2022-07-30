@@ -14,7 +14,7 @@ internal abstract class BaseLiteDbRepositoryFactory<TInterface, TConcrete> : IRe
     public ILoggerFactory LoggerFactory { get; }
     public LiteDbManager LiteDbManager { get; }
 
-    public abstract IRepository Create(ulong guildId);
+    public abstract IRepository Create(DiscordGuildId guildId);
     public abstract IRepository Create();
 
 

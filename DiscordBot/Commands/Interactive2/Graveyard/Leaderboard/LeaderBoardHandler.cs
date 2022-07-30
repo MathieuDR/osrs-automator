@@ -1,4 +1,5 @@
-using DiscordBot.Commands.Interactive2.Base.Handlers;
+using DiscordBot.Common.Identities;
+using DiscordBot.Common.Models.Data.Graveyard;
 using DiscordBot.Common.Models.Enums;
 using Microsoft.Extensions.DependencyInjection;
 using WiseOldManConnector.Helpers;
@@ -33,7 +34,7 @@ public class LeaderBoardHandler : ApplicationCommandHandlerBase<LeaderboardReque
 		return Result.Ok();
 	}
 
-	private Task PresentLeaderboard((ulong user, Shame[] shames)[] memberShames, ShameLocation? location, MetricType? metricType) {
+	private Task PresentLeaderboard((DiscordUserId user, Shame[] shames)[] memberShames, ShameLocation? location, MetricType? metricType) {
 		var board = CreateLeaderboard(memberShames, location, metricType);
 
 		_ = Context.CreatePaginatorReplyBuilder()
@@ -43,7 +44,7 @@ public class LeaderBoardHandler : ApplicationCommandHandlerBase<LeaderboardReque
 		return Task.CompletedTask;
 	}
 
-	private Models.DiscordLeaderBoard<int> CreateLeaderboard((ulong user, Shame[] shames)[] memberShames, ShameLocation? location, MetricType? metricType) {
+	private Models.DiscordLeaderBoard<int> CreateLeaderboard((DiscordUserId user, Shame[] shames)[] memberShames, ShameLocation? location, MetricType? metricType) {
 		var board = new Models.DiscordLeaderBoard<int>() {
 			Name =  location.HasValue ? metricType.HasValue ? metricType.Value.ToDisplayNameOrFriendly() : location.Value.ToDisplayNameOrFriendly() : "All" + " shame",
 			ScoreFieldName = "Shames"
@@ -52,7 +53,7 @@ public class LeaderBoardHandler : ApplicationCommandHandlerBase<LeaderboardReque
 		var shamesPerUser = memberShames.OrderByDescending(x => x.shames.Length).ToArray();
 		for (var i = 0; i < shamesPerUser.Length; i++) {
 			var (user, shames) = shamesPerUser[i];
-			board.Entries.Add(new LeaderboardEntry<int>(Context.Guild.GetUser(user).DisplayName(), shames.Length, i + 1));
+			board.Entries.Add(new LeaderboardEntry<int>(Context.Guild.GetUser(user.UlongValue).DisplayName(), shames.Length, i + 1));
 		}
 
 		return board;

@@ -1,3 +1,5 @@
+using DiscordBot.Common.Identities;
+using DiscordBot.Common.Models.Data.Configuration;
 using DiscordBot.Common.Models.Enums;
 using DiscordBot.Data.Interfaces;
 using DiscordBot.Data.Strategies;
@@ -95,10 +97,10 @@ public class ManageCommandsApplicationCommandHandler : ApplicationCommandHandler
         return Result.Ok();
     }
 
-    private (string Name, ulong Id) GetGuild(MessageComponentContext context) {
+    private (string Name, DiscordGuildId Id) GetGuild(MessageComponentContext context) {
         var guilds = _serviceProvider.GetRequiredService<DiscordSocketClient>().Guilds
             .Where(x => x.Id == ulong.Parse(context.SelectedMenuOptions.First()))
-            .Select(x => (x.Name, x.Id)).ToList();
+            .Select(x => (x.Name, x.GetGuildId())).ToList();
 
         if (!guilds.Any()) {
             throw new ArgumentException("Could not find guild");
@@ -217,10 +219,10 @@ public class ManageCommandsApplicationCommandHandler : ApplicationCommandHandler
     /// </summary>
     /// <param name="registeredCommands">Guildids where the command has been registered</param>
     /// <returns></returns>
-    private ComponentBuilder GetGuildsSelectMenu(IEnumerable<ulong> registeredCommands) {
-        registeredCommands ??= Array.Empty<ulong>();
+    private ComponentBuilder GetGuildsSelectMenu(IEnumerable<DiscordGuildId> registeredCommands) {
+        registeredCommands ??= Array.Empty<DiscordGuildId>();
         var guilds = _serviceProvider.GetRequiredService<DiscordSocketClient>().Guilds
-            .Select(x => (x.Name, x.Id));
+            .Select(x => (x.Name, Id: x.GetGuildId()));
 
         return new ComponentBuilder()
             .WithSelectMenu(new SelectMenuBuilder()

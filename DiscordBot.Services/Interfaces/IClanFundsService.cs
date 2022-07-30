@@ -1,5 +1,5 @@
 using DiscordBot.Common.Dtos.Discord;
-using DiscordBot.Common.Models.Data;
+using DiscordBot.Common.Models.Data.ClanFunds;
 using FluentResults;
 
 namespace DiscordBot.Services.Interfaces; 

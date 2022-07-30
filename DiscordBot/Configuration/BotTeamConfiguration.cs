@@ -1,6 +1,8 @@
+using DiscordBot.Common.Identities;
+
 namespace DiscordBot.Configuration;
 
 public class BotTeamConfiguration {
-	public ulong GuildId { get; set; }
-	public ulong OwnerId { get; set; }
+	public DiscordGuildId GuildId { get; set; }
+	public DiscordUserId OwnerId { get; set; }
 }

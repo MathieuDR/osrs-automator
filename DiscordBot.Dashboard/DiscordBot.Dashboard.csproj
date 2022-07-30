@@ -4,45 +4,32 @@
         <TargetFramework>net6.0</TargetFramework>
         <Nullable>enable</Nullable>
         <ImplicitUsings>enable</ImplicitUsings>
-        <RootNamespace>Dashboard</RootNamespace>
     </PropertyGroup>
 
     <ItemGroup>
         <ProjectReference Include="..\DiscordBot\DiscordBot.csproj" />
+        <ProjectReference Include="..\src\DiscordBot.Components\DiscordBot.Components.csproj" />
     </ItemGroup>
 
     <ItemGroup>
-        <PackageReference Include="Mapster" Version="7.2.0" />
-        <PackageReference Include="MathieuDR.Common" Version="1.2.1" />
+        <PackageReference Include="Blazorise.Bootstrap5" Version="1.0.5" />
+        <PackageReference Include="Blazorise.Components" Version="1.0.5" />
+        <PackageReference Include="Mapster" Version="7.3.0" />
+        <PackageReference Include="MathieuDR.Common" Version="1.3.0" />
         <PackageReference Include="Microsoft.AspNetCore.Mvc.Versioning" Version="5.0.0" />
         <PackageReference Include="Microsoft.AspNetCore.Mvc.Versioning.ApiExplorer" Version="5.0.0" />
-        <PackageReference Include="Serilog.AspNetCore" Version="4.1.0" />
+        <PackageReference Include="Serilog.AspNetCore" Version="5.0.0" />
         <PackageReference Include="Serilog.Enrichers.AspNetCore" Version="1.0.0" />
-        <PackageReference Include="Swashbuckle.AspNetCore" Version="6.2.3" />
+        <PackageReference Include="Swashbuckle.AspNetCore" Version="6.3.1" />
+    </ItemGroup>
+    
+    <ItemGroup>
+        <Watch Include="wwroot\scripts\*.js" />
+        <Watch Include="wwroot\css\*.css" />
+        <Watch Include="**\*.razor" />
     </ItemGroup>
 
     <ItemGroup>
-        <_ContentIncludedByDefault Remove="Pages\Shared\MainLayout.razor" />
-        <_ContentIncludedByDefault Remove="Pages\Shared\NavMenu.razor" />
-    </ItemGroup>
-
-    <ItemGroup>
-      <Compile Remove="logs\**" />
-      <Compile Remove="db\**" />
-    </ItemGroup>
-
-    <ItemGroup>
-      <EmbeddedResource Remove="logs\**" />
-      <EmbeddedResource Remove="db\**" />
-    </ItemGroup>
-
-    <ItemGroup>
-      <None Remove="logs\**" />
-      <None Remove="db\**" />
-    </ItemGroup>
-
-    <ItemGroup>
-      <Content Remove="logs\**" />
-      <Content Remove="db\**" />
+      <Folder Include="wwwroot\img" />
     </ItemGroup>
 </Project>

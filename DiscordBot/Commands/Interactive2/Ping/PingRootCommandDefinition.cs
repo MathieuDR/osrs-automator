@@ -1,6 +1,4 @@
-﻿using DiscordBot.Commands.Interactive2.Base.Definitions;
-
-namespace DiscordBot.Commands.Interactive2.Ping;
+﻿namespace DiscordBot.Commands.Interactive2.Ping;
 
 
 public class PingRootCommandDefinition : RootCommandDefinitionBase {

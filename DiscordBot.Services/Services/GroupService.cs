@@ -1,6 +1,7 @@
 ﻿using System.Text;
 using DiscordBot.Common.Dtos.Discord;
-using DiscordBot.Common.Models.Data;
+using DiscordBot.Common.Identities;
+using DiscordBot.Common.Models.Data.Configuration;
 using DiscordBot.Common.Models.Decorators;
 using DiscordBot.Common.Models.Enums;
 using DiscordBot.Data.Interfaces;
@@ -258,7 +259,7 @@ internal class GroupService : RepositoryService, IGroupService {
         return Task.FromResult(Result.Ok(result));
     }
 
-    private GuildConfig GetGroupConfig(ulong guildId, bool validate = true) {
+    private GuildConfig GetGroupConfig(DiscordGuildId guildId, bool validate = true) {
         var repo = GetRepository<IGuildConfigRepository>(guildId);
         var result = repo.GetSingle().Value;
         if (validate) {

@@ -1,5 +1,5 @@
 using DiscordBot.Common.Dtos.Discord;
-using DiscordBot.Common.Models.Data;
+using DiscordBot.Common.Models.Data.Configuration;
 using DiscordBot.Common.Models.Enums;
 using DiscordBot.Data.Strategies;
 using DiscordBot.Services.Interfaces;
@@ -84,7 +84,7 @@ internal class AuthorizationService : BaseGuildConfigurationService, IAuthorizat
         }
     }
 
-    private static void UpdateRoleInAuthDictionary(Dictionary<ulong, AuthorizationRoles> dictionary, ulong id, AuthorizationRoles roleToUpdate,
+    private static void UpdateRoleInAuthDictionary<TIdentity>(Dictionary<TIdentity, AuthorizationRoles> dictionary, TIdentity id, AuthorizationRoles roleToUpdate,
         bool removing) {
         if (!dictionary.TryGetValue(id, out var role)) {
             if (removing) {

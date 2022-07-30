@@ -1,5 +1,4 @@
-using Common.Extensions;
-using DiscordBot.Commands.Interactive2.Base.Definitions;
+using MathieuDR.Common.Extensions;
 
 namespace DiscordBot.Services;
 

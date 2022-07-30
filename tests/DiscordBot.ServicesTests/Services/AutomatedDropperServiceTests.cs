@@ -3,7 +3,8 @@ using System.Text;
 using AutoBogus;
 using Bogus;
 using DiscordBot.Common.Dtos.Runescape;
-using DiscordBot.Common.Models.Data;
+using DiscordBot.Common.Identities;
+using DiscordBot.Common.Models.Data.Drops;
 using DiscordBot.Data.Interfaces;
 using DiscordBot.Data.Strategies;
 using DiscordBot.Services.Services;
@@ -66,13 +67,15 @@ public class AutomatedDropperServiceTests {
         schedulerFactory.GetAllSchedulers().Returns(new Collection<IScheduler> {
             scheduler
         });
-        var guid = Guid.NewGuid();
+        // random ulong;
+        var endpoint = EndpointId.New();
+        var userId = DiscordUserId.Empty;
         var imageString = Convert.ToBase64String(Encoding.UTF8.GetBytes("ImageString"));
 
         RunescapeDropData lastUpdated = null;
-        repo.GetActive(Arg.Is(guid)).Returns(Result.Ok<RunescapeDropData>(null));
+        repo.GetActive(Arg.Is(userId)).Returns(Result.Ok<RunescapeDropData>(null));
         repo.UpdateOrInsert(Arg.Do<RunescapeDropData>(a => {
-            repo.GetActive(Arg.Is(guid)).Returns(Result.Ok(a));
+            repo.GetActive(Arg.Is(userId)).Returns(Result.Ok(a));
             lastUpdated = a;
         }));
 
@@ -92,17 +95,17 @@ public class AutomatedDropperServiceTests {
         var drop = _faker.Generate();
 
         //Act
-        var firstRun = await sut.HandleDropRequest(guid, null, imageString);
+        var firstRun = await sut.HandleDropRequest(endpoint, null, imageString);
 
         //Assert
         firstRun.IsSuccess.Should().BeTrue(string.Join(", ", firstRun.Errors));
         lastUpdated.Should().NotBeNull();
-        lastUpdated.Endpoint.Should().Be(guid);
+        lastUpdated.Endpoint.Should().Be(endpoint);
         lastUpdated.Drops.Should().HaveCount(1, "We sent one drop info");
         lastUpdated.Drops.First().Image.Should().Be(imageString);
         lastUpdated.Drops.First().Amount.Should().Be(0);
         lastUpdated.Drops.First().Item.Should().Be(null);
-        lastUpdated.RecipientUsername.Should().BeNullOrEmpty();
+        lastUpdated.Drops.First().Recipient.Should().BeEquivalentTo(default(RunescapeDrop.Player));
     }
 
     [Fact]
@@ -136,13 +139,15 @@ public class AutomatedDropperServiceTests {
         schedulerFactory.GetAllSchedulers().Returns(new Collection<IScheduler> {
             scheduler
         });
-        var guid = Guid.NewGuid();
+        
+        var endpoint = EndpointId.New();
+        var userId = DiscordUserId.Empty;
         var imageString = Convert.ToBase64String(Encoding.UTF8.GetBytes("ImageString"));
 
         RunescapeDropData lastUpdated = null;
-        repo.GetActive(Arg.Is(guid)).Returns(Result.Ok<RunescapeDropData>(null));
+        repo.GetActive(Arg.Is(userId)).Returns(Result.Ok<RunescapeDropData>(null));
         repo.UpdateOrInsert(Arg.Do<RunescapeDropData>(a => {
-            repo.GetActive(Arg.Is(guid)).Returns(Result.Ok(a));
+            repo.GetActive(Arg.Is(userId)).Returns(Result.Ok(a));
             lastUpdated = a;
         }));
 
@@ -162,18 +167,19 @@ public class AutomatedDropperServiceTests {
         var drop = _faker.Generate();
 
         //Act
-        var firstRun = await sut.HandleDropRequest(guid, null, imageString);
-        var secondRun = await sut.HandleDropRequest(guid, drop, null);
+        var firstRun = await sut.HandleDropRequest(endpoint, null, imageString);
+        var secondRun = await sut.HandleDropRequest(endpoint, drop, null);
 
         //Assert
         firstRun.IsSuccess.Should().BeTrue(string.Join(", ", firstRun.Errors));
         secondRun.IsSuccess.Should().BeTrue(string.Join(", ", secondRun.Errors));
         lastUpdated.Should().NotBeNull();
-        lastUpdated.Endpoint.Should().Be(guid);
+        lastUpdated.Endpoint.Should().Be(endpoint);
         lastUpdated.Drops.Should().HaveCount(1, "We sent one drop info");
         lastUpdated.Drops.First().Image.Should().Be(imageString);
         lastUpdated.Drops.First().Amount.Should().Be(drop.Amount);
         lastUpdated.Drops.First().Item.Should().Be(drop.Item);
+        lastUpdated.PlayerDrops.Should().HaveCount(1, "One player drop");
     }
 
     [Fact]
@@ -186,13 +192,15 @@ public class AutomatedDropperServiceTests {
         schedulerFactory.GetAllSchedulers().Returns(new Collection<IScheduler> {
             scheduler
         });
-        var guid = Guid.NewGuid();
+        
+        var endpoint = EndpointId.New();
+        var userId = DiscordUserId.Empty;
         var imageString = Convert.ToBase64String(Encoding.UTF8.GetBytes("ImageString"));
 
         RunescapeDropData lastUpdated = null;
-        repo.GetActive(Arg.Is(guid)).Returns(Result.Ok<RunescapeDropData>(null));
+        repo.GetActive(Arg.Is(userId)).Returns(Result.Ok<RunescapeDropData>(null));
         repo.UpdateOrInsert(Arg.Do<RunescapeDropData>(a => {
-            repo.GetActive(Arg.Is(guid)).Returns(Result.Ok(a));
+            repo.GetActive(Arg.Is(userId)).Returns(Result.Ok(a));
             lastUpdated = a;
         }));
 
@@ -212,14 +220,14 @@ public class AutomatedDropperServiceTests {
         var drop = _faker.Generate();
 
         //Act
-        var firstRun = await sut.HandleDropRequest(guid, drop, null);
-        var secondRun = await sut.HandleDropRequest(guid, null, imageString);
+        var firstRun = await sut.HandleDropRequest(endpoint, drop, null);
+        var secondRun = await sut.HandleDropRequest(endpoint, null, imageString);
 
         //Assert
         firstRun.IsSuccess.Should().BeTrue(string.Join(", ", firstRun.Errors));
         secondRun.IsSuccess.Should().BeTrue(string.Join(", ", secondRun.Errors));
         lastUpdated.Should().NotBeNull();
-        lastUpdated.Endpoint.Should().Be(guid);
+        lastUpdated.Endpoint.Should().Be(endpoint);
         lastUpdated.Drops.Should().HaveCount(1, "We sent one drop info");
         lastUpdated.Drops.First().Image.Should().Be(imageString);
         lastUpdated.Drops.First().Amount.Should().Be(drop.Amount);
@@ -236,10 +244,11 @@ public class AutomatedDropperServiceTests {
         schedulerFactory.GetAllSchedulers().Returns(new Collection<IScheduler> {
             scheduler
         });
-        var guid = Guid.NewGuid();
-
+        
+        var endpoint = EndpointId.New();
+        var userId = DiscordUserId.Empty;
         RunescapeDropData lastUpdated = null;
-        repo.GetActive(Arg.Is(guid)).Returns(Result.Ok<RunescapeDropData>(null));
+        repo.GetActive(Arg.Is(userId)).Returns(Result.Ok<RunescapeDropData>(null));
         scheduler.CheckExists(Arg.Any<JobKey>()).Returns(false);
 
         var sut = new AutomatedDropperService(Substitute.For<ILogger<AutomatedDropperService>>(),
@@ -247,10 +256,10 @@ public class AutomatedDropperServiceTests {
         var drop = _faker.Generate();
 
         //Act
-        _ = await sut.HandleDropRequest(guid, drop, null);
+        _ = await sut.HandleDropRequest(endpoint, drop, null);
 
         //Assert
-        scheduler.Received(1).ScheduleJob(Arg.Is<IJobDetail>(x => x.Key.Name == guid.ToString()), Arg.Any<ITrigger>());
+        scheduler.Received(1).ScheduleJob(Arg.Is<IJobDetail>(x => x.Key.Name == userId.ToString()), Arg.Any<ITrigger>());
     }
 
     [Fact]
@@ -263,12 +272,13 @@ public class AutomatedDropperServiceTests {
         schedulerFactory.GetAllSchedulers().Returns(new Collection<IScheduler> {
             scheduler
         });
-        var guid = Guid.NewGuid();
-
+        
+        var endpoint = EndpointId.New();
+        var userId = DiscordUserId.Empty;
         RunescapeDropData lastUpdated = null;
-        repo.GetActive(Arg.Is(guid)).Returns(Result.Ok<RunescapeDropData>(null));
+        repo.GetActive(Arg.Is(userId)).Returns(Result.Ok<RunescapeDropData>(null));
         repo.UpdateOrInsert(Arg.Do<RunescapeDropData>(a => {
-            repo.GetActive(Arg.Is(guid)).Returns(Result.Ok(a));
+            repo.GetActive(Arg.Is(userId)).Returns(Result.Ok(a));
             lastUpdated = a;
         }));
 
@@ -288,11 +298,11 @@ public class AutomatedDropperServiceTests {
         var drop = _faker.Generate();
 
         //Act
-        var firstRun = await sut.HandleDropRequest(guid, drop, null);
-        var secondRun = await sut.HandleDropRequest(guid, drop, null);
+        var firstRun = await sut.HandleDropRequest(endpoint, drop, null);
+        var secondRun = await sut.HandleDropRequest(endpoint, drop, null);
 
         //Assert
-        await scheduler.Received(1).ScheduleJob(Arg.Is<IJobDetail>(x => x.Key.Name == guid.ToString()), Arg.Any<ITrigger>());
+        await scheduler.Received(1).ScheduleJob(Arg.Is<IJobDetail>(x => x.Key.Name == endpoint.ToString()), Arg.Any<ITrigger>());
         await scheduler.Received(1).RescheduleJob(Arg.Any<TriggerKey>(), Arg.Any<ITrigger>());
     }
 
@@ -306,10 +316,11 @@ public class AutomatedDropperServiceTests {
         schedulerFactory.GetAllSchedulers().Returns(new Collection<IScheduler> {
             scheduler
         });
-        var guid = Guid.NewGuid();
 
+        var endpoint = EndpointId.New();
+        var userId = DiscordUserId.Empty;
         RunescapeDropData lastUpdated = null;
-        repo.GetActive(Arg.Is(guid)).Returns(Result.Ok<RunescapeDropData>(null));
+        repo.GetActive(Arg.Is(userId)).Returns(Result.Ok<RunescapeDropData>(null));
 
 
         scheduler.CheckExists(Arg.Any<JobKey>()).Returns(false);
@@ -319,7 +330,7 @@ public class AutomatedDropperServiceTests {
         var drop = _faker.Generate();
 
         //Act
-        var firstRun = await sut.HandleDropRequest(guid, drop, null);
+        var firstRun = await sut.HandleDropRequest(endpoint, drop, null);
 
         //Assert
         repo.Received(1).UpdateOrInsert(Arg.Any<RunescapeDropData>());
@@ -335,10 +346,11 @@ public class AutomatedDropperServiceTests {
         schedulerFactory.GetAllSchedulers().Returns(new Collection<IScheduler> {
             scheduler
         });
-        var guid = Guid.NewGuid();
-
+        
+        var endpoint = EndpointId.New();
+        var userId = DiscordUserId.Empty;
         RunescapeDropData lastUpdated = null;
-        repo.GetActive(Arg.Is(guid)).Returns(Result.Ok<RunescapeDropData>(null));
+        repo.GetActive(Arg.Is(userId)).Returns(Result.Ok<RunescapeDropData>(null));
 
 
         scheduler.CheckExists(Arg.Any<JobKey>()).Returns(false);
@@ -348,9 +360,9 @@ public class AutomatedDropperServiceTests {
         var drop = _faker.Generate();
 
         //Act
-        var firstRun = await sut.HandleDropRequest(guid, drop, null);
+        var firstRun = await sut.HandleDropRequest(endpoint, drop, null);
 
         //Assert
-        repo.Received(1).GetActive(Arg.Is(guid));
+        repo.Received(1).GetActive(Arg.Is(userId));
     }
 }

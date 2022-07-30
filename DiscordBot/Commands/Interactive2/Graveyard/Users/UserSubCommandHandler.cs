@@ -1,4 +1,4 @@
-using DiscordBot.Commands.Interactive2.Base.Handlers;
+using DiscordBot.Common.Identities;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace DiscordBot.Commands.Interactive2.Graveyard.Users;
@@ -22,7 +22,7 @@ public class UserSubCommandHandler : ApplicationCommandHandlerBase<UserSubComman
 		return Result.Ok();
 	}
 
-	private Task PresentUsers(ulong[] usersValue) {
+	private Task PresentUsers(DiscordUserId[] usersValue) {
 		var strings = usersValue.Select(x=> $"<@{x}>").ToArray();
 		// Send the message
 		_ = Context.CreatePaginatorReplyBuilder().WithLines(strings, modifications: x => x.WithTitle("Opted in to the graveyard")).RespondAsync();

@@ -1,5 +1,5 @@
 using System.Text;
-using Common.Extensions;
+using MathieuDR.Common.Extensions;
 
 namespace DiscordBot.Helpers.Builders;
 
@@ -7,16 +7,7 @@ public class BaseInteractionReplyBuilder<TInteraction> : IInteractionReplyBuilde
 	where TInteraction : SocketInteraction {
 	private readonly BaseInteractiveContext<TInteraction> _context;
 
-	private Action<EmbedBuilder, Result> _failureEmbedModifications = (builder, result) => {
-		foreach (var error in result.Errors) {
-			builder.AddField(f => {
-				f.Name = "Error: ";
-				f.Value = error.Message;
-			});
-		}
-	};
-
-	private Action<EmbedBuilder, Result> _successEmbedModifications;
+	
 	private Task _updateTask;
 
 	public BaseInteractionReplyBuilder(BaseInteractiveContext<TInteraction> ctx) => _context = ctx;
@@ -28,7 +19,7 @@ public class BaseInteractionReplyBuilder<TInteraction> : IInteractionReplyBuilde
 	public AllowedMentions AllowedMentions { get; private set; } = AllowedMentions.None;
 	public Task UpdateOrNoopTask => _updateTask ?? Task.CompletedTask;
 	public HashSet<ActionRowBuilder> ActionRows { get; } = new();
-	public Result? Result { get; private set; }
+	public Result Result { get; private set; }
 
 	public IInteractionReplyBuilder<TInteraction> WithContent(string content) {
 		Content = content;
@@ -145,14 +136,44 @@ public class BaseInteractionReplyBuilder<TInteraction> : IInteractionReplyBuilde
 		Result = result;
 		return this;
 	}
-
-	public IResultInteractionReplyBuilder<TInteraction> WithSuccessEmbed(Action<EmbedBuilder, Result> embedBuilder) {
-		_successEmbedModifications = embedBuilder;
-		return this;
+	
+	public IResultInteractionReplyBuilder<TInteraction> FromResult<T>(Result<T> result) {
+		return FromResult(result.ToResult());
 	}
 
-	public IResultInteractionReplyBuilder<TInteraction> WithFailureEmbed(Action<EmbedBuilder, Result> embedBuilder) {
-		_failureEmbedModifications = embedBuilder;
+	public IResultInteractionReplyBuilder<TInteraction> WithSuccessEmbed(Action<EmbedBuilder, Result> embedBuilderModification) {
+		if (Result is null || Result.IsFailed) {
+			return this;
+		} 
+		
+		var embedBuilder = _context.CreateEmbedBuilder();
+		embedBuilder.WithSuccess("Everything went well!");
+		embedBuilderModification?.Invoke(embedBuilder, Result);
+		Embeds.Add(embedBuilder.Build());
+		return this;
+	}
+	
+	public IResultInteractionReplyBuilder<TInteraction> WithSuccessEmbed<T>(Action<EmbedBuilder, Result<T>> embedBuilderModification) {
+		if (Result is null || Result.IsFailed) {
+			return this;
+		} 
+		
+		var embedBuilder = _context.CreateEmbedBuilder();
+		embedBuilder.WithSuccess("Everything went well!");
+		embedBuilderModification?.Invoke(embedBuilder, Result);
+		Embeds.Add(embedBuilder.Build());
+		return this;
+	}
+	
+	public IResultInteractionReplyBuilder<TInteraction> WithFailureEmbed(Action<EmbedBuilder, Result> embedBuilderModification) {
+		if (Result is null || Result.IsSuccess) {
+			return this;
+		} 
+		
+		var embedBuilder = _context.CreateEmbedBuilder();
+		embedBuilder.WithFailure("Stuff went wrong!");
+		embedBuilderModification?.Invoke(embedBuilder, Result);
+		Embeds.Add(embedBuilder.Build());
 		return this;
 	}
 
@@ -171,10 +192,14 @@ public class BaseInteractionReplyBuilder<TInteraction> : IInteractionReplyBuilde
 		var embed = _context.CreateEmbedBuilder();
 		if (Result.IsSuccess) {
 			embed.WithSuccess("Everything went well!");
-			_successEmbedModifications?.Invoke(embed, Result);
 		} else {
 			embed.WithFailure("Stuff went wrong!");
-			_failureEmbedModifications?.Invoke(embed, Result);
+			foreach (var error in Result.Errors) {
+				embed.AddField(f => {
+					f.Name = "Error: ";
+					f.Value = error.Message;
+				});
+			}
 		}
 
 		Embeds.Add(embed.Build());

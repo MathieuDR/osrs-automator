@@ -1,5 +1,4 @@
-﻿using System.Globalization;
-using Common.Formatters;
+﻿using MathieuDR.Common.Formatters;
 
 namespace DiscordBot.Helpers.Extensions;
 
