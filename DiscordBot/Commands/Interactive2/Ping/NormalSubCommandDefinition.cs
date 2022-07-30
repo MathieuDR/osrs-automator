@@ -1,5 +1,3 @@
-using DiscordBot.Commands.Interactive2.Base.Definitions;
-
 namespace DiscordBot.Commands.Interactive2.Ping;
 
 public class NormalSubCommandDefinition : SubCommandDefinitionBase<PingRootCommandDefinition> {

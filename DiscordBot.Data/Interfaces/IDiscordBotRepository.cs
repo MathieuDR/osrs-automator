@@ -1,26 +1,28 @@
-﻿using DiscordBot.Common.Models.Data;
+﻿using DiscordBot.Common.Models.Data.Configuration;
+using DiscordBot.Common.Models.Data.Counting;
+using DiscordBot.Common.Models.Data.PlayerManagement;
 using OsrsPlayer = WiseOldManConnector.Models.Output.Player;
 
 namespace DiscordBot.Data.Interfaces;
 
 public interface IDiscordBotRepository {
-    Player GetPlayerByOsrsAccount(ulong guildId, int womId);
-    Player GetPlayerByOsrsAccount(ulong guildId, string username);
-    Player CoupleOsrsPlayerToGuild(ulong guildId, ulong discordUserId, OsrsPlayer womPlayer);
-    Player UpdateOrInsertPlayerForGuild(ulong guildId, Player player);
+    Player GetPlayerByOsrsAccount(DiscordGuildId guildId, int womId);
+    Player GetPlayerByOsrsAccount(DiscordGuildId guildId, string username);
+    Player CoupleOsrsPlayerToGuild(DiscordGuildId guildId, DiscordUserId discordUserId, OsrsPlayer womPlayer);
+    Player UpdateOrInsertPlayerForGuild(DiscordGuildId guildId, Player player);
 
-    Player GetPlayerById(ulong guildId, ulong id);
-    Player InsertPlayerForGuild(ulong guildId, Player player);
+    Player GetPlayerById(DiscordGuildId guildId, DiscordUserId id);
+    Player InsertPlayerForGuild(DiscordGuildId guildId, Player player);
     GuildConfig CreateOrUpdateGroupConfig(GuildConfig config);
     GuildConfig InsertConfig(GuildConfig config);
-    GuildConfig GetGroupConfig(ulong guildId);
-    IEnumerable<Player> GetAllPlayersForGuild(in ulong guildId);
+    GuildConfig GetGroupConfig(DiscordGuildId guildId);
+    IEnumerable<Player> GetAllPlayersForGuild(in DiscordGuildId guildId);
 
-    AutomatedJobState GetAutomatedJobState(ulong guildId);
-    AutomatedJobState CreateOrUpdateAutomatedJobState(ulong guildId, AutomatedJobState jobState);
+    AutomatedJobState GetAutomatedJobState(DiscordGuildId guildId);
+    AutomatedJobState CreateOrUpdateAutomatedJobState(DiscordGuildId guildId, AutomatedJobState jobState);
 
-    UserCountInfo GetCountInfoByUserId(ulong guildId, ulong userId);
+    UserCountInfo GetCountInfoByUserId(DiscordGuildId guildId, DiscordUserId userId);
 
-    UserCountInfo UpdateOrInsertUserCountInfoForGuid(ulong guildId, UserCountInfo countInfo);
-    IEnumerable<UserCountInfo> GetAllUserCountInfos(ulong guildId);
+    UserCountInfo UpdateOrInsertUserCountInfoForGuid(DiscordGuildId guildId, UserCountInfo countInfo);
+    IEnumerable<UserCountInfo> GetAllUserCountInfos(DiscordGuildId guildId);
 }

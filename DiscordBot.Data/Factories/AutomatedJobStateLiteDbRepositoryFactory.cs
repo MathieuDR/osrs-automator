@@ -10,7 +10,7 @@ internal class AutomatedJobStateLiteDbRepositoryFactory : BaseLiteDbRepositoryFa
 
     public override bool RequiresGuildId => true;
 
-    public override IAutomatedJobStateRepository Create(ulong guildId) {
+    public override IAutomatedJobStateRepository Create(DiscordGuildId guildId) {
         return new AutomatedJobStateRepository(GetLogger(), LiteDbManager.GetDatabase(guildId));
     }
 

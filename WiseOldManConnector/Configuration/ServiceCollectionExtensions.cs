@@ -1,4 +1,4 @@
-﻿using Common.Semaphores;
+﻿using MathieuDR.Common.Semaphores;
 using Microsoft.Extensions.DependencyInjection;
 using WiseOldManConnector.Api;
 using WiseOldManConnector.Interfaces;

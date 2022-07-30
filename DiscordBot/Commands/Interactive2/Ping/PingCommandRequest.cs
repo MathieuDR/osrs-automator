@@ -1,5 +1,4 @@
-﻿using DiscordBot.Commands.Interactive2.Base.Requests;
-using DiscordBot.Common.Models.Enums;
+﻿using DiscordBot.Common.Models.Enums;
 
 namespace DiscordBot.Commands.Interactive2.Ping; 
 

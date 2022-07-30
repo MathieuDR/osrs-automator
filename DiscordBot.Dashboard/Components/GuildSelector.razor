@@ -1,0 +1,49 @@
+<Select TValue="long" SelectedValueChanged="@OnSelectedValueChanged">
+    <SelectItem Disabled>@FirstOption</SelectItem>
+    @foreach (var guild in Guilds) {
+        <SelectItem Value="@guild.Id.Value">
+            @guild.Name (@guild.Id.Value)
+        </SelectItem>
+    }
+</Select>
+
+@code {
+    [Inject]
+    public ICachedDiscordService CachedDiscordService { get; set; }
+
+    public List<Guild> Guilds { get; set; } = new();
+
+    [Parameter] public Guild DiscordGuild { get; set; }
+
+    [Parameter] public EventCallback<Guild> DiscordGuildChanged { get; set; }
+
+    public string FirstOption { get; set; } = "Loading...";
+
+
+    Task OnSelectedValueChanged( long value ) {
+        DiscordGuild = Guilds.First(x => x.Id.Value == value);
+        DiscordGuildChanged.InvokeAsync(DiscordGuild);
+        return Task.CompletedTask;
+    }
+
+    private async Task GetGuilds(int retries = 0) {
+        var guilds = await CachedDiscordService.GetGuilds();
+        if (guilds.IsSuccess) {
+            Guilds = guilds.Value.ToList();
+            FirstOption = "Please select a server";
+        } else {
+            if (retries < 3) {
+                await Task.Delay(1000);
+                await GetGuilds(retries + 1);
+            } else {
+                FirstOption = "Failed to load servers";
+            }
+        }
+    }
+    
+    
+    protected override async Task OnInitializedAsync() {
+        await GetGuilds();
+        await base.OnInitializedAsync();
+    }
+}

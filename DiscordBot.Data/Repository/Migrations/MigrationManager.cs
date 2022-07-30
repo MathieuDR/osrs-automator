@@ -1,6 +1,5 @@
 using LiteDB;
-using Serilog;
-
+using Microsoft.Extensions.Logging;
 namespace DiscordBot.Data.Repository.Migrations;
 
 public class MigrationManager {
@@ -9,10 +8,10 @@ public class MigrationManager {
 
     private int? _currentMigration;
 
-    public MigrationManager(ILogger logger) {
-        _logger = logger;
+    public MigrationManager(ILoggerFactory loggerFactory) {
+        _logger = loggerFactory.CreateLogger<MigrationManager>();
         _migrations = new List<IMigration>();
-        _migrations.Add(new MigrationToBetterCountModels(logger));
+        _migrations.Add(new MigrationToBetterCountModels(loggerFactory.CreateLogger<MigrationToBetterCountModels>()));
         Validate();
     }
 

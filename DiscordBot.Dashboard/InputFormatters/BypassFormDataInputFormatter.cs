@@ -2,7 +2,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Formatters;
 using Microsoft.AspNetCore.Mvc.ModelBinding.Binders;
 
-namespace Dashboard.InputFormatters;
+namespace DiscordBot.Dashboard.InputFormatters;
 
 /// <summary>
 ///     This input formatter bypasses the <see cref="BodyModelBinder" /> by returning a null result, when the request has a
@@ -11,11 +11,7 @@ namespace Dashboard.InputFormatters;
 ///     method.
 /// </summary>
 public class BypassFormDataInputFormatter : IInputFormatter {
-    public bool CanRead(InputFormatterContext context) {
-        return context.HttpContext.Request.HasFormContentType;
-    }
+	public bool CanRead(InputFormatterContext context) => context.HttpContext.Request.HasFormContentType;
 
-    public Task<InputFormatterResult> ReadAsync(InputFormatterContext context) {
-        return InputFormatterResult.SuccessAsync(null);
-    }
+	public Task<InputFormatterResult> ReadAsync(InputFormatterContext context) => InputFormatterResult.SuccessAsync(null);
 }

@@ -1,0 +1,88 @@
+@page "/dropper/settings"
+@using DiscordBot.Common.Models.Data.Drops
+@using DiscordBot.Dashboard.Extensions
+@using DiscordBot.Dashboard.Models
+
+<PageHeader>
+    Automated dropper settings
+</PageHeader>
+
+<Row>
+    <Column>
+        <Column>
+                <Fields>
+                    <Field>
+                        <FieldLabel>Server</FieldLabel>
+                        <GuildSelector DiscordGuildChanged="OnDiscordGuildChange" />
+                    </Field>
+                </Fields>
+            </Column>
+    </Column>
+</Row>
+
+
+
+@if (SelectedGuild is null || SelectedGuild is default(Guild)) {
+    <Row>
+        <Paragraph>Please select a server.</Paragraph>
+    </Row>
+} else {
+    <DropperGuildConfigurationComponent Guild="SelectedGuild" Configuration="GuildConfiguration" />
+}
+
+<Row Margin="Margin.Is2.FromTop">
+    <Column>
+        <Button Color="Color.Primary" Clicked="@SaveConfiguration">Save</Button>
+    </Column>
+    
+    <Column>
+        <Button Color="Color.Primary" Clicked="@ResetCache">Reset Cache</Button>
+    </Column>
+</Row>
+
+@code {
+    public Guild? SelectedGuild { get; set; }
+
+    [Inject]
+    public ICachedDiscordService CachedDiscordService { get; set; }
+    
+    [Inject]
+    public INotificationService NotificationService { get; set; }
+    
+    [Inject]
+    public IAutomatedDropperService AutomatedDropperService { get; set; }
+
+    public DropperGuildConfigurationModel? GuildConfiguration;
+    private DropperGuildConfiguration? _guildConfiguration;
+
+    public void ResetCache() {
+         _ = CachedDiscordService.ResetCache();
+        NotificationService.Success("Cache reset!");
+    }
+
+    private async Task OnDiscordGuildChange(Guild guild) {
+        SelectedGuild = guild;
+        var result = await AutomatedDropperService.GetGuildConfiguration(guild);
+        if (result.IsFailed) {
+            _ = NotificationService.Error("Cannot get guild configuration");
+        }
+
+        GuildConfiguration = result.Value.ToRequest();
+        _guildConfiguration = result.Value;
+    }
+
+    private async Task SaveConfiguration() {
+        if (GuildConfiguration is null || _guildConfiguration is null) {
+            _ = NotificationService.Error("Oh boy, something went wrong. \nThere is no configuration!");
+        }
+        
+        var result = await AutomatedDropperService.SaveGuildConfiguration(GuildConfiguration!.ToRecord(_guildConfiguration!));
+        
+        if (result.IsFailed) {
+            _ = NotificationService.Error("Couldn't save the guild configuration");
+        }
+
+        _ = NotificationService.Success("Saved!");
+    }
+
+}

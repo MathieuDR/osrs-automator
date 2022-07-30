@@ -1,0 +1,141 @@
+@using DiscordBot.Common.Models.Data.Drops
+@using DiscordBot.Dashboard.Models
+   
+<Row>
+    <Column>
+        <Heading Size="HeadingSize.Is4"><Text TextWeight="TextWeight.Bold">@Guild.Name</Text> configuration</Heading>
+    </Column>
+</Row>
+
+<Row>
+    <Column ColumnSize="ColumnSize.Is12">
+        <Heading Size="HeadingSize.Is5">General</Heading>
+    </Column>
+
+    <Column ColumnSize="ColumnSize.Is12">
+        <Fields>
+            <Field>
+                <Switch TValue="bool" @bind-Checked="@Configuration.IsEnabled">Enabled </Switch>
+            </Field>
+        </Fields>
+    </Column>
+
+    <Column ColumnSize="ColumnSize.Is12">
+        <UserlistSelector Users="Users" FieldName="Disabled users" @bind-SelectedUsers="@Configuration.DisabledUsers" />
+    </Column>
+</Row>
+
+<Row>
+    <Accordion>
+        <Collapse Visible="@defaultVisible">
+            <CollapseHeader>
+                <Heading Size="HeadingSize.Is5">
+                    <Button Clicked="@(() => defaultVisible = !defaultVisible)">Default settings</Button>
+                </Heading>
+            </CollapseHeader>
+            <CollapseBody>
+                <Column>
+                    <Row>
+                        <Column>
+                            <Heading Size="HeadingSize.Is2">
+                                Default settings
+                            </Heading>
+                        </Column>
+                    </Row>
+                    <Row>
+                        <Column>
+                            <Paragraph>
+                                These settings are the default. <br />
+                                You will be able to 'inherit' these settings on any specific dropper.
+                            </Paragraph>
+                            <Paragraph>
+                                A common use case would be to set the default settings to general 'rules' for all droppers. For example you might want to set the default rarity and value.
+                                If you want to diverge from these defaults, you can set these settings on the specific dropper.
+                            </Paragraph>
+                        </Column>
+                    </Row>
+                </Column>
+                <Column>
+                    <DropperConfiguration Users="Users" Model="Configuration.BaseConfiguration" Name="Default"/>
+                </Column>
+            </CollapseBody>
+        </Collapse>
+        <Collapse Visible="@channelVisible">
+            <CollapseHeader>
+                <Heading Size="HeadingSize.Is5">
+                    <Button Clicked="@(() => channelVisible = !channelVisible)">Channel </Button>
+                </Heading>
+            </CollapseHeader>
+            <CollapseBody>
+                <Column>
+                    <Row>
+                        <Column>
+                            <Heading Size="HeadingSize.Is2">
+                                Choose a channel
+                            </Heading>
+                        </Column>
+                    </Row>
+                    <Row>
+                        <ExtendedChannelSelector Guild="Guild" FieldName="Channels" Channels="_channels"></ExtendedChannelSelector>
+                    </Row>
+                </Column>
+                <Column>
+                    @* <DropperConfiguration/> *@
+                </Column>
+            </CollapseBody>
+        </Collapse>
+    </Accordion>
+</Row>
+        
+        
+
+@code {
+
+    bool defaultVisible = true;
+    bool channelVisible = false;
+    
+    [Parameter]
+    public Guild Guild { get; set; }
+    
+    [Parameter]
+    public DropperGuildConfigurationModel Configuration { get; set; }
+
+    [Inject] ICachedDiscordService CachedDiscordService { get; set; }
+    
+    [Inject] INotificationService NotificationService { get; set; }
+    [Inject] ILogger<DropperGuildConfigurationComponent> Logger { get; set; }
+
+    List<DiscordUserId> _userIds = new();
+    List<ExtendedChannel> _channels;
+
+
+    DropperConfigurationRequest defaultConfig = new DropperConfigurationRequest();
+    
+    List<GuildUser> Users;
+
+    protected override async Task OnInitializedAsync() {
+        await base.OnInitializedAsync();
+    }
+
+    protected override async Task OnParametersSetAsync() {
+        var channelsResultTask = CachedDiscordService.GetOrderedTextChannels(Guild.Id);
+        var userResult = await CachedDiscordService.GetUsers(Guild.Id);
+        if (userResult.IsFailed) {
+            _ = NotificationService.Error("Cannot get the users.");
+        }
+
+        Users = userResult.Value.ToList();
+        var channelsResult = await channelsResultTask;
+
+        if (channelsResult.IsFailed) {
+            _ = NotificationService.Error("Cannot get the channels.");
+        }
+        _channels = channelsResult.Value.Select(x => {
+            var hasConfig = Configuration.ChannelConfigurations.ContainsKey(x.Id);
+            return new ExtendedChannel(x, false, !hasConfig);
+        }).ToList();
+        
+        await base.OnParametersSetAsync();
+    }
+
+}

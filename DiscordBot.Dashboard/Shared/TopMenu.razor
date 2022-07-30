@@ -1,0 +1,84 @@
+<Bar @bind-Visible="@topbarVisible" Breakpoint="Breakpoint.Desktop" Background="Background.Primary" ThemeContrast="ThemeContrast.Light">
+    <BarBrand>
+        <BarItem>
+            <BarLink To="">
+                <BarIcon IconName="IconName.Dashboard" />
+                Automator
+            </BarLink>
+        </BarItem>
+    </BarBrand>
+    <BarToggler />
+    <BarMenu>
+        <BarStart>
+            <BarItem>
+                <BarLink To="/">Home</BarLink>
+            </BarItem>
+            <BarItem>
+                <BarDropdown>
+                    <BarDropdownToggle>
+                        Settings
+                    </BarDropdownToggle>
+                    <BarDropdownMenu>
+                        <BarDropdownItem To="/dropper/settings">Dropper settings</BarDropdownItem>
+                    </BarDropdownMenu>
+                </BarDropdown>
+            </BarItem>
+            <BarItem>
+                <BarDropdown>
+                    <BarDropdownToggle>Blazorise</BarDropdownToggle>
+                    <BarDropdownMenu>
+                         <BarDropdownItem To="https://blazorise.com/docs/">
+                            Documentation
+                        </BarDropdownItem>
+                        <BarDropdownItem To="https://blazorise.com/docs/quick-start/">
+                            Quick-Start Guide
+                        </BarDropdownItem>
+                        <BarDropdownItem To="https://blazorise.com/docs/usage/">
+                            Hot reload not working?
+                        </BarDropdownItem>
+                    </BarDropdownMenu>
+                </BarDropdown>
+            </BarItem>
+           
+        </BarStart>
+        <BarEnd>
+            <BarItem>
+                <BarDropdown RightAligned>
+                    <BarDropdownToggle><Icon Name="IconName.Language" /></BarDropdownToggle>
+                    <BarDropdownMenu>
+                        @foreach ( var cultureInfo in LocalizationService.AvailableCultures )
+                        {
+                            <BarDropdownItem @key="@cultureInfo.Name" Clicked="@(()=>SelectCulture(cultureInfo.Name))">
+                                @if ( cultureInfo.IsNeutralCulture )
+                                {
+                                    @cultureInfo.EnglishName
+                                }
+                                else
+                                {
+                                    @cultureInfo.Parent.EnglishName
+                                }
+                            </BarDropdownItem>
+                        }
+                    </BarDropdownMenu>
+                </BarDropdown>
+            </BarItem>
+            
+        </BarEnd>
+    </BarMenu>
+</Bar>
+@code {
+    protected override async Task OnInitializedAsync() {
+        await SelectCulture( "en-US" );
+        await base.OnInitializedAsync();
+    }
+
+    Task SelectCulture(string name) {
+        LocalizationService.ChangeLanguage(name);
+        return Task.CompletedTask;
+    }
+
+    private bool topbarVisible = false;
+    [Parameter] public EventCallback<bool> ThemeEnabledChanged { get; set; }
+    [Inject] protected ITextLocalizerService LocalizationService { get; set; }
+    [CascadingParameter] protected Theme Theme { get; set; }
+}

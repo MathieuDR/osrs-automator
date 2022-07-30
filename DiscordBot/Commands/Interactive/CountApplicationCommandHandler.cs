@@ -1,4 +1,5 @@
 using System.Text;
+using DiscordBot.Common.Models.Data.Counting;
 using DiscordBot.Common.Models.Enums;
 
 namespace DiscordBot.Commands.Interactive;
@@ -115,10 +116,10 @@ public class CountApplicationCommandHandler : ApplicationCommandHandler {
 
     private async Task HandleNewCount(ApplicationCommandContext context, int startCount, int newCount, IGuildUser user) {
         try {
-            var thresholds = (await _counterService.GetThresholds(user.GuildId)).OrderBy(x=>x.Threshold);
-            var channelId = await _counterService.GetChannelForGuild(user.GuildId);
+            var thresholds = await _counterService.GetThresholds(user.GetGuildId()).OrderBy(x=>x.Threshold);;
+            var channelId = await _counterService.GetChannelForGuild(user.GetGuildId());
 
-            if (!(context.Guild.GetChannel(channelId) is ISocketMessageChannel channel)) {
+            if (!(context.Guild.GetChannel(channelId.UlongValue) is ISocketMessageChannel channel)) {
                 return;
             }
 
@@ -128,7 +129,7 @@ public class CountApplicationCommandHandler : ApplicationCommandHandler {
                 if (startCount < thresholdThreshold && newCount >= thresholdThreshold) {
                     // Hit it
                     await channel.SendMessageAsync($"{threshold.Name} hit for <@{user.Id}>!");
-                    if (threshold.GivenRoleId.HasValue && context.Guild.GetRole(threshold.GivenRoleId.Value) is IRole role) {
+                    if (threshold.GivenRoleId.HasValue && context.Guild.GetRole(threshold.GivenRoleId.Value.UlongValue) is IRole role) {
                         await user.AddRoleAsync(role);
                     }
                 }
@@ -137,7 +138,7 @@ public class CountApplicationCommandHandler : ApplicationCommandHandler {
                     // Remove it
                     await channel.SendMessageAsync($"<@{user.Id}> has not sufficient points anymore for {threshold.Name}");
 
-                    if (threshold.GivenRoleId.HasValue && context.Guild.GetRole(threshold.GivenRoleId.Value) is IRole role) {
+                    if (threshold.GivenRoleId.HasValue && context.Guild.GetRole(threshold.GivenRoleId.Value.UlongValue) is IRole role) {
                         await user.RemoveRoleAsync(role);
                     }
                 }

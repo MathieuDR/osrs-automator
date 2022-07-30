@@ -1,4 +1,4 @@
-using DiscordBot.Common.Models.Data;
+using DiscordBot.Common.Models.Data.PlayerManagement;
 using DiscordBot.Data.Interfaces;
 using FluentResults;
 using LiteDB;
@@ -11,9 +11,9 @@ internal class PlayerRepository : BaseLiteDbRepository<Player>, IPlayerRepositor
 
     public override string CollectionName => "players";
 
-    public Result<Player> GetByDiscordId(ulong id) {
+    public Result<Player> GetByDiscordId(DiscordUserId id) {
         return Result.Ok(GetCollection()
-            .FindOne(p => p.DiscordId == id));
+            .FindOne(p => p.DiscordUserId == id));
     }
 
     public Result<Player> GetPlayerByOsrsAccount(int womId) {

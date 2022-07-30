@@ -1,8 +1,8 @@
 using System.Text.Json.Serialization;
 
-namespace Dashboard.Models.ApiRequests.DiscordEmbed;
+namespace DiscordBot.Dashboard.Models.ApiRequests.DiscordEmbed;
 
 public class Thumbnail {
-    [JsonPropertyName("url")]
-    public string Url { get; set; }
+	[JsonPropertyName("url")]
+	public string Url { get; set; }
 }

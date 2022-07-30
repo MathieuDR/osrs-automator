@@ -1,4 +1,4 @@
-using DiscordBot.Common.Models.Data;
+using DiscordBot.Common.Models.Data.Counting;
 using DiscordBot.Data.Interfaces;
 using FluentResults;
 using LiteDB;
@@ -10,7 +10,7 @@ internal class UserCountInfoRepository : BaseLiteDbRepository<UserCountInfo>, IU
     public UserCountInfoRepository(ILogger<UserCountInfoRepository> logger, LiteDatabase database) : base(logger, database) { }
     public override string CollectionName => "guildUserCounts";
 
-    public Result<UserCountInfo> GetByDiscordUserId(ulong id) {
+    public Result<UserCountInfo> GetByDiscordUserId(DiscordUserId id) {
         return Result.Ok(GetCollection().FindOne(x => x.DiscordId == id));
     }
 }

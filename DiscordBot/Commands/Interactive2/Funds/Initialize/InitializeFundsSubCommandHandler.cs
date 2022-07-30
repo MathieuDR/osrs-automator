@@ -1,5 +1,4 @@
-using Common.Parsers;
-using DiscordBot.Commands.Interactive2.Base.Handlers;
+using MathieuDR.Common.Parsers;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace DiscordBot.Commands.Interactive2.Funds.Initialize;

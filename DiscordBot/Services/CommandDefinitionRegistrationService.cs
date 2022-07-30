@@ -1,4 +1,4 @@
-using DiscordBot.Commands.Interactive2.Base.Definitions;
+using DiscordBot.Common.Models.Data.Configuration;
 using DiscordBot.Data.Interfaces;
 
 namespace DiscordBot.Services;
@@ -81,7 +81,7 @@ public class CommandDefinitionRegistrationService : ICommandRegistrationService 
                 command = null;
             }
 
-            if (applicationCommandInfo.RegisteredGuilds.Contains(guild.Id)) {
+            if (applicationCommandInfo.RegisteredGuilds.Contains(guild.GetGuildId())) {
                 if (command is null) {
                     _logger.LogInformation("Adding {name} command", applicationCommandInfo.CommandName);
                     await guild.CreateApplicationCommandAsync(properties);

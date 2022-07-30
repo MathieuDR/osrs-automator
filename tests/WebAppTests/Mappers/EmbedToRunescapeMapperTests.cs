@@ -1,7 +1,7 @@
 using System.Text.Json;
-using Dashboard.Models.ApiRequests.DiscordEmbed;
-using Dashboard.Transformers;
 using DiscordBot.Common.Dtos.Runescape;
+using DiscordBot.Dashboard.Models.ApiRequests.DiscordEmbed;
+using DiscordBot.Dashboard.Transformers;
 using FluentAssertions;
 using WebAppTests.Resources.EmbedJsons;
 using WiseOldManConnector.Models.WiseOldMan.Enums;

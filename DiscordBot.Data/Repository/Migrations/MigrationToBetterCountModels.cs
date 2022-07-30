@@ -1,10 +1,10 @@
 using LiteDB;
-using Serilog;
+using Microsoft.Extensions.Logging;
 
 namespace DiscordBot.Data.Repository.Migrations;
 
 public sealed class MigrationToBetterCountModels : BaseMigration {
-    public MigrationToBetterCountModels(ILogger logger) : base(logger) { }
+    public MigrationToBetterCountModels(ILogger<MigrationToBetterCountModels> logger) : base(logger) { }
     public override int Version => 1;
 
     public override void DoUp(LiteDatabase database) {
