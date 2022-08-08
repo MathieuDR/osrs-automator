@@ -26,7 +26,11 @@ public class RankingCountSubcommandHandler : ApplicationCommandHandlerBase<Ranki
         }
 
         var embed = CreateEmbed(rankingMembers);
-        _ = Context.CreateReplyBuilder().WithEmbed(embed);
+        _ = Context
+            .CreateReplyBuilder()
+            .WithEmbed(embed)
+            .RespondAsync();
+        
         return Task.FromResult(Result.Ok());
     }
 
