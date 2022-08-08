@@ -63,7 +63,6 @@ public static class ConfigurationExtensions {
 			.AddSingleton<ICommandAuthorizationService, CommandAuthorizationService>()
 			.AddSingleton<PingApplicationCommandHandler>()
 			.AddSingleton<ManageCommandsApplicationCommandHandler>()
-			.AddSingleton<CountApplicationCommandHandler>()
 			.AddSingleton<KillBotCommandHandler>()
 			.AddSingleton<CountConfigurationApplicationCommandHandler>()
 			.AddSingleton<ConfigureApplicationCommandHandler>()
@@ -74,7 +73,6 @@ public static class ConfigurationExtensions {
 				new IApplicationCommandHandler[] {
 					x.GetRequiredService<PingApplicationCommandHandler>(),
 					x.GetRequiredService<ManageCommandsApplicationCommandHandler>(),
-					x.GetRequiredService<CountApplicationCommandHandler>(),
 					x.GetRequiredService<CountConfigurationApplicationCommandHandler>(),
 					x.GetRequiredService<KillBotCommandHandler>(),
 					x.GetRequiredService<ConfigureApplicationCommandHandler>(),

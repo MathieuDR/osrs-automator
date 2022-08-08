@@ -13,4 +13,6 @@ public interface IRepository<T> : IRepository where T : BaseModel, new() {
     public Result Update(T toUpdate);
     public Result UpdateOrInsert(T entity);
     public Result Delete(T toDelete);
+    public Result BulkInsert(IEnumerable<T> toInsertModels);
+    public Result BulkUpdateOrInsert(IEnumerable<T> toUpsertModels);
 }
