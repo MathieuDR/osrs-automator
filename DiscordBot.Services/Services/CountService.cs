@@ -1,3 +1,4 @@
+using System.Text;
 using DiscordBot.Common.Dtos.Discord;
 using DiscordBot.Common.Helpers.Extensions;
 using DiscordBot.Common.Identities;
@@ -196,6 +197,49 @@ internal class CountService : RepositoryService, ICounterService {
     public Task<DiscordChannelId> GetChannelForGuild(DiscordGuildId guildId) {
         var config = GetGroupConfigWithValidCountConfig(guildId);
         return Task.FromResult(config.CountConfig.OutputChannelId);
+    }
+
+    public Task<string> GetCsvExport(Guild guild) {
+        const string csvDelimiter = ",";
+        var repo = GetRepository<IUserCountInfoRepository>(guild.Id);
+        var allResult = repo.GetAll();
+
+        if (allResult.IsFailed) {
+            return Task.FromResult("something went wrong");
+        }
+
+        var all = allResult.Value;
+        var builder = new StringBuilder();
+        builder.Append("Id");
+        builder.Append(csvDelimiter);
+        builder.Append("Additive");
+        builder.Append(csvDelimiter);
+        builder.Append("Reason");
+        builder.Append(csvDelimiter);
+        builder.Append("RequestedById");
+        builder.Append(csvDelimiter);
+        builder.Append("RequestedByTag");
+        builder.Append(csvDelimiter);
+        builder.Append("RequestedOn");
+        builder.Append("\n");
+        foreach (var info in all) {
+            foreach (var history in info.CountHistory) {
+                builder.Append(info.DiscordId);
+                builder.Append(csvDelimiter);
+                builder.Append(history.Additive);
+                builder.Append(csvDelimiter);
+                builder.Append(history.Reason);
+                builder.Append(csvDelimiter);
+                builder.Append(history.RequestedBy);
+                builder.Append(csvDelimiter);
+                builder.Append(history.RequestedDiscordTag);
+                builder.Append(csvDelimiter);
+                builder.Append(history.RequestedOn.ToString("u"));
+                builder.Append("\n");
+            }
+        }
+
+        return Task.FromResult(builder.ToString());
     }
 
     private UserCountInfo GetOrCreateUserCountInfo(GuildUser user, GuildUser requester = null) {

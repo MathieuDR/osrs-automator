@@ -15,4 +15,5 @@ public interface ICounterService {
     Task<bool> RemoveThreshold(DiscordGuildId guildId, int index);
     Task<IReadOnlyList<CountThreshold>> GetThresholds(DiscordGuildId guildId);
     Task<DiscordChannelId> GetChannelForGuild(DiscordGuildId guildId);
+    Task<string> GetCsvExport(Guild toGuildDto);
 }
