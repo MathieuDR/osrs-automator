@@ -6,6 +6,7 @@ using DiscordBot.Common.Models.Data.Counting;
 using DiscordBot.Data.Interfaces;
 using DiscordBot.Data.Strategies;
 using DiscordBot.Services.Interfaces;
+using FluentResults;
 using Microsoft.Extensions.Logging;
 
 namespace DiscordBot.Services.Services;
@@ -25,26 +26,41 @@ internal class CountService : RepositoryService, ICounterService {
     public async Task<Dictionary<GuildUser, int>> Count(IEnumerable<GuildUser> users, GuildUser requester, int additive, string reason) {
         var config = GetGroupConfigWithValidCountConfig(requester.GuildId);
 
-        var dict = new Dictionary<GuildUser, (int oldCount, int newCount)>();
-        var counts = new List<UserCountInfo>();
+        var (dict, counts) = CreateCountHistory(users, requester, additive, reason);
+        UpsertCounts(requester, counts);
 
-        foreach (var user in users.Distinct()) {
-            var count = GetOrCreateUserCountInfo(user, requester);
-            var newCount = new Count(requester.Id, requester.Username, additive, reason);
-            var currentCount = count.CurrentCount;
-            count.CountHistory.Add(newCount);
-            dict.Add(user, (currentCount, currentCount + additive));
-            counts.Add(count);
-        }
+        var (roleDict, messages) = TriggerThreDictionary(additive, config, dict);
+
+        var messageTask = SendMessage(messages, config);
+        await HandleRoles(requester, additive, roleDict);
+        await messageTask;
         
-        var repo = GetRepository<IUserCountInfoRepository>(requester.GuildId);
-        repo.BulkUpdateOrInsert(counts);
+        return dict.ToDictionary(x => x.Key, x => x.Value.newCount);
+    }
 
+    private async Task HandleRoles(GuildUser requester, int additive, Dictionary<DiscordRoleId, List<DiscordUserId>> roleDict) {
+        var dictParam = roleDict
+            .ToDictionary(x => x.Key, x => x.Value.AsEnumerable())
+            .ReverseDictionary();
+
+        if (additive > 0) {
+            await _discordService.AddRoles(requester.GuildId, dictParam);
+        } else {
+            await _discordService.RemoveRoles(requester.GuildId, dictParam);
+        }
+    }
+
+    private Task<Result> SendMessage(List<string> messages, GuildConfig config) {
+        var message = string.Join(Environment.NewLine, messages);
+        var messageTask = _discordService.SendSuccessEmbed(config.CountConfig.OutputChannelId, message);
+        return messageTask;
+    }
+
+    private static (Dictionary<DiscordRoleId, List<DiscordUserId>> UserPerRolesDictionary, List<string> Messages) TriggerThreDictionary(int additive, GuildConfig config, Dictionary<GuildUser, (int oldCount, int newCount)> dict) {
         var thresholds = config.CountConfig.Thresholds.OrderBy(x => x.Threshold).ToList();
         var roleDict = new Dictionary<DiscordRoleId, List<DiscordUserId>>();
         var isPositive = additive > 0;
         var messages = new List<string>();
-
 
         foreach (var (user, countValue) in dict) {
             foreach (var threshold in thresholds) {
@@ -58,7 +74,7 @@ internal class CountService : RepositoryService, ICounterService {
                     if (threshold.GivenRoleId.HasValue) {
                         roleDict.Insert(threshold.GivenRoleId.Value, user.Id);
                     }
-                    
+
                     continue;
                 }
 
@@ -73,6 +89,7 @@ internal class CountService : RepositoryService, ICounterService {
                     if (threshold.GivenRoleId.HasValue) {
                         roleDict.Insert(threshold.GivenRoleId.Value, user.Id);
                     }
+
                     continue;
                 }
 
@@ -82,20 +99,29 @@ internal class CountService : RepositoryService, ICounterService {
             }
         }
 
-        var message = string.Join(Environment.NewLine, messages);
-        var messageTask = _discordService.SendSuccessEmbed(config.CountConfig.OutputChannelId, message);
-        var dictParam = roleDict
-            .ToDictionary(x => x.Key, x => x.Value.AsEnumerable())
-            .ReverseDictionary();
-        
-        if (isPositive) {
-            await _discordService.AddRoles(requester.GuildId, dictParam);
-        } else {
-            await _discordService.RemoveRoles(requester.GuildId, dictParam);
+        return (roleDict, messages);
+    }
+
+    private void UpsertCounts(GuildUser requester, List<UserCountInfo> counts) {
+        var repo = GetRepository<IUserCountInfoRepository>(requester.GuildId);
+        repo.BulkUpdateOrInsert(counts);
+    }
+
+    private (Dictionary<GuildUser, (int oldCount, int newCount)> UserCountValuesDictionary, List<UserCountInfo> CountObjects) CreateCountHistory(IEnumerable<GuildUser> users, GuildUser requester, int additive,
+        string reason) {
+        var dict = new Dictionary<GuildUser, (int oldCount, int newCount)>();
+        var counts = new List<UserCountInfo>();
+
+        foreach (var user in users.Distinct()) {
+            var count = GetOrCreateUserCountInfo(user, requester);
+            var newCount = new Count(requester.Id, requester.Username, additive, reason);
+            var currentCount = count.CurrentCount;
+            count.CountHistory.Add(newCount);
+            dict.Add(user, (currentCount, currentCount + additive));
+            counts.Add(count);
         }
 
-        await messageTask;
-        return dict.ToDictionary(x => x.Key, x => x.Value.newCount);
+        return (dict, counts);
     }
 
     public UserCountInfo GetCountInfo(GuildUser user) => GetOrCreateUserCountInfo(user);
