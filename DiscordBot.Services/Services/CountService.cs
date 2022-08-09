@@ -1,16 +1,22 @@
+using System.Text;
 using DiscordBot.Common.Dtos.Discord;
+using DiscordBot.Common.Helpers.Extensions;
 using DiscordBot.Common.Identities;
 using DiscordBot.Common.Models.Data.Configuration;
 using DiscordBot.Common.Models.Data.Counting;
 using DiscordBot.Data.Interfaces;
 using DiscordBot.Data.Strategies;
 using DiscordBot.Services.Interfaces;
+using FluentResults;
 using Microsoft.Extensions.Logging;
 
 namespace DiscordBot.Services.Services;
 
 internal class CountService : RepositoryService, ICounterService {
-    public CountService(ILogger<CountService> logger, IRepositoryStrategy repositoryStrategy) : base(logger, repositoryStrategy) { }
+    private readonly IDiscordService _discordService;
+
+    public CountService(ILogger<CountService> logger, IRepositoryStrategy repositoryStrategy, IDiscordService discordService) : base(logger,
+        repositoryStrategy) => _discordService = discordService;
 
 
     public int TotalCount(GuildUser user) {
@@ -18,25 +24,128 @@ internal class CountService : RepositoryService, ICounterService {
         return count.CurrentCount;
     }
 
-    public int Count(GuildUser user, GuildUser requester, int additive, string reason) {
-        var count = GetOrCreateUserCountInfo(user, requester);
-        var newCount = new Count(requester.Id, requester.Username, additive, reason);
-        count.CountHistory.Add(newCount);
+    public async Task<Dictionary<GuildUser, int>> Count(IEnumerable<GuildUser> users, GuildUser requester, int additive, string reason) {
+        var config = GetGroupConfigWithValidCountConfig(requester.GuildId);
 
-        var repo = GetRepository<IUserCountInfoRepository>(user.GuildId);
-        repo.UpdateOrInsert(count);
+        var (dict, counts) = CreateCountHistory(users, requester, additive, reason);
+        UpsertCounts(requester, counts);
 
-        return count.CurrentCount;
+        var (roleDict, messages) = TriggerThreDictionary(additive, config, dict);
+
+        var messageTask = SendMessage(messages, config);
+        await HandleRoles(requester, additive, roleDict);
+        await messageTask;
+        
+        return dict.ToDictionary(x => x.Key, x => x.Value.newCount);
     }
 
-    public UserCountInfo GetCountInfo(GuildUser user) {
-        return GetOrCreateUserCountInfo(user);
+    private async Task HandleRoles(GuildUser requester, int additive, Dictionary<DiscordRoleId, List<DiscordUserId>> roleDict) {
+        var dictParam = roleDict
+            .ToDictionary(x => x.Key, x => x.Value.AsEnumerable())
+            .ReverseDictionary();
+
+        if (additive > 0) {
+            await _discordService.AddRoles(requester.GuildId, dictParam);
+        } else {
+            await _discordService.RemoveRoles(requester.GuildId, dictParam);
+        }
     }
+
+    private Task<Result> SendMessage(List<string> messages, GuildConfig config) {
+        var message = string.Join(Environment.NewLine, messages);
+        var messageTask = _discordService.SendSuccessEmbed(config.CountConfig.OutputChannelId, message);
+        return messageTask;
+    }
+
+    private static (Dictionary<DiscordRoleId, List<DiscordUserId>> UserPerRolesDictionary, List<string> Messages) TriggerThreDictionary(int additive, GuildConfig config, Dictionary<GuildUser, (int oldCount, int newCount)> dict) {
+        var thresholds = config.CountConfig.Thresholds.OrderBy(x => x.Threshold).ToList();
+        var roleDict = new Dictionary<DiscordRoleId, List<DiscordUserId>>();
+        var isPositive = additive > 0;
+        var messages = new List<string>();
+
+        foreach (var (user, countValue) in dict) {
+            foreach (var threshold in thresholds) {
+                var value = threshold.Threshold;
+
+
+                if (isPositive && countValue.oldCount < value && countValue.newCount >= value) {
+                    // Hit it
+                    messages.Add($"{threshold.Name} hit for <@{user.Id}>!");
+
+                    if (threshold.GivenRoleId.HasValue) {
+                        roleDict.Insert(threshold.GivenRoleId.Value, user.Id);
+                    }
+
+                    continue;
+                }
+
+                if (isPositive && countValue.newCount < value) {
+                    break;
+                }
+
+                if (!isPositive && countValue.oldCount >= value && countValue.newCount < value) {
+                    // Remove it
+                    messages.Add($"<@{user.Id}> has not sufficient points anymore for {threshold.Name}");
+
+                    if (threshold.GivenRoleId.HasValue) {
+                        roleDict.Insert(threshold.GivenRoleId.Value, user.Id);
+                    }
+
+                    continue;
+                }
+
+                if (!isPositive && countValue.newCount >= value) {
+                    break;
+                }
+            }
+        }
+
+        return (roleDict, messages);
+    }
+
+    private void UpsertCounts(GuildUser requester, List<UserCountInfo> counts) {
+        var repo = GetRepository<IUserCountInfoRepository>(requester.GuildId);
+        repo.BulkUpdateOrInsert(counts);
+    }
+
+    private (Dictionary<GuildUser, (int oldCount, int newCount)> UserCountValuesDictionary, List<UserCountInfo> CountObjects) CreateCountHistory(IEnumerable<GuildUser> users, GuildUser requester, int additive,
+        string reason) {
+        var dict = new Dictionary<GuildUser, (int oldCount, int newCount)>();
+        var counts = new List<UserCountInfo>();
+
+        foreach (var user in users.Distinct()) {
+            var count = GetOrCreateUserCountInfo(user, requester);
+            var newCount = new Count(requester.Id, requester.Username, additive, reason);
+            var currentCount = count.CurrentCount;
+            count.CountHistory.Add(newCount);
+            dict.Add(user, (currentCount, currentCount + additive));
+            counts.Add(count);
+        }
+
+        return (dict, counts);
+    }
+
+    public UserCountInfo GetCountInfo(GuildUser user) => GetOrCreateUserCountInfo(user);
 
     public List<UserCountInfo> TopCounts(Guild guild, int quantity) {
         var repo = GetRepository<IUserCountInfoRepository>(guild.Id);
         var all = repo.GetAll().Value;
         return all.OrderByDescending(c => c.CurrentCount).Take(quantity).ToList();
+    }
+
+    public List<UserCountInfo> CountRanking(GuildUser user, int quantity) {
+        var repo = GetRepository<IUserCountInfoRepository>(user.GuildId);
+        var all = repo.GetAll().Value.OrderByDescending(c => c.CurrentCount).ToList();
+        var userCountInfo = all.FirstOrDefault(x => x.DiscordId == user.Id);
+
+        var userPos = 0;
+        var before = quantity / 2;
+        if (userCountInfo is not null) {
+            userPos = all.IndexOf(userCountInfo);
+        }
+
+        var leftBound = Math.Max(0, userPos - before);
+        return all.Skip(leftBound).Take(quantity).ToList();
     }
 
     public Task<bool> SetChannelForCounts(GuildUser user, Channel outputChannel) {
@@ -90,6 +199,48 @@ internal class CountService : RepositoryService, ICounterService {
         return Task.FromResult(config.CountConfig.OutputChannelId);
     }
 
+    public Task<string> GetCsvExport(Guild guild) {
+        const string csvDelimiter = ",";
+        var repo = GetRepository<IUserCountInfoRepository>(guild.Id);
+        var allResult = repo.GetAll();
+
+        if (allResult.IsFailed) {
+            return Task.FromResult("something went wrong");
+        }
+
+        var all = allResult.Value;
+        var builder = new StringBuilder();
+        builder.Append("Id");
+        builder.Append(csvDelimiter);
+        builder.Append("Additive");
+        builder.Append(csvDelimiter);
+        builder.Append("Reason");
+        builder.Append(csvDelimiter);
+        builder.Append("RequestedById");
+        builder.Append(csvDelimiter);
+        builder.Append("RequestedByTag");
+        builder.Append(csvDelimiter);
+        builder.Append("RequestedOn");
+        builder.Append("\n");
+        foreach (var info in all) {
+            foreach (var history in info.CountHistory) {
+                builder.Append(info.DiscordId);
+                builder.Append(csvDelimiter);
+                builder.Append(history.Additive);
+                builder.Append(csvDelimiter);
+                builder.Append(history.Reason);
+                builder.Append(csvDelimiter);
+                builder.Append(history.RequestedBy);
+                builder.Append(csvDelimiter);
+                builder.Append(history.RequestedDiscordTag);
+                builder.Append(csvDelimiter);
+                builder.Append(history.RequestedOn.ToString("u"));
+                builder.Append("\n");
+            }
+        }
+
+        return Task.FromResult(builder.ToString());
+    }
 
     private UserCountInfo GetOrCreateUserCountInfo(GuildUser user, GuildUser requester = null) {
         var repo = GetRepository<IUserCountInfoRepository>(user.GuildId);

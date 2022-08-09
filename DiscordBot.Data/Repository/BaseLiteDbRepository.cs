@@ -49,6 +49,23 @@ internal abstract class BaseLiteDbRepository<T> : IRepository<T> where T : BaseM
         return collection.Delete(toDelete._id) ? Result.Ok() : Result.Fail("Delete failed");
     }
 
+    public Result BulkInsert(IEnumerable<T> toInsertModels) {
+        var collection = GetCollection();
+        collection.InsertBulk(toInsertModels);
+        return Result.Ok();
+    }
+
+    public Result BulkUpdateOrInsert(IEnumerable<T> toUpsertModels) {
+        var models = toUpsertModels as T[] ?? toUpsertModels.ToArray();
+        var toUpdate = models.Where(x => x._id is not null);
+        var toInsert = models.Where(x => x._id is null);
+
+        var updateResult = toUpdate.Select(Update).Merge();
+        var insertResult = BulkInsert(toInsert);
+
+        return updateResult.WithReasons(insertResult.Reasons);
+    }
+
     protected ILiteCollection<T> GetCollection() {
         return LiteDatabase.GetCollection<T>(CollectionName);
     }

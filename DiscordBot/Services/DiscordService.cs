@@ -76,6 +76,33 @@ public class DiscordService : IDiscordService {
         var result = _client.GetGuild(guildId.UlongValue).Users.Select(x => x.ToGuildUserDto());
         return Task.FromResult(Result.Ok(result));
     }
+    public async Task<Result> AddRoles(DiscordGuildId guildId, Dictionary<DiscordUserId, IEnumerable<DiscordRoleId>> userDicts) {
+        var guild = await GetGuild(guildId);
+        foreach (var (user, roles) in userDicts) {
+            var discordUser = guild.GetUser(user.UlongValue);
+            await discordUser.AddRolesAsync(roles.Select(x => x.UlongValue));
+        }
+        
+        return Result.Ok();
+    }
+
+    private async Task<SocketGuild> GetGuild(DiscordGuildId guild) {
+        if(_client.ConnectionState != ConnectionState.Connected) {
+            return null;
+        }
+
+        return _client.Guilds.FirstOrDefault(x => x.Id == guild.UlongValue);
+    }
+
+    public async Task<Result> RemoveRoles(DiscordGuildId guildId, Dictionary<DiscordUserId, IEnumerable<DiscordRoleId>> userDicts) {
+        var guild = await GetGuild(guildId);
+        foreach (var (user, roles) in userDicts) {
+            var discordUser = guild.GetUser(user.UlongValue);
+            await discordUser.RemoveRolesAsync(roles.Select(x => x.UlongValue));
+        }
+        
+        return Result.Ok();
+    }
 
     public async Task<Result> SendFailedEmbed(DiscordChannelId channelId, string message, Guid traceId) {
         EmbedBuilder builder = new EmbedBuilder();
@@ -84,6 +111,15 @@ public class DiscordService : IDiscordService {
             .AddCommonProperties()
             .WithDescription(message).WithTitle($"Failed to update group.")
             .AddField("TraceId", traceId.ToString());
+
+        return await SendEmbed(channelId, builder);
+    }
+
+    public async Task<Result> SendSuccessEmbed(DiscordChannelId channelId, string message) {
+        EmbedBuilder builder = new EmbedBuilder();
+
+        builder.WithSuccess(message)
+            .AddCommonProperties();
 
         return await SendEmbed(channelId, builder);
     }

@@ -110,7 +110,7 @@ public class LiteDbManager: IDisposable {
 
     private static void CreateDirectory(string connectionString) {
         var path = Path.GetDirectoryName(connectionString);
-        if (path is not null && !Directory.Exists(path)) {
+        if (!string.IsNullOrWhiteSpace(path) && !Directory.Exists(path)) {
             Directory.CreateDirectory(path);
         }
     }
