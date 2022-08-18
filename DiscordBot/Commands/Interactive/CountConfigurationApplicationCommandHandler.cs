@@ -157,7 +157,7 @@ public class CountConfigurationApplicationCommandHandler : ApplicationCommandHan
         }
 
         try {
-            if (await _counterService.SetChannelForCounts(context.GuildUser.ToGuildUserDto(), channel.ToChannelDto())) {
+            if (!await _counterService.SetChannelForCounts(context.GuildUser.ToGuildUserDto(), channel.ToChannelDto())) {
                 return Result.Fail("Could not set the channel");
             }
         } catch (Exception e) {
