@@ -9,7 +9,7 @@ public interface ICounterService {
     Task<Dictionary<GuildUser, int>> Count(IEnumerable<GuildUser> users, GuildUser requester, int additive, string reason);
     UserCountInfo GetCountInfo(GuildUser user);
     List<UserCountInfo> TopCounts(Guild contextGuild, int quantity);
-    List<UserCountInfo> CountRanking(GuildUser user, int quantity);
+    (List<UserCountInfo> users, int startIndex) CountRanking(GuildUser user, int quantity);
     Task<bool> SetChannelForCounts(GuildUser user, Channel outputChannel);
     Task<bool> CreateThreshold(GuildUser creator, int count, string name, Role role = null);
     Task<bool> RemoveThreshold(DiscordGuildId guildId, int index);

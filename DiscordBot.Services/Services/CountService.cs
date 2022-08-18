@@ -52,6 +52,9 @@ internal class CountService : RepositoryService, ICounterService {
     }
 
     private Task<Result> SendMessage(List<string> messages, GuildConfig config) {
+        if (!messages.Any()) {
+            return Task.FromResult(Result.Ok());
+        }
         var message = string.Join(Environment.NewLine, messages);
         var messageTask = _discordService.SendSuccessEmbed(config.CountConfig.OutputChannelId, message);
         return messageTask;
@@ -133,7 +136,7 @@ internal class CountService : RepositoryService, ICounterService {
         return all.OrderByDescending(c => c.CurrentCount).Take(quantity).ToList();
     }
 
-    public List<UserCountInfo> CountRanking(GuildUser user, int quantity) {
+    public (List<UserCountInfo> users, int startIndex) CountRanking(GuildUser user, int quantity) {
         var repo = GetRepository<IUserCountInfoRepository>(user.GuildId);
         var all = repo.GetAll().Value.OrderByDescending(c => c.CurrentCount).ToList();
         var userCountInfo = all.FirstOrDefault(x => x.DiscordId == user.Id);
@@ -145,7 +148,7 @@ internal class CountService : RepositoryService, ICounterService {
         }
 
         var leftBound = Math.Max(0, userPos - before);
-        return all.Skip(leftBound).Take(quantity).ToList();
+        return (all.Skip(leftBound).Take(quantity).ToList(), leftBound);
     }
 
     public Task<bool> SetChannelForCounts(GuildUser user, Channel outputChannel) {
