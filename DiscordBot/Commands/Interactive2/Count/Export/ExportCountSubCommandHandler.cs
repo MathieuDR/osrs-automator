@@ -65,6 +65,11 @@ public class ExportCountSubCommandHandler : ApplicationCommandHandlerBase<Export
 
     private (string userName, string discriminator, string display) ExtractUserInfo(DiscordUserId id) {
         var user = Context.Guild.GetUser(id.UlongValue);
+
+        if (user is null) {
+            return ("UNKNOWN", "UNKNOWN", "UNKNOWN");
+        }
+        
         var userName = user.Username;
         var discriminator = user.Discriminator;
         var display = user.DisplayName();
