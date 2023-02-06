@@ -39,6 +39,6 @@ internal class WOMCompetition : BaseResponse {
     [JsonProperty("totalGained")]
     public double TotalGained { get; set; }
 
-    [JsonProperty("participants")]
+    [JsonProperty("participations")]
     public List<Participant> Participants { get; set; }
 }

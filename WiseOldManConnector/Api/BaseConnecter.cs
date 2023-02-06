@@ -3,9 +3,11 @@ using AutoMapper;
 using MathieuDR.Common.Semaphores;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
 using RestSharp;
 using RestSharp.Serializers.NewtonsoftJson;
+using WiseOldManConnector.Configuration;
 using WiseOldManConnector.Interfaces;
 using WiseOldManConnector.Models;
 using WiseOldManConnector.Models.API.Responses;
@@ -14,7 +16,7 @@ using WiseOldManConnector.Models.Output.Exceptions;
 namespace WiseOldManConnector.Api;
 
 internal abstract class BaseConnecter {
-    protected const string BaseUrl = "https://wiseoldman.net/api";
+    protected const string BaseUrl = "https://api.wiseoldman.net/v2";
     private readonly RestClient Client;
     protected readonly IWiseOldManLogger Logger;
     protected readonly Mapper Mapper;
@@ -22,7 +24,19 @@ internal abstract class BaseConnecter {
 
     protected BaseConnecter(IServiceProvider provider) {
         Logger = provider.GetService(typeof(IWiseOldManLogger)) as IWiseOldManLogger;
-        Client = new RestClient(BaseUrl);
+
+        var settings = provider.GetService<IOptions<WiseOldManOptions>>();
+        var userAgent = settings?.Value.UserAgent ?? "OSRS - Automator";
+        var opts = new RestClientOptions(BaseUrl) {
+            UserAgent = userAgent
+        };
+        
+        Client = new RestClient(opts);
+        if (settings is not null) {
+            Client.AddDefaultHeader("x-api-key", settings.Value.ApiKey);
+        }
+
+
         Client.UseNewtonsoftJson();
         Mapper = Transformers.Configuration.GetMapper();
         Semaphore = provider.GetRequiredService<TimeSpanSemaphore>();
@@ -44,7 +58,6 @@ internal abstract class BaseConnecter {
     protected async Task<T> ExecuteRequest<T>(RestRequest request) where T : IResponse {
         LogRequest(request);
         var result = await Semaphore.RunAsync(() => Client.ExecuteAsync<T>(request));
-        //var result = await Client.ExecuteAsync<T>(request);
         LogResponse(result);
 
         ValidateResponse(result);
@@ -92,7 +105,6 @@ internal abstract class BaseConnecter {
 
     private void ValidateResponse<T>(RestResponse<T> response) {
         if (response == null) {
-            // SHOULD NEVER HAPPEN I THINK
             throw new NullReferenceException("We did not receive a response. Please try again later or contact the administration.");
         }
 

@@ -37,7 +37,7 @@ public class CompetitionConnectorTests : ConnectorTests {
         Assert.Equal("Chaos altar rush", competition.Title);
         Assert.Equal(new DateTimeOffset(2021, 01, 14, 18, 30, 0, new TimeSpan(1, 0, 0)), competition.StartDate);
         Assert.Equal(new DateTimeOffset(2021, 01, 14, 22, 00, 0, new TimeSpan(1, 0, 0)), competition.EndDate);
-        Assert.Equal("3 hours, 30 minutes", competition.Duration);
+        Assert.Equal("3 hours, 30 minutes", competition.DurationDescription);
         Assert.Equal(MetricType.Prayer, competition.Metric);
         Assert.Equal(51, competition.GroupId);
         Assert.True(competition.Score >= 0);
@@ -59,7 +59,6 @@ public class CompetitionConnectorTests : ConnectorTests {
 
             Assert.NotNull(competitionParticipant.Player);
             Assert.NotNull(competitionParticipant.CompetitionDelta);
-            Assert.NotNull(competitionParticipant.History);
 
 
             // Delta
@@ -67,13 +66,6 @@ public class CompetitionConnectorTests : ConnectorTests {
                 Assert.True(competitionParticipant.CompetitionDelta.End >= competitionParticipant.CompetitionDelta.Start);
                 Assert.Equal(competitionParticipant.CompetitionDelta.Gained,
                     competitionParticipant.CompetitionDelta.End - competitionParticipant.CompetitionDelta.Start);
-            }
-
-            //History
-            if (competitionParticipant.CompetitionDelta.Gained > 0 && i < 5) {
-                Assert.NotEmpty(competitionParticipant.History);
-            } else {
-                Assert.Empty(competitionParticipant.History);
             }
 
             //Player

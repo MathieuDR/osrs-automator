@@ -1,4 +1,5 @@
-﻿using WiseOldManConnector.Models.WiseOldMan.Enums;
+﻿using Humanizer;
+using WiseOldManConnector.Models.WiseOldMan.Enums;
 
 namespace WiseOldManConnector.Models.Output;
 
@@ -13,7 +14,9 @@ public class Competition : IBaseConnectorOutput {
     public int? GroupId { get; set; }
     public DateTimeOffset CreateDate { get; set; }
     public DateTimeOffset? UpdatedDate { get; set; }
-    public string Duration { get; set; }
+    public TimeSpan Duration => EndDate - StartDate;
+
+    public string DurationDescription => Duration.Humanize(2);
     public int ParticipantCount { get; set; }
     public double TotalGained { get; set; }
     public List<CompetitionParticipant> Participants { get; set; }

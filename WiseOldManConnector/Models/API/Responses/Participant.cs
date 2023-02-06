@@ -2,10 +2,10 @@
 
 namespace WiseOldManConnector.Models.API.Responses;
 
-internal class Participant : PlayerResponse {
-    [JsonProperty("history")]
-    public List<CompetitionParticipantHistory> History { get; set; }
-
+internal class Participant : BaseResponse {
     [JsonProperty("progress")]
     public CompetitionParticipantProgress Progress { get; set; }
+
+    [JsonProperty("player")]
+    public PlayerResponse Player { get; set; }
 }

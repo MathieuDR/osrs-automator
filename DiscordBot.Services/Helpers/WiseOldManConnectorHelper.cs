@@ -25,7 +25,7 @@ public static class WiseOldManConnectorHelper {
         builder.AppendLine($"Competition: {competition.Title} ({competition.Metric})");
         builder.AppendLine($"Start: {competition.StartDate}");
         builder.AppendLine($"End: {competition.EndDate}");
-        builder.AppendLine($"Duration: {competition.Duration}");
+        builder.AppendLine($"Duration: {competition.DurationDescription}");
 
         return builder.ToString();
     }

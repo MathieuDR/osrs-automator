@@ -48,21 +48,15 @@ internal static class Configuration {
                 .ConvertUsing<WOMCompetitionToParticipantsCollectionConverter>();
 
             cfg.CreateMap<Participant, CompetitionParticipant>()
-                .ForMember(dest => dest.Player, opt => opt.MapFrom(src => src))
-                .ForMember(dest => dest.CompetitionDelta, opt => opt.MapFrom(src => src.Progress))
-                .ForMember(dest => dest.History, opt => opt.MapFrom(src => src.History));
-
-            cfg.CreateMap<CompetitionParticipantHistory, HistoryItem>()
-                .ForMember(dest => dest.DateTime, opt => opt.MapFrom(src => src.Date));
-
+                .ForMember(dest => dest.Player, opt => opt.MapFrom(src => src.Player))
+                .ForMember(dest => dest.CompetitionDelta, opt => opt.MapFrom(src => src.Progress));
+              
             cfg.CreateMap<CompetitionParticipantProgress, Delta>();
 
 
-            cfg.CreateMap<Participant, Player>();
+            // cfg.CreateMap<Participant, Player>();
 
-            //cfg.CreateMap<SearchResponse, Player>();
             cfg.CreateMap<WOMGroup, Group>();
-            cfg.CreateMap<GroupCreateResponse, VerificationGroup>();
             cfg.CreateMap<GroupEditResponse, Group>();
 
 
@@ -135,11 +129,6 @@ internal static class Configuration {
             cfg.CreateMap<LeaderboardMember, Record>()
                 .ForMember(dest => dest.Player, opt => opt.MapFrom(src => src.Player))
                 .ForMember(dest => dest.UpdateDateTime, opt => opt.MapFrom(src => src.Player.UpdatedAt));
-
-            cfg.CreateMap<StatisticsResponse, Statistics>()
-                .ForMember(dest => dest.Maxed200MExpPlayers, opt => opt.MapFrom(src => src.Maxed200MsCount))
-                .ForMember(dest => dest.MaxedCombatPlayers, opt => opt.MapFrom(src => src.MaxedCombatCount))
-                .ForMember(dest => dest.MaxedTotalPlayers, opt => opt.MapFrom(src => src.MaxedTotalCount));
 
             cfg.CreateMap<NameChangeResponse, NameChange>();
         });

@@ -11,23 +11,7 @@ internal class NameConnector : BaseConnecter, IWiseOldManNameApi {
     public NameConnector(IServiceProvider provider) : base(provider) { }
     protected override string Area { get; } = "names";
 
-    public Task<ConnectorCollectionResponse<NameChange>> View(int limit = 20, int offset = 0) {
-        throw new NotImplementedException();
-    }
-
-    public Task<ConnectorCollectionResponse<NameChange>> View(string username, int limit = 20, int offset = 0) {
-        throw new NotImplementedException();
-    }
-
-    public Task<ConnectorCollectionResponse<NameChange>> View(NameChangeStatus status, int limit = 20, int offset = 0) {
-        throw new NotImplementedException();
-    }
-
-    public Task<ConnectorCollectionResponse<NameChange>> View(string username, NameChangeStatus status, int limit = 20, int offset = 0) {
-        throw new NotImplementedException();
-    }
-
-    public async Task<ConnectorResponse<NameChange>> Request(string oldUsername, string newUsername) {
+   public async Task<ConnectorResponse<NameChange>> Request(string oldUsername, string newUsername) {
         var request = GetNewRestRequest();
         request.Method = Method.Post;
         request.AddJsonBody(new {
@@ -37,18 +21,5 @@ internal class NameConnector : BaseConnecter, IWiseOldManNameApi {
 
         var result = await ExecuteRequest<NameChangeResponse>(request);
         return GetResponse<NameChange>(result);
-    }
-
-    public async Task<ConnectorCollectionResponse<NameChange>> Request(IEnumerable<Tuple<string, string>> items) {
-        var request = GetNewRestRequest();
-        request.Method = Method.Post;
-
-        request.AddJsonBody(items.Select(x => new {
-            oldName = x.Item1,
-            newName = x.Item2
-        }));
-
-        var result = await ExecuteCollectionRequest<NameChangeResponse>(request);
-        return GetResponse<NameChangeResponse, NameChange>(result);
     }
 }

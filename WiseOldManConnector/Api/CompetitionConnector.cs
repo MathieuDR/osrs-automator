@@ -16,42 +16,6 @@ internal class CompetitionConnector : BaseConnecter, IWiseOldManCompetitionApi {
 
     protected override string Area { get; }
 
-    public Task<ConnectorCollectionResponse<Competition>> SearchCompetition(CompetitionRequest request) {
-        throw new NotImplementedException();
-    }
-
-    public Task<ConnectorCollectionResponse<Competition>> Search(string title) {
-        throw new NotImplementedException();
-    }
-
-    public Task<ConnectorCollectionResponse<Competition>> Search(string title, int limit, int offset) {
-        throw new NotImplementedException();
-    }
-
-    public Task<ConnectorCollectionResponse<Competition>> Search(string title, MetricType metric) {
-        throw new NotImplementedException();
-    }
-
-    public Task<ConnectorCollectionResponse<Competition>> Search(string title, MetricType metric, int limit, int offset) {
-        throw new NotImplementedException();
-    }
-
-    public Task<ConnectorCollectionResponse<Competition>> Search(string title, MetricType metric, CompetitionStatus status) {
-        throw new NotImplementedException();
-    }
-
-    public Task<ConnectorCollectionResponse<Competition>>
-        Search(string title, MetricType metric, CompetitionStatus status, int limit, int offset) {
-        throw new NotImplementedException();
-    }
-
-    public Task<ConnectorCollectionResponse<Competition>> Search(string title, CompetitionStatus status) {
-        throw new NotImplementedException();
-    }
-
-    public Task<ConnectorCollectionResponse<Competition>> Search(string title, CompetitionStatus status, int limit, int offset) {
-        throw new NotImplementedException();
-    }
 
     public async Task<ConnectorResponse<Competition>> View(int id) {
         var request = GetNewRestRequest("{id}");
@@ -77,25 +41,5 @@ internal class CompetitionConnector : BaseConnecter, IWiseOldManCompetitionApi {
 
         var result = await ExecuteRequest<WOMCompetition>(webRequest);
         return GetResponse<Competition>(result);
-    }
-
-    public Task<ConnectorResponse<Competition>> Edit(int id, string verificationCode, CompetitionRequest request) {
-        throw new NotImplementedException();
-    }
-
-    public Task<ConnectorResponse<MessageResponse>> AddParticipants(int id, string verificationCode, IEnumerable<string> participants) {
-        throw new NotImplementedException();
-    }
-
-    public Task<ConnectorResponse<MessageResponse>> RemoveParticipants(int id, string verificationCode, IEnumerable<string> participants) {
-        throw new NotImplementedException();
-    }
-
-    public Task<ConnectorResponse<MessageResponse>> Delete(int id, string verificationCode) {
-        throw new NotImplementedException();
-    }
-
-    public Task<ConnectorResponse<MessageResponse>> Update(int id) {
-        throw new NotImplementedException();
     }
 }

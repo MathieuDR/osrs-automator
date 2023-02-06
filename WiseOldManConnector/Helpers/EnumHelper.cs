@@ -149,6 +149,8 @@ public static class EnumHelper {
             MetricType.TheatreOfBlood,
             MetricType.TheatreOfBloodHardMode,
             MetricType.ThermonuclearSmokeDevil,
+            MetricType.TombsOfAmascut,
+            MetricType.TombsOfAmascutExpertMode,
             MetricType.TzkalZuk,
             MetricType.TztokJad,
             MetricType.Venenatis,

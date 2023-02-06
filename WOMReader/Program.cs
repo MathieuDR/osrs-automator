@@ -37,11 +37,11 @@ internal class Program {
                 var competition = competitions[index];
                 using (LogContext.PushProperty("competition",
                            new {
-                               competition.Id, competition.Metric, competition.Title, competition.Duration, competition.StartDate, competition.EndDate
+                               competition.Id, competition.Metric, competition.Title, Duration = competition.DurationDescription, competition.StartDate, competition.EndDate
                            })) {
                     logger.LogInformation($"Competition {competition.Title} - {competition.Metric}");
                     logger.LogInformation(
-                        $"Time {competition.StartDate} - {competition.EndDate} ({competition.Duration})");
+                        $"Time {competition.StartDate} - {competition.EndDate} ({competition.DurationDescription})");
 
 
                     foreach (var metric in metrics) {
