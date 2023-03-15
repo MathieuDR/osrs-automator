@@ -182,35 +182,6 @@ public class GroupConnectorTests : ConnectorTests {
     }
 
     [Fact]
-    public async Task MembersFromGroupResultInValidPlayers() {
-        var id = TestConfiguration.ValidGroupId;
-
-        var response = await _groupApi.GetMembers(id);
-        var player = response.Data.FirstOrDefault();
-
-        var flags = response.Data.Select(x => x.Country).Distinct();
-
-        Assert.NotEmpty(player.DisplayName);
-        Assert.NotEmpty(player.Username);
-        Assert.True(player.Id > 0);
-        Assert.True(player.OverallExperience > 1000);
-        Assert.NotNull(player.Role);
-        Assert.True(player.UpdatedAt < DateTimeOffset.Now);
-        Assert.True(player.RegisteredAt < DateTimeOffset.Now);
-        Assert.True(flags.Count() >= 3);
-    }
-
-    [Fact]
-    public async Task MembersFromValidGroupResultsInMultipleMembers() {
-        var id = TestConfiguration.ValidGroupId;
-
-        var response = await _groupApi.GetMembers(id);
-
-        Assert.NotNull(response);
-        Assert.NotEmpty(response.Data);
-    }
-
-    [Fact]
     public async Task RecentAchievementsHasValidAchievements() {
         var id = TestConfiguration.ValidGroupId;
 

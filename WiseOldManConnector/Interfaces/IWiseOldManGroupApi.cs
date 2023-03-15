@@ -8,7 +8,6 @@ namespace WiseOldManConnector.Interfaces;
 public interface IWiseOldManGroupApi {
     #region groups
     Task<ConnectorResponse<Group>> View(int id);
-    Task<ConnectorCollectionResponse<Player>> GetMembers(int id);
     Task<ConnectorCollectionResponse<Competition>> Competitions(int id);
     Task<ConnectorResponse<DeltaLeaderboard>> GainedLeaderboards(int id, MetricType metric, Period period);
     Task<ConnectorResponse<HighscoreLeaderboard>> Highscores(int id, MetricType metric);
