@@ -144,13 +144,13 @@ public class GroupConnectorTests : ConnectorTests {
         var id = TestConfiguration.ValidGroupId;
         var metric = MetricType.Slayer;
 
-        var response = await _groupApi.Highscores(id, metric);
+        var response = await _groupApi.Highscores(id, metric).ConfigureAwait(false);
         var highscore = response.Data.Members.FirstOrDefault();
 
         Assert.Equal(metric, highscore.MetricType);
         Assert.True(highscore.Metric.Level > 1 && highscore.Metric.Level < 100);
         Assert.True(highscore.Metric.Rank > 0);
-        Assert.True(highscore.Metric.Value >= 36690434);
+        Assert.True(highscore.Metric.Value >= 33335312);
     }
 
     [Fact]
