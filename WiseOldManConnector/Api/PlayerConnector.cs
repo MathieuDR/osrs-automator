@@ -30,10 +30,8 @@ internal class PlayerConnector : BaseConnecter, IWiseOldManPlayerApi {
     #region track
 
     public async Task<ConnectorResponse<Player>> Track(string username) {
-        var request = GetNewRestRequest("track");
+        var request = GetNewRestRequest(username.ToLowerInvariant());
         request.Method = Method.Post;
-        username = username.ToLowerInvariant();
-        request.AddJsonBody(new { username });
 
         var result = await ExecuteRequest<PlayerResponse>(request);
         return GetResponse<Player>(result);
