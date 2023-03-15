@@ -10,7 +10,7 @@ public class NameChange {
 
     public string NewName { get; set; }
 
-    public NameChangeStatus Status { get; set; }
+    public string Status { get; set; }
 
     public DateTime? ResolvedAt { get; set; }
 

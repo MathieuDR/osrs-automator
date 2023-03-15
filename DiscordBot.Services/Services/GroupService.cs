@@ -196,7 +196,7 @@ internal class GroupService : RepositoryService, IGroupService {
             request = new CreateCompetitionRequest(title.ToString(), metric, start.UtcDateTime, end.UtcDateTime,
                 config.WomGroupId, config.WomVerificationCode);
         } else {
-            var groupMembers = (await _groupApi.GetMembers(config.WomGroupId)).Data.ToList();
+            var groupMembers = (await _groupApi.View(config.WomGroupId)).Data.Members;
             config.WomGroup.Members = groupMembers;
 
             var repo = RepositoryStrategy.GetOrCreateRepository<IGuildConfigRepository>(config.GuildId);

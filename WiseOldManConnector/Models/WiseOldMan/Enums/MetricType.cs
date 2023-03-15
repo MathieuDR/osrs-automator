@@ -291,6 +291,14 @@ public enum MetricType {
     [EnumMember(Value = "thermonuclear_smoke_devil")]
     [Display(Name = "Thermonuclear Smoke Devil")]
     ThermonuclearSmokeDevil,
+    
+    [EnumMember(Value = "tombs_of_amascut")]
+    [Display(Name = "Tombs of Amascut")]
+    TombsOfAmascut,
+    
+    [EnumMember(Value = "tombs_of_amascut_expert")]
+    [Display(Name = "Tombs of Amascut Expert Mode")]
+    TombsOfAmascutExpertMode,
 
     [EnumMember(Value = "tzkal_zuk")]
     [Display(Name = "TzKal-Zuk")]
@@ -303,7 +311,6 @@ public enum MetricType {
     [EnumMember(Value = "venenatis")]
     [Display(Name = "Venenatis")]
     Venenatis,
-
 
     [EnumMember(Value = "vetion")]
     [Display(Name = "Vet'ion")]

@@ -16,7 +16,7 @@ internal class NameChangeResponse : BaseResponse {
     public string NewName { get; set; }
 
     [JsonProperty("status")]
-    public int Status { get; set; }
+    public string Status { get; set; }
 
     [JsonProperty("resolvedAt")]
     public DateTime? ResolvedAt { get; set; }

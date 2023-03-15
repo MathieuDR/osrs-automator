@@ -17,7 +17,7 @@ internal static class Configuration {
 
             // Adding specific maps
 
-            //cfg.CreateMap<string, MetricType>().ConvertUsing<StringToMetricTypeConverter>();
+            cfg.CreateMap<string, MetricType>().ConvertUsing<StringToMetricTypeConverter>();
             cfg.CreateMap<PlayerResponse, Player>();
             cfg.CreateMap<Metric, Models.Output.Metric>();
 
@@ -40,29 +40,16 @@ internal static class Configuration {
                     opt => opt.MapFrom(src => src.ParticipantCount ?? src.Participants.Count))
                 .ForMember(dest => dest.Participants, opt => opt.MapFrom(src => src));
 
-            //cfg.CreateMap<WOMCompetition, Competition>().ConvertUsing<WOMCompetitionToParticipantsCollectionConverter>();
-
-            
-            
             cfg.CreateMap<WOMCompetition, IEnumerable<CompetitionParticipant>>()
                 .ConvertUsing<WOMCompetitionToParticipantsCollectionConverter>();
 
             cfg.CreateMap<Participant, CompetitionParticipant>()
-                .ForMember(dest => dest.Player, opt => opt.MapFrom(src => src))
-                .ForMember(dest => dest.CompetitionDelta, opt => opt.MapFrom(src => src.Progress))
-                .ForMember(dest => dest.History, opt => opt.MapFrom(src => src.History));
-
-            cfg.CreateMap<CompetitionParticipantHistory, HistoryItem>()
-                .ForMember(dest => dest.DateTime, opt => opt.MapFrom(src => src.Date));
-
+                .ForMember(dest => dest.Player, opt => opt.MapFrom(src => src.Player))
+                .ForMember(dest => dest.CompetitionDelta, opt => opt.MapFrom(src => src.Progress));
+              
             cfg.CreateMap<CompetitionParticipantProgress, Delta>();
 
-
-            cfg.CreateMap<Participant, Player>();
-
-            //cfg.CreateMap<SearchResponse, Player>();
             cfg.CreateMap<WOMGroup, Group>();
-            cfg.CreateMap<GroupCreateResponse, VerificationGroup>();
             cfg.CreateMap<GroupEditResponse, Group>();
 
 
@@ -73,7 +60,6 @@ internal static class Configuration {
 
 
             cfg.CreateMap<AssertDisplayNameResponse, string>().ConvertUsing<AssertDisplayNameResponseToStringConverter>();
-
 
             cfg.CreateMap<WOMAchievement, Achievement>()
                 .ForMember(dest => dest.AchievedAt, opt => opt.MapFrom(src => src.CreatedAt))
@@ -118,7 +104,7 @@ internal static class Configuration {
                 .ForMember(dest => dest.Members, opt => opt.MapFrom(src => src));
 
             cfg.CreateMap<LeaderboardMember, Player>();
-            cfg.CreateMap<LeaderboardMember, Models.Output.Metric>()
+            cfg.CreateMap<LeaderboardData, Models.Output.Metric>()
                 .ForMember(dest => dest.Value,
                     opt => opt.MapFrom(src => src.Experience ?? src.Score ?? src.Kills ?? src.Value));
 
@@ -127,7 +113,7 @@ internal static class Configuration {
 
             cfg.CreateMap<LeaderboardMember, HighscoreMember>()
                 .ForMember(dest => dest.Player, opt => opt.MapFrom(src => src.Player))
-                .ForMember(dest => dest.Metric, opt => opt.MapFrom(src => src));
+                .ForMember(dest => dest.Metric, opt => opt.MapFrom(src => src.Data));
 
             cfg.CreateMap<IEnumerable<LeaderboardMember>, RecordLeaderboard>()
                 .ForMember(dest => dest.Members, opt => opt.MapFrom(src => src));
@@ -135,11 +121,6 @@ internal static class Configuration {
             cfg.CreateMap<LeaderboardMember, Record>()
                 .ForMember(dest => dest.Player, opt => opt.MapFrom(src => src.Player))
                 .ForMember(dest => dest.UpdateDateTime, opt => opt.MapFrom(src => src.Player.UpdatedAt));
-
-            cfg.CreateMap<StatisticsResponse, Statistics>()
-                .ForMember(dest => dest.Maxed200MExpPlayers, opt => opt.MapFrom(src => src.Maxed200MsCount))
-                .ForMember(dest => dest.MaxedCombatPlayers, opt => opt.MapFrom(src => src.MaxedCombatCount))
-                .ForMember(dest => dest.MaxedTotalPlayers, opt => opt.MapFrom(src => src.MaxedTotalCount));
 
             cfg.CreateMap<NameChangeResponse, NameChange>();
         });

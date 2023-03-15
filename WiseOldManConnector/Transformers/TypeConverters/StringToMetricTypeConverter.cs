@@ -93,6 +93,8 @@ internal class StringToMetricTypeConverter : ITypeConverter<string, MetricType> 
             "theatre_of_blood" => MetricType.TheatreOfBlood,
             "theatre_of_blood_hard_mode" => MetricType.TheatreOfBloodHardMode,
             "thermonuclear_smoke_devil" => MetricType.ThermonuclearSmokeDevil,
+            "tombs_of_amascut_expert" => MetricType.TombsOfAmascutExpertMode,
+            "tombs_of_amascut" => MetricType.TombsOfAmascut,
             "tzkal_zuk" => MetricType.TzkalZuk,
             "tztok_jad" => MetricType.TztokJad,
             "venenatis" => MetricType.Venenatis,
