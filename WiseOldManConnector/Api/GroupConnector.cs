@@ -25,16 +25,6 @@ internal class GroupConnector : BaseConnecter, IWiseOldManGroupApi {
         var result = await ExecuteRequest<WOMGroup>(request);
         return GetResponse<Group>(result);
     }
-
-    public async Task<ConnectorCollectionResponse<Player>> GetMembers(int id) {
-        var request = GetNewRestRequest("{id}/members");
-
-        request.AddParameter("id", id, ParameterType.UrlSegment);
-
-        var result = await ExecuteCollectionRequest<PlayerResponse>(request);
-        return GetResponse<PlayerResponse, Player>(result);
-    }
-
    
     public async Task<ConnectorCollectionResponse<Competition>> Competitions(int id) {
         var request = GetNewRestRequest("{id}/competitions");

@@ -23,5 +23,5 @@ internal class LeaderboardData {
     [JsonProperty("Score")]
     public int? Score { get; set; }
     [JsonProperty("Value")]
-    public int? Value { get; set; }
+    public long? Value { get; set; }
 }
