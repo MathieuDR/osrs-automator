@@ -32,7 +32,7 @@ internal abstract class BaseConnecter {
         };
         
         Client = new RestClient(opts);
-        if (settings is not null) {
+        if (settings is not null && !string.IsNullOrWhiteSpace(settings.Value.ApiKey)) {
             Client.AddDefaultHeader("x-api-key", settings.Value.ApiKey);
         }
 
