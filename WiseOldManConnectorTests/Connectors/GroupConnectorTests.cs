@@ -195,7 +195,7 @@ public class GroupConnectorTests : ConnectorTests {
         Assert.True(achievement.Threshold > 0);
     }
 
-   [Fact]
+    [Fact]
     public async Task ViewGroupResultsInValidGroup() {
         var id = TestConfiguration.ValidGroupId;
 
@@ -207,6 +207,17 @@ public class GroupConnectorTests : ConnectorTests {
         Assert.True(response.Data.MemberCount > 1);
         Assert.True(response.Data.Verified);
         Assert.True(response.Data.Score > 1);
+    }
+
+    
+    [Fact]
+    public async Task ViewGroup_ShouldHaveMembers_WhenQueriedWithValidId() {
+        var id = TestConfiguration.ValidGroupId;
+
+        var response = await _groupApi.View(id);
+
+        Assert.NotEmpty(response.Data.Members);
+        Assert.True(response.Data.MemberCount == response.Data.Members.Count);
     }
 
     [Fact]

@@ -1,4 +1,5 @@
 using DiscordBot.Services.ExternalServices;
+using DiscordBot.Services.HttpClients;
 using DiscordBot.Services.Interfaces;
 using DiscordBot.Services.Services;
 using Microsoft.Extensions.DependencyInjection;
@@ -14,9 +15,17 @@ public static partial class ServiceConfigurationExtensions {
     }
 
     private static IServiceCollection AddExternalServices(this IServiceCollection serviceCollection) {
+        
+        // var httpClient = new HttpClient(new HttpLoggingHandler()){ BaseAddress = new Uri("https://oldschool.runescape.wiki/")};
+        
+        // add refit client "IOsrsWikiApi"
+        // with an httpclient that uses HttpLoggingHandler as a delegating handler
+
         serviceCollection
             .AddRefitClient<IOsrsWikiApi>()
-            .ConfigureHttpClient(c => c.BaseAddress = new Uri("https://oldschool.runescape.wiki/"));
+            .ConfigureHttpClient(c => c.BaseAddress = new Uri("https://oldschool.runescape.wiki/"))
+            .ConfigurePrimaryHttpMessageHandler(() => new HttpLoggingHandler());
+
 
         return serviceCollection;
     }

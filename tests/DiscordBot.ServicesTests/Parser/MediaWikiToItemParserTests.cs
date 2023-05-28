@@ -12,8 +12,8 @@ public class MediaWikiToItemParserTests {
         file ??= WikiResponseFiles.Files.FirstOrDefault();
         var json = File.ReadAllText(file.Path);
         var response = JsonSerializer.Deserialize<QueryResponse>(json);
-
-        return response.Query.Pages.FirstOrDefault().Value.Revisions.FirstOrDefault().Content;
+        
+        return response.Query.Pages.First().Value.Revisions.First().Slots.Main.Content;
     }
 
     [Fact]

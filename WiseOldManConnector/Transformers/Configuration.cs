@@ -49,7 +49,9 @@ internal static class Configuration {
               
             cfg.CreateMap<CompetitionParticipantProgress, Delta>();
 
-            cfg.CreateMap<WOMGroup, Group>();
+            cfg.CreateMap<WOMGroup, Group>()
+                .ForMember(dest => dest.Members, opt => opt.MapFrom(src => src.Members.Select(x => x.Player).ToArray()));
+
             cfg.CreateMap<GroupEditResponse, Group>();
 
 

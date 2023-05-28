@@ -18,8 +18,8 @@ public class MediaWikiJsonResponseToQueryResponseTests {
         response.Query.Pages.Should().HaveCount(pages);
         foreach (var page in response.Query.Pages) {
             page.Value.Revisions.Should().HaveCount(1);
-            page.Value.Revisions.FirstOrDefault().Should().NotBeNull();
-            page.Value.Revisions.FirstOrDefault().Content.Should().NotBeNullOrEmpty();
+            page.Value.Revisions.First().Slots.Main.Should().NotBeNull();
+            page.Value.Revisions.First().Slots.Main.Content.Should().NotBeNullOrEmpty();
         }
     }
 }

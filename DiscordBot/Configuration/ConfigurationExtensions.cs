@@ -8,6 +8,7 @@ using MediatR;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Serilog;
+using WiseOldManConnector.Configuration;
 using WiseOldManConnector.Interfaces;
 
 namespace DiscordBot.Configuration;
@@ -89,6 +90,14 @@ public static class ConfigurationExtensions {
 		serviceCollection
 			.AddOptions<MetricSynonymsConfiguration>()
 			.Bind(configuration.GetSection("MetricSynonyms"));
+		
+		serviceCollection
+			.AddOptions<MetricSynonymsConfiguration>()
+			.Bind(configuration.GetSection("MetricSynonyms"));
+
+		serviceCollection
+			.AddOptions<WiseOldManOptions>()
+			.Bind(configuration.GetSection("WiseOldMan"));
 
 		serviceCollection
 			.AddOptions<BotConfiguration>()

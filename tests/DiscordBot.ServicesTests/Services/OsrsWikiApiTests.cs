@@ -21,7 +21,7 @@ public class OsrsWikiApiTests {
         request.Query.Pages.Should().HaveCount(1);
         request.Query.Pages.FirstOrDefault().Value.Should().NotBeNull();
         request.Query.Pages.FirstOrDefault().Value.Revisions.Should().HaveCount(1);
-        request.Query.Pages.FirstOrDefault().Value.Revisions.FirstOrDefault().Content.Should().NotBeNullOrEmpty();
+        request.Query.Pages.FirstOrDefault().Value.Revisions.FirstOrDefault().Slots.Main.Content.Should().NotBeNullOrEmpty();
     }
 
     [Fact]

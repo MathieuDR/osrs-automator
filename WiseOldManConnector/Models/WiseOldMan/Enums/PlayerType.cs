@@ -26,4 +26,8 @@ public enum PlayerType {
     [EnumMember(Value = "group_ironman")]
     [Display(Name = "Group Ironman")]
     GroupIronMan,
+    
+    [EnumMember(Value = "fresh_start")]
+    [Display(Name = "Fresh start")]
+    FreshStart
 }

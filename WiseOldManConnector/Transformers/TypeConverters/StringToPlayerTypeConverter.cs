@@ -22,6 +22,7 @@ internal class StringToPlayerTypeConverter : ITypeConverter<string, PlayerType> 
                 "ironman" => PlayerType.IronMan,
                 "regular" => PlayerType.Regular,
                 "unknown" => PlayerType.Unknown,
+                "fresh_start" => PlayerType.FreshStart,
                 _ => throw new ArgumentOutOfRangeException(nameof(source), source, null)
             };
         }

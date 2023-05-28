@@ -43,12 +43,10 @@ internal class CollectionLogItemProvider : BaseService, ICollectionLogItemProvid
             return Result.Fail("No pages in api request");
         }
 
-        var revision = page.Value.Revisions.FirstOrDefault();
-
-        if (revision is null) {
-            return Result.Fail("No revision in page in api request");
+        try {
+            return MediaWikiContentToItemsParser.GetItems(page.Value.Revisions.First().Slots.Main.Content);
+        } catch (Exception e) {
+            return Result.Fail(new ExceptionalError("Failed to parse page", e));
         }
-
-        return MediaWikiContentToItemsParser.GetItems(revision.Content);
     }
 }
