@@ -16,11 +16,11 @@
         <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="7.0.0" />
         <PackageReference Include="Microsoft.Extensions.Options" Version="7.0.1" />
         <PackageReference Include="Microsoft.Extensions.Options.ConfigurationExtensions" Version="7.0.0" />
-        <PackageReference Include="Quartz" Version="3.4.0" />
-        <PackageReference Include="Quartz.Extensions.DependencyInjection" Version="3.4.0" />
+        <PackageReference Include="Quartz" Version="3.6.2" />
+        <PackageReference Include="Quartz.Extensions.DependencyInjection" Version="3.6.2" />
         <PackageReference Include="Refit" Version="6.3.2" />
         <PackageReference Include="Refit.HttpClientFactory" Version="6.3.2" />
-        <PackageReference Include="TimeZoneNames" Version="5.0.1" />
+        <PackageReference Include="TimeZoneNames" Version="6.0.0" />
     </ItemGroup>
 
     <ItemGroup>
