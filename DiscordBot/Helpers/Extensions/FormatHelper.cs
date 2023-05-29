@@ -84,4 +84,36 @@ public static class FormatHelper {
 
         return Experiences[index];
     }
+    
+    public static string CutToChars(this string text, int chars) {
+        if (text.Length <= chars) {
+            return text;
+        }
+
+        return text[..chars];
+    }
+    
+    public static string CutToCharsAndAddDots(this string text, int chars) {
+        if (text.Length <= chars) {
+            return text;
+        }
+
+        return text[..(chars - 3)] + "...";
+    }
+    
+    public static string CutToWordsAndAddDots(this string text, int chars) {
+        if (text.Length <= chars) {
+            return text;
+        }
+
+        var words = text.Split(' ');
+        var result = "";
+        var index = 0;
+        while (result.Length < chars && index < words.Length) {
+            result += words[index] + " ";
+            index++;
+        }
+
+        return result;
+    }
 }
