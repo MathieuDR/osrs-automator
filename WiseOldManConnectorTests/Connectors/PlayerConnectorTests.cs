@@ -1,7 +1,6 @@
 using Microsoft.Extensions.DependencyInjection;
 using WiseOldManConnector.Helpers;
 using WiseOldManConnector.Interfaces;
-using WiseOldManConnector.Models;
 using WiseOldManConnector.Models.Output;
 using WiseOldManConnector.Models.Output.Exceptions;
 using WiseOldManConnector.Models.WiseOldMan.Enums;
@@ -9,7 +8,6 @@ using WiseOldManConnectorTests.Configuration;
 using WiseOldManConnectorTests.Fixtures;
 using Xunit;
 using Xunit.Abstractions;
-using Record = WiseOldManConnector.Models.Output.Record;
 
 namespace WiseOldManConnectorTests.Connectors;
 

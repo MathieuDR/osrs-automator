@@ -31,13 +31,11 @@ internal abstract class BaseConnecter {
             UserAgent = userAgent
         };
         
-        Client = new RestClient(opts);
+        Client = new RestClient(opts, configureSerialization: s => s.UseNewtonsoftJson());
         if (settings is not null && !string.IsNullOrWhiteSpace(settings.Value.ApiKey)) {
             Client.AddDefaultHeader("x-api-key", settings.Value.ApiKey);
         }
-
-
-        Client.UseNewtonsoftJson();
+        
         Mapper = Transformers.Configuration.GetMapper();
         Semaphore = provider.GetRequiredService<TimeSpanSemaphore>();
     }

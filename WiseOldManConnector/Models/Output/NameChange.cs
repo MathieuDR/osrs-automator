@@ -1,5 +1,3 @@
-using WiseOldManConnector.Models.WiseOldMan.Enums;
-
 namespace WiseOldManConnector.Models.Output;
 
 public class NameChange {

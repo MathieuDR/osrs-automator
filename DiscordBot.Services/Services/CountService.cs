@@ -1,4 +1,3 @@
-using System.Text;
 using DiscordBot.Common.Dtos.Discord;
 using DiscordBot.Common.Helpers.Extensions;
 using DiscordBot.Common.Identities;

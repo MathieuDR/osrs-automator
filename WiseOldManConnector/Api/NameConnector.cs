@@ -3,7 +3,6 @@ using WiseOldManConnector.Interfaces;
 using WiseOldManConnector.Models;
 using WiseOldManConnector.Models.API.Responses;
 using WiseOldManConnector.Models.Output;
-using WiseOldManConnector.Models.WiseOldMan.Enums;
 
 namespace WiseOldManConnector.Api;
 

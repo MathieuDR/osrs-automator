@@ -1,6 +1,5 @@
 ﻿using WiseOldManConnector.Models;
 using WiseOldManConnector.Models.Output;
-using WiseOldManConnector.Models.WiseOldMan.Enums;
 
 namespace WiseOldManConnector.Interfaces;
 

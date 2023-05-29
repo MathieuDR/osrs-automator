@@ -1,5 +1,4 @@
 ﻿using Newtonsoft.Json;
-using WiseOldManConnector.Models.Output;
 
 namespace WiseOldManConnector.Models.API.Responses;
 

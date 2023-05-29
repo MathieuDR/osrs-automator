@@ -1,5 +1,5 @@
+using Asp.Versioning.ApiExplorer;
 using DiscordBot.Dashboard;
-using Microsoft.AspNetCore.Mvc.ApiExplorer;
 using Serilog;
 using Serilog.Events;
 using Serilog.Formatting.Json;
@@ -20,7 +20,7 @@ try {
 	builder.Services.AddHostedService<DiscordBot.Bot>();
 
 	var app = builder.Build();
-	StartupHelper.ConfigurePipeline(app, app.Environment, app.Services.GetRequiredService<IApiVersionDescriptionProvider>(), builder.Configuration);
+	// StartupHelper.ConfigurePipeline(app, app.Environment, app.Services.GetRequiredService<IApiVersionDescriptionProvider>(), builder.Configuration);
 
 	app.Run();
 } catch (Exception e) {
