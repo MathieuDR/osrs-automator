@@ -1,11 +1,4 @@
-using DiscordBot.Common.Dtos.Runescape;
-using DiscordBot.Common.Identities;
-using DiscordBot.Dashboard.Binders;
-using DiscordBot.Dashboard.Models.ApiRequests.DiscordEmbed;
-using DiscordBot.Dashboard.Transformers;
 using DiscordBot.Services.Interfaces;
-using FluentResults;
-using MathieuDR.Common.Extensions;
 using Microsoft.AspNetCore.Mvc;
 
 namespace DiscordBot.Dashboard.Controllers.V1;
@@ -14,59 +7,41 @@ namespace DiscordBot.Dashboard.Controllers.V1;
 [ApiVersion("1.0")]
 [Route("api/v{version:apiVersion}/[controller]")]
 public class AutomatedDropperController : Controller {
-	private readonly IAutomatedDropperService _dropperService;
-	private readonly ILogger<AutomatedDropperController> _logger;
-	private readonly IMapper<Embed, RunescapeDrop> _mapper;
+    private readonly IAutomatedDropperService _dropperService;
+    private readonly ILogger<AutomatedDropperController> _logger;
 
-	public AutomatedDropperController(ILogger<AutomatedDropperController> logger, IMapper<Embed, RunescapeDrop> mapper,
-		IAutomatedDropperService dropperService) {
-		_logger = logger;
-		_mapper = mapper;
-		_dropperService = dropperService;
-	}
+    public AutomatedDropperController(ILogger<AutomatedDropperController> logger, IAutomatedDropperService dropperService) {
+        _logger = logger;
+        _dropperService = dropperService;
+    }
 
-	[HttpPost("dropper/{id:required}")]
-	public async Task<IActionResult> Get([FromBody] EmbedCollection bodyEmbeds,
-		[ModelBinder(BinderType = typeof(JsonModelBinder))]
-		EmbedCollection formEmbeds,
-		[FromForm] IFormFile? file, [FromRoute] string id) {
-		if (!Guid.TryParse(id, out var endpoint)) {
-			BadRequest("Invalid endpoint");
-		}
+    // create an endpoint where we have an ID as a guid from route
+    // an file form a form
+    // and a json payload also from the form under the value "payload_json"
 
-		_logger.LogInformation("Received drop");
-		var dropResult = GetDrop(bodyEmbeds, formEmbeds);
-		if (dropResult.IsFailed) {
-			_logger.LogError("Error with receiving result: {0}", dropResult.CombineMessage());
-			BadRequest(dropResult.Errors.FirstOrDefault());
-		}
+    [HttpPost("dropper/{id:required}")]
+    public async Task<IActionResult> Get([FromForm] IFormFile? image, [FromRoute] string id, [FromForm(Name = "payload_json")] string? payload) {
+        if (!Guid.TryParse(id, out var endpoint)) {
+            return BadRequest("Invalid endpoint");
+        }
 
-		string? image = null;
-		if (file is not null) {
-			image = await ToBase64String(file);
-		}
+        if (payload == null) {
+            return BadRequest("No payload provided");
+        }
 
-		_ = _dropperService.HandleDropRequest(new EndpointId(endpoint), dropResult.Value, image);
+        if (image != null && image.Length > 0) {
+            var base64Image = await ConvertFileToBase64String(image);
+        }
 
-		return Ok();
-	}
 
-	private Result<RunescapeDrop> GetDrop(EmbedCollection bodyEmbeds, EmbedCollection formEmbeds) {
-		var embeds = bodyEmbeds ?? formEmbeds;
-		var embed = embeds?.Embeds.FirstOrDefault();
+        return Ok();
+    }
 
-		if (embed is not null) {
-			return _mapper.Map(embed);
-		}
 
-		return Result.Ok();
-	}
-
-	private static async Task<string> ToBase64String(IFormFile file) {
-		await using var stream = file.OpenReadStream();
-		await using var memoryStream = new MemoryStream();
-		await stream.CopyToAsync(memoryStream);
-		var bytes = memoryStream.ToArray();
-		return Convert.ToBase64String(bytes);
-	}
+    private async Task<string> ConvertFileToBase64String(IFormFile file) {
+        using var stream = new MemoryStream();
+        await file.CopyToAsync(stream);
+        var bytes = stream.ToArray();
+        return Convert.ToBase64String(bytes);
+    }
 }
