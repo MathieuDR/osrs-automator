@@ -1,9 +1,7 @@
 ﻿using System.Text.RegularExpressions;
 using Microsoft.Extensions.DependencyInjection;
-using WiseOldManConnector.Helpers;
 using WiseOldManConnector.Interfaces;
 using WiseOldManConnector.Models.Output.Exceptions;
-using WiseOldManConnector.Models.Requests;
 using WiseOldManConnector.Models.WiseOldMan.Enums;
 using WiseOldManConnectorTests.Configuration;
 using WiseOldManConnectorTests.Fixtures;

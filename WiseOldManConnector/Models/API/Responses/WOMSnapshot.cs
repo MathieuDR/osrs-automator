@@ -1,5 +1,4 @@
-﻿using AutoMapper.Internal;
-using Newtonsoft.Json;
+﻿using Newtonsoft.Json;
 using WiseOldManConnector.Deserializers;
 using WiseOldManConnector.Models.WiseOldMan.Enums;
 

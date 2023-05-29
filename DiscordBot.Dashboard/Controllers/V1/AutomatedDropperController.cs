@@ -1,3 +1,4 @@
+using Asp.Versioning;
 using DiscordBot.Common.Dtos.Runescape;
 using DiscordBot.Common.Identities;
 using DiscordBot.Dashboard.Binders;

@@ -205,11 +205,14 @@ public class ManageCommandsApplicationCommandHandler : ApplicationCommandHandler
         var strategy = _serviceProvider.GetRequiredService<ICommandStrategy>();
         var commands = strategy.GetCommandDescriptions().ToList();
         commands.AddRange(_commandDefinitionProvider.GetRootDefinitionDescriptions().Value);
+        
+        
+        
         return new ComponentBuilder()
             .WithSelectMenu(new SelectMenuBuilder()
                 .WithCustomId(SubCommand("command"))
                 .WithOptions(commands.Select(c => new SelectMenuOptionBuilder()
-                    .WithLabel($"{c.Name}: {c.Description}")
+                    .WithLabel($"{c.Name}: {c.Description}".CutToCharsAndAddDots(100))
                     .WithValue(c.Name)).ToList())
                 .WithPlaceholder("Choose a command"));
     }
@@ -234,7 +237,7 @@ public class ManageCommandsApplicationCommandHandler : ApplicationCommandHandler
                     }
 
                     return new SelectMenuOptionBuilder()
-                        .WithLabel(label)
+                        .WithLabel(label.CutToCharsAndAddDots(100))
                         .WithValue(c.Id.ToString());
                 }).ToList())
                 .WithPlaceholder("Choose a guild"));
