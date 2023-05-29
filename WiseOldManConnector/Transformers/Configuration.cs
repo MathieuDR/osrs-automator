@@ -40,8 +40,8 @@ internal static class Configuration {
                     opt => opt.MapFrom(src => src.ParticipantCount ?? src.Participants.Count))
                 .ForMember(dest => dest.Participants, opt => opt.MapFrom(src => src));
 
-            cfg.CreateMap<WOMCompetition, IEnumerable<CompetitionParticipant>>()
-                .ConvertUsing<WOMCompetitionToParticipantsCollectionConverter>();
+            cfg.CreateMap<WOMCompetition, List<CompetitionParticipant>>()
+                .ConvertUsing<WomCompetitionToParticipantsCollectionConverter>();
 
             cfg.CreateMap<Participant, CompetitionParticipant>()
                 .ForMember(dest => dest.Player, opt => opt.MapFrom(src => src.Player))

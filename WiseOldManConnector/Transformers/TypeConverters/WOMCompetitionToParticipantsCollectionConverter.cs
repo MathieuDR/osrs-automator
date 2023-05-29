@@ -5,8 +5,8 @@ using WiseOldManConnector.Models.WiseOldMan.Enums;
 
 namespace WiseOldManConnector.Transformers.TypeConverters;
 
-internal class WOMCompetitionToParticipantsCollectionConverter : ITypeConverter<WOMCompetition, IEnumerable<CompetitionParticipant>> {
-    public IEnumerable<CompetitionParticipant> Convert(WOMCompetition source, IEnumerable<CompetitionParticipant> destination,
+internal class WomCompetitionToParticipantsCollectionConverter : ITypeConverter<WOMCompetition, List<CompetitionParticipant>> {
+    public List<CompetitionParticipant> Convert(WOMCompetition source, List<CompetitionParticipant> destination,
         ResolutionContext context) {
         var result = new List<CompetitionParticipant>();
         var metric = context.Mapper.Map<MetricType>(source.Metric);
