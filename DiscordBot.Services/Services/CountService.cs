@@ -3,6 +3,7 @@ using DiscordBot.Common.Helpers.Extensions;
 using DiscordBot.Common.Identities;
 using DiscordBot.Common.Models.Data.Configuration;
 using DiscordBot.Common.Models.Data.Counting;
+using DiscordBot.Common.Models.Data.Items;
 using DiscordBot.Data.Interfaces;
 using DiscordBot.Data.Strategies;
 using DiscordBot.Services.Interfaces;
@@ -214,6 +215,22 @@ internal class CountService : RepositoryService, ICounterService {
 
         return Task.FromResult(allResult.Value);
     }
+
+    public Task<IEnumerable<Item>> GetItemsForGuild(Guild guild) {
+        var items =  new List<Item>() { new Item("Dragon Claws",new List<string>(){"dclaws", "d claws", "dragon claws", "claws"}, 50, true)};
+        return Task.FromResult(items.AsEnumerable());
+    }
+
+    public async Task<IEnumerable<(string synonym, Item item)>> GetItemsForGuild(Guild guild, string autocomplete) {
+        var allItems = await GetItemsForGuild(guild);
+        var search = autocomplete.ToLower();
+        
+        return allItems
+            .Where(x => x.Synonyms.Any(s => s.StartsWith(search)))
+            .Select(x => (x.Synonyms.First(s => s.StartsWith(search)), x));
+    }
+
+    public Task<bool> UploadItemJson(GuildUser user, string json) => throw new NotImplementedException();
 
     private UserCountInfo GetOrCreateUserCountInfo(GuildUser user, GuildUser requester = null) {
         var repo = GetRepository<IUserCountInfoRepository>(user.GuildId);

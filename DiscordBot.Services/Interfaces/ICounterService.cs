@@ -1,6 +1,7 @@
 using DiscordBot.Common.Dtos.Discord;
 using DiscordBot.Common.Identities;
 using DiscordBot.Common.Models.Data.Counting;
+using DiscordBot.Common.Models.Data.Items;
 
 namespace DiscordBot.Services.Interfaces;
 
@@ -16,4 +17,8 @@ public interface ICounterService {
     Task<IReadOnlyList<CountThreshold>> GetThresholds(DiscordGuildId guildId);
     Task<DiscordChannelId> GetChannelForGuild(DiscordGuildId guildId);
     Task<IEnumerable<UserCountInfo>> GetAllUserInfo(Guild toGuildDto);
+    
+    Task<IEnumerable<Item>> GetItemsForGuild(Guild toGuildDto);
+    Task<IEnumerable<(string synonym, Item item)>> GetItemsForGuild(Guild toGuildDto, string autocomplete);
+    Task<bool> UploadItemJson(GuildUser user, string json);
 }

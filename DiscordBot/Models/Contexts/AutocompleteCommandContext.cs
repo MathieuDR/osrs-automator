@@ -1,3 +1,5 @@
+using Microsoft.Extensions.DependencyInjection;
+
 namespace DiscordBot.Models.Contexts;
 
 public class AutocompleteCommandContext : BaseInteractiveContext<SocketAutocompleteInteraction> {
@@ -22,6 +24,10 @@ public class AutocompleteCommandContext : BaseInteractiveContext<SocketAutocompl
     
     public Task RespondAsync<T>(IEnumerable<T> options) {
         return InnerContext.RespondAsync(options?.Take(20).Select(x => new AutocompleteResult(x.ToString(), x.ToString()?.ToLower())));
+    }
+
+    public Task RespondAsync<T>(IEnumerable<(string name, T value)> options) {
+        return InnerContext.RespondAsync(options?.Take(20).Select(x => new AutocompleteResult(x.name, x.value)));
     }
 
     public override Task RespondAsync(string text = null, IEnumerable<Embed> embeds = null, bool isTts = false, bool ephemeral = false, AllowedMentions allowedMentions = null,
