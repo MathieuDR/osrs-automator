@@ -164,8 +164,8 @@ internal class CountService : RepositoryService, ICounterService {
             new ("Points", item.Value.ToString(), true)
         };
 
-        if (splits.Length > 0) {
-            fields.Add(new EmbedFieldDto("Points for split", (item.Value * 0.2).ToString(CultureInfo.InvariantCulture), true));
+        if (splits.Length > 0 && item.Splittable) {
+            fields.Add(new EmbedFieldDto("Points for split", item.SplitValue!.Value.ToString(), true));
             fields.Add(new EmbedFieldDto("Split with", string.Join(", ", splits.Select(x => x.Username)), false));
             
             descriptionBuilder.Append($" {user.Username} is splitting with {splits.Length} players: {string.Join(", ", splits.Select(x => x.Username))}.");
