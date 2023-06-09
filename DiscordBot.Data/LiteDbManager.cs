@@ -87,14 +87,20 @@ public class LiteDbManager: IDisposable {
         lock (_createLock) {
             _logger.LogTrace("Requesting LiteDb for {guild}", guildId);
 
-            if (!_databases.TryGetValue(guildId, out var database)) {
-                _logger.LogTrace("Creating LiteDb for {guild}", guildId);
-                database = CreateDatabase(GetGuildFileName(guildId));
-                _databases.Add(guildId, database);
+            if (!_databases.TryGetValue(guildId, out var database)){
+                database = CreateDb(guildId);
             }
 
             return database;
         }
+    }
+
+    private LiteDatabase CreateDb(DiscordGuildId guildId) {
+        LiteDatabase database;
+        _logger.LogTrace("Creating LiteDb for {guild}", guildId);
+        database = CreateDatabase(GetGuildFileName(guildId));
+        _databases.Add(guildId, database);
+        return database;
     }
 
     private LiteDatabase CreateDatabase(string connectionString) {

@@ -20,7 +20,7 @@ internal sealed  class AddCountSelfSubCommandHandler : ApplicationCommandHandler
             return r;
         }
 
-        // var scoreDict =  await ApplyScores(users, score, reason);
+        await _countService.SelfCount(Context.GuildUser.ToGuildUserDto(), item, users.Select(x=>x.ToGuildUserDto()).ToArray(), image.Url);
         return SendEmbed(item, users, image);
     }
 
@@ -48,10 +48,6 @@ internal sealed  class AddCountSelfSubCommandHandler : ApplicationCommandHandler
 
             return Result.Ok();
     }
-
-    // private Task<Dictionary<GuildUser, int>> ApplyScores(Item item, List<IUser> users, Attachment image) {
-    //     return _countService.Count(users.Select(x=>x.ToGuildUserDto()), Context.GuildUser.ToGuildUserDto(), score, reason);
-    // }
 
     private Result SendEmbed(Item item, List<IUser> users, Attachment image) {
         var title = $"Requested points for {item.Name}";

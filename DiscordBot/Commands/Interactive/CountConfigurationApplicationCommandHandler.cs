@@ -119,7 +119,7 @@ public class CountConfigurationApplicationCommandHandler : ApplicationCommandHan
             .WithOptions(
                 thresholdInfo.Select(i =>
                         new SelectMenuOptionBuilder()
-                            .WithLabel(i.Label.NoMention.CutToCharsAndAddDots(100))
+                            .WithLabel(i.Label.NoMention.Truncate(100))
                             .WithValue(i.Id))
                     .ToList());
     }

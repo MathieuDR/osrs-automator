@@ -9,8 +9,8 @@ public record BaseRecord {
 	public DateTime CreatedOn { get; init; } = DateTime.Now;
 
 	public virtual Dictionary<string, string> ToDictionary() {
-		var t = GetType();
-		var props = t.GetProperties();
+		var type = GetType();
+		var props = type.GetProperties();
 		var dict = new Dictionary<string, string>();
 
 		foreach (var prp in props) {

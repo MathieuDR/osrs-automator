@@ -8,3 +8,4 @@ internal sealed  class CountSelfItemAutoCompleteRequest : AutoCompleteCommandReq
     public CountSelfItemAutoCompleteRequest(AutocompleteCommandContext context) : base(context) { }
     public override AuthorizationRoles MinimumAuthorizationRole=> AuthorizationRoles.ClanMember;
 }
+

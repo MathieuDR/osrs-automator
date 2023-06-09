@@ -1,4 +1,10 @@
+using DiscordBot.Common.Dtos.Discord;
 using DiscordBot.Common.Identities;
+using DiscordBot.Common.Models.Commands;
+using DiscordBot.Common.Models.Data;
+using DiscordBot.Common.Models.Data.Base;
+using DiscordBot.Common.Models.Data.Confirmation;
+using DiscordBot.Common.Models.Data.Items;
 using DiscordBot.Data;
 using DiscordBot.Data.Configuration;
 using DiscordBot.Data.Repository.Migrations;
@@ -32,8 +38,6 @@ public class TestModelWithList {
 
 	public List<DiscordUserId> List { get; set; }
 }
-
-
 
 public class IdentityTests : IDisposable {
 	protected LiteDbManager _dbManager;
@@ -75,6 +79,43 @@ public class IdentityTests : IDisposable {
 
 		//Assert
 		db.Should().NotBeNull();
+	}
+
+	[Fact]
+	public void InterfaceStuff() {
+		//Arrange
+		var guildUser = new GuildUser() {
+			GuildId = new DiscordGuildId(100UL),
+			Id = new DiscordUserId(100UL),
+			IsBot = false,
+			RoleIds = new List<DiscordRoleId>() { new DiscordRoleId(10UL) },
+			Username = "myName"
+		};
+
+		var item = new Item("Name", new List<string>() { "item" }, 10, null);
+		var embeds = new EmbedFieldDto[] {
+			new ("name", "description", false)
+		};
+
+		var command = new SelfCountConfirmCommand("title", "description", embeds, item, guildUser, Array.Empty<GuildUser>(), "url");
+
+		var insert = new Confirmation(new DiscordMessageId(12UL), new DiscordUserId(123UL), null, command);
+		using (var db = _dbManager.GetDatabase(new DiscordGuildId(10))) {
+			var coll = db.GetCollection<Confirmation>("confirmations");
+			coll.Insert(insert);			
+		}
+		
+		_dbManager.ClearDb();
+		
+		//Act
+		Confirmation read;
+		using (var newDb = _dbManager.GetDatabase(new DiscordGuildId(10))) {
+			var newCollection = newDb.GetCollection<Confirmation>("confirmations");
+			read = newCollection.FindAll().FirstOrDefault();
+		}
+
+		//Assert
+		read.Should().BeEquivalentTo(insert, opts => opts.Excluding(x => x.Id).Excluding(x=>x.CreatedOn));
 	}
 
 	[Fact]

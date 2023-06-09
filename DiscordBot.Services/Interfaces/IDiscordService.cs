@@ -1,7 +1,9 @@
 using DiscordBot.Common.Dtos.Discord;
 using DiscordBot.Common.Identities;
+using DiscordBot.Common.Models.Data;
 using DiscordBot.Common.Models.Data.ClanFunds;
 using DiscordBot.Common.Models.Data.Drops;
+using DiscordBot.Common.Models.Enums;
 using FluentResults;
 using WiseOldManConnector.Models.Output;
 
@@ -22,4 +24,5 @@ public interface IDiscordService {
     Task<Result<IEnumerable<GuildUser>>> GetUsers(DiscordGuildId guildId);
     Task<Result> AddRoles(DiscordGuildId guild, Dictionary<DiscordUserId, IEnumerable<DiscordRoleId>> userDicts);
     Task<Result> RemoveRoles(DiscordGuildId guild, Dictionary<DiscordUserId, IEnumerable<DiscordRoleId>> userDicts);
+    Task<Result<DiscordMessageId>> SendConfirmationMessage(DiscordChannelId channelId, string title, string description, EmbedFieldDto[] fields, string thumbnailUrl = null);
 }

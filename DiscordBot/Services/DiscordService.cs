@@ -104,6 +104,35 @@ public class DiscordService : IDiscordService {
         return Result.Ok();
     }
 
+    public async Task<Result<DiscordMessageId>> SendConfirmationMessage(DiscordChannelId channelId, string title, string description,
+        EmbedFieldDto[] fields,
+        string thumbnailUrl = null) {
+        
+        var builder = new EmbedBuilder()
+            .AddCommonProperties()
+            .WithColor(new Color(255, 204, 0))
+            .WithTitle(title.Truncate(256))
+            .WithDescription(description.Truncate(4096))
+            .WithThumbnailUrl(thumbnailUrl);
+        
+        foreach (var field in fields) {
+            builder.AddField(field.Name.Truncate(256), field.Description.Truncate(2048), field.Inline);
+        }
+        
+        var componentBuilder = new ComponentBuilder()
+            .WithButton("Accept", $"confirm:confirmed", ButtonStyle.Success)
+            .WithButton("Decline", $"confirm:declined", ButtonStyle.Danger);
+
+        
+        var messageResult = await SendEmbed(channelId, builder, componentBuilder);
+
+        if (messageResult.IsFailed) {
+            return messageResult.ToResult();
+        }
+
+        return Result.Ok(new DiscordMessageId(messageResult.Value.Id));
+    }
+
     public async Task<Result> SendFailedEmbed(DiscordChannelId channelId, string message, Guid traceId) {
         EmbedBuilder builder = new EmbedBuilder();
 
@@ -112,7 +141,7 @@ public class DiscordService : IDiscordService {
             .WithDescription(message).WithTitle($"Failed to update group.")
             .AddField("TraceId", traceId.ToString());
 
-        return await SendEmbed(channelId, builder);
+        return (await SendEmbed(channelId, builder)).ToResult();
     }
 
     public async Task<Result> SendSuccessEmbed(DiscordChannelId channelId, string message) {
@@ -121,7 +150,7 @@ public class DiscordService : IDiscordService {
         builder.WithSuccess(message)
             .AddCommonProperties();
 
-        return await SendEmbed(channelId, builder);
+        return (await SendEmbed(channelId, builder)).ToResult();
     }
 
     public async Task<Result> SendWomGroupSuccessEmbed(DiscordChannelId channelId, string message, int groupId, string groupName) {
@@ -132,15 +161,15 @@ public class DiscordService : IDiscordService {
             .AddCommonProperties()
             .WithDescription(message).WithTitle($"Group {groupName} updated");
 
-        return await SendEmbed(channelId, builder);
+        return (await SendEmbed(channelId, builder)).ToResult();
     }
     
-    private async Task<Result> SendEmbed(DiscordChannelId channelId, EmbedBuilder builder) {
+    private async Task<Result<RestUserMessage>> SendEmbed(DiscordChannelId channelId, EmbedBuilder builder, ComponentBuilder componentBuilder = null) {
         var channel = await _client.GetChannelAsync(channelId.UlongValue);
         
         if(channel is ISocketMessageChannel socketChannel) {
-            await socketChannel.SendMessageAsync("", false, builder.Build());
-            return Result.Ok();
+            RestUserMessage result = await socketChannel.SendMessageAsync("", false, builder.Build(), components: componentBuilder?.Build());
+            return Result.Ok(result);
         }
 
         return Result.Fail("Could not send message");
