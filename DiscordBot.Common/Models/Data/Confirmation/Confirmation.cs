@@ -1,7 +1,5 @@
 using DiscordBot.Common.Models.Commands;
 using DiscordBot.Common.Models.Data.Base;
-using DiscordBot.Common.Models.Enums;
-using LiteDB;
 
 namespace DiscordBot.Common.Models.Data.Confirmation; 
 

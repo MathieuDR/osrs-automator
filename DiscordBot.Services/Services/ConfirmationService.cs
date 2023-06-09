@@ -20,7 +20,13 @@ internal sealed class ConfirmationService : RepositoryService, IConfirmationServ
     }
 
     public async Task<Result> CreateConfirm(GuildUser requestedBy, IConfirmCommand command) {
-        var discordMessageResult = await  _discordService.SendConfirmationMessage(new DiscordChannelId(570935856727326720L), command.Title, command.Description, command.Fields, command.ImageUrl);
+        var configResult = GetConfirmationConfiguration(requestedBy.GuildId);
+        if (configResult.IsFailed) {
+            return configResult.ToResult();
+        }
+
+        var channel = configResult.Value.ConfirmationChannel;
+        var discordMessageResult = await  _discordService.SendConfirmationMessage(channel, command.Title, command.Description, command.Fields, command.ImageUrl);
 
         if (discordMessageResult.IsFailed) {
             return discordMessageResult.ToResult();
@@ -48,6 +54,17 @@ internal sealed class ConfirmationService : RepositoryService, IConfirmationServ
         return repo.Update(confirmation);
     }
 
+    public Result SetConfirmChannel(Channel channelId, GuildUser requestedBy) {
+        var repo = GetRepository<IConfirmConfigurationRepository>(requestedBy.GuildId);
+        var configResult = repo.GetSingle();
+
+        var configuration = configResult.IsFailed
+            ? new ConfirmationConfiguration(requestedBy, channelId.Id)
+            : configResult.Value with { ConfirmationChannel = channelId.Id };
+
+        return repo.UpdateOrInsert(configuration);
+    }
+
     private bool SendCommand(bool accepted, IConfirmCommand command, GuildUser confirmedBy) {
         if (!accepted) {
             return false;
@@ -65,6 +82,11 @@ internal sealed class ConfirmationService : RepositoryService, IConfirmationServ
         }
 
         return false;
+    }
+    
+    private Result<ConfirmationConfiguration> GetConfirmationConfiguration(DiscordGuildId guildId) {
+        var repo = GetRepository<IConfirmConfigurationRepository>(guildId);
+        return repo.GetSingle();
     }
 }
 

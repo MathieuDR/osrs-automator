@@ -2,7 +2,7 @@
 
 namespace DiscordBot.Commands.Interactive2.Base.Definitions;
 
-public abstract class CommandDefinitionBase : ICommandDefinition {
+public  abstract class CommandDefinitionBase : ICommandDefinition {
 	public CommandDefinitionBase(IServiceProvider serviceProvider) {
 		ServiceProvider = serviceProvider;
 		var loggerFactory = ServiceProvider.GetRequiredService<ILoggerFactory>();
