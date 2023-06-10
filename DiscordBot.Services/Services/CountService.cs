@@ -170,20 +170,30 @@ internal class CountService : RepositoryService, ICounterService {
         return _confirmationService.CreateConfirm(user, command);
     }
 
-    public Task<Result> SetRequestChannel(GuildUser user, Channel channel) {
+    public Task<Result> SetRequestChannel(GuildUser user, Channel? channel) {
         var repo = GetRepository<ISelfCountConfigurationRepository>(user.GuildId);
         var configResult = repo.GetSingle();
-        var config = configResult.IsSuccess ? configResult.Value with {RequestChannel = channel.Id} : new SelfCountConfiguration(user.GuildId, user.Id, new List<Item>(), channel.Id);
+        var config = configResult.IsSuccess && configResult.Value is not null 
+            ? configResult.Value with {RequestChannel = channel?.Id} 
+            : new SelfCountConfiguration(user.GuildId, user.Id, new List<Item>(), channel?.Id);
         
         return Task.FromResult(repo.UpdateOrInsert(config));
     }
 
     public Task<Result> SaveItemsFromJson(GuildUser user, string json) {
         var items = JsonConvert.DeserializeObject<List<Item>>(json);
+        //  add item name to synonym and create list if doesn't exist
+        items!.ForEach(x => {
+            if(!x.Synonyms.Contains(x.Name)) {
+                x.Synonyms.Add(x.Name);
+            }
+        });
+        
+        
         var repo = GetRepository<ISelfCountConfigurationRepository>(user.GuildId);
         var configResult = repo.GetSingle();
         
-        var config = configResult.IsSuccess ? configResult.Value with {Items = items} : new SelfCountConfiguration(user.GuildId, user.Id, items, null);
+        var config = configResult.IsSuccess  && configResult.Value is not null  ? configResult.Value with {Items = items} : new SelfCountConfiguration(user.GuildId, user.Id, items, null);
         return Task.FromResult(repo.UpdateOrInsert(config));
     }
 

@@ -5,25 +5,24 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace DiscordBot.Commands.Interactive2.CountSelf.Add;
 
-internal sealed  class AddCountSelfSubCommandHandler : ApplicationCommandHandlerBase<AddCountSelfSubCommandRequest> {
+internal sealed class AddCountSelfSubCommandHandler : ApplicationCommandHandlerBase<AddCountSelfSubCommandRequest> {
     private readonly ICounterService _countService;
 
-    public AddCountSelfSubCommandHandler(IServiceProvider serviceProvider) : base(serviceProvider) {
+    public AddCountSelfSubCommandHandler(IServiceProvider serviceProvider) : base(serviceProvider) =>
         _countService = serviceProvider.GetRequiredService<ICounterService>();
-    }
-    protected override async Task<Result> DoWork(CancellationToken cancellationToken) {
-        await Context.DeferAsync();
 
+    protected override async Task<Result> DoWork(CancellationToken cancellationToken) {
         if (!await IsRequestChannel()) {
             _ = Context
                 .CreateReplyBuilder(true)
                 .WithEmbed(x => x.WithFailure("This channel is not configured for self counting request."))
-                .FollowupAsync();
-            
+                .RespondAsync();
+
             return Result.Ok();
         }
-        
-        
+
+        await Context.DeferAsync();
+
         var (item, users, image) = await GetOptions();
 
         var r = ValidateOptions(item, users.Count, image);
@@ -31,7 +30,7 @@ internal sealed  class AddCountSelfSubCommandHandler : ApplicationCommandHandler
             return r;
         }
 
-        await _countService.SelfCount(Context.GuildUser.ToGuildUserDto(), item, users.Select(x=>x.ToGuildUserDto()).ToArray(), image.Url);
+        await _countService.SelfCount(Context.GuildUser.ToGuildUserDto(), item, users.Select(x => x.ToGuildUserDto()).ToArray(), image.Url);
         return SendEmbed(item, users, image);
     }
 
@@ -41,34 +40,33 @@ internal sealed  class AddCountSelfSubCommandHandler : ApplicationCommandHandler
     }
 
     private Result ValidateOptions(Item item, int usersCount, Attachment image) {
-        
-            if (!Context.InGuild) {
-                return Result.Fail("Command need to be executed in a guild");
-            }
+        if (!Context.InGuild) {
+            return Result.Fail("Command need to be executed in a guild");
+        }
 
-            if (item is null) {
-                return Result.Fail("Item not found");
-            }
-        
-            if (!item.Splittable && usersCount > 0) {
-                return Result.Fail($"Item {item.Name} is not splittable, but you tried to split it with {usersCount} users.");
-            }
+        if (item is null) {
+            return Result.Fail("Item not found");
+        }
 
-            // check if the discord attachment is an image
-            if (image != null) {
-                var isImage = image.ContentType.StartsWith("image");
-                if (!isImage) {
-                    return Result.Fail("The attachment is not an image");
-                }
-            }
+        if (!item.Splittable && usersCount > 0) {
+            return Result.Fail($"Item {item.Name} is not splittable, but you tried to split it with {usersCount} users.");
+        }
 
-            return Result.Ok();
+        // check if the discord attachment is an image
+        if (image != null) {
+            var isImage = image.ContentType.StartsWith("image");
+            if (!isImage) {
+                return Result.Fail("The attachment is not an image");
+            }
+        }
+
+        return Result.Ok();
     }
 
     private Result SendEmbed(Item item, List<IUser> users, Attachment image) {
         var title = $"Requested points for {item.Name}";
         var descr = $"Requested {item.Value} points for {Context.User.DisplayName()}";
-        
+
         _ = Context.CreateReplyBuilder()
             .WithEmbed(b => {
                 b.WithSuccess(descr, title);
@@ -76,11 +74,11 @@ internal sealed  class AddCountSelfSubCommandHandler : ApplicationCommandHandler
                 if (users.Count > 0) {
                     b.AddField("Split with", string.Join(", ", users.Select(x => x.DisplayName())));
                 }
-                
+
                 b.WithThumbnailUrl(image.Url);
             })
             .FollowupAsync();
-        
+
         return Result.Ok();
     }
 
@@ -102,7 +100,7 @@ internal sealed  class AddCountSelfSubCommandHandler : ApplicationCommandHandler
         return descrBuilder.ToString();
     }
 
- 
+
     private async Task<(Item item, List<IUser> splits, Attachment image)> GetOptions() {
         var itemString = Context.SubCommandOptions.GetOptionValue<string>(AddCountSelfSubCommandDefinition.ItemOption);
         var usersString = Context.SubCommandOptions.GetOptionValue<string>(AddCountSelfSubCommandDefinition.SplitUsers);

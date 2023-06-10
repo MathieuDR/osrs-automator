@@ -58,7 +58,7 @@ internal sealed class ConfirmationService : RepositoryService, IConfirmationServ
         var repo = GetRepository<IConfirmConfigurationRepository>(requestedBy.GuildId);
         var configResult = repo.GetSingle();
 
-        var configuration = configResult.IsFailed
+        var configuration = configResult.IsFailed || configResult.Value is null
             ? new ConfirmationConfiguration(requestedBy, channelId.Id)
             : configResult.Value with { ConfirmationChannel = channelId.Id };
 

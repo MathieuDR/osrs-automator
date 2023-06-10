@@ -10,6 +10,7 @@ internal sealed class CountSelfConfigureHandler : ApplicationCommandHandlerBase<
         _counterService = serviceProvider.GetRequiredService<ICounterService>();
     }
     protected override async Task<Result> DoWork(CancellationToken cancellationToken) {
+        _ = Context.DeferAsync();
         var (channel, jsonAttachment) = ParseOptions();
         var reply = Context.CreateReplyBuilder(true);
 
@@ -27,16 +28,12 @@ internal sealed class CountSelfConfigureHandler : ApplicationCommandHandlerBase<
             return Result.Fail("No json or channel provided");
         }
 
-        _ = reply.RespondAsync();
+        _ = reply.FollowupAsync();
         return Result.Ok();
     }
 
     private async Task<Result> HandleChannelOptionResult(IChannel channel, IInteractionReplyBuilder<SocketSlashCommand> reply) {
-        if (channel is null) {
-            return Result.Ok();
-        }
-
-        var result = await _counterService.SetRequestChannel(Context.GuildUser.ToGuildUserDto(), channel.ToChannelDto());
+        var result = await _counterService.SetRequestChannel(Context.GuildUser.ToGuildUserDto(), channel?.ToChannelDto());
         if (result.IsFailed) {
             return result;
         }
@@ -66,8 +63,8 @@ internal sealed class CountSelfConfigureHandler : ApplicationCommandHandlerBase<
     }
 
     private (IChannel channel, Attachment jsonAttachment) ParseOptions() {
-        var channel = Context.Options.GetOptionValue<IChannel>(CountSelfConfigureCommandDefinition.Channel);
-        var jsonFile = Context.Options.GetOptionValue<Attachment>(CountSelfConfigureCommandDefinition.Json);
+        var channel = Context.SubCommandOptions.GetOptionValue<IChannel>(CountSelfConfigureCommandDefinition.Channel);
+        var jsonFile = Context.SubCommandOptions.GetOptionValue<Attachment>(CountSelfConfigureCommandDefinition.Json);
          
         
         return (channel, jsonFile);
@@ -75,7 +72,7 @@ internal sealed class CountSelfConfigureHandler : ApplicationCommandHandlerBase<
     
     private async Task<string> GetJsonFromAttachment(Attachment attachment) {
         // check if it's json file
-        if(attachment.ContentType != "application/json") {
+        if(!attachment.ContentType.StartsWith("application/json")) {
             return null;
         }
 

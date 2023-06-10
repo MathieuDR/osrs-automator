@@ -9,7 +9,7 @@ internal sealed class CountSelfConfigureCommandDefinition : SubCommandDefinition
     public static string Json => "json";
     protected override Task<SlashCommandOptionBuilder> ExtendOptionCommandBuilder(SlashCommandOptionBuilder builder) {
         builder.AddOption(Channel, ApplicationCommandOptionType.Channel, "Channel for the self count requests", false);
-        builder.AddOption(Json, ApplicationCommandOptionType.Boolean, "The items to parse", false);
+        builder.AddOption(Json, ApplicationCommandOptionType.Attachment, "The items to parse", false);
         return Task.FromResult(builder);
     }
 }

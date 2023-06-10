@@ -6,16 +6,19 @@ namespace DiscordBot.Common.Models.Data.Items;
 public sealed record Item : BaseRecord {
     public Item(string Name, List<string> Synonyms, int Value, int? SplitValue) {
         this.Name = Name;
-        this.Synonyms = Synonyms;
+        this.Synonyms = Synonyms ?? new();
         this.Value = Value;
         this.SplitValue = SplitValue;
-        Id = ObjectId.NewObjectId();
+        
+        if (!this.Synonyms.Contains(Name)) {
+            this.Synonyms.Add(Name);
+        }
     }
 
     public Item() { }
 
     public string Name { get; init; }
-    public List<string> Synonyms { get; init; }
+    public List<string> Synonyms { get; init; } = new();
     public int Value { get; init; }
     public int? SplitValue { get; init; }
 
