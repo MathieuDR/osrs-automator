@@ -25,6 +25,8 @@ public static class ConfigurationExtensions {
             .AddTransient<ClanFundsLiteDbRepositoryFactory>()
             .AddTransient<ItemsLiteDbRepositoryFactory>()
             .AddTransient<ConfirmationLiteDbRepositoryFactory>()
+            .AddTransient<ConfirmationConfigurationLiteDbRepositoryFactory>()
+            .AddTransient<SelfCountConfigurationLiteDbRepositoryFactory>()
             .AddTransient<RunescapeDropperGuildConfigurationRepositoryFactory>()
             .AddSingleton<IRepositoryStrategy>(x =>
                 new RepositoryStrategy(new IRepositoryFactory[] {
@@ -38,7 +40,9 @@ public static class ConfigurationExtensions {
                     x.GetRequiredService<ClanFundsLiteDbRepositoryFactory>(),
                     x.GetRequiredService<RunescapeDropperGuildConfigurationRepositoryFactory>(),
                     x.GetRequiredService<ItemsLiteDbRepositoryFactory>(),
-                    x.GetRequiredService<ConfirmationLiteDbRepositoryFactory>()
+                    x.GetRequiredService<ConfirmationLiteDbRepositoryFactory>(),
+                    x.GetRequiredService<ConfirmationConfigurationLiteDbRepositoryFactory>(),
+                    x.GetRequiredService<SelfCountConfigurationLiteDbRepositoryFactory>(),
                 }))
             .AddOptions<LiteDbOptions>()
             .Configure<IConfiguration>((options, configuration1) => configuration.GetSection(LiteDbOptions.SectionName).Bind(options));

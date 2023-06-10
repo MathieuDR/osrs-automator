@@ -18,8 +18,11 @@ public interface ICounterService {
     Task<IReadOnlyList<CountThreshold>> GetThresholds(DiscordGuildId guildId);
     Task<DiscordChannelId> GetChannelForGuild(DiscordGuildId guildId);
     Task<IEnumerable<UserCountInfo>> GetAllUserInfo(Guild toGuildDto);
-    Task<IEnumerable<Item>> GetItemsForGuild(Guild toGuildDto);
+    Task<List<Item>> GetItemsForGuild(Guild toGuildDto);
     Task<IEnumerable<(string synonym, Item item)>> GetItemsForGuild(Guild toGuildDto, string autocomplete);
-    Task<bool> UploadItemJson(GuildUser user, string json);
+    Task<Result<bool>> CanSelfCountInChannel(GuildUser user, Channel channel);
     Task<Result> SelfCount(GuildUser user, Item item, GuildUser[] splits, String imageUrl);
+    
+    Task<Result> SetRequestChannel(GuildUser user, Channel channel);
+    Task<Result> SaveItemsFromJson(GuildUser user, string json);
 }

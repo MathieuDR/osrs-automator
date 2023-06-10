@@ -13,6 +13,7 @@ using DiscordBot.Data.Strategies;
 using DiscordBot.Services.Interfaces;
 using FluentResults;
 using Microsoft.Extensions.Logging;
+using Newtonsoft.Json;
 
 namespace DiscordBot.Services.Services;
 
@@ -132,9 +133,15 @@ internal class CountService : RepositoryService, ICounterService {
         return Task.FromResult(allResult.Value);
     }
 
-    public Task<IEnumerable<Item>> GetItemsForGuild(Guild guild) {
-        var items = new List<Item> { new("Dragon Claws", new List<string> { "dclaws", "d claws", "dragon claws", "claws" }, 50, 10) };
-        return Task.FromResult(items.AsEnumerable());
+    public Task<List<Item>> GetItemsForGuild(Guild guild) {
+        var repo = GetRepository<ISelfCountConfigurationRepository>(guild.Id);
+        var configResult = repo.GetSingle();
+
+        if (configResult.IsFailed) {
+            throw new Exception("No config found");
+        }
+        
+        return Task.FromResult(configResult.Value.Items);
     }
 
     public async Task<IEnumerable<(string synonym, Item item)>> GetItemsForGuild(Guild guild, string autocomplete) {
@@ -146,11 +153,38 @@ internal class CountService : RepositoryService, ICounterService {
             .Select(x => (x.Synonyms.First(s => s.StartsWith(search)), x));
     }
 
-    public Task<bool> UploadItemJson(GuildUser user, string json) => throw new NotImplementedException();
+    public Task<Result<bool>> CanSelfCountInChannel(GuildUser user, Channel channel) {
+        var repo = GetRepository<ISelfCountConfigurationRepository>(user.GuildId);
+        var configResult = repo.GetSingle();
+
+        if (configResult.IsFailed) {
+            return Task.FromResult(Result.Fail<bool>("No config found"));
+        }
+
+        var config = configResult.Value;
+        return Task.FromResult(Result.Ok(!config.RequestChannel.HasValue || config.RequestChannel == channel.Id));
+    }
 
     public Task<Result> SelfCount(GuildUser user, Item item, GuildUser[] splits, string imageUrl) {
         var command = CreateSelfCountConfirmCommand(user, item, splits, imageUrl);
         return _confirmationService.CreateConfirm(user, command);
+    }
+
+    public Task<Result> SetRequestChannel(GuildUser user, Channel channel) {
+        var repo = GetRepository<ISelfCountConfigurationRepository>(user.GuildId);
+        var configResult = repo.GetSingle();
+        var config = configResult.IsSuccess ? configResult.Value with {RequestChannel = channel.Id} : new SelfCountConfiguration(user.GuildId, user.Id, new List<Item>(), channel.Id);
+        
+        return Task.FromResult(repo.UpdateOrInsert(config));
+    }
+
+    public Task<Result> SaveItemsFromJson(GuildUser user, string json) {
+        var items = JsonConvert.DeserializeObject<List<Item>>(json);
+        var repo = GetRepository<ISelfCountConfigurationRepository>(user.GuildId);
+        var configResult = repo.GetSingle();
+        
+        var config = configResult.IsSuccess ? configResult.Value with {Items = items} : new SelfCountConfiguration(user.GuildId, user.Id, items, null);
+        return Task.FromResult(repo.UpdateOrInsert(config));
     }
 
     private static SelfCountConfirmCommand CreateSelfCountConfirmCommand(GuildUser user, Item item, GuildUser[] splits, string imageUrl) {

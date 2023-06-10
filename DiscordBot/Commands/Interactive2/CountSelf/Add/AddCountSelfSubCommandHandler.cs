@@ -13,6 +13,17 @@ internal sealed  class AddCountSelfSubCommandHandler : ApplicationCommandHandler
     }
     protected override async Task<Result> DoWork(CancellationToken cancellationToken) {
         await Context.DeferAsync();
+
+        if (!await IsRequestChannel()) {
+            _ = Context
+                .CreateReplyBuilder(true)
+                .WithEmbed(x => x.WithFailure("This channel is not configured for self counting request."))
+                .FollowupAsync();
+            
+            return Result.Ok();
+        }
+        
+        
         var (item, users, image) = await GetOptions();
 
         var r = ValidateOptions(item, users.Count, image);
@@ -22,6 +33,11 @@ internal sealed  class AddCountSelfSubCommandHandler : ApplicationCommandHandler
 
         await _countService.SelfCount(Context.GuildUser.ToGuildUserDto(), item, users.Select(x=>x.ToGuildUserDto()).ToArray(), image.Url);
         return SendEmbed(item, users, image);
+    }
+
+    private async Task<bool> IsRequestChannel() {
+        var result = await _countService.CanSelfCountInChannel(Context.User.ToGuildUserDto(), Context.TextChannel.ToChannelDto());
+        return result.IsSuccess && result.Value;
     }
 
     private Result ValidateOptions(Item item, int usersCount, Attachment image) {
