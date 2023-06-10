@@ -149,8 +149,8 @@ internal class CountService : RepositoryService, ICounterService {
         var search = autocomplete.ToLower();
 
         return allItems
-            .Where(x => x.Synonyms.Any(s => s.StartsWith(search)))
-            .Select(x => (x.Synonyms.First(s => s.StartsWith(search)), x));
+            .Where(x => x.Synonyms.Any(s => s.Contains(search)))
+            .Select(x => (x.Synonyms.First(s => s.Contains(search)), x));
     }
 
     public Task<Result<bool>> CanSelfCountInChannel(GuildUser user, Channel channel) {
@@ -184,8 +184,9 @@ internal class CountService : RepositoryService, ICounterService {
         var items = JsonConvert.DeserializeObject<List<Item>>(json);
         //  add item name to synonym and create list if doesn't exist
         items!.ForEach(x => {
-            if(!x.Synonyms.Contains(x.Name)) {
-                x.Synonyms.Add(x.Name);
+            var lowered = x.Name.ToLower();
+            if(!x.Synonyms.Contains(lowered)) {
+                x.Synonyms.Add(lowered);
             }
         });
         
