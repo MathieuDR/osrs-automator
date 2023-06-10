@@ -1,4 +1,5 @@
 using System.Collections.Immutable;
+using DiscordBot.Common.Identities;
 
 namespace DiscordBot.Models.Contexts;
 
@@ -7,7 +8,8 @@ public class MessageComponentContext : BaseInteractiveContext<SocketMessageCompo
         : base(innerContext, provider) { }
 
     public string CustomId => InnerContext.Data.CustomId;
-    public string[] CustomIdParts => CustomId.Split('.');
+    public string[] Parameters => CustomId.Split(':').Last().Split('.');
+    public string[] CustomIdParts => CustomId.Split(':').First().Split('.');
     public string CustomSubCommandId => CustomIdParts?[1];
 
     public IEnumerable<string> SelectedMenuOptions
@@ -16,8 +18,7 @@ public class MessageComponentContext : BaseInteractiveContext<SocketMessageCompo
     public IReadOnlyCollection<EmbedField> EmbedFields => InnerContext.Message.Embeds.FirstOrDefault()?.Fields ?? new ImmutableArray<EmbedField>();
 
     public override string Message => InnerContext.Message.Content;
-    
-    
+    public DiscordMessageId MessageId => new DiscordMessageId(InnerContext.Message.Id);
 
     public Task UpdateAsync(
         Optional<string> content = new(),
@@ -39,6 +40,6 @@ public class MessageComponentContext : BaseInteractiveContext<SocketMessageCompo
     }
 
     public override string Command => CustomIdParts.FirstOrDefault();
-    public override string SubCommand => CustomIdParts.LastOrDefault();
-    public override string SubCommandGroup => CustomIdParts.Count() == 3 ? CustomIdParts[1] : null;
+    public override string SubCommand => CustomIdParts.Length > 1 ? CustomIdParts[1] : null;
+    public override string SubCommandGroup => null;
 }

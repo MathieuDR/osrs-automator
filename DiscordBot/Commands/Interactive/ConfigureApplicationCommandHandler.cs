@@ -12,7 +12,7 @@ public class ConfigureApplicationCommandHandler : ApplicationCommandHandler {
     private const string TimeZoneOption = "timezone";
     private const string WomGroupId = "group-id";
     private const string WomVerificationCode = "verification-code";
-
+    
 
     private readonly IGroupService _groupService;
     private readonly IDictionary<string, string> _timeZones;

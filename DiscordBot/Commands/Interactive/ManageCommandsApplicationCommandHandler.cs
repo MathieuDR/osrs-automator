@@ -212,7 +212,7 @@ public class ManageCommandsApplicationCommandHandler : ApplicationCommandHandler
             .WithSelectMenu(new SelectMenuBuilder()
                 .WithCustomId(SubCommand("command"))
                 .WithOptions(commands.Select(c => new SelectMenuOptionBuilder()
-                    .WithLabel($"{c.Name}: {c.Description}".CutToCharsAndAddDots(100))
+                    .WithLabel($"{c.Name}: {c.Description}".Truncate(100))
                     .WithValue(c.Name)).ToList())
                 .WithPlaceholder("Choose a command"));
     }
@@ -237,7 +237,7 @@ public class ManageCommandsApplicationCommandHandler : ApplicationCommandHandler
                     }
 
                     return new SelectMenuOptionBuilder()
-                        .WithLabel(label.CutToCharsAndAddDots(100))
+                        .WithLabel(label.Truncate(100))
                         .WithValue(c.Id.ToString());
                 }).ToList())
                 .WithPlaceholder("Choose a guild"));

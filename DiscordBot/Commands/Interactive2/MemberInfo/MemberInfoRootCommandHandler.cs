@@ -39,7 +39,7 @@ public class MemberInfoRootCommandHandler : ApplicationCommandHandlerBase<Member
 			csvBuilder.Append(CsvDelimiter);
 			csvBuilder.Append(member.Username);
 			csvBuilder.Append(CsvDelimiter);
-			csvBuilder.Append(member.Discriminator);
+			csvBuilder.Append(member.Discriminator ?? "");
 			csvBuilder.Append(CsvDelimiter);
 			csvBuilder.Append(member.Nickname);
 			csvBuilder.Append(CsvDelimiter);

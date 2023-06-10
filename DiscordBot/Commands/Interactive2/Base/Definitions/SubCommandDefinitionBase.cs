@@ -1,6 +1,6 @@
 namespace DiscordBot.Commands.Interactive2.Base.Definitions;
 
-public abstract class SubCommandDefinitionBase<TRoot> : CommandDefinitionBase, ISubCommandDefinition<TRoot> where TRoot : IRootCommandDefinition {
+public  abstract class SubCommandDefinitionBase<TRoot> : CommandDefinitionBase, ISubCommandDefinition<TRoot> where TRoot : IRootCommandDefinition {
 	protected SubCommandDefinitionBase(IServiceProvider serviceProvider) : base(serviceProvider) { }
 
 	public async Task<SlashCommandOptionBuilder> GetOptionBuilder() {

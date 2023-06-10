@@ -141,6 +141,8 @@ public class BaseInteractionReplyBuilder<TInteraction> : IInteractionReplyBuilde
 		return FromResult(result.ToResult());
 	}
 
+	public bool HasEmbeds => Embeds.Count > 0;
+
 	public IResultInteractionReplyBuilder<TInteraction> WithSuccessEmbed(Action<EmbedBuilder, Result> embedBuilderModification) {
 		if (Result is null || Result.IsFailed) {
 			return this;

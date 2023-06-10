@@ -23,4 +23,6 @@ public interface IInteractionReplyBuilder<TInteraction> : IBaseInteractionReplyB
 	IInteractionReplyBuilder<TInteraction> WithSelectMenu(SelectMenuBuilder menu);
 	IResultInteractionReplyBuilder<TInteraction> FromResult(Result result);
 	IResultInteractionReplyBuilder<TInteraction> FromResult<T>(Result<T> result);
+	
+	bool HasEmbeds { get; }
 }
