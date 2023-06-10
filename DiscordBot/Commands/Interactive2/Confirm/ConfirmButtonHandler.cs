@@ -17,10 +17,12 @@ internal sealed class ConfirmButtonHandler : MessageComponentHandlerBase<Confirm
         }
 
         var builder = Context.InnerContext.Message.Embeds.First().ToEmbedBuilder();
-        builder.AddField("Handled by", Context.GuildUser.DisplayName);
-        builder.AddField("Handled at", DateTime.Now.ToString("dd/MM/yyyy HH:mm:ss"));
+        // add empty field to reset the inline
+        builder.AddField("\u200b", "\u200b");
+        builder.AddField("Handled by", Context.GuildUser.DisplayName, true);
+        builder.AddField("Handled at", DateTime.Now.ToString("dd/MM/yyyy HH:mm:ss"), true);
         builder.WithColor(isConfirmed ? new Color(0,255,102) : new Color(255, 51, 102));
-        builder.AddField("Status", isConfirmed ? "Confirmed" : "Declined");
+        builder.AddField("Status", isConfirmed ? "Confirmed" : "Declined", true);
 
         Context.InnerContext.Message.ModifyAsync(x => {
             x.Embed = builder.Build();

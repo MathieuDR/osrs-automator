@@ -25,7 +25,7 @@ internal sealed class AddCountSelfSubCommandHandler : ApplicationCommandHandlerB
 
         var (item, users, image) = await GetOptions();
 
-        var r = ValidateOptions(item, users.Count, image);
+        var r = ValidateOptions(item, users, image);
         if (r.IsFailed) {
             return r;
         }
@@ -39,7 +39,8 @@ internal sealed class AddCountSelfSubCommandHandler : ApplicationCommandHandlerB
         return result.IsSuccess && result.Value;
     }
 
-    private Result ValidateOptions(Item item, int usersCount, Attachment image) {
+    private Result ValidateOptions(Item item, List<IUser> users, Attachment image) {
+        var usersCount = users.Count;
         if (!Context.InGuild) {
             return Result.Fail("Command need to be executed in a guild");
         }
@@ -50,6 +51,10 @@ internal sealed class AddCountSelfSubCommandHandler : ApplicationCommandHandlerB
 
         if (!item.Splittable && usersCount > 0) {
             return Result.Fail($"Item {item.Name} is not splittable, but you tried to split it with {usersCount} users.");
+        }
+        
+        if(item.Splittable && usersCount > 0 && users.Contains(Context.User)) {
+            return Result.Fail($"You can't split an item with yourself.");
         }
 
         // check if the discord attachment is an image

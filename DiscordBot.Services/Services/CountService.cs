@@ -193,7 +193,7 @@ internal class CountService : RepositoryService, ICounterService {
         var repo = GetRepository<ISelfCountConfigurationRepository>(user.GuildId);
         var configResult = repo.GetSingle();
         
-        var config = configResult.IsSuccess  && configResult.Value is not null  ? configResult.Value with {Items = items} : new SelfCountConfiguration(user.GuildId, user.Id, items, null);
+        var config = configResult.IsSuccess  && configResult.Value is not null ? configResult.Value with {Items = items} : new SelfCountConfiguration(user.GuildId, user.Id, items, null);
         return Task.FromResult(repo.UpdateOrInsert(config));
     }
 
