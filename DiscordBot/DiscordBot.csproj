@@ -7,6 +7,7 @@
         <PackageId>DiscordBot</PackageId>
         <LangVersion>10</LangVersion>
         <ImplicitUsings>enable</ImplicitUsings>
+        <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
     </PropertyGroup>
 
     <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
