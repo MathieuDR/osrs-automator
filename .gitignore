@@ -441,3 +441,5 @@ $RECYCLE.BIN/
 /appsettings.debug.json
 /appsettings.Development.json
 /.sonarqube
+
+.direnv
