@@ -20,6 +20,11 @@ public abstract class ConfigurableGuildJob : BaseGuildJob {
     protected IRepositoryStrategy RepositoryStrategy { get; }
 
     protected override Task<Result> DoWorkForGuild(Guild guild) {
+        // This method is synchronous (returns a Task without awaiting it), so the lease held by
+        // `repo` is released as soon as this method returns - i.e. before DoWorkForGuildWithContext's
+        // work actually runs. That's fine only because guildConfiguration/jobConfiguration below are
+        // plain materialised values (not lazily backed by the repository/lease), so nothing handed
+        // down to the concrete job needs the database to still be open.
         using var repo = RepositoryStrategy.GetOrCreateRepository<IGuildConfigRepository>(guild.Id);
         var guildConfiguration = repo.GetSingle().ValueOrDefault;
         ChannelJobConfiguration jobConfiguration = null;

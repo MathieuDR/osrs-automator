@@ -196,6 +196,6 @@ internal class GraveyardService : IGraveyardService {
 		using var configRepo = _repositoryStrategy.GetOrCreateRepository<IGuildConfigRepository>(guildId);
 		var configuration = configRepo.GetSingle().Value;
 
-		return shames.Select(x => x with { ShamedAt = x.ShamedAt.ToOffset(configuration.Timezone)});
+		return shames.Select(x => x with { ShamedAt = x.ShamedAt.ToOffset(configuration.Timezone)}).ToList();
 	}
 }

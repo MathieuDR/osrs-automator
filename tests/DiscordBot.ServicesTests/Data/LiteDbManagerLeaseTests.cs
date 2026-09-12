@@ -168,20 +168,27 @@ public class LiteDbManagerLeaseTests : IDisposable {
 		var mgr = CreateManager(false);
 		var guildId = new DiscordGuildId(10);
 
-		//Act
-		var lease = mgr.Lease(guildId);
-		lease.Dispose();
+		try {
+			//Act
+			var lease = mgr.Lease(guildId);
+			lease.Dispose();
 
-		//Assert
-		FileIsUnlocked(PathFor(guildId)).Should().BeFalse();
-		mgr.OpenDatabaseCount.Should().Be(1);
+			//Assert
+			FileIsUnlocked(PathFor(guildId)).Should().BeFalse();
+			mgr.OpenDatabaseCount.Should().Be(1);
 
-		//Act
-		mgr.DisposeAll();
+			//Act
+			mgr.DisposeAll();
 
-		//Assert
-		FileIsUnlocked(PathFor(guildId)).Should().BeTrue();
-		mgr.OpenDatabaseCount.Should().Be(0);
+			//Assert
+			FileIsUnlocked(PathFor(guildId)).Should().BeTrue();
+			mgr.OpenDatabaseCount.Should().Be(0);
+		} finally {
+			// A failed assertion above must not leave this manager's database open and file
+			// locked - that would break Dispose() on this test class and cascade into the next
+			// test class sharing this collection.
+			mgr.DisposeAll();
+		}
 	}
 
 	[Fact]
@@ -231,6 +238,41 @@ public class LiteDbManagerLeaseTests : IDisposable {
 
 		//Assert
 		all.Count().Should().Be(2);
+	}
+
+	[Fact]
+	public void NestedRepositories_SameGuild_ShareDatabaseAndReleaseTogether() {
+		//Arrange
+		var guildId = new DiscordGuildId(10);
+		var guildConfigFactory = new GuildConfigLiteDbRepositoryFactory(NullLoggerFactory.Instance, _dbManager);
+		var playerFactory = new PlayerLiteDbRepositoryFactory(NullLoggerFactory.Instance, _dbManager);
+
+		//Act
+		var outer = guildConfigFactory.Create(guildId);
+
+		//Assert
+		_dbManager.OpenDatabaseCount.Should().Be(1);
+
+		//Act
+		var inner = playerFactory.Create(guildId);
+
+		//Assert
+		_dbManager.OpenDatabaseCount.Should().Be(1);
+
+		//Act
+		inner.Dispose();
+
+		//Assert
+		_dbManager.OpenDatabaseCount.Should().Be(1);
+		var getSingle = () => outer.GetSingle();
+		getSingle.Should().NotThrow();
+
+		//Act
+		outer.Dispose();
+
+		//Assert
+		_dbManager.OpenDatabaseCount.Should().Be(0);
+		FileIsUnlocked(PathFor(guildId)).Should().BeTrue();
 	}
 
 	[Fact]

@@ -12,7 +12,10 @@ using Serilog.Context;
 namespace DiscordBot.Data;
 
 public class LiteDbManager {
-    private sealed class Entry {
+    // Internal (not private) so DatabaseLease can hold a reference to the exact Entry instance it
+    // was created against, and Release() can compare that reference against whatever entry is
+    // currently cached for the path - see the comment on Release().
+    internal sealed class Entry {
         public LiteDatabase Db;
         public int RefCount;
     }
@@ -137,11 +140,17 @@ public class LiteDbManager {
                 entry.RefCount++;
             }
 
-            return new DatabaseLease(this, path, entry.Db);
+            return new DatabaseLease(this, path, entry.Db, entry);
         }
     }
 
-    internal void Release(string path) {
+    // expectedEntry is the exact Entry instance the DatabaseLease was created against (see
+    // LeaseFile). A lease can outlive the entry it belongs to - e.g. DisposeAll() clears _open
+    // while leases are still outstanding, and a later Lease() for the same path creates a brand
+    // new Entry. If we only matched on path, disposing such a stale lease would decrement/close
+    // *that new entry* even though this lease has nothing to do with it. Comparing the reference
+    // ensures a stale lease can never affect a database it wasn't leased from.
+    internal void Release(string path, Entry expectedEntry) {
         lock (GetFileLock(path)) {
             // Remove the entry from _open BEFORE disposing, not after: LiteDatabase.Dispose()
             // runs a checkpoint and can throw (disk full, IO error). If we disposed first and
@@ -154,6 +163,13 @@ public class LiteDbManager {
             LiteDatabase toDispose = null;
             lock (_gate) {
                 if (!_open.TryGetValue(path, out var entry)) {
+                    return;
+                }
+
+                if (!ReferenceEquals(entry, expectedEntry)) {
+                    _logger.LogDebug(
+                        "Ignoring release for {path}: the lease was created against a different (stale) database entry than the one currently open",
+                        path);
                     return;
                 }
 
@@ -176,8 +192,16 @@ public class LiteDbManager {
             liteDatabase = new LiteDatabase(connectionString, BsonMapper);
         }
 
-        using (LogContext.PushProperty("db", connectionString)) {
-            _manager.Migrate(liteDatabase);
+        try {
+            using (LogContext.PushProperty("db", connectionString)) {
+                _manager.Migrate(liteDatabase);
+            }
+        } catch {
+            // Migrate() throwing must not leak the LiteDatabase: it already holds the exclusive
+            // file lock, so without this every later Lease() for this path would fail forever
+            // (until process restart).
+            liteDatabase.Dispose();
+            throw;
         }
 
         return liteDatabase;
@@ -190,6 +214,14 @@ public class LiteDbManager {
         }
     }
 
+    /// <summary>
+    /// Force-disposes every currently open <see cref="LiteDatabase"/> and clears the cache,
+    /// regardless of outstanding reference counts. Only safe to call at process shutdown (e.g.
+    /// the admin <c>/kill</c> command) or in tests. Any <see cref="DatabaseLease"/> still held by
+    /// a caller at the time this runs becomes invalid: its underlying database is disposed out
+    /// from under it, and disposing that lease afterwards is a no-op (the entry it was leased
+    /// against is gone, see <see cref="Release"/>) rather than double-disposing.
+    /// </summary>
     public void DisposeAll() {
         _logger.LogInformation("Disposing all open databases");
         List<LiteDatabase> toDispose;
