@@ -64,7 +64,7 @@ public static class EmbedBuilderHelper {
 
         var footerText = $"Requested by {userName}.";
         if (!string.IsNullOrWhiteSpace(appendToFooter)) {
-            footerText += $", {appendToFooter}";
+            footerText += $" · {appendToFooter}";
         }
 
         builder.Footer = new EmbedFooterBuilder {

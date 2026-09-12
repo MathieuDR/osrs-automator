@@ -22,11 +22,15 @@ public abstract class BaseInteractiveContext<T> : BaseInteractiveContext where T
         ServiceProvider = provider;
         InteractiveService = provider.GetRequiredService<InteractiveService>();
         Client = provider.GetRequiredService<DiscordSocketClient>();
+        HostingFooter = InnerContext.Channel is IGuildChannel
+            ? provider.GetRequiredService<IHostingService>().GetStatus(Guild.GetGuildId(), Guild.Name).FooterText
+            : null;
     }
 
     public T InnerContext { get; }
     public IServiceProvider ServiceProvider { get; }
     public DiscordSocketClient Client { get; }
+    public string HostingFooter { get; }
 
     public SocketGuild Guild => Client.GetGuild(InnerContext.Channel.Cast<IGuildChannel>().GuildId);
     public bool InGuild => Guild != null;
@@ -47,15 +51,27 @@ public abstract class BaseInteractiveContext<T> : BaseInteractiveContext where T
     public override bool IsDeferred => _isDeferred;
 
     public PageBuilder CreatePageBuilder(string description = null) {
-        return new PageBuilder()
+        var builder = new PageBuilder()
             .WithColor(GuildUser.GetHighestRole()?.Color ?? 0x7000FB)
             .WithDescription(description ?? string.Empty)
             .WithCurrentTimestamp();
+
+        if (HostingFooter is not null) {
+            builder.WithFooter(HostingFooter);
+        }
+
+        return builder;
     }
-    
+
     public PageBuilder CreatePageBuilder(EmbedBuilder embedBuilder, string description = null) {
-        return PageBuilder.FromEmbedBuilder(embedBuilder)
+        var builder = PageBuilder.FromEmbedBuilder(embedBuilder)
             .WithDescription(description ?? string.Empty);
+
+        if (HostingFooter is not null && embedBuilder.Footer is null) {
+            builder.WithFooter(HostingFooter);
+        }
+
+        return builder;
     }
 
     public string GetDisplayNameById(DiscordUserId user) {
@@ -118,6 +134,7 @@ public abstract class BaseInteractiveContext<T> : BaseInteractiveContext where T
         RequestOptions options = null,
         MessageComponent component = null) {
         _isDeferred = true;
+        text = AppendHostingFooter(text, embeds);
         return InnerContext.RespondAsync(text, embeds?.ToArray(), isTts, ephemeral, allowedMentions, component, options: options);
     }
 
@@ -129,13 +146,22 @@ public abstract class BaseInteractiveContext<T> : BaseInteractiveContext where T
         AllowedMentions allowedMentions = null,
         RequestOptions options = null,
         MessageComponent component = null) {
+        text = AppendHostingFooter(text, embeds);
         return InnerContext.FollowupAsync(text, embeds?.ToArray(), isTts, ephemeral, allowedMentions, component, options: options);
+    }
+
+    private string AppendHostingFooter(string text, IEnumerable<Embed> embeds) {
+        if (HostingFooter is not null && (embeds is null || !embeds.Any()) && !string.IsNullOrEmpty(text)) {
+            text += "\n-# " + HostingFooter;
+        }
+
+        return text;
     }
 
     public override EmbedBuilder CreateEmbedBuilder(string title = null, string content = null) {
         return new EmbedBuilder()
             .WithColor(GuildUser.GetHighestRole()?.Color ?? 0x7000FB)
-            .WithMessageAuthorFooter(User)
+            .WithMessageAuthorFooter(User, HostingFooter ?? string.Empty)
             .WithTitle(title)
             .WithDescription(content ?? string.Empty)
             .WithCurrentTimestamp();

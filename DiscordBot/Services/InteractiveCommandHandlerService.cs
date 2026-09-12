@@ -19,6 +19,7 @@ public class InteractiveCommandHandlerService {
 	private readonly IServiceProvider _provider;
 	private readonly ICommandRegistrationService _registrationService;
 	private readonly ICommandStrategy _strategy;
+	private readonly IHostingService _hostingService;
 
 	public InteractiveCommandHandlerService(ILogger<InteractiveCommandHandlerService> logger,
 		DiscordSocketClient client,
@@ -28,7 +29,8 @@ public class InteractiveCommandHandlerService {
 		IOptions<BotTeamConfiguration> botTeamConfiguration,
 		ICommandInstigator commandInstigator,
 		InteractiveService interactiveService,
-		ICommandStrategy strategy) {
+		ICommandStrategy strategy,
+		IHostingService hostingService) {
 		_logger = logger;
 		_client = client;
 		_provider = provider;
@@ -38,6 +40,7 @@ public class InteractiveCommandHandlerService {
 		_interactiveService = interactiveService;
 		_strategy = strategy;
 		_commandInstigator = commandInstigator;
+		_hostingService = hostingService;
 
 		client.InteractionCreated += OnInteraction;
 	}
@@ -94,6 +97,14 @@ public class InteractiveCommandHandlerService {
 
 		_logger.LogInformation("[{ctx}] Command triggered", ctx);
 
+		if (arg is SocketSlashCommand && ctx is ApplicationCommandContext appCtx && appCtx.InGuild
+			&& !string.Equals(appCtx.Command, "hosting", StringComparison.OrdinalIgnoreCase)
+			&& _hostingService.ShouldDegrade(appCtx.Guild.GetGuildId(), appCtx.User.GetUserId())) {
+			var degradedMsg = _hostingService.GetDegradedMessage(appCtx.Guild.GetGuildId(), appCtx.Guild.Name);
+			_logger.LogInformation("[{ctx}] degraded mode: refusing command", ctx);
+			await appCtx.RespondAsync(embeds: new[] { appCtx.CreateEmbedBuilder().WithFailure(degradedMsg).Build() });
+			return;
+		}
 
 		var result = await _commandInstigator.ExecuteCommandAsync(ctx).ConfigureAwait(false);
 		if (result.IsFailed && result.HasError(x=> x.HasMetadataKey("404"))) {
