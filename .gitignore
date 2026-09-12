@@ -443,3 +443,7 @@ $RECYCLE.BIN/
 /.sonarqube
 
 .direnv
+
+# Local planning artefacts (specs/plans/reviews from AI-assisted work); kept out of the repo
+docs/superpowers/
+.superpowers/

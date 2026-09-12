@@ -13,10 +13,9 @@ referenced area changes, update the matching document.
 | 05 | [Dashboard, WOM connector & misc](05-dashboard-wom-connector-and-misc.md) | know what the peripheral projects are (Blazor dashboard, Wise Old Man API client, `WOMReader`, dead placeholders). |
 | 06 | [Memory investigation](06-memory-leak-investigation.md) | understand the memory footprint. Measured LiteDB behaviour, ranked causes, remediation options. Input to the LiteDB lifecycle spec. |
 
-## Specs derived from these docs
+## Design history
 
-- `docs/superpowers/specs/2026-09-12-litedb-lifecycle-design.md` — close guild databases when idle (memory footprint).
-- `docs/superpowers/specs/2026-09-12-hosting-payment-tracker-design.md` — owner-only hosting payment tracker with reminder and footer.
+The specs, plans and reviews behind the 2026-09-12 LiteDB lifecycle and hosting tracker work are kept locally under `docs/superpowers/` (git-ignored). The implementation notes that matter for maintenance live in the documents above.
 
 ## Quick facts that trip people up
 
