@@ -663,4 +663,37 @@ public class HostingServiceTests : IDisposable {
 		second.DaysOverdue.Should().Be(120);
 		second.FooterText.Should().StartWith("T90 ");
 	}
+
+	// --- template catalog ---
+
+	[Fact]
+	public void GetTemplateCatalog_ReflectsConfigAndCounts() {
+		var messages = new MessageConfiguration {
+			Hosting = new HostingMessages {
+				NeverPaid = new List<string> { "np1" },
+				Overdue = new List<HostingTier> { new() { MinDays = 0, Texts = new List<string> { "t0" } } },
+				Degraded = new DegradedMode { Texts = new List<string> { "d1" } }
+			}
+		};
+		var service = CreateService(messages: messages, randomSource: SequenceRandom(0.0));
+
+		service.GetDegradedMessage(new DiscordGuildId(100), "X"); // increments "d1" once
+
+		var catalog = service.GetTemplateCatalog();
+
+		catalog.Should().ContainSingle(e => e.Kind == "NeverPaid" && e.Text == "np1" && e.UsageCount == 0);
+		catalog.Should().ContainSingle(e => e.Kind == "Overdue" && e.TierMinDays == 0 && e.Text == "t0" && e.UsageCount == 0);
+		catalog.Should().ContainSingle(e => e.Kind == "Degraded" && e.Text == "d1" && e.UsageCount == 1);
+	}
+
+	[Fact]
+	public void GetTemplateCatalog_UsesDefaultsWhenOverdueAndDegradedEmpty_NeverPaidStaysEmpty() {
+		var service = CreateService();
+
+		var catalog = service.GetTemplateCatalog();
+
+		catalog.Count(e => e.Kind == "Overdue").Should().Be(HostingDefaults.Overdue.Sum(t => t.Texts.Count));
+		catalog.Count(e => e.Kind == "Degraded").Should().Be(HostingDefaults.Degraded.Count);
+		catalog.Count(e => e.Kind == "NeverPaid").Should().Be(0);
+	}
 }

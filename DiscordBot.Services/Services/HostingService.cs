@@ -254,6 +254,39 @@ public class HostingService : BaseService, IHostingService {
 		return _cache.Values.ToList();
 	}
 
+	public IReadOnlyList<TemplateCatalogEntry> GetTemplateCatalog() {
+		var settings = LoadSettings();
+		var counts = settings.TemplateUsageCounts;
+		var entries = new List<TemplateCatalogEntry>();
+
+		var neverPaid = _messages.Hosting.NeverPaid;
+		if (neverPaid is not null) {
+			foreach (var text in neverPaid) {
+				entries.Add(new TemplateCatalogEntry("NeverPaid", null, text, counts.GetValueOrDefault(TemplateKey("NeverPaid", null, text))));
+			}
+		}
+
+		IReadOnlyList<HostingTier> tiers = _messages.Hosting.Overdue;
+		if (tiers is null || tiers.Count == 0) {
+			tiers = HostingDefaults.Overdue;
+		}
+		foreach (var tier in tiers.OrderBy(t => t.MinDays)) {
+			foreach (var text in tier.Texts) {
+				entries.Add(new TemplateCatalogEntry("Overdue", tier.MinDays, text, counts.GetValueOrDefault(TemplateKey("Overdue", tier.MinDays, text))));
+			}
+		}
+
+		IReadOnlyList<string> degraded = _messages.Hosting.Degraded.Texts;
+		if (degraded is null || degraded.Count == 0) {
+			degraded = HostingDefaults.Degraded;
+		}
+		foreach (var text in degraded) {
+			entries.Add(new TemplateCatalogEntry("Degraded", null, text, counts.GetValueOrDefault(TemplateKey("Degraded", null, text))));
+		}
+
+		return entries;
+	}
+
 	private DateOnly Today() => HostingDates.ToDateOnly(_clock.UtcNow);
 
 	private static HostingPayment? LastPaymentOf(GuildHostingState? state) =>
