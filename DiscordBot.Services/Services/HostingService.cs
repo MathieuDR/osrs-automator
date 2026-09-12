@@ -220,6 +220,7 @@ public class HostingService : BaseService, IHostingService {
 			}
 
 			var chosen = PickRandom(texts);
+			IncrementTemplateUsage(TemplateKey("Degraded", null, chosen));
 			return Substitute(chosen, guildId, guildName, days, dueOn, lastPayment?.PaidOn);
 		} catch (Exception ex) {
 			Logger.LogWarning(ex, "Failed to build the degraded message for guild {GuildId}", guildId);

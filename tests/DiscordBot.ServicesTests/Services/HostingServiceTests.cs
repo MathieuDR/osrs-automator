@@ -409,6 +409,22 @@ public class HostingServiceTests : IDisposable {
 		seen.Should().BeEquivalentTo(new[] { "alpha 120", "beta 120" });
 	}
 
+	[Fact]
+	public void GetDegradedMessage_IncrementsTemplateUsage() {
+		var guildId = new DiscordGuildId(73);
+		SeedPayment(guildId, new DateOnly(2026, 5, 15), 0); // 120 days overdue
+		var messages = new MessageConfiguration {
+			Hosting = new HostingMessages { Degraded = new DegradedMode { Texts = new List<string> { "{server} owes {days} days" } } }
+		};
+		var service = CreateService(messages: messages, randomSource: SequenceRandom(0.0));
+
+		service.GetDegradedMessage(guildId, "Clan Z");
+
+		using var repo = _repositoryStrategy.GetOrCreateRepository<IHostingSettingsRepository>();
+		var settings = repo.GetSingle().Value;
+		settings!.TemplateUsageCounts["Degraded:-:{server} owes {days} days"].Should().Be(1);
+	}
+
 	// --- overview ---
 
 	[Fact]
