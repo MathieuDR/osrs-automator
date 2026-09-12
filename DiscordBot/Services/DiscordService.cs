@@ -166,13 +166,33 @@ public class DiscordService : IDiscordService {
     
     private async Task<Result<RestUserMessage>> SendEmbed(DiscordChannelId channelId, EmbedBuilder builder, ComponentBuilder componentBuilder = null) {
         var channel = await _client.GetChannelAsync(channelId.UlongValue);
-        
+
         if(channel is ISocketMessageChannel socketChannel) {
             RestUserMessage result = await socketChannel.SendMessageAsync("", false, builder.Build(), components: componentBuilder?.Build());
             return Result.Ok(result);
         }
 
         return Result.Fail("Could not send message");
+    }
+
+    public async Task<Result> SendMentionEmbed(DiscordChannelId channelId, DiscordUserId mention, string title, EmbedFieldDto[] fields, bool isAlert) {
+        var channel = await _client.GetChannelAsync(channelId.UlongValue);
+
+        if (channel is not ISocketMessageChannel socketChannel) {
+            return Result.Fail("Could not send message");
+        }
+
+        var builder = new EmbedBuilder()
+            .WithTitle(title)
+            .WithColor(isAlert ? Color.Red : Color.Orange)
+            .WithCurrentTimestamp();
+
+        foreach (var field in fields) {
+            builder.AddField(field.Name, field.Description, field.Inline);
+        }
+
+        await socketChannel.SendMessageAsync($"<@{mention.UlongValue}>", embed: builder.Build(), allowedMentions: AllowedMentions.All);
+        return Result.Ok();
     }
 
 

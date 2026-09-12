@@ -10,6 +10,7 @@ using WiseOldManConnector.Models.Output;
 namespace DiscordBot.Services.Interfaces;
 
 public interface IDiscordService {
+    Task<Result> SendMentionEmbed(DiscordChannelId channelId, DiscordUserId mention, string title, EmbedFieldDto[] fields, bool isAlert);
     Task<Result> SetUsername(GuildUser user, string nickname);
     Task<Result> PrintRunescapeDataDrop(RunescapeDropData data, DiscordGuildId guildId, DiscordChannelId channelId);
     Task<Result<IEnumerable<Guild>>> GetGuilds();
