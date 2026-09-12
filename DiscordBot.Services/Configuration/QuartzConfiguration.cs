@@ -83,6 +83,8 @@ public static partial class ServiceConfigurationExtensions {
                 .WithDescription("Showing top gains for all the servers!")
         );
 
+        quartzServices.ScheduleJob<MemoryReportJob>(t => t.WithIdentity("memory-report", "ops").WithSimpleSchedule(s => s.WithIntervalInMinutes(30).RepeatForever()).StartAt(DateBuilder.EvenSecondDate(DateTimeOffset.UtcNow.AddSeconds(30))).WithDescription("Logs process memory and open LiteDB count"));
+
         return quartzServices;
     }
 }
