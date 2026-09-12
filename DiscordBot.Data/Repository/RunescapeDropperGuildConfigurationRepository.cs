@@ -7,6 +7,6 @@ namespace DiscordBot.Data.Repository;
 
 internal class RunescapeDropperGuildConfigurationRepository : BaseSingleRecordLiteDbRepository<DropperGuildConfiguration>,
 	IRunescapeDropperGuildConfigurationRepository {
-	public RunescapeDropperGuildConfigurationRepository(ILogger<RunescapeDropperGuildConfigurationRepository> logger, LiteDatabase database) : base(logger, database) { }
+	public RunescapeDropperGuildConfigurationRepository(ILogger<RunescapeDropperGuildConfigurationRepository> logger, DatabaseLease lease) : base(logger, lease) { }
 	public override string CollectionName => "runescapeDropperGuildConfiguration";
 }

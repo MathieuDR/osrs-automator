@@ -10,7 +10,7 @@ internal class GuildConfigLiteDbRepositoryFactory : BaseLiteDbRepositoryFactory<
     public override bool RequiresGuildId => true;
 
     public override IGuildConfigRepository Create(DiscordGuildId guildId) {
-        return new GuildConfigRepository(GetLogger(), LiteDbManager.GetDatabase(guildId));
+        return new GuildConfigRepository(GetLogger(), LiteDbManager.Lease(guildId));
     }
 
     public override IRepository Create() {

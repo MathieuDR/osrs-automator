@@ -14,6 +14,6 @@ internal class RunescapeDropDataRepositoryFactory : BaseLiteDbRepositoryFactory<
     }
 
     public override IRuneScapeDropDataRepository Create() {
-        return new RuneScapeDropDataRepository(GetLogger(), LiteDbManager.GetCommonDatabase());
+        return new RuneScapeDropDataRepository(GetLogger(), LiteDbManager.LeaseCommon());
     }
 }

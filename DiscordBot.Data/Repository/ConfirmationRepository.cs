@@ -7,7 +7,7 @@ using Microsoft.Extensions.Logging;
 namespace DiscordBot.Data.Repository;
 
 internal sealed class ConfirmationRepository : BaseRecordLiteDbRepository<Confirmation>, IConfirmationRepository {
-    public ConfirmationRepository(ILogger logger, LiteDatabase database) : base(logger, database) { }
+    public ConfirmationRepository(ILogger logger, DatabaseLease lease) : base(logger, lease) { }
     public override string CollectionName => "confirmations";
 
     public Result<Confirmation> GetUnconfirmedByMessageId(DiscordMessageId discordMessageId) {

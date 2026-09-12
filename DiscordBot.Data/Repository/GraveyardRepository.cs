@@ -9,7 +9,7 @@ using WiseOldManConnector.Models.WiseOldMan.Enums;
 namespace DiscordBot.Data.Repository; 
 
 internal class GraveyardRepository : BaseSingleRecordLiteDbRepository<Graveyard>, IGraveyardRepository{
-	public GraveyardRepository(ILogger logger, LiteDatabase database) : base(logger, database) { }
+	public GraveyardRepository(ILogger logger, DatabaseLease lease) : base(logger, lease) { }
 	public override string CollectionName => "graveyard";
 	
 	public Result<List<Shame>> GetShamesForUser(DiscordUserId userId) {

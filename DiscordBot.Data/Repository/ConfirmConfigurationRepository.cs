@@ -6,6 +6,6 @@ using Microsoft.Extensions.Logging;
 namespace DiscordBot.Data.Repository; 
 
 internal sealed class ConfirmConfigurationRepository : BaseSingleRecordLiteDbRepository<ConfirmationConfiguration>, IConfirmConfigurationRepository{
-    public ConfirmConfigurationRepository(ILogger logger, LiteDatabase database) : base(logger, database) { }
+    public ConfirmConfigurationRepository(ILogger logger, DatabaseLease lease) : base(logger, lease) { }
     public override string CollectionName => "confirmationConfiguration";
 }

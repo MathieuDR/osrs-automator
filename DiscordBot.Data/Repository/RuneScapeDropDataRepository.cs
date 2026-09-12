@@ -7,7 +7,7 @@ using Microsoft.Extensions.Logging;
 namespace DiscordBot.Data.Repository;
 
 internal class RuneScapeDropDataRepository : BaseRecordLiteDbRepository<RunescapeDropData>, IRuneScapeDropDataRepository {
-    public RuneScapeDropDataRepository(ILogger<RuneScapeDropDataRepository> logger, LiteDatabase database) : base(logger, database) { }
+    public RuneScapeDropDataRepository(ILogger<RuneScapeDropDataRepository> logger, DatabaseLease lease) : base(logger, lease) { }
     public override string CollectionName => "RunescapeDropRecords";
 
     public Result<bool> HasActiveDrop(EndpointId endpoint) {

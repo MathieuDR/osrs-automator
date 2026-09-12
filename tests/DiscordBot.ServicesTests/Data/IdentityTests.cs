@@ -39,6 +39,12 @@ public class TestModelWithList {
 	public List<DiscordUserId> List { get; set; }
 }
 
+// BsonMapper.Global is a process-wide static shared by every LiteDbManager instance. Concurrent
+// construction of LiteDbManager from two xUnit test classes running in parallel collections races
+// on that shared static and can corrupt LiteDB's own internal state (surfacing as unrelated
+// exceptions deep inside the LiteDB engine). Both LiteDbManager-driving test classes share this
+// collection so xUnit runs them sequentially relative to each other.
+[Collection("LiteDbManager")]
 public class IdentityTests : IDisposable {
 	protected LiteDbManager _dbManager;
 	private IOptions<LiteDbOptions> _options;

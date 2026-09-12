@@ -12,7 +12,7 @@ internal class SelfCountConfigurationLiteDbRepositoryFactory : BaseLiteDbReposit
     public override bool RequiresGuildId => true;
 
     public override ISelfCountConfigurationRepository Create(DiscordGuildId guildId) {
-        return new SelfCountConfigurationRepository(GetLogger(), LiteDbManager.GetDatabase(guildId));
+        return new SelfCountConfigurationRepository(GetLogger(), LiteDbManager.Lease(guildId));
     }
 
     public override ISelfCountConfigurationRepository Create() {

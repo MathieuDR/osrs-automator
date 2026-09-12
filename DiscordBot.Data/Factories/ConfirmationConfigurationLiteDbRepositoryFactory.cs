@@ -11,7 +11,7 @@ internal class ConfirmationConfigurationLiteDbRepositoryFactory : BaseLiteDbRepo
     public override bool RequiresGuildId => true;
 
     public override IConfirmConfigurationRepository Create(DiscordGuildId guildId) {
-        return new ConfirmConfigurationRepository(GetLogger(), LiteDbManager.GetDatabase(guildId));
+        return new ConfirmConfigurationRepository(GetLogger(), LiteDbManager.Lease(guildId));
     }
 
     public override IConfirmConfigurationRepository Create() {

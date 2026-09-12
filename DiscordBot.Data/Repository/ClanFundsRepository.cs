@@ -6,6 +6,6 @@ using Microsoft.Extensions.Logging;
 namespace DiscordBot.Data.Repository; 
 
 internal class ClanFundsRepository : BaseSingleRecordLiteDbRepository<ClanFunds>, IClanFundsRepository {
-	public ClanFundsRepository(ILogger<ClanFundsRepository> logger, LiteDatabase database) : base(logger, database) { }
+	public ClanFundsRepository(ILogger<ClanFundsRepository> logger, DatabaseLease lease) : base(logger, lease) { }
 	public override string CollectionName => "ClanFunds";
 }

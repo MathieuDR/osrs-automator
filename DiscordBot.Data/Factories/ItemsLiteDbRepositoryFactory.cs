@@ -11,7 +11,7 @@ internal class ItemsLiteDbRepositoryFactory : BaseLiteDbRepositoryFactory<IItems
     public override bool RequiresGuildId => true;
 
     public override IItemsRepository Create(DiscordGuildId guildId) {
-        return new ItemsRepository(GetLogger(), LiteDbManager.GetDatabase(guildId));
+        return new ItemsRepository(GetLogger(), LiteDbManager.Lease(guildId));
     }
 
     public override IClanFundsRepository Create() {

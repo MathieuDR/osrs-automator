@@ -17,8 +17,14 @@ public class LiteDbManager {
         public int RefCount;
     }
 
+    // LiteDB's engine constructor is not safe to call from multiple threads at once (it touches
+    // process-wide static state independent of which file is being opened), so every LiteDatabase
+    // construction across every LiteDbManager instance is serialized through this one static lock.
+    private static readonly object _constructionLock = new();
+
     private readonly object _gate = new();
     private readonly Dictionary<string, Entry> _open = new();
+    private readonly Dictionary<string, object> _fileLocks = new();
     private readonly ILogger<LiteDbManager> _logger;
     private readonly MigrationManager _manager;
     private readonly LiteDbOptions _options;
@@ -97,38 +103,71 @@ public class LiteDbManager {
         return LeaseFile(CreateConnectionString());
     }
 
-    private DatabaseLease LeaseFile(string path) {
+    // _gate only ever guards quick, in-memory dictionary bookkeeping. The (potentially slow) I/O of
+    // opening or disposing a LiteDatabase happens under a lock scoped to that one file's path, so
+    // that different guilds' databases never block each other, while still preventing the race
+    // where a Lease() for a path slips in between another thread dropping the entry from _open and
+    // that thread's Dispose() completing - LiteDB does not tolerate two engines on one file at once.
+    private object GetFileLock(string path) {
         lock (_gate) {
-            if (!_open.TryGetValue(path, out var entry)) {
-                entry = new Entry { Db = CreateDatabase(path) };
-                _open[path] = entry;
+            if (!_fileLocks.TryGetValue(path, out var fileLock)) {
+                fileLock = new object();
+                _fileLocks[path] = fileLock;
             }
 
-            entry.RefCount++;
+            return fileLock;
+        }
+    }
+
+    private DatabaseLease LeaseFile(string path) {
+        lock (GetFileLock(path)) {
+            Entry entry;
+            lock (_gate) {
+                _open.TryGetValue(path, out entry);
+            }
+
+            if (entry is null) {
+                entry = new Entry { Db = CreateDatabase(path) };
+                lock (_gate) {
+                    _open[path] = entry;
+                }
+            }
+
+            lock (_gate) {
+                entry.RefCount++;
+            }
+
             return new DatabaseLease(this, path, entry.Db);
         }
     }
 
     internal void Release(string path) {
-        LiteDatabase toDispose = null;
-        lock (_gate) {
-            if (!_open.TryGetValue(path, out var entry)) {
-                return;
+        lock (GetFileLock(path)) {
+            Entry entry;
+            lock (_gate) {
+                if (!_open.TryGetValue(path, out entry)) {
+                    return;
+                }
+
+                entry.RefCount--;
             }
 
-            entry.RefCount--;
             if (entry.RefCount <= 0 && _options.CloseWhenUnused) {
-                _open.Remove(path);
-                toDispose = entry.Db;
+                entry.Db.Dispose();
+                lock (_gate) {
+                    _open.Remove(path);
+                }
             }
         }
-
-        toDispose?.Dispose();
     }
 
     private LiteDatabase CreateDatabase(string connectionString) {
         CreateDirectory(connectionString);
-        var liteDatabase = new LiteDatabase(connectionString, BsonMapper);
+
+        LiteDatabase liteDatabase;
+        lock (_constructionLock) {
+            liteDatabase = new LiteDatabase(connectionString, BsonMapper);
+        }
 
         using (LogContext.PushProperty("db", connectionString)) {
             _manager.Migrate(liteDatabase);

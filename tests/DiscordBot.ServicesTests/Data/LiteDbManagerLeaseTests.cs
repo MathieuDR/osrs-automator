@@ -1,6 +1,8 @@
 using DiscordBot.Common.Identities;
+using DiscordBot.Common.Models.Data.Configuration;
 using DiscordBot.Data;
 using DiscordBot.Data.Configuration;
+using DiscordBot.Data.Factories;
 using DiscordBot.Data.Repository.Migrations;
 using FluentAssertions;
 using Microsoft.Extensions.Logging.Abstractions;
@@ -10,6 +12,11 @@ using Xunit;
 
 namespace DiscordBot.ServicesTests.Data;
 
+// Shares a collection with IdentityTests: both construct LiteDbManager instances, whose ctor
+// mutates the process-wide static BsonMapper.Global. Running them in different xUnit collections
+// (the default) lets that construction race across threads and corrupts LiteDB's own state,
+// surfacing as unrelated exceptions inside the LiteDB engine. See the comment on IdentityTests.
+[Collection("LiteDbManager")]
 public class LiteDbManagerLeaseTests : IDisposable {
 	private readonly LiteDbManager _dbManager;
 	private readonly IOptions<LiteDbOptions> _options;
@@ -158,7 +165,7 @@ public class LiteDbManagerLeaseTests : IDisposable {
 	[Fact]
 	public void CloseWhenUnused_False_KeepsDatabaseOpen() {
 		//Arrange
-		using var mgr = CreateManager(false);
+		var mgr = CreateManager(false);
 		var guildId = new DiscordGuildId(10);
 
 		//Act
@@ -192,6 +199,38 @@ public class LiteDbManagerLeaseTests : IDisposable {
 		for (ulong g = 0; g < 10; g++) {
 			FileIsUnlocked(PathFor(new DiscordGuildId(g))).Should().BeTrue();
 		}
+	}
+
+	[Fact]
+	public void Repository_Dispose_ReleasesFile() {
+		//Arrange
+		var guildId = new DiscordGuildId(10);
+		var factory = new GuildConfigLiteDbRepositoryFactory(NullLoggerFactory.Instance, _dbManager);
+		var repo = factory.Create(guildId);
+
+		//Act
+		repo.GetSingle();
+		repo.Dispose();
+
+		//Assert
+		FileIsUnlocked(PathFor(guildId)).Should().BeTrue();
+	}
+
+	[Fact]
+	public void GetAll_ReturnsMaterialisedList() {
+		//Arrange
+		var guildId = new DiscordGuildId(10);
+		var factory = new GuildConfigLiteDbRepositoryFactory(NullLoggerFactory.Instance, _dbManager);
+		var repo = factory.Create(guildId);
+		repo.Insert(new GuildConfig(guildId, new DiscordUserId(1)));
+		repo.Insert(new GuildConfig(guildId, new DiscordUserId(2)));
+
+		//Act
+		var all = repo.GetAll().Value;
+		repo.Dispose();
+
+		//Assert
+		all.Count().Should().Be(2);
 	}
 
 	[Fact]
