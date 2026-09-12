@@ -1,6 +1,6 @@
 # Hosting payment tracker ("public shaming")
 
-Date: 2026-09-12 (rev 3, after owner feedback) · Status: **draft, awaiting owner review** · Scope: new `/hosting` command with guild autocomplete, one common-DB collection, one Quartz job, a footer hook in the reply pipeline, configurable shaming messages, and a "degraded mode" that randomly fails commands once a server is very overdue.
+Date: 2026-09-12 (rev 3, after owner feedback) · Status: **implemented on feature/hosting-tracker-and-litedb-lifecycle** · Scope: new `/hosting` command with guild autocomplete, one common-DB collection, one Quartz job, a footer hook in the reply pipeline, configurable shaming messages, and a "degraded mode" that randomly fails commands once a server is very overdue.
 
 Background: `docs/codebase/02-command-system.md` (commands, authorization, autocomplete, reply builders), `03-data-layer.md` (common DB, repositories), `04-services-and-jobs.md` (Quartz, `IDiscordService`).
 
@@ -250,3 +250,51 @@ Config: the owner confirmed production `appsettings` sets `Bot:TeamConfiguration
 4. 12-month default term: fine?
 5. Degraded-mode failures are public (not ephemeral) so the channel sees them. Keep, or make them ephemeral?
 6. Degraded mode defaults: 90 days and 20 %. Both are config.
+
+## 9. Implementation notes / deviations
+
+Where the built code differs from the design above (all committed on
+`feature/hosting-tracker-and-litedb-lifecycle`; see `docs/codebase/02-command-system.md`,
+`03-data-layer.md`, `04-services-and-jobs.md` for the fuller write-up):
+
+- **`SendMentionEmbed` takes plain data, not an `EmbedBuilder`.** §3.5 sketched
+  `Task<Result> SendMentionEmbed(DiscordChannelId channelId, DiscordUserId mention, EmbedBuilder embed)`.
+  The shipped signature is
+  `Task<Result> SendMentionEmbed(DiscordChannelId channelId, DiscordUserId mention, string title, EmbedFieldDto[] fields, bool isAlert)`
+  — `HostingReminderJob` lives in `DiscordBot.Services`, which has no reference to `Discord.Net`/
+  `EmbedBuilder` (verified in the csproj files, same constraint §3.5 already called out for
+  `BotTeamConfiguration`), so the embed is built entirely inside `DiscordService`. `isAlert` picks red vs.
+  orange (red when any guild in the batch is overdue, i.e. `ReminderKind.Due`).
+- **`HostingStatus` has no `GuildName`.** §3.2 sketched
+  `record HostingStatus(DiscordGuildId GuildId, string GuildName, bool FooterEnabled, HostingPayment? LastPayment, DateOnly? DueOn, int? DaysOverdue)`.
+  The shipped shape (`DiscordBot.Services/Models/HostingStatus.cs`) is
+  `record HostingStatus(DiscordGuildId GuildId, bool FooterEnabled, HostingPayment? LastPayment, DateOnly? DueOn, int? DaysOverdue, string? FooterText)`
+  — no `GuildName` field; `IHostingService.GetStatus`/`GetOverview` instead take an optional `guildName`
+  *parameter* (used only for `{server}` substitution in `FooterText`/degraded messages, falling back to
+  `guildId.ToString()`), and `FooterText` is a constructor parameter rather than a computed `init` property.
+- **`HostingSettings.ReminderChannelId` is `long?`, not `DiscordChannelId?`.** §3.1 asked for
+  `DiscordChannelId?` with a fallback to `long?` "if LiteDB does not map it" (nullable-struct round-trip
+  needed a test). The shipped model stores `long?` directly and converts to `DiscordChannelId` only at the
+  `HostingService` boundary (`GetReminderChannel`/`SetReminderChannel`) — the nullable-struct BSON mapper
+  path was not attempted.
+- **Date storage rule**: every hosting date (`HostingPayment.PaidOn`, `UpcomingReminderSentForDueOn`,
+  `DueReminderSentForDueOn`) is stored as UTC midnight (`HostingDates.ToStorage(DateOnly)`:
+  `DateTime.SpecifyKind(date.ToDateTime(TimeOnly.MinValue), DateTimeKind.Utc)`) and read back as a
+  `DateOnly` via `HostingDates.ToDateOnly(DateTime)` (`stored.ToUniversalTime()` then
+  `DateOnly.FromDateTime`) — needed because LiteDB is configured with `UtcDate=false`, so a round-tripped
+  `DateTime` comes back `Local`-kind for the same instant; comparing raw `DateTime`s (rather than the
+  `DateOnly` this helper produces) would be timezone-fragile. `HostingReminderJob.Decide` and
+  `HostingService` both go through `HostingDates`, never comparing raw `DateTime`s directly.
+- **`IClock` instead of `TimeProvider`.** §3.2 suggested `TimeProvider` (or `Func<DateTime>`) for "today".
+  The target framework is net7.0, which predates `TimeProvider` (introduced in .NET 8), so a minimal
+  `IClock { DateTime UtcNow { get; } }`/`SystemClock` seam was rolled instead
+  (`DiscordBot.Services/Helpers/IClock.cs`), registered `AddSingleton<IClock, SystemClock>()`.
+- **`internal DoWorkForTests()` seam on `HostingReminderJob`.** `BaseJob.DoWork` is `protected` (invoked by
+  Quartz via `Execute(IJobExecutionContext)`); rather than construct a fake `IJobExecutionContext` in
+  tests, the job exposes `internal Task<Result> DoWorkForTests() => DoWork()`, reachable from
+  `DiscordBot.ServicesTests` via `InternalsVisibleTo`.
+- **Reminder decision table condition is phrased slightly differently than §3.5's table**, though
+  behaviourally equivalent for the "misfired 09:00 run" case: the shipped `Decide` uses
+  `daysOverdue is >= -30 and < 0` (a closed range) for the "upcoming" condition rather than
+  `DaysOverdue == -30 or (-30 < DaysOverdue < 0 and ...)`; both admit every day from 30-days-out through
+  the day before due, gated by "not already sent for this `DueOn`" either way.

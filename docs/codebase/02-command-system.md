@@ -21,7 +21,36 @@ decommissioned.
 - **Current ("v2"/"Interactive2")** — `DiscordBot/Commands/Interactive2/*`. Reflection-discovered
   Definition/Request/Handler triads dispatched through **MediatR**. This is where all new features go:
   `Ping` (parallel demo of the same command name space), `Graveyard`, `Job`, `Confirm`, `Count`, `CountSelf`,
-  `Drops`, `Funds`, `MemberInfo`.
+  `Drops`, `Funds`, `MemberInfo`, `Hosting`.
+
+  `Hosting` (`Commands/Interactive2/Hosting/`) is the owner-only hosting payment tracker
+  (`docs/superpowers/specs/2026-09-12-hosting-payment-tracker-design.md`):
+  - `HostingRootCommandDefinition` — `/hosting`, `builder.WithDMPermission(false)`.
+  - Subcommands, all `SubCommandDefinitionBase<HostingRootCommandDefinition>`:
+    - `paid` (`Paid/PaidSubCommandDefinition`) — options `server` (string, required, autocomplete),
+      `date` (string, optional, `yyyy-MM-dd`, default today), `months` (integer, optional, min 1 max 60,
+      default 12), `note` (string, optional). Records a payment, auto-sets the reminder channel to the
+      current channel if none is set yet, replies ephemeral with the new due date.
+    - `status` (`Status/StatusSubCommandDefinition`) — `server` (string, optional, autocomplete). Without
+      `server`: a paginated code-block overview of every guild the bot is in (via
+      `CreatePaginatorReplyBuilder().WithLines(...)`, 20 rows/page), most-overdue first. With `server`:
+      that guild's status line plus its last 10 payments.
+    - `footer` (`Footer/FooterSubCommandDefinition`) — `server` (autocomplete, required), `enabled`
+      (boolean, required). Toggles `GuildHostingState.FooterEnabled` for that guild — also the kill
+      switch for degraded mode (§below).
+    - `remind` (`Remind/RemindSubCommandDefinition`) — `channel` (channel, required). Sets the owner
+      reminder channel via `IHostingService.SetReminderChannel`.
+  - **Owner-only gate**: every Request (`PaidSubCommandRequest`, `StatusSubCommandRequest`,
+    `FooterSubCommandRequest`, `RemindSubCommandRequest`) declares
+    `MinimumAuthorizationRole => AuthorizationRoles.BotOwner` (§4 — de-facto single-user gate).
+  - **Owner-guild guard**: every Handler's `DoWork` calls
+    `HostingHandlerHelpers.EnsureOwnerGuild(Context, botTeamConfiguration)` first
+    (`Commands/Interactive2/Hosting/HostingHandlerHelpers.cs`), which fails with
+    `"Only available in the bot owner's server"` unless the interaction is in a guild channel whose id
+    matches `Bot:TeamConfiguration:GuildId`.
+  - **Registration**: like every Interactive2 command, `/hosting` is invisible in Discord until an
+    owner/admin runs the legacy `/commands` command once, picks `hosting`, and registers it to the owner
+    guild (§3) — it is not force-registered like `commands`/`kill`.
 
 **Both are wired up simultaneously and cooperate via fallback:**
 - `InteractiveCommandHandlerService.OnInteraction` (`DiscordBot/Services/InteractiveCommandHandlerService.cs:64-120`)
@@ -258,6 +287,21 @@ and a Handler derives `AutoCompleteHandlerBase<TRequest>`, reading `Context.Curr
 One Request/Handler pair can serve the same option name across several subcommands by implementing
 `IAutoCompleteCommandRequest<T>` multiple times (see §2, `ShameLocationAutoCompleteRequest`).
 
+A second example of the same one-handler-many-subcommands pattern:
+`HostingGuildAutoCompleteHandler`/`HostingGuildAutoCompleteRequest`
+(`Commands/Interactive2/Hosting/HostingGuildAutoCompleteHandler.cs`) backs the `server` option across
+`paid`, `status`, and `footer` — `HostingGuildAutoCompleteRequest` derives
+`AutoCompleteCommandRequestBase<PaidSubCommandDefinition>` and additionally implements
+`IAutoCompleteCommandRequest<StatusSubCommandDefinition>` and
+`IAutoCompleteCommandRequest<FooterSubCommandDefinition>`. Discord has no "guild" option type, so `server`
+is a plain string option (`isAutocomplete: true`); the handler reads `Context.Client.Guilds`, filters by
+`Context.CurrentOptionAsString` (case-insensitive `Contains` on the guild name), takes 20, and responds
+with `(name, id-as-string)` pairs — the **label is the guild name, the value is the guild id as a
+string**. `HostingHandlerHelpers.ResolveServer` (used by every `Hosting` handler, not just autocomplete)
+then parses that value back: `ulong.TryParse` first, else an exact case-insensitive name match against
+`DiscordSocketClient.Guilds`, else `Result.Fail("Unknown server")` — covering both a picked-from-list
+value and free-typed text.
+
 **Message components (buttons/select menus)**, Interactive2 custom-id format
 (`DiscordBot/Models/Contexts/MessageComponentContext.cs:10-13`):
 
@@ -285,6 +329,37 @@ Don't mix the two formats when extending either system.
 message being interacted with — used by legacy handlers to carry state across button clicks, e.g.
 `ManageCommandsApplicationCommandHandler.HandleGuildSubCommand` reads the "Command" field back out of the
 embed), and `UpdateAsync(...)` to edit the original message in place.
+
+---
+
+## 5a. Reply-pipeline hooks: hosting footer and degraded mode
+
+Two cross-cutting hooks from the hosting payment tracker
+(`docs/superpowers/specs/2026-09-12-hosting-payment-tracker-design.md`) sit in the shared pipeline rather
+than in the `Hosting` command itself, so they apply to every command.
+
+**Footer hook** — `BaseInteractiveContext<T>` (`DiscordBot/Models/Contexts/BaseInteractiveContext.cs`):
+the constructor resolves `IHostingService.GetStatus(guild.Id, guild.Name).FooterText` once per interaction
+(only `InGuild`; `null` in DMs and on any resolution failure — wrapped in try/catch so a broken common DB
+never breaks command dispatch) and stores it as `HostingFooter`. It is then surfaced three ways:
+1. `CreateEmbedBuilder(title, content)` passes `HostingFooter ?? string.Empty` as the `appendToFooter`
+   argument of `WithMessageAuthorFooter` (`EmbedBuilderHelper.cs`), which joins it onto the "Requested by
+   …" footer with `" · "` as separator when non-empty.
+2. `CreatePageBuilder(...)` (both overloads) calls `.WithFooter(HostingFooter)` when non-null, unless an
+   embed-derived page already has its own footer.
+3. `RespondAsync`/`FollowupAsync` overrides: `AppendHostingFooter` appends `"\n-# " + HostingFooter`
+   (Discord subtext markdown) to the reply text when there are no embeds and the text is non-empty —
+   covers text-only replies (e.g. `ping2 normal`).
+
+**Degraded-mode check** — `InteractiveCommandHandlerService.OnInteraction`
+(`DiscordBot/Services/InteractiveCommandHandlerService.cs`), right after the context is built and before
+`_commandInstigator.ExecuteCommandAsync`: for a `SocketSlashCommand` in a guild whose command name is not
+`"hosting"`, it calls `_hostingService.ShouldDegrade(guild.Id, user.Id)`; if true, it responds immediately
+with a failure embed built from `_hostingService.GetDegradedMessage(...)` and returns — the command never
+runs. `ShouldDegrade` itself (in `HostingService`) is what excludes the owner guild, the owner user, and a
+guild with `FooterEnabled == false`, plus the "not overdue enough"/"degraded mode disabled" cases — the
+`OnInteraction` check only excludes autocomplete/button interactions (pattern-matched on
+`SocketSlashCommand`) and the `hosting` command name itself.
 
 ---
 

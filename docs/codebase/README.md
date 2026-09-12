@@ -26,3 +26,8 @@ referenced area changes, update the matching document.
 - `Bot:TeamConfiguration` (`GuildId`, `OwnerId`) is the only "owner" concept. `OwnerId` bypasses all authorization; roles `BotOwner`/`BotAdmin`/`BotModerator` are effectively owner-only.
 - New Interactive2 commands are discovered by reflection but are **not pushed to Discord** until someone runs `/commands` and registers them (globally or per guild).
 - Two command systems coexist; write new code only in `DiscordBot/Commands/Interactive2/`.
+- The hosting payment tracker's overdue footer and "degraded mode" (random command failures once very
+  overdue) exist and are on by default. Turn the footer off for one server with
+  `/hosting footer server:<name> enabled:false` (also disables degraded mode for that server — it's the
+  same kill switch); turn degraded mode off bot-wide with `Bot:Messages:Hosting:Degraded:Enabled = false`
+  in config.

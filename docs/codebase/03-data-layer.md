@@ -90,8 +90,22 @@ Base implementations (`DiscordBot.Data/Repository/`), all `internal abstract`:
 | `SelfCountConfiguration` (again, see §9) | `ItemsRepository` | `IItemsRepository` | `ItemsLiteDbRepositoryFactory` | `"items"` | per-guild |
 | `ApplicationCommandInfo` | `ApplicationCommandInfoRepository` | `IApplicationCommandInfoRepository` | `CommandInfoRepositoryFactory` | `nameof(ApplicationCommandInfo)` = `"ApplicationCommandInfo"` | **common** |
 | `RunescapeDropData` | `RuneScapeDropDataRepository` | `IRuneScapeDropDataRepository` | `RunescapeDropDataRepositoryFactory` | `"RunescapeDropRecords"` | **common** |
+| `GuildHostingState` | `GuildHostingStateRepository` | `IGuildHostingStateRepository` | `GuildHostingStateRepositoryFactory` | `"guildHosting"` | **common** |
+| `HostingSettings` | `HostingSettingsRepository` | `IHostingSettingsRepository` | `HostingSettingsRepositoryFactory` | `"hostingSettings"` | **common** |
 
-Only two factories are "common"-scoped (`RequiresGuildId => false`): `CommandInfoRepositoryFactory` and `RunescapeDropDataRepositoryFactory`. Every other factory has `RequiresGuildId => true` and its `Create()` (no-guild) overload throws `NotImplementedException`; conversely, common-scoped factories throw `NotImplementedException` from `Create(DiscordGuildId)`.
+Only four factories are "common"-scoped (`RequiresGuildId => false`): `CommandInfoRepositoryFactory`, `RunescapeDropDataRepositoryFactory`, `GuildHostingStateRepositoryFactory`, and `HostingSettingsRepositoryFactory`. Every other factory has `RequiresGuildId => true` and its `Create()` (no-guild) overload throws `NotImplementedException`; conversely, common-scoped factories throw `NotImplementedException` from `Create(DiscordGuildId)`.
+
+`GuildHostingState` (`DiscordBot.Common/Models/Data/Hosting/GuildHostingState.cs`) is a `BaseRecord` (not
+`BaseGuildRecord` — despite being one-per-guild, it lives in the **common** db so the owner can list every
+server from one file) holding `GuildId`, `FooterEnabled`, `Payments` (`List<HostingPayment>`, newest last),
+and `UpcomingReminderSentForDueOn`/`DueReminderSentForDueOn` (nullable `DateTime`, storing which `DueOn`
+each reminder was last sent for). `GuildHostingStateRepository` adds `GetByGuildId(DiscordGuildId)` beyond
+the base CRUD surface and `EnsureIndex(x => x.GuildId, true)` (unique) in its constructor.
+`HostingSettings` (same file family) is a single-record document (`ISingleRecordRepository`,
+`BaseSingleRecordLiteDbRepository`) holding one nullable field, `ReminderChannelId` — stored as **`long?`,
+not `DiscordChannelId?`** (see the data-layer discrepancy noted in the hosting spec's implementation-notes
+section: the nullable-struct BSON mapper round-trip was not attempted/verified, so the simpler `long?` was
+used and converted to `DiscordChannelId` at the `HostingService` boundary).
 
 Some repositories add query methods beyond the base CRUD surface (declared on their own interface, not on the generic base interfaces): `IPlayerRepository.GetByDiscordId/GetPlayerByOsrsAccount`, `IGuildConfigRepository.GetSingle()` (note: `GuildConfig` derives from `BaseGuildModel`/`BaseModel`, not `BaseRecord`, so it does **not** get `ISingleRecordRepository`'s `GetSingle()` — `IGuildConfigRepository` declares its own, implemented as `GetCollection().FindAll().SingleOrDefault()`, which throws if more than one `GuildConfig` document ever exists in a guild's db), `IGraveyardRepository` (shame-management helpers operating on the single `Graveyard` document), `IConfirmationRepository.GetUnconfirmedByMessageId`, `IApplicationCommandInfoRepository.GetByCommandName`, `IUserCountInfoRepository.GetByDiscordUserId`.
 
@@ -205,7 +219,7 @@ Note the inconsistent Id property naming: `BaseModel._id` (lowercase, `[BsonId]`
 - `MigrationManager` (singleton) — constructed with a hardcoded list: currently only `new MigrationToBetterCountModels(...)` (`Version => 1`). `Validate()` (run in ctor) checks for duplicate version numbers and that every version from 1 up to `CurrentMigration` (= max registered version) exists — **adding migration N+2 while skipping N+1 throws at startup.**
 - `Migrate(LiteDatabase, int? migrateTo = null)` — compares `liteDatabase.UserVersion` to the target version (default = `CurrentMigration`, i.e. latest) and runs `Up` (or `Down`, if `migrateTo` is lower than current — no caller currently passes a lower `migrateTo`) migrations one version at a time until they match.
 
-**When migrations run:** `LiteDbManager.CreateDatabase(connectionString)` calls `_manager.Migrate(liteDatabase)` immediately after constructing every new `LiteDatabase` — i.e. **on every first-open of every guild db and the common db** (not on every operation — only once per process lifetime per db, since the `LiteDatabase` is then cached). A `LogContext.PushProperty("db", connectionString)` scopes migration log lines to the db file name.
+**When migrations run:** `LiteDbManager.CreateDatabase(connectionString)` calls `_manager.Migrate(liteDatabase)` immediately after constructing every new `LiteDatabase` — i.e. **every time that file is opened**, not once per process lifetime. With the default `CloseWhenUnused = true` (§9), a database is closed once its last lease is released, so the *next* `Lease()`/`LeaseCommon()` for that same file opens a fresh `LiteDatabase` and runs `Migrate` again — driven by the file's own `UserVersion`, not by any in-process "already migrated" flag. On an up-to-date file this is cheap (a `UserVersion` read that finds nothing to do), but a migration can run many times over a process's lifetime for the same file, not just once — keep migrations idempotent and cheap (see §10.8, which states this precisely; this section previously said "once per db file", which is only true while `CloseWhenUnused = false`). A `LogContext.PushProperty("db", connectionString)` scopes migration log lines to the db file name.
 
 **Existing migration:** `MigrationToBetterCountModels` (version 1) — renames `guildConfig.CountConfig._tresholds` → `Thresholds` and each threshold's `Treshold` field → `Threshold` (typo fix), operating directly on raw `BsonDocument`s via `database.GetCollection("guildConfig")` (untyped). `DoDown` reverses it and is annotated "untested".
 

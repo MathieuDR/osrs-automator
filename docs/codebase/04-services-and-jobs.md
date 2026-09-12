@@ -31,6 +31,25 @@ are registered in `DiscordBot.Services/Configuration/ServiceConfigurationExtensi
 | `IConfirmationService` | `ConfirmationService` | Generic "post an embed with Accept/Decline buttons, execute a `MediatR` command on accept" workflow | Transient | `IRepositoryStrategy`, `IDiscordService`, `IMediator` |
 | `IJobService` | *(interface only — no implementation found in this scope; not registered in `AddServices()`)* | Intended to expose `ChannelJobConfiguration` lookup by `JobType` | — | — |
 | `IDiscordService` | `DiscordService` (`DiscordBot/Services/DiscordService.cs`, **not** in `.Services` project) | Every outbound call into Discord.Net — sending messages/embeds, role management, guild/channel/user lookups | Transient | `DiscordSocketClient` (Singleton) |
+| `IHostingService` | `HostingService` | Owner-only hosting payment tracker (`docs/superpowers/specs/2026-09-12-hosting-payment-tracker-design.md`): footer text per guild, payment recording, reminder-channel/reminder-sent bookkeeping, and the "degraded mode" random-failure decision | **Singleton** (unusual — see below) | `IRepositoryStrategy`, `MessageConfiguration`, `IOptions<BotTeamConfiguration>`, `IClock`, `Func<double>` (random source) |
+
+`IHostingService`/`HostingService` (`DiscordBot.Services/Interfaces/IHostingService.cs`,
+`DiscordBot.Services/Services/HostingService.cs`) is the one service registered **singleton** instead of
+transient: it caches every `GuildHostingState` in a `ConcurrentDictionary<DiscordGuildId, GuildHostingState>`,
+lazily loaded on first access (`EnsureCacheLoaded`, double-checked locking; a failed/thrown load leaves
+`_cacheLoaded` false so the next call retries rather than permanently caching "empty") and kept in sync on
+every write. It also caches the single `HostingSettings` document the same way. Day counts (`DaysOverdue`)
+are recomputed per call from `IClock.UtcNow` (via the `HostingDates` helper, §"date storage" below), so a
+footer/degraded decision rolls over at midnight without a cache invalidation. `GetStatus` and
+`GetOverview` never throw — repository exceptions are caught, logged, and turned into a "silent" status
+(`FooterText = null`) so a broken common DB never breaks a command reply. `ShouldDegrade` is the decision
+behind degraded mode: false when degraded mode is disabled in config, when the guild is the owner guild or
+the user is the owner, when the guild has no payment record or has its footer disabled (the per-guild
+footer toggle doubles as the shaming kill switch), or when `DaysOverdue < Degraded.MinDaysOverdue`;
+otherwise it draws `_randomSource() < Degraded.FailureChance` (default source `Random.Shared.NextDouble`,
+injectable for tests). `IClock`/`SystemClock` (`DiscordBot.Services/Helpers/IClock.cs`) is a minimal
+`DateTime UtcNow` seam — rolled by hand because the target framework is net7.0 (predates `TimeProvider`) —
+registered `AddSingleton<IClock, SystemClock>()` in `ServiceConfigurationExtensions`.
 
 Base classes used by most services (`DiscordBot.Services/Services/`):
 - `BaseService` — holds `ILogger Logger`.
@@ -78,6 +97,7 @@ Every method, in declaration order:
 | `Task<Result> AddRoles(DiscordGuildId guild, Dictionary<DiscordUserId, IEnumerable<DiscordRoleId>> userDicts)` | For each user, `IGuildUser.AddRolesAsync(roleIds)`. |
 | `Task<Result> RemoveRoles(...)` | Same, `RemoveRolesAsync`. |
 | `Task<Result<DiscordMessageId>> SendConfirmationMessage(DiscordChannelId channelId, string title, string description, EmbedFieldDto[] fields, string thumbnailUrl = null)` | Builds an embed with title/description/fields/thumbnail plus an `Accept`/`Decline` `ComponentBuilder` (custom ids `confirm:confirmed` / `confirm:declined`), sends it, returns the resulting message id — consumed by `IConfirmationService.CreateConfirm`. |
+| `Task<Result> SendMentionEmbed(DiscordChannelId channelId, DiscordUserId mention, string title, EmbedFieldDto[] fields, bool isAlert)` | Resolves the channel, builds an `EmbedBuilder` (red if `isAlert`, else orange) with one `AddField` per `EmbedFieldDto`, and posts it with `<@{mention}>` as the message content and `AllowedMentions.All`. Added for `HostingReminderJob` (§4) — note this takes plain data (`title`/`fields`), **not** a caller-built `EmbedBuilder` as the original hosting-tracker design sketched, because `DiscordBot.Services` (where the job lives) has no reference to `Discord.Net`/`EmbedBuilder`; the embed is built entirely inside `DiscordService`. |
 
 Private helper `SendEmbed(DiscordChannelId, EmbedBuilder, ComponentBuilder?)`
 does the actual `_client.GetChannelAsync(id)` → cast to `ISocketMessageChannel`
@@ -260,6 +280,37 @@ Concrete jobs:
 | `MonthlyTopDeltasJob` | `ConfigurableGuildJob` | `MonthlyTopGains` | Same shape as above but `GetTopDeltasOfGroup(groupId, metric, Period.Month)`. |
 | `HandleRunescapeDropJob` | `RepositoryJob` | *(none — not guild-configurable)* | Reads the "active" `RunescapeDropData` for the endpoint's user (`Context.MergedJobDataMap.GetLongValue("endpoint")`), determines which guilds should see it (`GetGuildIdsForEndpoint` — currently **hardcoded** to a single guild id, `403539795944538122`), iterates that guild's `DropperGuildConfiguration.ChannelConfigurations`, and calls `_discordService.PrintRunescapeDataDrop(filteredData, guildId, channelId)` per channel. Deletes the active record once all configured guilds have been messaged. |
 | `MemoryReportJob` | `BaseJob` | *(none — diagnostic only)* | Logs process memory metrics (working set, GC heap, OS handle count) and the count of open LiteDB databases every 30 minutes. Used to monitor resource usage and verify that the lease-based lifecycle is properly closing unused databases. |
+| `HostingReminderJob` | `BaseJob` | *(none — not guild-configurable; reads `IHostingService`/`IDiscordService` directly, not `GuildConfig`)* | Scheduled daily at 09:00 `Europe/Berlin` (`WithMisfireHandlingInstructionFireAndProceed`, identity `"hosting-reminder"`/group `"hosting"`, `DiscordBot.Services/Configuration/QuartzConfiguration.cs`). Reminds the bot owner about upcoming/overdue clan hosting payments. |
+
+### `HostingReminderJob` decision rules
+
+`DiscordBot.Services/Jobs/HostingReminderJob.cs`. Unlike the `ConfigurableGuildJob`s above, this job does
+not read `GuildConfig`/`ChannelJobConfiguration` at all — the reminder channel is a single, bot-wide
+setting (`IHostingService.GetReminderChannel()`, backed by the common-db `HostingSettings` document, §03).
+If none is set, the run logs a Warning and does nothing (no per-guild bookkeeping). Otherwise, for every
+guild the bot is in (`IDiscordService.GetGuilds()`) that has at least one recorded payment, the static pure
+function `HostingReminderJob.Decide(HostingStatus, GuildHostingState)` picks one of:
+
+| condition | decision |
+|---|---|
+| `DaysOverdue >= 0` and `DueReminderSentForDueOn` doesn't match this `DueOn` | `ReminderKind.Due` |
+| `-30 <= DaysOverdue < 0` and `UpcomingReminderSentForDueOn` doesn't match this `DueOn` | `ReminderKind.Upcoming` |
+| anything else (already sent for this `DueOn`, or too far out) | `ReminderKind.None` |
+
+`Due` takes precedence over `Upcoming` (checked first) — once overdue, an unsent "upcoming" reminder for
+the same due date is skipped, not sent alongside. This yields **exactly two reminders per due date** (one
+`Upcoming` somewhere in the last 30 days before `DueOn`, one `Due` on/after `DueOn`), and none after that,
+until a new payment produces a new `DueOn` (which re-arms both, since the "sent for" fields are compared
+against the *current* `DueOn`, not a boolean). All guilds that need a reminder in the same run are combined
+into **one** embed (one `EmbedFieldDto` field per guild, via `SendMentionEmbed`, §2) with a single
+`<@OwnerId>` mention; the embed is colored red if any guild in the batch is `Due`, else orange. On success,
+`MarkDueReminderSent`/`MarkUpcomingReminderSent` is called per guild; on send failure the whole `Result`
+fails and **no** guild is marked sent, so the next day's run retries all of them. `Decide` being a plain
+static method (not touching Quartz/Discord) is what makes the decision table unit-testable in isolation.
+The job also exposes `internal Task<Result> DoWorkForTests() => DoWork()` — `BaseJob.DoWork` is
+`protected`, and tests substitute `IHostingService`/`IDiscordService` with NSubstitute directly rather than
+building a fake `IJobExecutionContext`, so this internal seam (exposed to
+`DiscordBot.ServicesTests` via `InternalsVisibleTo`) is the test entry point.
 
 ### Recipe: how a job finds its channel and posts — "periodically post into a guild channel"
 This is the closest existing pattern for "post a message into a guild channel
