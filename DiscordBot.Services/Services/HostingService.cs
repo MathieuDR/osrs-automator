@@ -61,6 +61,9 @@ public class HostingService : BaseService, IHostingService {
 			return new HostingStatus(guildId, footerEnabled, lastPayment, dueOn, daysOverdue, footerText, footerTemplate, footerTierMinDays);
 		} catch (Exception ex) {
 			Logger.LogWarning(ex, "Failed to get hosting status for guild {GuildId}", guildId);
+			// Report the footer setting from whatever is already cached, rather than defaulting to
+			// `false`: a read failure here must not be misreported as "footer off" for a guild that
+			// actually has it on (or has never touched the setting, where the real default is `true`).
 			var footerEnabled = _cache.TryGetValue(guildId, out var cached) ? cached.FooterEnabled : true;
 			return new HostingStatus(guildId, footerEnabled, null, null, null, null, null, null);
 		}
