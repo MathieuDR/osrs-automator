@@ -296,15 +296,26 @@ public class HostingService : BaseService, IHostingService {
 				return;
 			}
 
-			using var repo = _repositoryStrategy.GetOrCreateRepository<IGuildHostingStateRepository>();
-			var all = repo.GetAll();
-			if (all.IsSuccess) {
+			// A failed/thrown load must NOT set _cacheLoaded = true: that would permanently poison
+			// the singleton cache as "loaded but empty" (every guild would look like "never paid"
+			// until process restart). Leaving it false lets the next call retry.
+			try {
+				using var repo = _repositoryStrategy.GetOrCreateRepository<IGuildHostingStateRepository>();
+				var all = repo.GetAll();
+				if (!all.IsSuccess) {
+					Logger.LogWarning("Failed to load hosting states from the repository, will retry on next access: {Errors}",
+						string.Join("; ", all.Errors));
+					return;
+				}
+
 				foreach (var state in all.Value) {
 					_cache[state.GuildId] = state;
 				}
-			}
 
-			_cacheLoaded = true;
+				_cacheLoaded = true;
+			} catch (Exception ex) {
+				Logger.LogWarning(ex, "Failed to load hosting states from the repository, will retry on next access");
+			}
 		}
 	}
 
@@ -335,11 +346,25 @@ public class HostingService : BaseService, IHostingService {
 				return _settingsCache ?? new HostingSettings();
 			}
 
-			using var repo = _repositoryStrategy.GetOrCreateRepository<IHostingSettingsRepository>();
-			var result = repo.GetSingle();
-			_settingsCache = result.IsSuccess ? result.Value : null;
-			_settingsLoaded = true;
-			return _settingsCache ?? new HostingSettings();
+			// Same rule as EnsureCacheLoaded: a failed/thrown load must NOT set _settingsLoaded =
+			// true, so the next call retries instead of being stuck with "no reminder channel"
+			// forever.
+			try {
+				using var repo = _repositoryStrategy.GetOrCreateRepository<IHostingSettingsRepository>();
+				var result = repo.GetSingle();
+				if (!result.IsSuccess) {
+					Logger.LogWarning("Failed to load hosting settings from the repository, will retry on next access: {Errors}",
+						string.Join("; ", result.Errors));
+					return new HostingSettings();
+				}
+
+				_settingsCache = result.Value;
+				_settingsLoaded = true;
+				return _settingsCache ?? new HostingSettings();
+			} catch (Exception ex) {
+				Logger.LogWarning(ex, "Failed to load hosting settings from the repository, will retry on next access");
+				return new HostingSettings();
+			}
 		}
 	}
 }

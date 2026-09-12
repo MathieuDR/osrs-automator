@@ -11,6 +11,7 @@ using DiscordBot.Data.Strategies;
 using DiscordBot.Services.Helpers;
 using DiscordBot.Services.Services;
 using FluentAssertions;
+using FluentResults;
 using Microsoft.Extensions.Logging.Abstractions;
 using Microsoft.Extensions.Options;
 using NSubstitute;
@@ -180,6 +181,18 @@ public class HostingServiceTests : IDisposable {
 
 		status.DaysOverdue.Should().Be(30);
 		status.FooterText.Should().StartWith("T30 ");
+	}
+
+	[Fact]
+	public void Overdue90_UsesTier90() {
+		var guildId = new DiscordGuildId(80);
+		SeedPayment(guildId, new DateOnly(2026, 6, 14), 0); // exactly 90 days overdue
+		var service = CreateService(messages: TestTierMessages());
+
+		var status = service.GetStatus(guildId);
+
+		status.DaysOverdue.Should().Be(90);
+		status.FooterText.Should().StartWith("T90 ");
 	}
 
 	[Fact]
@@ -439,5 +452,44 @@ public class HostingServiceTests : IDisposable {
 		stored.Should().NotBeNull();
 		stored!.DueReminderSentForDueOn.Should().NotBeNull();
 		HostingDates.ToDateOnly(stored.DueReminderSentForDueOn!.Value).Should().Be(dueOn);
+	}
+
+	// --- resilience ---
+
+	[Fact]
+	public void GetStatus_WhenFirstLoadFails_RetriesOnNextCall() {
+		var guildId = new DiscordGuildId(60);
+
+		var failingRepo = Substitute.For<IGuildHostingStateRepository>();
+		failingRepo.GetAll().Returns(Result.Fail<IEnumerable<GuildHostingState>>("simulated transient DB error"));
+
+		var workingRepo = Substitute.For<IGuildHostingStateRepository>();
+		workingRepo.GetAll().Returns(Result.Ok<IEnumerable<GuildHostingState>>(new List<GuildHostingState> {
+			new() {
+				GuildId = guildId,
+				FooterEnabled = true,
+				Payments = new List<HostingPayment> {
+					new() { PaidOn = HostingDates.ToStorage(new DateOnly(2026, 5, 15)), TermMonths = 0, RecordedBy = new DiscordUserId(1) }
+				}
+			}
+		}));
+
+		var strategy = Substitute.For<IRepositoryStrategy>();
+		strategy.GetOrCreateRepository<IGuildHostingStateRepository>().Returns(failingRepo, workingRepo);
+
+		var service = new HostingService(NullLogger<HostingService>.Instance, strategy, TestTierMessages(),
+			Options.Create(new BotTeamConfiguration()), new FakeClock(FixedNow));
+
+		// First call: the repository fails, so the cache must NOT be marked as loaded.
+		var first = service.GetStatus(guildId);
+		first.LastPayment.Should().BeNull();
+		first.FooterText.Should().BeNull();
+
+		// Second call: a working repository is returned this time, so the cache must retry and
+		// populate rather than staying stuck on the earlier failure.
+		var second = service.GetStatus(guildId);
+		second.LastPayment.Should().NotBeNull();
+		second.DaysOverdue.Should().Be(120);
+		second.FooterText.Should().StartWith("T90 ");
 	}
 }
