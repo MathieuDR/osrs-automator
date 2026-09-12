@@ -66,25 +66,24 @@ public abstract class BaseInteractiveContext<T> : BaseInteractiveContext where T
     public PageBuilder CreatePageBuilder(string description = null) {
         var builder = new PageBuilder()
             .WithColor(GuildUser.GetHighestRole()?.Color ?? 0x7000FB)
-            .WithDescription(description ?? string.Empty)
+            .WithDescription(AppendHostingFooterToDescription(description ?? string.Empty))
             .WithCurrentTimestamp();
-
-        if (HostingFooter is not null) {
-            builder.WithFooter(HostingFooter);
-        }
 
         return builder;
     }
 
     public PageBuilder CreatePageBuilder(EmbedBuilder embedBuilder, string description = null) {
         var builder = PageBuilder.FromEmbedBuilder(embedBuilder)
-            .WithDescription(description ?? string.Empty);
-
-        if (HostingFooter is not null && embedBuilder.Footer is null) {
-            builder.WithFooter(HostingFooter);
-        }
+            .WithDescription(AppendHostingFooterToDescription(description ?? string.Empty));
 
         return builder;
+    }
+
+    // Fergun's StaticPaginatorBuilder.WithFooter(PaginatorFooter.Users | PaginatorFooter.PageNumber)
+    // (see GetBaseStaticPaginatorBuilder below) overrides any per-page embed footer, so the hosting line
+    // is appended as Discord subtext at the end of the page description instead of set via .WithFooter.
+    private string AppendHostingFooterToDescription(string description) {
+        return HostingFooter is not null ? description + "\n-# " + HostingFooter : description;
     }
 
     public string GetDisplayNameById(DiscordUserId user) {

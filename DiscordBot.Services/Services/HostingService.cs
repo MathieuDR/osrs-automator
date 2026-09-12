@@ -61,7 +61,11 @@ public class HostingService : BaseService, IHostingService {
 			return new HostingStatus(guildId, footerEnabled, lastPayment, dueOn, daysOverdue, footerText);
 		} catch (Exception ex) {
 			Logger.LogWarning(ex, "Failed to get hosting status for guild {GuildId}", guildId);
-			return new HostingStatus(guildId, false, null, null, null, null);
+			// Report the footer setting from whatever is already cached, rather than defaulting to
+			// `false`: a read failure here must not be misreported as "footer off" for a guild that
+			// actually has it on (or has never touched the setting, where the real default is `true`).
+			var footerEnabled = _cache.TryGetValue(guildId, out var cached) ? cached.FooterEnabled : true;
+			return new HostingStatus(guildId, footerEnabled, null, null, null, null);
 		}
 	}
 
@@ -167,48 +171,63 @@ public class HostingService : BaseService, IHostingService {
 	}
 
 	public bool ShouldDegrade(DiscordGuildId guildId, DiscordUserId userId) {
-		var degraded = _messages.Hosting.Degraded;
-		if (!degraded.Enabled) {
+		try {
+			var degraded = _messages.Hosting.Degraded;
+			if (!degraded.Enabled) {
+				return false;
+			}
+
+			if (guildId == _team.GuildId || userId == _team.OwnerId) {
+				return false;
+			}
+
+			var state = TryGetState(guildId);
+			var lastPayment = LastPaymentOf(state);
+			if (state is null || lastPayment is null || !state.FooterEnabled) {
+				return false;
+			}
+
+			var dueOn = HostingDates.ToDateOnly(lastPayment.PaidOn).AddMonths(lastPayment.TermMonths);
+			var daysOverdue = Today().DayNumber - dueOn.DayNumber;
+			if (daysOverdue < degraded.MinDaysOverdue) {
+				return false;
+			}
+
+			return _randomSource() < degraded.FailureChance;
+		} catch (Exception ex) {
+			Logger.LogWarning(ex, "Failed to evaluate degraded mode for guild {GuildId}", guildId);
 			return false;
 		}
-
-		if (guildId == _team.GuildId || userId == _team.OwnerId) {
-			return false;
-		}
-
-		var state = TryGetState(guildId);
-		var lastPayment = LastPaymentOf(state);
-		if (state is null || lastPayment is null || !state.FooterEnabled) {
-			return false;
-		}
-
-		var dueOn = HostingDates.ToDateOnly(lastPayment.PaidOn).AddMonths(lastPayment.TermMonths);
-		var daysOverdue = Today().DayNumber - dueOn.DayNumber;
-		if (daysOverdue < degraded.MinDaysOverdue) {
-			return false;
-		}
-
-		return _randomSource() < degraded.FailureChance;
 	}
 
 	public string GetDegradedMessage(DiscordGuildId guildId, string? guildName = null) {
-		var texts = _messages.Hosting.Degraded.Texts;
-		if (texts is null || texts.Count == 0) {
-			texts = HostingDefaults.Degraded;
+		try {
+			IReadOnlyList<string> texts = _messages.Hosting.Degraded.Texts;
+			if (texts is null || texts.Count == 0) {
+				texts = HostingDefaults.Degraded;
+			}
+
+			var state = TryGetState(guildId);
+			var lastPayment = LastPaymentOf(state);
+
+			int days = 0;
+			DateOnly? dueOn = null;
+			if (lastPayment is not null) {
+				dueOn = HostingDates.ToDateOnly(lastPayment.PaidOn).AddMonths(lastPayment.TermMonths);
+				days = Math.Abs(Today().DayNumber - dueOn.Value.DayNumber);
+			}
+
+			var chosen = PickRandom(texts);
+			return Substitute(chosen, guildId, guildName, days, dueOn, lastPayment?.PaidOn);
+		} catch (Exception ex) {
+			Logger.LogWarning(ex, "Failed to build the degraded message for guild {GuildId}", guildId);
+			try {
+				return Substitute(HostingDefaults.Degraded[0], guildId, guildName, 0, null, null);
+			} catch (Exception ex2) {
+				Logger.LogWarning(ex2, "Failed to build the fallback degraded message for guild {GuildId}", guildId);
+				return "Command withheld: this server's hosting is unpaid. Retry.";
+			}
 		}
-
-		var state = TryGetState(guildId);
-		var lastPayment = LastPaymentOf(state);
-
-		int days = 0;
-		DateOnly? dueOn = null;
-		if (lastPayment is not null) {
-			dueOn = HostingDates.ToDateOnly(lastPayment.PaidOn).AddMonths(lastPayment.TermMonths);
-			days = Math.Abs(Today().DayNumber - dueOn.Value.DayNumber);
-		}
-
-		var chosen = PickRandom(texts);
-		return Substitute(chosen, guildId, guildName, days, dueOn, lastPayment?.PaidOn);
 	}
 
 	public IReadOnlyList<GuildHostingState> GetAllStates() {
@@ -240,7 +259,7 @@ public class HostingService : BaseService, IHostingService {
 			return null;
 		}
 
-		var tiers = _messages.Hosting.Overdue;
+		IReadOnlyList<HostingTier> tiers = _messages.Hosting.Overdue;
 		if (tiers is null || tiers.Count == 0) {
 			tiers = HostingDefaults.Overdue;
 		}
@@ -260,17 +279,10 @@ public class HostingService : BaseService, IHostingService {
 	private static string Substitute(string template, DiscordGuildId guildId, string? guildName, int? days, DateOnly? dueOn, DateTime? paidOn) {
 		var result = template.Replace("{server}", guildName ?? guildId.ToString());
 
-		if (days.HasValue) {
-			result = result.Replace("{days}", Math.Abs(days.Value).ToString());
-		}
-
-		if (dueOn.HasValue) {
-			result = result.Replace("{date}", dueOn.Value.ToString("d MMM yyyy", CultureInfo.InvariantCulture));
-		}
-
-		if (paidOn.HasValue) {
-			result = result.Replace("{paidDate}", HostingDates.ToDateOnly(paidOn.Value).ToString("d MMM yyyy", CultureInfo.InvariantCulture));
-		}
+		result = result.Replace("{days}", days.HasValue ? Math.Abs(days.Value).ToString() : string.Empty);
+		result = result.Replace("{date}", dueOn.HasValue ? dueOn.Value.ToString("d MMM yyyy", CultureInfo.InvariantCulture) : string.Empty);
+		result = result.Replace("{paidDate}",
+			paidOn.HasValue ? HostingDates.ToDateOnly(paidOn.Value).ToString("d MMM yyyy", CultureInfo.InvariantCulture) : string.Empty);
 
 		return result;
 	}

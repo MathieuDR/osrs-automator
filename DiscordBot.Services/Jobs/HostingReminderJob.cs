@@ -22,14 +22,12 @@ public class HostingReminderJob : BaseJob {
 	private readonly IHostingService _hosting;
 	private readonly IDiscordService _discord;
 	private readonly BotTeamConfiguration _team;
-	private readonly IClock _clock;
 
 	public HostingReminderJob(ILogger<HostingReminderJob> logger, IHostingService hosting, IDiscordService discord,
-		IOptions<BotTeamConfiguration> team, IClock clock) : base(logger) {
+		IOptions<BotTeamConfiguration> team) : base(logger) {
 		_hosting = hosting;
 		_discord = discord;
 		_team = team.Value;
-		_clock = clock;
 	}
 
 	// BaseJob.DoWork is protected (invoked by Quartz through Execute); tests substitute
@@ -40,8 +38,13 @@ public class HostingReminderJob : BaseJob {
 
 	protected override async Task<Result> DoWork() {
 		var channelResult = _hosting.GetReminderChannel();
-		if (channelResult.IsFailed || channelResult.Value is not { } channel) {
-			Logger.LogWarning("No hosting reminder channel configured");
+		if (channelResult.IsFailed) {
+			Logger.LogWarning("Could not read hosting settings, skipping reminder run: {Errors}", string.Join("; ", channelResult.Errors));
+			return Result.Ok();
+		}
+
+		if (channelResult.Value is not { } channel) {
+			Logger.LogInformation("No hosting reminder channel configured, skipping reminder run");
 			return Result.Ok();
 		}
 

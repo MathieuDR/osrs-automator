@@ -32,7 +32,7 @@ public class PaidSubCommandHandler : ApplicationCommandHandlerBase<PaidSubComman
 		var guildId = serverResult.Value;
 
 		var dateString = Context.SubCommandOptions.GetOptionValue<string>(PaidSubCommandDefinition.DateOption);
-		var paidOn = DateOnly.FromDateTime(DateTime.Today);
+		var paidOn = DateOnly.FromDateTime(DateTime.UtcNow);
 		if (!string.IsNullOrWhiteSpace(dateString)) {
 			if (!DateOnly.TryParseExact(dateString, "yyyy-MM-dd", CultureInfo.InvariantCulture, DateTimeStyles.None, out paidOn)) {
 				return Result.Fail($"Could not parse date '{dateString}', expected yyyy-MM-dd");
@@ -47,16 +47,23 @@ public class PaidSubCommandHandler : ApplicationCommandHandlerBase<PaidSubComman
 			return recordResult;
 		}
 
+		var reminderChannelSetFailed = false;
 		var reminderChannelResult = _hostingService.GetReminderChannel();
 		if (reminderChannelResult.IsSuccess && reminderChannelResult.Value is null) {
-			_hostingService.SetReminderChannel(new DiscordChannelId(Context.Channel.Id));
+			var setChannelResult = _hostingService.SetReminderChannel(new DiscordChannelId(Context.Channel.Id));
+			reminderChannelSetFailed = setChannelResult.IsFailed;
 		}
 
 		var serverName = _client.GetGuild(guildId.UlongValue)?.Name ?? serverValue;
 		var dueOn = paidOn.AddMonths(months);
 
+		var message = $"{serverName}: paid {paidOn:d MMM yyyy}, {months} months, due {dueOn:d MMM yyyy}";
+		if (reminderChannelSetFailed) {
+			message += "\nCould not set the reminder channel automatically; run /hosting remind";
+		}
+
 		_ = Context.CreateReplyBuilder(ephemeral: true)
-			.WithEmbed(x => x.WithSuccess($"{serverName}: paid {paidOn:d MMM yyyy}, {months} months, due {dueOn:d MMM yyyy}"))
+			.WithEmbed(x => x.WithSuccess(message))
 			.RespondAsync();
 
 		return Result.Ok();

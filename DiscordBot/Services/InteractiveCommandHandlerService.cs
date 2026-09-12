@@ -97,13 +97,20 @@ public class InteractiveCommandHandlerService {
 
 		_logger.LogInformation("[{ctx}] Command triggered", ctx);
 
-		if (arg is SocketSlashCommand && ctx is ApplicationCommandContext appCtx && appCtx.Guild is SocketGuild guild
-			&& !string.Equals(appCtx.Command, "hosting", StringComparison.OrdinalIgnoreCase)
-			&& _hostingService.ShouldDegrade(guild.GetGuildId(), appCtx.User.GetUserId())) {
-			var degradedMsg = _hostingService.GetDegradedMessage(guild.GetGuildId(), guild.Name);
-			_logger.LogInformation("[{ctx}] degraded mode: refusing command", ctx);
-			await appCtx.RespondAsync(embeds: new[] { appCtx.CreateEmbedBuilder().WithFailure(degradedMsg).Build() });
-			return;
+		// Hosting is a side concern to every other command's dispatch: a bug or a common-DB failure in
+		// here must never leave the interaction unanswered, so any exception is logged and falls
+		// through to normal dispatch below rather than propagating out of OnInteraction.
+		try {
+			if (arg is SocketSlashCommand && ctx is ApplicationCommandContext appCtx && appCtx.Guild is SocketGuild guild
+				&& !string.Equals(appCtx.Command, "hosting", StringComparison.OrdinalIgnoreCase)
+				&& _hostingService.ShouldDegrade(guild.GetGuildId(), appCtx.User.GetUserId())) {
+				var degradedMsg = _hostingService.GetDegradedMessage(guild.GetGuildId(), guild.Name);
+				_logger.LogInformation("[{ctx}] degraded mode: refusing command", ctx);
+				await appCtx.RespondAsync(embeds: new[] { appCtx.CreateEmbedBuilder().WithFailure(degradedMsg).Build() });
+				return;
+			}
+		} catch (Exception ex) {
+			_logger.LogWarning(ex, "[{ctx}] degraded-mode check failed, dispatching normally", ctx);
 		}
 
 		var result = await _commandInstigator.ExecuteCommandAsync(ctx).ConfigureAwait(false);

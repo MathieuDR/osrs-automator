@@ -55,25 +55,37 @@ public class InteractionPaginatorReplyBuilder<TInteraction> where TInteraction :
 	private void CreatePagesFromLines(string[] lines, int linesPerPage, string? header, string? footer, Action<EmbedBuilder>? modifications) {
 		int footerSize = footer?.Length ?? 0;
 
+		// Fergun's StaticPaginatorBuilder.WithFooter(PaginatorFooter.Users | PaginatorFooter.PageNumber)
+		// (see BaseInteractiveContext.GetBaseStaticPaginatorBuilder) overrides any per-page embed footer,
+		// so the hosting line is appended as Discord subtext at the end of the page description instead -
+		// treated exactly like the `footer` parameter for the purposes of the max-length accounting below,
+		// and always placed after `footer` when both are present.
+		var hostingSubtext = _context.HostingFooter is not null ? "\n-# " + _context.HostingFooter : null;
+		int hostingSize = hostingSubtext?.Length ?? 0;
+
 		var currentPage = new StringBuilder();
-		
-		if (footerSize + (header?.Length ?? 0) >= _maxPageLength) {
+
+		if (footerSize + hostingSize + (header?.Length ?? 0) >= _maxPageLength) {
 			throw new Exception("Header and footer combined are too long");
 		}
-		
+
 		// append header at start
 		if (header != null) {
 			currentPage.AppendLine(header);
 		}
-		
+
 		for (var i = 0; i < lines.Length; i++) {
 			var line = lines[i];
 
 			// check if it's the end of the page
-			if (currentPage.Length + line.Length + footerSize + 1 > _maxPageLength || (i + 1) % linesPerPage == 0) {
+			if (currentPage.Length + line.Length + footerSize + hostingSize + 1 > _maxPageLength || (i + 1) % linesPerPage == 0) {
 				// if it is, add footer and create new page
 				if (footer != null) {
 					currentPage.AppendLine(footer);
+				}
+
+				if (hostingSubtext != null) {
+					currentPage.Append(hostingSubtext);
 				}
 
 				var builder = _context.CreateEmbedBuilder("", currentPage.ToString());
@@ -97,6 +109,10 @@ public class InteractionPaginatorReplyBuilder<TInteraction> where TInteraction :
 			// add footer
 			if (footer != null) {
 				currentPage.AppendLine(footer);
+			}
+
+			if (hostingSubtext != null) {
+				currentPage.Append(hostingSubtext);
 			}
 
 			// create page

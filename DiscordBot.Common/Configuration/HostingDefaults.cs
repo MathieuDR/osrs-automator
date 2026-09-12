@@ -6,7 +6,7 @@ namespace DiscordBot.Common.Configuration;
 /// has no default - null/empty means "stay silent" by design.
 /// </summary>
 public static class HostingDefaults {
-	public static readonly List<HostingTier> Overdue = new() {
+	public static readonly IReadOnlyList<HostingTier> Overdue = new List<HostingTier> {
 		new HostingTier {
 			MinDays = 0,
 			Texts = new List<string> {
@@ -41,7 +41,7 @@ public static class HostingDefaults {
 		}
 	};
 
-	public static readonly List<string> Degraded = new() {
+	public static readonly IReadOnlyList<string> Degraded = new List<string> {
 		"💸 Not running that one: {server} has not paid for hosting in {days} days. Nothing is broken. Retry, or pay.",
 		"🛑 Command withheld: this server's hosting bill is {days} days overdue. Retry, or nudge whoever holds the clan coffers.",
 		"💤 The bot works when the hosting gets paid. {days} days overdue. Retry in a moment.",

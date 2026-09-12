@@ -74,8 +74,7 @@ public class HostingReminderJobTests {
 
 		hosting.GetReminderChannel().Returns(Result.Ok<DiscordChannelId?>(channel));
 
-		var job = new HostingReminderJob(NullLogger<HostingReminderJob>.Instance, hosting, discord, Options.Create(team),
-			new FakeClock(new DateTime(2026, 9, 12, 0, 0, 0, DateTimeKind.Utc)));
+		var job = new HostingReminderJob(NullLogger<HostingReminderJob>.Instance, hosting, discord, Options.Create(team));
 
 		return (job, hosting, discord, channel, team);
 	}
@@ -89,7 +88,7 @@ public class HostingReminderJobTests {
 		hosting.GetReminderChannel().Returns(Result.Ok<DiscordChannelId?>(null));
 
 		var job = new HostingReminderJob(NullLogger<HostingReminderJob>.Instance, hosting, discord,
-			Options.Create(new BotTeamConfiguration()), new FakeClock(DateTime.UtcNow));
+			Options.Create(new BotTeamConfiguration()));
 
 		var result = await job.DoWorkForTests();
 
@@ -169,8 +168,30 @@ public class HostingReminderJobTests {
 			Arg.Any<EmbedFieldDto[]>(), Arg.Any<bool>());
 	}
 
-	private sealed class FakeClock : IClock {
-		public FakeClock(DateTime utcNow) => UtcNow = utcNow;
-		public DateTime UtcNow { get; }
+	[Fact]
+	public async Task DoWork_UpcomingGuild_SendsNonAlertEmbedAndMarksUpcomingOnly() {
+		var (job, hosting, discord, channel, team) = CreateJob();
+
+		var upcomingGuild = MakeGuild(1, "ClanA");
+		discord.GetGuilds().Returns(Result.Ok<IEnumerable<Guild>>(new[] { upcomingGuild }));
+
+		var upcomingState = new GuildHostingState { GuildId = upcomingGuild.Id };
+		hosting.GetAllStates().Returns(new List<GuildHostingState> { upcomingState });
+
+		var upcomingStatus = new HostingStatus(upcomingGuild.Id, true, null, DueOn, -30, null);
+		hosting.GetStatus(upcomingGuild.Id, upcomingGuild.Name).Returns(upcomingStatus);
+
+		discord.SendMentionEmbed(channel, team.OwnerId, Arg.Any<string>(), Arg.Any<EmbedFieldDto[]>(), Arg.Any<bool>())
+			.Returns(Result.Ok());
+
+		var result = await job.DoWorkForTests();
+
+		result.IsSuccess.Should().BeTrue();
+
+		await discord.Received(1).SendMentionEmbed(channel, team.OwnerId, "Hosting payments",
+			Arg.Is<EmbedFieldDto[]>(f => f.Length == 1 && f[0].Name == "ClanA"), false);
+
+		hosting.Received(1).MarkUpcomingReminderSent(upcomingGuild.Id, DueOn);
+		hosting.DidNotReceive().MarkDueReminderSent(Arg.Any<DiscordGuildId>(), Arg.Any<DateOnly>());
 	}
 }

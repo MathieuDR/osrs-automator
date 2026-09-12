@@ -1,3 +1,4 @@
+using System.Globalization;
 using DiscordBot.Common.Configuration;
 using DiscordBot.Common.Identities;
 using DiscordBot.Models.Contexts;
@@ -17,7 +18,7 @@ public static class HostingHandlerHelpers {
 		}
 
 		if (ulong.TryParse(value, out var id)) {
-			return Result.Ok(new DiscordGuildId(id));
+			return client.GetGuild(id) is not null ? Result.Ok(new DiscordGuildId(id)) : Result.Fail("Unknown server");
 		}
 
 		var guild = client.Guilds.FirstOrDefault(g => string.Equals(g.Name, value, StringComparison.OrdinalIgnoreCase));
@@ -37,8 +38,10 @@ public static class HostingHandlerHelpers {
 	}
 
 	public static string FormatStatusLine(HostingStatus s, string name) {
-		var paidDate = s.LastPayment is not null ? HostingDates.ToDateOnly(s.LastPayment.PaidOn).ToString("d MMM yyyy") : "never";
-		var dueDate = s.DueOn is not null ? s.DueOn.Value.ToString("d MMM yyyy") : "-";
+		var paidDate = s.LastPayment is not null
+			? HostingDates.ToDateOnly(s.LastPayment.PaidOn).ToString("d MMM yyyy", CultureInfo.InvariantCulture)
+			: "never";
+		var dueDate = s.DueOn is not null ? s.DueOn.Value.ToString("d MMM yyyy", CultureInfo.InvariantCulture) : "-";
 
 		string daysText;
 		if (s.DaysOverdue is null) {

@@ -345,6 +345,61 @@ public class HostingServiceTests : IDisposable {
 		service.ShouldDegrade(guildId, new DiscordUserId(999)).Should().BeFalse();
 	}
 
+	[Fact]
+	public void ShouldDegrade_True_AtExactlyMinDaysOverdue() {
+		var guildId = new DiscordGuildId(37);
+		SeedPayment(guildId, new DateOnly(2026, 6, 14), 0); // exactly 90 days overdue, the default MinDaysOverdue
+		var service = CreateService(randomSource: SequenceRandom(0.0));
+
+		service.ShouldDegrade(guildId, new DiscordUserId(999)).Should().BeTrue();
+	}
+
+	// --- degraded message ---
+
+	[Fact]
+	public void GetDegradedMessage_UsesDefaultsWhenTextsNull() {
+		var guildId = new DiscordGuildId(70);
+		SeedPayment(guildId, new DateOnly(2026, 5, 15), 0); // 120 days overdue
+		var messages = new MessageConfiguration { Hosting = new HostingMessages { Degraded = new DegradedMode { Texts = null } } };
+		var service = CreateService(messages: messages, randomSource: SequenceRandom(0.0));
+
+		var message = service.GetDegradedMessage(guildId, "Clan Z");
+
+		var expected = HostingDefaults.Degraded[0].Replace("{server}", "Clan Z").Replace("{days}", "120");
+		message.Should().Be(expected);
+	}
+
+	[Fact]
+	public void GetDegradedMessage_SubstitutesPlaceholders() {
+		var guildId = new DiscordGuildId(71);
+		SeedPayment(guildId, new DateOnly(2026, 5, 15), 0); // 120 days overdue
+		var messages = new MessageConfiguration {
+			Hosting = new HostingMessages { Degraded = new DegradedMode { Texts = new List<string> { "{server} owes {days} days" } } }
+		};
+		var service = CreateService(messages: messages, randomSource: SequenceRandom(0.0));
+
+		var message = service.GetDegradedMessage(guildId, "Clan Z");
+
+		message.Should().Be("Clan Z owes 120 days");
+	}
+
+	[Fact]
+	public void GetDegradedMessage_CyclesAllTexts() {
+		var guildId = new DiscordGuildId(72);
+		SeedPayment(guildId, new DateOnly(2026, 5, 15), 0); // 120 days overdue
+		var messages = new MessageConfiguration {
+			Hosting = new HostingMessages { Degraded = new DegradedMode { Texts = new List<string> { "alpha {days}", "beta {days}" } } }
+		};
+		var service = CreateService(messages: messages, randomSource: SequenceRandom(0.0, 0.99));
+
+		var seen = new HashSet<string> {
+			service.GetDegradedMessage(guildId, "Clan Z"),
+			service.GetDegradedMessage(guildId, "Clan Z")
+		};
+
+		seen.Should().BeEquivalentTo(new[] { "alpha 120", "beta 120" });
+	}
+
 	// --- overview ---
 
 	[Fact]
