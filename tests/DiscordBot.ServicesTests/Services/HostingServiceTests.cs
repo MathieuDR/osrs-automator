@@ -334,6 +334,10 @@ public class HostingServiceTests : IDisposable {
 		var service = CreateService(team: team, randomSource: ThrowingRandom());
 
 		service.ShouldDegrade(guildId, new DiscordUserId(999)).Should().BeFalse();
+
+		var state = service.GetAllStates().First(s => s.GuildId == guildId);
+		state.DegradeDeniedCount.Should().Be(0);
+		state.DegradeAllowedCount.Should().Be(0);
 	}
 
 	[Fact]
@@ -345,6 +349,10 @@ public class HostingServiceTests : IDisposable {
 		var service = CreateService(team: team, randomSource: ThrowingRandom());
 
 		service.ShouldDegrade(guildId, ownerId).Should().BeFalse();
+
+		var state = service.GetAllStates().First(s => s.GuildId == guildId);
+		state.DegradeDeniedCount.Should().Be(0);
+		state.DegradeAllowedCount.Should().Be(0);
 	}
 
 	[Fact]
@@ -354,6 +362,10 @@ public class HostingServiceTests : IDisposable {
 		var service = CreateService(randomSource: ThrowingRandom());
 
 		service.ShouldDegrade(guildId, new DiscordUserId(999)).Should().BeFalse();
+
+		var state = service.GetAllStates().First(s => s.GuildId == guildId);
+		state.DegradeDeniedCount.Should().Be(0);
+		state.DegradeAllowedCount.Should().Be(0);
 	}
 
 	[Fact]
@@ -364,6 +376,10 @@ public class HostingServiceTests : IDisposable {
 		var service = CreateService(messages: messages, randomSource: ThrowingRandom());
 
 		service.ShouldDegrade(guildId, new DiscordUserId(999)).Should().BeFalse();
+
+		var state = service.GetAllStates().First(s => s.GuildId == guildId);
+		state.DegradeDeniedCount.Should().Be(0);
+		state.DegradeAllowedCount.Should().Be(0);
 	}
 
 	[Fact]
