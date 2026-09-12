@@ -1,6 +1,6 @@
 using DiscordBot.Commands.Interactive;
+using DiscordBot.Common.Configuration;
 using DiscordBot.Common.Identities;
-using DiscordBot.Configuration;
 using DiscordBot.Data.Interfaces;
 using DiscordBot.Data.Strategies;
 using MathieuDR.Common.Extensions;

@@ -1,6 +1,6 @@
 using DiscordBot.Common.Identities;
 
-namespace DiscordBot.Configuration;
+namespace DiscordBot.Common.Configuration;
 
 public class BotTeamConfiguration {
 	public DiscordGuildId GuildId { get; set; }
