@@ -143,21 +143,28 @@ public class LiteDbManager {
 
     internal void Release(string path) {
         lock (GetFileLock(path)) {
-            Entry entry;
+            // Remove the entry from _open BEFORE disposing, not after: LiteDatabase.Dispose()
+            // runs a checkpoint and can throw (disk full, IO error). If we disposed first and
+            // only removed the entry afterwards, a throw would leave a dead LiteDatabase sitting
+            // in _open with RefCount <= 0 forever, and every later Lease() for this path would
+            // hand out that disposed instance for the rest of the process's lifetime. Removing
+            // first means the entry is already gone regardless of whether Dispose() throws; the
+            // per-file lock we're still holding keeps this atomic with respect to a concurrent
+            // Lease() for the same path.
+            LiteDatabase toDispose = null;
             lock (_gate) {
-                if (!_open.TryGetValue(path, out entry)) {
+                if (!_open.TryGetValue(path, out var entry)) {
                     return;
                 }
 
                 entry.RefCount--;
-            }
-
-            if (entry.RefCount <= 0 && _options.CloseWhenUnused) {
-                entry.Db.Dispose();
-                lock (_gate) {
+                if (entry.RefCount <= 0 && _options.CloseWhenUnused) {
                     _open.Remove(path);
+                    toDispose = entry.Db;
                 }
             }
+
+            toDispose?.Dispose();
         }
     }
 
