@@ -19,6 +19,7 @@ internal abstract class RepositoryService : BaseService {
     /// <param name="guildId">Id of a guild</param>
     /// <typeparam name="T">Type of repository</typeparam>
     /// <returns>Repository of Type T</returns>
+    /// <remarks>Caller owns the repository; dispose it (using var).</remarks>
     protected T GetRepository<T>(DiscordGuildId? guildId = null) where T : class, IRepository {
         Logger.LogDebug("Trying to create repo: {type}", typeof(T).Name);
         return !guildId.HasValue ? RepositoryStrategy.GetOrCreateRepository<T>() : RepositoryStrategy.GetOrCreateRepository<T>(guildId.Value);

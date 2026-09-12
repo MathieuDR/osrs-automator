@@ -14,7 +14,7 @@ internal abstract class BaseGuildConfigurationService : RepositoryService {
 
 
 	protected Result SaveGuildConfig(GuildConfig guildConfig) {
-		var repo = GetRepository<IGuildConfigRepository>(guildConfig.GuildId);
+		using var repo = GetRepository<IGuildConfigRepository>(guildConfig.GuildId);
 		return repo.UpdateOrInsert(guildConfig);
 	}
 
@@ -27,7 +27,7 @@ internal abstract class BaseGuildConfigurationService : RepositoryService {
 	}
 
 	protected GuildConfig GetGuildConfig(DiscordGuildId guildId) {
-		var repo = GetRepository<IGuildConfigRepository>(guildId);
+		using var repo = GetRepository<IGuildConfigRepository>(guildId);
 		return repo.GetSingle().Value;
 	}
 }

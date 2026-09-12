@@ -25,7 +25,7 @@ internal class GraveyardService : IGraveyardService {
 	public Task<Result> OptIn(GuildUser user) {
 		_logger.LogInformation($"Opting in user {user.Username}");
 		
-		var repository = _repositoryStrategy.GetOrCreateRepository<IGraveyardRepository>(user.GuildId);
+		using var repository = _repositoryStrategy.GetOrCreateRepository<IGraveyardRepository>(user.GuildId);
 
 		var configurationResult = repository.GetSingle();
 		if (configurationResult.IsFailed) {
@@ -47,7 +47,7 @@ internal class GraveyardService : IGraveyardService {
 	public Task<Result> OptOut(GuildUser user) {
 		_logger.LogInformation($"Opting user {user.Username} out");
 		
-		var graveyardRepository = _repositoryStrategy.GetOrCreateRepository<IGraveyardRepository>(user.GuildId);
+		using var graveyardRepository = _repositoryStrategy.GetOrCreateRepository<IGraveyardRepository>(user.GuildId);
 		
 		var configurationResult = graveyardRepository.GetSingle();
 		if (configurationResult.IsFailed || configurationResult.Value == null) {
@@ -65,7 +65,7 @@ internal class GraveyardService : IGraveyardService {
 	}
 
 	public Task<Result<bool>> IsOptedIn(GuildUser user) {
-		var graveyardRepository = _repositoryStrategy.GetOrCreateRepository<IGraveyardRepository>(user.GuildId);
+		using var graveyardRepository = _repositoryStrategy.GetOrCreateRepository<IGraveyardRepository>(user.GuildId);
 		var configurationResult = graveyardRepository.GetSingle();
 		
 		if(configurationResult.IsFailed){
@@ -93,12 +93,12 @@ internal class GraveyardService : IGraveyardService {
 		}
 		
 		var shame = new Shame(location, metricType, imageUrl, shamedBy.Id);
-		var graveyardRepository = _repositoryStrategy.GetOrCreateRepository<IGraveyardRepository>(shamed.GuildId);
+		using var graveyardRepository = _repositoryStrategy.GetOrCreateRepository<IGraveyardRepository>(shamed.GuildId);
 		return graveyardRepository.AddShame(shamed.Id, shame);
 	}
 
 	public Task<Result> UpdateShameLocation(GuildUser shamed, Guid shameId, ShameLocation location, MetricType? metricType) {
-		var repository = _repositoryStrategy.GetOrCreateRepository<IGraveyardRepository>(shamed.GuildId);
+		using var repository = _repositoryStrategy.GetOrCreateRepository<IGraveyardRepository>(shamed.GuildId);
 		var shameResult = repository.GetShameById(shamed.Id, shameId);
 		
 		if(shameResult.IsFailed){
@@ -112,7 +112,7 @@ internal class GraveyardService : IGraveyardService {
 	}
 
 	public Task<Result> UpdateShameImage(GuildUser shamed, Guid shameId, string imageUrl) {
-		var repository = _repositoryStrategy.GetOrCreateRepository<IGraveyardRepository>(shamed.GuildId);
+		using var repository = _repositoryStrategy.GetOrCreateRepository<IGraveyardRepository>(shamed.GuildId);
 		var shameResult = repository.GetShameById(shamed.Id, shameId);
 		
 		if(shameResult.IsFailed){
@@ -132,7 +132,7 @@ internal class GraveyardService : IGraveyardService {
 			return Result.Fail("User is not opted in.");
 		}
 		
-		var graveyardRepository = _repositoryStrategy.GetOrCreateRepository<IGraveyardRepository>(user.GuildId);
+		using var graveyardRepository = _repositoryStrategy.GetOrCreateRepository<IGraveyardRepository>(user.GuildId);
 		var repositoryResult = location is null ? graveyardRepository.GetShamesForUser(user.Id) 
 			: graveyardRepository.GetShamesForUserPerLocation(user.Id, location.Value, metricTypeLocation);
 		
@@ -145,7 +145,7 @@ internal class GraveyardService : IGraveyardService {
 	}
 
 	public Task<Result<(DiscordUserId userId, Shame[] shames)[]>> GetShames(Guild guild, ShameLocation? location, MetricType? metricTypeLocation) {
-		var graveyardRepository = _repositoryStrategy.GetOrCreateRepository<IGraveyardRepository>(guild.GuildId);
+		using var graveyardRepository = _repositoryStrategy.GetOrCreateRepository<IGraveyardRepository>(guild.GuildId);
 		var graveyard = graveyardRepository.GetSingle();
 		
 		if(graveyard.IsFailed || graveyard.Value is null){
@@ -174,7 +174,7 @@ internal class GraveyardService : IGraveyardService {
 	}
 
 	public Task<Result<DiscordUserId[]>> GetOptedInUsers(Guild guild) {
-		var graveyardRepository = _repositoryStrategy.GetOrCreateRepository<IGraveyardRepository>(guild.GuildId);
+		using var graveyardRepository = _repositoryStrategy.GetOrCreateRepository<IGraveyardRepository>(guild.GuildId);
 		var graveyardResult = graveyardRepository.GetSingle();
 		
 		if(graveyardResult.IsFailed || graveyardResult.Value is null){
@@ -188,12 +188,12 @@ internal class GraveyardService : IGraveyardService {
 	public Task<Result> RemoveShame(GuildUser user, Guid id) {
 		_logger.LogInformation("Removing shame {id} for user {user} ({userId})", id, user.Username, user.Id);
 		
-		var repository = _repositoryStrategy.GetOrCreateRepository<IGraveyardRepository>(user.GuildId);
+		using var repository = _repositoryStrategy.GetOrCreateRepository<IGraveyardRepository>(user.GuildId);
 		return Task.FromResult(repository.RemoveShame(user.Id, id));
 	}
 
 	private IEnumerable<Shame> SetTimezone(IEnumerable<Shame> shames, DiscordGuildId guildId) {
-		var configRepo = _repositoryStrategy.GetOrCreateRepository<IGuildConfigRepository>(guildId);
+		using var configRepo = _repositoryStrategy.GetOrCreateRepository<IGuildConfigRepository>(guildId);
 		var configuration = configRepo.GetSingle().Value;
 
 		return shames.Select(x => x with { ShamedAt = x.ShamedAt.ToOffset(configuration.Timezone)});

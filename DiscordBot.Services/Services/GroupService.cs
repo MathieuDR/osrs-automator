@@ -45,7 +45,7 @@ internal class GroupService : RepositoryService, IGroupService {
             throw new Exception("Group does not exist.");
         }
 
-        var repo = GetRepository<IGuildConfigRepository>(guildUser.GuildId);
+        using var repo = GetRepository<IGuildConfigRepository>(guildUser.GuildId);
         var config = repo.GetSingle().Value ?? new GuildConfig(guildUser.GuildId, guildUser.Id);
 
         config.WomVerificationCode = verificationCode;
@@ -59,13 +59,13 @@ internal class GroupService : RepositoryService, IGroupService {
     public ValueTask<Result> SetTimeZone(GuildUser guildUser, string key) {
         GuildConfig config = GetGroupConfig(guildUser.GuildId);
         config.Timezone = key;
-        var repo = GetRepository<IGuildConfigRepository>(guildUser.GuildId);
+        using var repo = GetRepository<IGuildConfigRepository>(guildUser.GuildId);
         repo.Update(config);
         return ValueTask.FromResult(Result.Ok());
     }
 
     public async Task SetAutoAdd(GuildUser guildUser, bool autoAdd) {
-        var repo = GetRepository<IGuildConfigRepository>(guildUser.GuildId);
+        using var repo = GetRepository<IGuildConfigRepository>(guildUser.GuildId);
         var config = GetGroupConfig(guildUser.GuildId);
         if (config.WomGroupId <= 0) {
             throw new Exception("No Wise Old Man set for this server.");
@@ -98,7 +98,7 @@ internal class GroupService : RepositoryService, IGroupService {
             config.AutomatedMessagesConfig.ChannelJobs.Add(jobType, setting);
         }
 
-        var repo = GetRepository<IGuildConfigRepository>(user.GuildId);
+        using var repo = GetRepository<IGuildConfigRepository>(user.GuildId);
         repo.UpdateOrInsert(config);
         return Task.CompletedTask;
     }
@@ -113,7 +113,7 @@ internal class GroupService : RepositoryService, IGroupService {
 
         var setting = config.AutomatedMessagesConfig.ChannelJobs[jobType];
         setting.IsEnabled = !setting.IsEnabled;
-        var repo = GetRepository<IGuildConfigRepository>(guild.Id);
+        using var repo = GetRepository<IGuildConfigRepository>(guild.Id);
         repo.UpdateOrInsert(config);
         return Task.FromResult(setting.IsEnabled);
     }
@@ -199,7 +199,7 @@ internal class GroupService : RepositoryService, IGroupService {
             var groupMembers = (await _groupApi.View(config.WomGroupId)).Data.Members;
             config.WomGroup.Members = groupMembers;
 
-            var repo = RepositoryStrategy.GetOrCreateRepository<IGuildConfigRepository>(config.GuildId);
+            using var repo = RepositoryStrategy.GetOrCreateRepository<IGuildConfigRepository>(config.GuildId);
             var updateResult = repo.Update(config);
 
 
@@ -260,7 +260,7 @@ internal class GroupService : RepositoryService, IGroupService {
     }
 
     private GuildConfig GetGroupConfig(DiscordGuildId guildId, bool validate = true) {
-        var repo = GetRepository<IGuildConfigRepository>(guildId);
+        using var repo = GetRepository<IGuildConfigRepository>(guildId);
         var result = repo.GetSingle().Value;
         if (validate) {
             if (result == null) {
@@ -273,7 +273,7 @@ internal class GroupService : RepositoryService, IGroupService {
     }
 
     private Task AddAllPlayersToGroup(GuildUser guildUser, GuildConfig config) {
-        var repo = GetRepository<IPlayerRepository>(guildUser.GuildId);
+        using var repo = GetRepository<IPlayerRepository>(guildUser.GuildId);
         var players = repo.GetAll().Value;
         var usernames = new List<string>();
 

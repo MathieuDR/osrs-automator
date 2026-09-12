@@ -25,7 +25,7 @@ internal class PlayerService : RepositoryService, IPlayerService {
     public async Task<ItemDecorator<Player>> CoupleDiscordGuildUserToOsrsAccount(GuildUser user,
         string proposedOsrsName) {
         proposedOsrsName = proposedOsrsName.ToLowerInvariant();
-        var repo = GetRepository<IPlayerRepository>(user.GuildId);
+        using var repo = GetRepository<IPlayerRepository>(user.GuildId);
         var discordUserPlayer = repo.GetByDiscordId(user.Id).Value ?? new Common.Models.Data.PlayerManagement.Player(user.GuildId, user.Id);
 
         CheckIfPlayerIsAlreadyCoupled(user, proposedOsrsName, discordUserPlayer);
@@ -47,7 +47,7 @@ internal class PlayerService : RepositoryService, IPlayerService {
     }
 
     public Task<IEnumerable<ItemDecorator<Player>>> GetAllOsrsAccounts(GuildUser user) {
-        var repo = GetRepository<IPlayerRepository>(user.GuildId);
+        using var repo = GetRepository<IPlayerRepository>(user.GuildId);
         var player = repo.GetByDiscordId(user.Id).Value;
 
         if (player == null) {
@@ -108,7 +108,7 @@ internal class PlayerService : RepositoryService, IPlayerService {
             await SetDefaultAccount(user, player.CoupledOsrsAccounts.FirstOrDefault(), player);
         }
 
-        var repo = GetRepository<IPlayerRepository>(user.GuildId);
+        using var repo = GetRepository<IPlayerRepository>(user.GuildId);
         repo.UpdateOrInsert(player);
     }
 
@@ -117,7 +117,7 @@ internal class PlayerService : RepositoryService, IPlayerService {
     }
 
     public Task<string> GetDefaultOsrsDisplayName(GuildUser user) {
-        var repo = GetRepository<IPlayerRepository>(user.GuildId);
+        using var repo = GetRepository<IPlayerRepository>(user.GuildId);
         var player = repo.GetByDiscordId(user.Id).Value;
         return Task.FromResult(player?.DefaultPlayerUsername);
     }
@@ -138,7 +138,7 @@ internal class PlayerService : RepositoryService, IPlayerService {
 
         await EnforceUsername(user, player);
 
-        var repo = GetRepository<IPlayerRepository>(user.GuildId);
+        using var repo = GetRepository<IPlayerRepository>(user.GuildId);
         repo.UpdateOrInsert(player);
 
         return player.Nickname;
@@ -149,7 +149,7 @@ internal class PlayerService : RepositoryService, IPlayerService {
     }
 
     private bool IsIdCoupledInServer(DiscordGuildId guildId, int id) {
-        var repo = GetRepository<IPlayerRepository>(guildId);
+        using var repo = GetRepository<IPlayerRepository>(guildId);
         return repo.GetPlayerByOsrsAccount(id) != null;
     }
 
@@ -168,7 +168,7 @@ internal class PlayerService : RepositoryService, IPlayerService {
 
         await EnforceUsername(discordUser, player);
 
-        var repo = GetRepository<IPlayerRepository>(discordUser.GuildId);
+        using var repo = GetRepository<IPlayerRepository>(discordUser.GuildId);
 
         repo.UpdateOrInsert(player);
         return player.DefaultPlayerUsername;
@@ -182,7 +182,7 @@ internal class PlayerService : RepositoryService, IPlayerService {
     }
 
     private Common.Models.Data.PlayerManagement.Player GetPlayerConfigurationOrThrowException(GuildUser user) {
-        var repo = GetRepository<IPlayerRepository>(user.GuildId);
+        using var repo = GetRepository<IPlayerRepository>(user.GuildId);
         var config = repo.GetByDiscordId(user.Id).Value;
 
         if (config == null) {
@@ -201,10 +201,10 @@ internal class PlayerService : RepositoryService, IPlayerService {
             await SetDefaultAccount(discordUser, osrsPlayer, player);
         }
 
-        var repo = GetRepository<IPlayerRepository>(discordUser.GuildId);
+        using var repo = GetRepository<IPlayerRepository>(discordUser.GuildId);
         repo.UpdateOrInsert(player);
 
-        var configRepo = GetRepository<IGuildConfigRepository>(discordUser.GuildId);
+        using var configRepo = GetRepository<IGuildConfigRepository>(discordUser.GuildId);
         var config = configRepo.GetSingle().Value;
         if (config is not null && config.AutoAddNewAccounts) {
             await _osrsHighscoreService.AddOsrsAccountToToGroup(config.WomGroupId, config.WomVerificationCode, osrsPlayer.Username);
@@ -216,7 +216,7 @@ internal class PlayerService : RepositoryService, IPlayerService {
             throw new ValidationException($"User {proposedOsrsName} is already coupled to you.");
         }
 
-        var repo = GetRepository<IPlayerRepository>(discordUser.GuildId);
+        using var repo = GetRepository<IPlayerRepository>(discordUser.GuildId);
         if (repo.GetPlayerByOsrsAccount(proposedOsrsName) != null) {
             throw new ValidationException($"User {proposedOsrsName} is already registered on this server.");
         }
@@ -227,7 +227,7 @@ internal class PlayerService : RepositoryService, IPlayerService {
         toUpdate.CoupledOsrsAccounts.Remove(old);
         toUpdate.CoupledOsrsAccounts.Add(osrsPlayer);
 
-        var repo = GetRepository<IPlayerRepository>(guildId);
+        using var repo = GetRepository<IPlayerRepository>(guildId);
         repo.UpdateOrInsert(toUpdate);
     }
 }

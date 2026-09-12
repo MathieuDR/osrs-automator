@@ -20,7 +20,7 @@ public abstract class ConfigurableGuildJob : BaseGuildJob {
     protected IRepositoryStrategy RepositoryStrategy { get; }
 
     protected override Task<Result> DoWorkForGuild(Guild guild) {
-        var repo = RepositoryStrategy.GetOrCreateRepository<IGuildConfigRepository>(guild.Id);
+        using var repo = RepositoryStrategy.GetOrCreateRepository<IGuildConfigRepository>(guild.Id);
         var guildConfiguration = repo.GetSingle().ValueOrDefault;
         ChannelJobConfiguration jobConfiguration = null;
         guildConfiguration?.AutomatedMessagesConfig?.ChannelJobs?.TryGetValue(JobType, out jobConfiguration);
