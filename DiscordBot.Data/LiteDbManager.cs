@@ -11,20 +11,23 @@ using Serilog.Context;
 
 namespace DiscordBot.Data;
 
-public class LiteDbManager: IDisposable {
-    private readonly object _commonLock = new();
-    private readonly object _createLock = new();
-    private readonly Dictionary<DiscordGuildId, LiteDatabase> _databases = new();
+public class LiteDbManager {
+    private sealed class Entry {
+        public LiteDatabase Db;
+        public int RefCount;
+    }
+
+    private readonly object _gate = new();
+    private readonly Dictionary<string, Entry> _open = new();
     private readonly ILogger<LiteDbManager> _logger;
     private readonly MigrationManager _manager;
     private readonly LiteDbOptions _options;
-    private LiteDatabase _commonDatabase;
 
     public LiteDbManager(ILogger<LiteDbManager> logger, IOptions<LiteDbOptions> options, MigrationManager manager) {
         _logger = logger;
         _manager = manager;
         _options = options.Value;
-        
+
         AddMappers();
     }
 
@@ -35,13 +38,13 @@ public class LiteDbManager: IDisposable {
         BsonMapper.RegisterType(id => id.Value, bson => new DiscordChannelId(bson.AsInt64));
         BsonMapper.RegisterType(id => id.Value, bson => new DiscordMessageId(bson.AsInt64));
         BsonMapper.RegisterType(id => id.Value, bson => new DiscordRoleId(bson.AsInt64));
-        
+
         AddDictMapper<DiscordRoleId, AuthorizationRoles>(x=> new DiscordRoleId(x));
         AddDictMapper<DiscordUserId, AuthorizationRoles>(x=> new DiscordUserId(x));
         AddDictMapper<DiscordUserId, List<Shame>>(x=> new DiscordUserId(x));
         AddDictMapper<DiscordUserId, EndpointId>(x=> new DiscordUserId(x));
     }
-    
+
     public static void AddDictMapper<TIdentity, TObject>(Func<ulong, TIdentity> ctor) where TIdentity : new() {
         BsonMapper.Global.RegisterType(
             dictionary => {
@@ -68,6 +71,14 @@ public class LiteDbManager: IDisposable {
 
     public BsonMapper BsonMapper { get; set; }
 
+    public int OpenDatabaseCount {
+        get {
+            lock (_gate) {
+                return _open.Count;
+            }
+        }
+    }
+
     private string CreateConnectionString(string identifier = "common") {
         return $"{_options.PathPrefix}{identifier}_{_options.FileSuffix}.db";
     }
@@ -76,31 +87,43 @@ public class LiteDbManager: IDisposable {
         return CreateConnectionString(guildId.ToString());
     }
 
-    public LiteDatabase GetCommonDatabase() {
-        lock (_commonLock) {
-            _logger.LogTrace("Requesting Common LiteDb");
-            return _commonDatabase ??= CreateDatabase(CreateConnectionString());
-        }
+    public DatabaseLease Lease(DiscordGuildId guildId) {
+        _logger.LogTrace("Requesting LiteDb lease for {guild}", guildId);
+        return LeaseFile(GetGuildFileName(guildId));
     }
 
-    public LiteDatabase GetDatabase(DiscordGuildId guildId) {
-        lock (_createLock) {
-            _logger.LogTrace("Requesting LiteDb for {guild}", guildId);
+    public DatabaseLease LeaseCommon() {
+        _logger.LogTrace("Requesting Common LiteDb lease");
+        return LeaseFile(CreateConnectionString());
+    }
 
-            if (!_databases.TryGetValue(guildId, out var database)){
-                database = CreateDb(guildId);
+    private DatabaseLease LeaseFile(string path) {
+        lock (_gate) {
+            if (!_open.TryGetValue(path, out var entry)) {
+                entry = new Entry { Db = CreateDatabase(path) };
+                _open[path] = entry;
             }
 
-            return database;
+            entry.RefCount++;
+            return new DatabaseLease(this, path, entry.Db);
         }
     }
 
-    private LiteDatabase CreateDb(DiscordGuildId guildId) {
-        LiteDatabase database;
-        _logger.LogTrace("Creating LiteDb for {guild}", guildId);
-        database = CreateDatabase(GetGuildFileName(guildId));
-        _databases.Add(guildId, database);
-        return database;
+    internal void Release(string path) {
+        LiteDatabase toDispose = null;
+        lock (_gate) {
+            if (!_open.TryGetValue(path, out var entry)) {
+                return;
+            }
+
+            entry.RefCount--;
+            if (entry.RefCount <= 0 && _options.CloseWhenUnused) {
+                _open.Remove(path);
+                toDispose = entry.Db;
+            }
+        }
+
+        toDispose?.Dispose();
     }
 
     private LiteDatabase CreateDatabase(string connectionString) {
@@ -121,18 +144,16 @@ public class LiteDbManager: IDisposable {
         }
     }
 
-    public void ClearDb() {
-        _commonDatabase?.Dispose();
-        _commonDatabase = null;
-        foreach (var liteDatabase in _databases) {
-            liteDatabase.Value.Dispose();
+    public void DisposeAll() {
+        _logger.LogInformation("Disposing all open databases");
+        List<LiteDatabase> toDispose;
+        lock (_gate) {
+            toDispose = _open.Values.Select(e => e.Db).ToList();
+            _open.Clear();
         }
-        
-        _databases.Clear();
-    }
 
-    public void Dispose() {
-        _logger.LogInformation("Disposing");
-        ClearDb();
+        foreach (var db in toDispose) {
+            db.Dispose();
+        }
     }
 }
