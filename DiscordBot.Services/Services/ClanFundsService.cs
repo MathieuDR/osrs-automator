@@ -19,7 +19,7 @@ public class ClanFundsService: BaseService, IClanFundsService {
 		_discordService = discordService;
 	}
 	public Task<Result<IEnumerable<ClanFundEvent>>> GetClanFundEvents(Guild guild) {
-		var repo = _repositoryStrategy.GetOrCreateRepository<IClanFundsRepository>(guild.Id);
+		using var repo = _repositoryStrategy.GetOrCreateRepository<IClanFundsRepository>(guild.Id);
 
 		var single = repo.GetSingle();
 		if (single.IsFailed) {
@@ -30,7 +30,7 @@ public class ClanFundsService: BaseService, IClanFundsService {
 	}
 
 	public Task<Result<ClanFunds>> GetClanFund(Guild guild) {
-		var repo = _repositoryStrategy.GetOrCreateRepository<IClanFundsRepository>(guild.Id);
+		using var repo = _repositoryStrategy.GetOrCreateRepository<IClanFundsRepository>(guild.Id);
 
 		var single = repo.GetSingle();
 		if (single.IsFailed || single.Value is null) {
@@ -62,7 +62,7 @@ public class ClanFundsService: BaseService, IClanFundsService {
 		}
 		
 		// save to clanfund
-		var repo = _repositoryStrategy.GetOrCreateRepository<IClanFundsRepository>(guild.Id);
+		using var repo = _repositoryStrategy.GetOrCreateRepository<IClanFundsRepository>(guild.Id);
 		var single = repo.GetSingle();
 		if (single.IsFailed  || single.Value is null) {
 			return Task.FromResult(Result.Fail("Could not get the clan funds from the repository! Perhaps it does not exist?"));
@@ -93,7 +93,7 @@ public class ClanFundsService: BaseService, IClanFundsService {
 			return updateResult.ToResult();
 		}
 			
-		var repo = _repositoryStrategy.GetOrCreateRepository<IClanFundsRepository>(guildId);
+		using var repo = _repositoryStrategy.GetOrCreateRepository<IClanFundsRepository>(guildId);
 		clanFunds = clanFunds with { DonationLeaderBoardMessage = updateResult.Value };
 		var repoUpdate = repo.Update(clanFunds);
 			
@@ -117,7 +117,7 @@ public class ClanFundsService: BaseService, IClanFundsService {
 	}
 
 	public async Task<Result> Initialize(GuildUser user, Channel trackingChannel, Channel donationChannel, long? currentFunds = null) {
-		var repo = _repositoryStrategy.GetOrCreateRepository<IClanFundsRepository>(user.GuildId);
+		using var repo = _repositoryStrategy.GetOrCreateRepository<IClanFundsRepository>(user.GuildId);
 
 		var single = repo.GetSingle();
 		if (single.IsFailed) {

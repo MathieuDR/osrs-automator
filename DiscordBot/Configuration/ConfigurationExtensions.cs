@@ -1,7 +1,7 @@
 using Discord.Commands;
 using DiscordBot.Commands.Interactive;
 using DiscordBot.Common.Configuration;
-using DiscordBot.Data.Interfaces;
+using DiscordBot.Data.Strategies;
 using DiscordBot.Services;
 using DiscordBot.Services.Services;
 using MediatR;
@@ -132,7 +132,7 @@ public static class ConfigurationExtensions {
             .Decorate<ICommandRegistrationService>((inner, provider) => new CommandDefinitionRegistrationService(
                 provider.GetRequiredService<ILogger<CommandDefinitionRegistrationService>>(),
                 provider.GetRequiredService<DiscordSocketClient>(),
-                provider.GetRequiredService<IApplicationCommandInfoRepository>(),
+                provider.GetRequiredService<IRepositoryStrategy>(),
                 provider.GetRequiredService<ICommandDefinitionProvider>(),
                 inner));
 

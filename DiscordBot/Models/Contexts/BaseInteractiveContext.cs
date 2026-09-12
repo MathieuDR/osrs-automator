@@ -22,11 +22,28 @@ public abstract class BaseInteractiveContext<T> : BaseInteractiveContext where T
         ServiceProvider = provider;
         InteractiveService = provider.GetRequiredService<InteractiveService>();
         Client = provider.GetRequiredService<DiscordSocketClient>();
+        HostingFooter = ResolveHostingFooter(provider);
     }
 
     public T InnerContext { get; }
     public IServiceProvider ServiceProvider { get; }
     public DiscordSocketClient Client { get; }
+    public string HostingFooter { get; }
+
+    // A footer lookup problem (guild not yet cached during a gateway resume, a broken common DB,
+    // ...) must never break command dispatch: resolve it defensively and swallow/log any failure.
+    private string ResolveHostingFooter(IServiceProvider provider) {
+        try {
+            if (InnerContext.Channel is IGuildChannel && Guild is SocketGuild guild) {
+                return provider.GetRequiredService<IHostingService>().GetStatus(guild.GetGuildId(), guild.Name).FooterText;
+            }
+        } catch (Exception ex) {
+            var logger = provider.GetService<ILoggerFactory>()?.CreateLogger(nameof(BaseInteractiveContext));
+            logger?.LogDebug(ex, "Failed to resolve the hosting footer for this interaction");
+        }
+
+        return null;
+    }
 
     public SocketGuild Guild => Client.GetGuild(InnerContext.Channel.Cast<IGuildChannel>().GuildId);
     public bool InGuild => Guild != null;
@@ -47,15 +64,26 @@ public abstract class BaseInteractiveContext<T> : BaseInteractiveContext where T
     public override bool IsDeferred => _isDeferred;
 
     public PageBuilder CreatePageBuilder(string description = null) {
-        return new PageBuilder()
+        var builder = new PageBuilder()
             .WithColor(GuildUser.GetHighestRole()?.Color ?? 0x7000FB)
-            .WithDescription(description ?? string.Empty)
+            .WithDescription(AppendHostingFooterToDescription(description ?? string.Empty))
             .WithCurrentTimestamp();
+
+        return builder;
     }
-    
+
     public PageBuilder CreatePageBuilder(EmbedBuilder embedBuilder, string description = null) {
-        return PageBuilder.FromEmbedBuilder(embedBuilder)
-            .WithDescription(description ?? string.Empty);
+        var builder = PageBuilder.FromEmbedBuilder(embedBuilder)
+            .WithDescription(AppendHostingFooterToDescription(description ?? string.Empty));
+
+        return builder;
+    }
+
+    // Fergun's StaticPaginatorBuilder.WithFooter(PaginatorFooter.Users | PaginatorFooter.PageNumber)
+    // (see GetBaseStaticPaginatorBuilder below) overrides any per-page embed footer, so the hosting line
+    // is appended as Discord subtext at the end of the page description instead of set via .WithFooter.
+    private string AppendHostingFooterToDescription(string description) {
+        return HostingFooter is not null ? description + "\n-# " + HostingFooter : description;
     }
 
     public string GetDisplayNameById(DiscordUserId user) {
@@ -118,6 +146,7 @@ public abstract class BaseInteractiveContext<T> : BaseInteractiveContext where T
         RequestOptions options = null,
         MessageComponent component = null) {
         _isDeferred = true;
+        text = AppendHostingFooter(text, embeds);
         return InnerContext.RespondAsync(text, embeds?.ToArray(), isTts, ephemeral, allowedMentions, component, options: options);
     }
 
@@ -129,13 +158,22 @@ public abstract class BaseInteractiveContext<T> : BaseInteractiveContext where T
         AllowedMentions allowedMentions = null,
         RequestOptions options = null,
         MessageComponent component = null) {
+        text = AppendHostingFooter(text, embeds);
         return InnerContext.FollowupAsync(text, embeds?.ToArray(), isTts, ephemeral, allowedMentions, component, options: options);
+    }
+
+    private string AppendHostingFooter(string text, IEnumerable<Embed> embeds) {
+        if (HostingFooter is not null && (embeds is null || !embeds.Any()) && !string.IsNullOrEmpty(text)) {
+            text += "\n-# " + HostingFooter;
+        }
+
+        return text;
     }
 
     public override EmbedBuilder CreateEmbedBuilder(string title = null, string content = null) {
         return new EmbedBuilder()
             .WithColor(GuildUser.GetHighestRole()?.Color ?? 0x7000FB)
-            .WithMessageAuthorFooter(User)
+            .WithMessageAuthorFooter(User, HostingFooter ?? string.Empty)
             .WithTitle(title)
             .WithDescription(content ?? string.Empty)
             .WithCurrentTimestamp();

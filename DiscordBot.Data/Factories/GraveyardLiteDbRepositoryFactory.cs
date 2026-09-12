@@ -11,7 +11,7 @@ internal class GraveyardLiteDbRepositoryFactory : BaseLiteDbRepositoryFactory<IG
 	public override bool RequiresGuildId => true;
 
 	public override IGraveyardRepository Create(DiscordGuildId guildId) {
-		return new GraveyardRepository(GetLogger(), LiteDbManager.GetDatabase(guildId));
+		return new GraveyardRepository(GetLogger(), LiteDbManager.Lease(guildId));
 	}
 
 	public override IGraveyardRepository Create() {

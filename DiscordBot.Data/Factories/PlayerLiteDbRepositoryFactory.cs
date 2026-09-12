@@ -10,7 +10,7 @@ internal class PlayerLiteDbRepositoryFactory : BaseLiteDbRepositoryFactory<IPlay
     public override bool RequiresGuildId => true;
 
     public override IPlayerRepository Create(DiscordGuildId guildId) {
-        return new PlayerRepository(GetLogger(), LiteDbManager.GetDatabase(guildId));
+        return new PlayerRepository(GetLogger(), LiteDbManager.Lease(guildId));
     }
 
     public override IRepository Create() {

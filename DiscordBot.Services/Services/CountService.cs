@@ -51,13 +51,13 @@ internal class CountService : RepositoryService, ICounterService {
     public UserCountInfo GetCountInfo(GuildUser user) => GetOrCreateUserCountInfo(user);
 
     public List<UserCountInfo> TopCounts(Guild guild, int quantity) {
-        var repo = GetRepository<IUserCountInfoRepository>(guild.Id);
+        using var repo = GetRepository<IUserCountInfoRepository>(guild.Id);
         var all = repo.GetAll().Value;
         return all.OrderByDescending(c => c.CurrentCount).Take(quantity).ToList();
     }
 
     public (List<UserCountInfo> users, int startIndex) CountRanking(GuildUser user, int quantity) {
-        var repo = GetRepository<IUserCountInfoRepository>(user.GuildId);
+        using var repo = GetRepository<IUserCountInfoRepository>(user.GuildId);
         var all = repo.GetAll().Value.OrderByDescending(c => c.CurrentCount).ToList();
         var userCountInfo = all.FirstOrDefault(x => x.DiscordId == user.Id);
 
@@ -72,7 +72,7 @@ internal class CountService : RepositoryService, ICounterService {
     }
 
     public Task<bool> SetChannelForCounts(GuildUser user, Channel outputChannel) {
-        var repo = GetRepository<IGuildConfigRepository>(user.GuildId);
+        using var repo = GetRepository<IGuildConfigRepository>(user.GuildId);
         var config = GetGroupConfig(user.GuildId);
         config.CountConfig ??= new CountConfig();
 
@@ -93,7 +93,7 @@ internal class CountService : RepositoryService, ICounterService {
         var result = config.CountConfig.AddThreshold(toAdd);
 
         if (result) {
-            var repo = GetRepository<IGuildConfigRepository>(creator.GuildId);
+            using var repo = GetRepository<IGuildConfigRepository>(creator.GuildId);
             repo.UpdateOrInsert(config);
         }
 
@@ -105,7 +105,7 @@ internal class CountService : RepositoryService, ICounterService {
         var result = config.CountConfig.RemoveAtIndex(index);
 
         if (result) {
-            var repo = GetRepository<IGuildConfigRepository>(guildId);
+            using var repo = GetRepository<IGuildConfigRepository>(guildId);
             repo.UpdateOrInsert(config);
         }
 
@@ -123,7 +123,7 @@ internal class CountService : RepositoryService, ICounterService {
     }
 
     public Task<IEnumerable<UserCountInfo>> GetAllUserInfo(Guild guild) {
-        var repo = GetRepository<IUserCountInfoRepository>(guild.Id);
+        using var repo = GetRepository<IUserCountInfoRepository>(guild.Id);
         var allResult = repo.GetAll();
 
         if (allResult.IsFailed) {
@@ -134,7 +134,7 @@ internal class CountService : RepositoryService, ICounterService {
     }
 
     public Task<List<Item>> GetItemsForGuild(Guild guild) {
-        var repo = GetRepository<ISelfCountConfigurationRepository>(guild.Id);
+        using var repo = GetRepository<ISelfCountConfigurationRepository>(guild.Id);
         var configResult = repo.GetSingle();
 
         if (configResult.IsFailed) {
@@ -154,7 +154,7 @@ internal class CountService : RepositoryService, ICounterService {
     }
 
     public Task<Result<bool>> CanSelfCountInChannel(GuildUser user, Channel channel) {
-        var repo = GetRepository<ISelfCountConfigurationRepository>(user.GuildId);
+        using var repo = GetRepository<ISelfCountConfigurationRepository>(user.GuildId);
         var configResult = repo.GetSingle();
 
         if (configResult.IsFailed) {
@@ -171,7 +171,7 @@ internal class CountService : RepositoryService, ICounterService {
     }
 
     public Task<Result> SetRequestChannel(GuildUser user, Channel? channel) {
-        var repo = GetRepository<ISelfCountConfigurationRepository>(user.GuildId);
+        using var repo = GetRepository<ISelfCountConfigurationRepository>(user.GuildId);
         var configResult = repo.GetSingle();
         var config = configResult.IsSuccess && configResult.Value is not null 
             ? configResult.Value with {RequestChannel = channel?.Id} 
@@ -191,7 +191,7 @@ internal class CountService : RepositoryService, ICounterService {
         });
         
         
-        var repo = GetRepository<ISelfCountConfigurationRepository>(user.GuildId);
+        using var repo = GetRepository<ISelfCountConfigurationRepository>(user.GuildId);
         var configResult = repo.GetSingle();
         
         var config = configResult.IsSuccess  && configResult.Value is not null ? configResult.Value with {Items = items} : new SelfCountConfiguration(user.GuildId, user.Id, items, null);
@@ -291,7 +291,7 @@ internal class CountService : RepositoryService, ICounterService {
     }
 
     private void UpsertCounts(GuildUser requester, List<UserCountInfo> counts) {
-        var repo = GetRepository<IUserCountInfoRepository>(requester.GuildId);
+        using var repo = GetRepository<IUserCountInfoRepository>(requester.GuildId);
         repo.BulkUpdateOrInsert(counts);
     }
 
@@ -314,7 +314,7 @@ internal class CountService : RepositoryService, ICounterService {
     }
 
     private UserCountInfo GetOrCreateUserCountInfo(GuildUser user, GuildUser requester = null) {
-        var repo = GetRepository<IUserCountInfoRepository>(user.GuildId);
+        using var repo = GetRepository<IUserCountInfoRepository>(user.GuildId);
         var result = repo.GetByDiscordUserId(user.Id).Value ?? new UserCountInfo(requester?.Id ?? user.Id) { DiscordId = user.Id };
 
         return result;
@@ -331,7 +331,7 @@ internal class CountService : RepositoryService, ICounterService {
     }
 
     private GuildConfig GetGroupConfig(DiscordGuildId guildId, bool validate = true) {
-        var repo = GetRepository<IGuildConfigRepository>(guildId);
+        using var repo = GetRepository<IGuildConfigRepository>(guildId);
         var result = repo.GetSingle().Value;
 
         if (result == null) {

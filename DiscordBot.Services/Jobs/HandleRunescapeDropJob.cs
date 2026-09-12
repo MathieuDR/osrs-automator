@@ -24,7 +24,7 @@ public class HandleRunescapeDropJob : RepositoryJob {
 
     protected override async Task<Result> DoWork() {
         var endpoint = new DiscordUserId(Context.MergedJobDataMap.GetLongValue("endpoint"));
-        var repo = RepositoryStrategy.GetOrCreateRepository<IRuneScapeDropDataRepository>();
+        using var repo = RepositoryStrategy.GetOrCreateRepository<IRuneScapeDropDataRepository>();
         var data = repo.GetActive(endpoint).Value;
 
         var guildIds = GetGuildIdsForEndpoint(endpoint).ToList();
@@ -87,7 +87,7 @@ public class HandleRunescapeDropJob : RepositoryJob {
                 continue;
             }
 
-            var repo = RepositoryStrategy.GetOrCreateRepository<IRunescapeDropperGuildConfigurationRepository>(guildId);
+            using var repo = RepositoryStrategy.GetOrCreateRepository<IRunescapeDropperGuildConfigurationRepository>(guildId);
             var configurationResult = repo.GetSingle();
             if (configurationResult.IsFailed) {
                 errors.AddRange(configurationResult.Errors);

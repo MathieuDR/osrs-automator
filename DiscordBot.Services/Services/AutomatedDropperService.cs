@@ -61,13 +61,13 @@ internal class AutomatedDropperService : RepositoryService, IAutomatedDropperSer
         Task.FromResult(GetGuildConfiguration(guild.Id, DiscordUserId.Empty));
 
     Task<Result> IAutomatedDropperService.SaveGuildConfiguration(DropperGuildConfiguration configuration) {
-        var repo = RepositoryStrategy.GetOrCreateRepository<IRunescapeDropperGuildConfigurationRepository>(configuration.GuildId);
+        using var repo = RepositoryStrategy.GetOrCreateRepository<IRunescapeDropperGuildConfigurationRepository>(configuration.GuildId);
         var r= repo.UpdateOrInsert(configuration);
         return Task.FromResult<Result>(r);
     }
 
     private Result SaveGuildConfiguration(DropperGuildConfiguration guildConfiguration) {
-        var repo = RepositoryStrategy.GetOrCreateRepository<IRunescapeDropperGuildConfigurationRepository>(guildConfiguration.GuildId);
+        using var repo = RepositoryStrategy.GetOrCreateRepository<IRunescapeDropperGuildConfigurationRepository>(guildConfiguration.GuildId);
         return repo.UpdateOrInsert(guildConfiguration);
     }
 
@@ -78,7 +78,7 @@ internal class AutomatedDropperService : RepositoryService, IAutomatedDropperSer
     }
 
     private Result<DropperGuildConfiguration> GetGuildConfiguration(DiscordGuildId guildId, DiscordUserId requestingUser) {
-        var repo = RepositoryStrategy.GetOrCreateRepository<IRunescapeDropperGuildConfigurationRepository>(guildId);
+        using var repo = RepositoryStrategy.GetOrCreateRepository<IRunescapeDropperGuildConfigurationRepository>(guildId);
         var result = repo.GetSingle();
 
         if (result.IsFailed) {
@@ -127,7 +127,7 @@ internal class AutomatedDropperService : RepositoryService, IAutomatedDropperSer
     }
 
     private Result<RunescapeDrop> SaveDropData(EndpointId endpoint, DiscordUserId userId, RunescapeDrop drop, string base64Image) {
-        var repo = RepositoryStrategy.GetOrCreateRepository<IRuneScapeDropDataRepository>();
+        using var repo = RepositoryStrategy.GetOrCreateRepository<IRuneScapeDropDataRepository>();
 
         var activeRecordResult = repo.GetActive(userId);
         var data = activeRecordResult.ValueOrDefault ?? new RunescapeDropData { UserId = userId, Endpoint = endpoint};

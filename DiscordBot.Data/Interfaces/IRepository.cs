@@ -4,7 +4,7 @@ using LiteDB;
 
 namespace DiscordBot.Data.Interfaces;
 
-public interface IRepository { }
+public interface IRepository : IDisposable { }
 
 public interface IRepository<T> : IRepository where T : BaseModel, new() {
     public Result<IEnumerable<T>> GetAll();

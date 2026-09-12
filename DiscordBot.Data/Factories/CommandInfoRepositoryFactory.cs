@@ -14,6 +14,6 @@ internal class CommandInfoRepositoryFactory : BaseLiteDbRepositoryFactory<IAppli
     }
 
     public override IApplicationCommandInfoRepository Create() {
-        return new ApplicationCommandInfoRepository(GetLogger(), LiteDbManager.GetCommonDatabase());
+        return new ApplicationCommandInfoRepository(GetLogger(), LiteDbManager.LeaseCommon());
     }
 }

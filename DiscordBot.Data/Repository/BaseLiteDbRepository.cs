@@ -7,17 +7,20 @@ using Microsoft.Extensions.Logging;
 namespace DiscordBot.Data.Repository;
 
 internal abstract class BaseLiteDbRepository<T> : IRepository<T> where T : BaseModel, new() {
-    public BaseLiteDbRepository(ILogger logger, LiteDatabase database) {
+    private readonly DatabaseLease _lease;
+
+    public BaseLiteDbRepository(ILogger logger, DatabaseLease lease) {
         Logger = logger;
-        LiteDatabase = database;
+        _lease = lease;
     }
 
     public ILogger Logger { get; }
-    public LiteDatabase LiteDatabase { get; }
+    public LiteDatabase LiteDatabase => _lease.Database;
     public abstract string CollectionName { get; }
 
     public virtual Result<IEnumerable<T>> GetAll() {
-        return Result.Ok(GetCollection().FindAll());
+        IEnumerable<T> all = GetCollection().FindAll().ToList();
+        return Result.Ok(all);
     }
 
     public virtual Result<T> Get(ObjectId id) {
@@ -69,4 +72,6 @@ internal abstract class BaseLiteDbRepository<T> : IRepository<T> where T : BaseM
     protected ILiteCollection<T> GetCollection() {
         return LiteDatabase.GetCollection<T>(CollectionName);
     }
+
+    public void Dispose() => _lease.Dispose();
 }

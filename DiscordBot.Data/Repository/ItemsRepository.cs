@@ -7,6 +7,6 @@ using Microsoft.Extensions.Logging;
 namespace DiscordBot.Data.Repository; 
 
 internal sealed class ItemsRepository : BaseSingleRecordLiteDbRepository<SelfCountConfiguration>, IItemsRepository{
-    public ItemsRepository(ILogger logger, LiteDatabase database) : base(logger, database) { }
+    public ItemsRepository(ILogger logger, DatabaseLease lease) : base(logger, lease) { }
     public override string CollectionName => "items";
 }

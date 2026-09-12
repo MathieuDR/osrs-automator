@@ -1,7 +1,8 @@
 using DiscordBot.Commands.Interactive;
+using DiscordBot.Common.Configuration;
 using DiscordBot.Common.Identities;
-using DiscordBot.Configuration;
 using DiscordBot.Data.Interfaces;
+using DiscordBot.Data.Strategies;
 using MathieuDR.Common.Extensions;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
@@ -11,32 +12,35 @@ namespace DiscordBot.Services;
 public class InteractiveCommandHandlerService {
 	private readonly IOptions<BotTeamConfiguration> _botTeamConfiguration;
 	private readonly DiscordSocketClient _client;
-	private readonly IApplicationCommandInfoRepository _commandInfoRepository;
+	private readonly IRepositoryStrategy _repositoryStrategy;
 	private readonly ICommandInstigator _commandInstigator;
 	private readonly InteractiveService _interactiveService;
 	private readonly ILogger<InteractiveCommandHandlerService> _logger;
 	private readonly IServiceProvider _provider;
 	private readonly ICommandRegistrationService _registrationService;
 	private readonly ICommandStrategy _strategy;
+	private readonly IHostingService _hostingService;
 
 	public InteractiveCommandHandlerService(ILogger<InteractiveCommandHandlerService> logger,
 		DiscordSocketClient client,
 		IServiceProvider provider,
-		IApplicationCommandInfoRepository commandInfoRepository,
+		IRepositoryStrategy repositoryStrategy,
 		ICommandRegistrationService registrationService,
 		IOptions<BotTeamConfiguration> botTeamConfiguration,
 		ICommandInstigator commandInstigator,
 		InteractiveService interactiveService,
-		ICommandStrategy strategy) {
+		ICommandStrategy strategy,
+		IHostingService hostingService) {
 		_logger = logger;
 		_client = client;
 		_provider = provider;
-		_commandInfoRepository = commandInfoRepository;
+		_repositoryStrategy = repositoryStrategy;
 		_registrationService = registrationService;
 		_botTeamConfiguration = botTeamConfiguration;
 		_interactiveService = interactiveService;
 		_strategy = strategy;
 		_commandInstigator = commandInstigator;
+		_hostingService = hostingService;
 
 		client.InteractionCreated += OnInteraction;
 	}
@@ -93,6 +97,21 @@ public class InteractiveCommandHandlerService {
 
 		_logger.LogInformation("[{ctx}] Command triggered", ctx);
 
+		// Hosting is a side concern to every other command's dispatch: a bug or a common-DB failure in
+		// here must never leave the interaction unanswered, so any exception is logged and falls
+		// through to normal dispatch below rather than propagating out of OnInteraction.
+		try {
+			if (arg is SocketSlashCommand && ctx is ApplicationCommandContext appCtx && appCtx.Guild is SocketGuild guild
+				&& !string.Equals(appCtx.Command, "hosting", StringComparison.OrdinalIgnoreCase)
+				&& _hostingService.ShouldDegrade(guild.GetGuildId(), appCtx.User.GetUserId())) {
+				var degradedMsg = _hostingService.GetDegradedMessage(guild.GetGuildId(), guild.Name);
+				_logger.LogInformation("[{ctx}] degraded mode: refusing command", ctx);
+				await appCtx.RespondAsync(embeds: new[] { appCtx.CreateEmbedBuilder().WithFailure(degradedMsg).Build() });
+				return;
+			}
+		} catch (Exception ex) {
+			_logger.LogWarning(ex, "[{ctx}] degraded-mode check failed, dispatching normally", ctx);
+		}
 
 		var result = await _commandInstigator.ExecuteCommandAsync(ctx).ConfigureAwait(false);
 		if (result.IsFailed && result.HasError(x=> x.HasMetadataKey("404"))) {
@@ -126,7 +145,8 @@ public class InteractiveCommandHandlerService {
         await RegisterCommandForOwnersGuild(killCommand);
 		
 
-		var commandInfos = _commandInfoRepository.GetAll().Value;
+		using var repo = _repositoryStrategy.GetOrCreateRepository<IApplicationCommandInfoRepository>();
+		var commandInfos = repo.GetAll().Value;
 		await _registrationService.UpdateAllCommands(commandInfos);
 	}
 

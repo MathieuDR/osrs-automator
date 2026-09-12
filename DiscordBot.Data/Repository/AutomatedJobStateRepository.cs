@@ -6,6 +6,6 @@ using Microsoft.Extensions.Logging;
 namespace DiscordBot.Data.Repository;
 
 internal class AutomatedJobStateRepository : BaseLiteDbRepository<AutomatedJobState>, IAutomatedJobStateRepository {
-    public AutomatedJobStateRepository(ILogger<AutomatedJobStateRepository> logger, LiteDatabase database) : base(logger, database) { }
+    public AutomatedJobStateRepository(ILogger<AutomatedJobStateRepository> logger, DatabaseLease lease) : base(logger, lease) { }
     public override string CollectionName => "guildJobState";
 }

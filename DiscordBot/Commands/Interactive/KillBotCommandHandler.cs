@@ -23,7 +23,7 @@ public class KillBotCommandHandler : ApplicationCommandHandler {
 
         await context.CreateReplyBuilder().WithEmbed(b => b.WithTitle("Killing bot")).RespondAsync();
         
-        _manager.Dispose();
+        _manager.DisposeAll();
         Environment.Exit(0);
         return Result.Ok();
     }

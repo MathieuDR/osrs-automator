@@ -11,7 +11,7 @@ internal class RunescapeDropperGuildConfigurationRepositoryFactory :
 	public override bool RequiresGuildId => true;
 
 	public override IRunescapeDropperGuildConfigurationRepository Create(DiscordGuildId guildId) {
-		return new RunescapeDropperGuildConfigurationRepository(GetLogger(), LiteDbManager.GetDatabase(guildId));
+		return new RunescapeDropperGuildConfigurationRepository(GetLogger(), LiteDbManager.Lease(guildId));
 	}
 
 	public override IRunescapeDropperGuildConfigurationRepository Create() => throw new NotImplementedException();

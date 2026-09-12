@@ -34,13 +34,13 @@ internal sealed class ConfirmationService : RepositoryService, IConfirmationServ
         
         var discordMessageId = discordMessageResult.Value;
 
-        var repo = GetRepository<IConfirmationRepository>(requestedBy.GuildId);
+        using var repo = GetRepository<IConfirmationRepository>(requestedBy.GuildId);
         return repo.Insert(new Confirmation(discordMessageId, requestedBy.Id, null, command));
     }
 
 
     public Result Confirm(bool accepted, DiscordMessageId messageId, GuildUser confirmedBy) {
-        var repo = GetRepository<IConfirmationRepository>(confirmedBy.GuildId);
+        using var repo = GetRepository<IConfirmationRepository>(confirmedBy.GuildId);
         var confirmationResult = repo.GetUnconfirmedByMessageId(messageId);
         if (confirmationResult.IsFailed) {
             return confirmationResult.ToResult();
@@ -55,7 +55,7 @@ internal sealed class ConfirmationService : RepositoryService, IConfirmationServ
     }
 
     public Result SetConfirmChannel(Channel channelId, GuildUser requestedBy) {
-        var repo = GetRepository<IConfirmConfigurationRepository>(requestedBy.GuildId);
+        using var repo = GetRepository<IConfirmConfigurationRepository>(requestedBy.GuildId);
         var configResult = repo.GetSingle();
 
         var configuration = configResult.IsFailed || configResult.Value is null
@@ -85,7 +85,7 @@ internal sealed class ConfirmationService : RepositoryService, IConfirmationServ
     }
     
     private Result<ConfirmationConfiguration> GetConfirmationConfiguration(DiscordGuildId guildId) {
-        var repo = GetRepository<IConfirmConfigurationRepository>(guildId);
+        using var repo = GetRepository<IConfirmConfigurationRepository>(guildId);
         return repo.GetSingle();
     }
 }

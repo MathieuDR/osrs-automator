@@ -39,6 +39,12 @@ public class TestModelWithList {
 	public List<DiscordUserId> List { get; set; }
 }
 
+// BsonMapper.Global is a process-wide static shared by every LiteDbManager instance. Concurrent
+// construction of LiteDbManager from two xUnit test classes running in parallel collections races
+// on that shared static and can corrupt LiteDB's own internal state (surfacing as unrelated
+// exceptions deep inside the LiteDB engine). Both LiteDbManager-driving test classes share this
+// collection so xUnit runs them sequentially relative to each other.
+[Collection("LiteDbManager")]
 public class IdentityTests : IDisposable {
 	protected LiteDbManager _dbManager;
 	private IOptions<LiteDbOptions> _options;
@@ -61,8 +67,8 @@ public class IdentityTests : IDisposable {
 	}
 
 	public void Dispose() {
-		_dbManager.Dispose();
-		
+		_dbManager.DisposeAll();
+
 		// Delete the database file that starts with the path prefix
 		var files = Directory.GetFiles(".", _options.Value.PathPrefix+"*.db");
 		foreach (var file in files) {
@@ -75,10 +81,10 @@ public class IdentityTests : IDisposable {
 		//Arrange
 
 		//Act
-		var db = _dbManager.GetDatabase(new DiscordGuildId(10));
+		using var lease = _dbManager.Lease(new DiscordGuildId(10));
 
 		//Assert
-		db.Should().NotBeNull();
+		lease.Database.Should().NotBeNull();
 	}
 
 	[Fact]
@@ -100,16 +106,18 @@ public class IdentityTests : IDisposable {
 		var command = new SelfCountConfirmCommand("title", "description", embeds, item, guildUser, Array.Empty<GuildUser>(), "url");
 
 		var insert = new Confirmation(new DiscordMessageId(12UL), new DiscordUserId(123UL), null, command);
-		using (var db = _dbManager.GetDatabase(new DiscordGuildId(10))) {
+		using (var lease = _dbManager.Lease(new DiscordGuildId(10))) {
+			var db = lease.Database;
 			var coll = db.GetCollection<Confirmation>("confirmations");
-			coll.Insert(insert);			
+			coll.Insert(insert);
 		}
-		
-		_dbManager.ClearDb();
-		
+
+		_dbManager.DisposeAll();
+
 		//Act
 		Confirmation read;
-		using (var newDb = _dbManager.GetDatabase(new DiscordGuildId(10))) {
+		using (var newLease = _dbManager.Lease(new DiscordGuildId(10))) {
+			var newDb = newLease.Database;
 			var newCollection = newDb.GetCollection<Confirmation>("confirmations");
 			read = newCollection.FindAll().FirstOrDefault();
 		}
@@ -121,7 +129,8 @@ public class IdentityTests : IDisposable {
 	[Fact]
 	public void Inserting_ShouldBeSuccessful_WhenUsingAnMappedIdentity() {
 		//Arrange
-		using var db = _dbManager.GetDatabase(new DiscordGuildId(10));
+		using var lease = _dbManager.Lease(new DiscordGuildId(10));
+		var db = lease.Database;
 
 		//Act
 		var coll = db.GetCollection<TestModel>("Models");
@@ -138,7 +147,8 @@ public class IdentityTests : IDisposable {
 	[Fact]
 	public void Reading_ShouldBeSuccessful_WhenUsingAnMappedIdentity() {
 		//Arrange
-		using var db = _dbManager.GetDatabase(new DiscordGuildId(10));
+		using var lease = _dbManager.Lease(new DiscordGuildId(10));
+		var db = lease.Database;
 		var model = new TestModel {
 			Name = "MyTestName",
 			UserId = new DiscordUserId(513512)
@@ -157,7 +167,8 @@ public class IdentityTests : IDisposable {
 	[Fact]
 	public void Inserting_ShouldBeSuccessful_WhenUsingAnMappedDictWithIdentityKey() {
 		//Arrange
-		using var db = _dbManager.GetDatabase(new DiscordGuildId(10));
+		using var lease = _dbManager.Lease(new DiscordGuildId(10));
+		var db = lease.Database;
 		var model = new TestModel {
 			Name = "MyTestName",
 			UserId = new DiscordUserId(513512)
@@ -191,7 +202,8 @@ public class IdentityTests : IDisposable {
 	[Fact]
 	public void Reading_ShouldBeSuccessful_WhenUsingAnMappedDictWithIdentityKey() {
 		//Arrange
-		using var db = _dbManager.GetDatabase(new DiscordGuildId(10));
+		using var lease = _dbManager.Lease(new DiscordGuildId(10));
+		var db = lease.Database;
 		var model = new TestModel {
 			Name = "MyTestName",
 			UserId = new DiscordUserId(513512)
@@ -226,7 +238,8 @@ public class IdentityTests : IDisposable {
 	[Fact]
 	public void Reading_ShouldBeSuccessful_WhenWritingAListOfIdentities() {
 		//Arrange
-		using var db = _dbManager.GetDatabase(new DiscordGuildId(10));
+		using var lease = _dbManager.Lease(new DiscordGuildId(10));
+		var db = lease.Database;
 		var list = new List<DiscordUserId>(){
 			new DiscordUserId(513512),
 			new DiscordUserId(5139512),
@@ -246,7 +259,8 @@ public class IdentityTests : IDisposable {
 	[Fact]
 	public void Reading_ShouldBeSuccessful_WhenReadingAListOfIdentities() {
 		//Arrange
-		using var db = _dbManager.GetDatabase(new DiscordGuildId(10));
+		using var lease = _dbManager.Lease(new DiscordGuildId(10));
+		var db = lease.Database;
 		var list = new List<DiscordUserId>(){
 			new(513512),
 			new(5139512),
