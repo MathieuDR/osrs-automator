@@ -25,5 +25,5 @@ public interface IDiscordService {
     Task<Result<IEnumerable<GuildUser>>> GetUsers(DiscordGuildId guildId);
     Task<Result> AddRoles(DiscordGuildId guild, Dictionary<DiscordUserId, IEnumerable<DiscordRoleId>> userDicts);
     Task<Result> RemoveRoles(DiscordGuildId guild, Dictionary<DiscordUserId, IEnumerable<DiscordRoleId>> userDicts);
-    Task<Result<DiscordMessageId>> SendConfirmationMessage(DiscordChannelId channelId, string title, string description, EmbedFieldDto[] fields, string thumbnailUrl = null);
+    Task<Result<DiscordMessageId>> SendConfirmationMessage(DiscordChannelId channelId, string title, string description, EmbedFieldDto[] fields, string thumbnailUrl = null, string requesterDisplayName = null, string requesterAvatarUrl = null, string hostingFooter = null);
 }

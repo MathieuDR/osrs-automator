@@ -30,7 +30,7 @@ internal sealed class AddCountSelfSubCommandHandler : ApplicationCommandHandlerB
             return r;
         }
 
-        await _countService.SelfCount(Context.GuildUser.ToGuildUserDto(), item, users.Select(x => x.ToGuildUserDto()).ToArray(), image.Url);
+        await _countService.SelfCount(Context.GuildUser.ToGuildUserDto(), item, users.Select(x => x.ToGuildUserDto()).ToArray(), image.Url, Context.HostingFooter, Context.User.GetAvatarUrl());
         return SendEmbed(item, users, image);
     }
 

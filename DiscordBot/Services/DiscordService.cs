@@ -106,15 +106,19 @@ public class DiscordService : IDiscordService {
 
     public async Task<Result<DiscordMessageId>> SendConfirmationMessage(DiscordChannelId channelId, string title, string description,
         EmbedFieldDto[] fields,
-        string thumbnailUrl = null) {
-        
+        string thumbnailUrl = null, string requesterDisplayName = null, string requesterAvatarUrl = null, string hostingFooter = null) {
+
         var builder = new EmbedBuilder()
             .AddCommonProperties()
             .WithColor(new Color(255, 204, 0))
             .WithTitle(title.Truncate(256))
             .WithDescription(description.Truncate(4096))
             .WithThumbnailUrl(thumbnailUrl);
-        
+
+        if (!string.IsNullOrWhiteSpace(requesterDisplayName)) {
+            builder.WithMessageAuthorFooter(requesterDisplayName, requesterAvatarUrl, hostingFooter ?? string.Empty);
+        }
+
         foreach (var field in fields) {
             builder.AddField(field.Name.Truncate(256), field.Description.Truncate(2048), field.Inline);
         }

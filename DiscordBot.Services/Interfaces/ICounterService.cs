@@ -21,7 +21,7 @@ public interface ICounterService {
     Task<List<Item>> GetItemsForGuild(Guild toGuildDto);
     Task<IEnumerable<(string synonym, Item item)>> GetItemsForGuild(Guild toGuildDto, string autocomplete);
     Task<Result<bool>> CanSelfCountInChannel(GuildUser user, Channel channel);
-    Task<Result> SelfCount(GuildUser user, Item item, GuildUser[] splits, String imageUrl);
+    Task<Result> SelfCount(GuildUser user, Item item, GuildUser[] splits, String imageUrl, string hostingFooter = null, string avatarUrl = null);
     
     Task<Result> SetRequestChannel(GuildUser user, Channel channel);
     Task<Result> SaveItemsFromJson(GuildUser user, string json);

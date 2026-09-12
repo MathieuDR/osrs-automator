@@ -165,9 +165,9 @@ internal class CountService : RepositoryService, ICounterService {
         return Task.FromResult(Result.Ok(!config.RequestChannel.HasValue || config.RequestChannel == channel.Id));
     }
 
-    public Task<Result> SelfCount(GuildUser user, Item item, GuildUser[] splits, string imageUrl) {
+    public Task<Result> SelfCount(GuildUser user, Item item, GuildUser[] splits, string imageUrl, string hostingFooter = null, string avatarUrl = null) {
         var command = CreateSelfCountConfirmCommand(user, item, splits, imageUrl);
-        return _confirmationService.CreateConfirm(user, command);
+        return _confirmationService.CreateConfirm(user, command, hostingFooter, avatarUrl);
     }
 
     public Task<Result> SetRequestChannel(GuildUser user, Channel? channel) {

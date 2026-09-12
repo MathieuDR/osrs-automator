@@ -19,14 +19,14 @@ internal sealed class ConfirmationService : RepositoryService, IConfirmationServ
         _discordService = discordService;
     }
 
-    public async Task<Result> CreateConfirm(GuildUser requestedBy, IConfirmCommand command) {
+    public async Task<Result> CreateConfirm(GuildUser requestedBy, IConfirmCommand command, string hostingFooter = null, string avatarUrl = null) {
         var configResult = GetConfirmationConfiguration(requestedBy.GuildId);
         if (configResult.IsFailed) {
             return configResult.ToResult();
         }
 
         var channel = configResult.Value.ConfirmationChannel;
-        var discordMessageResult = await  _discordService.SendConfirmationMessage(channel, command.Title, command.Description, command.Fields, command.ImageUrl);
+        var discordMessageResult = await  _discordService.SendConfirmationMessage(channel, command.Title, command.Description, command.Fields, command.ImageUrl, requestedBy.Username, avatarUrl, hostingFooter);
 
         if (discordMessageResult.IsFailed) {
             return discordMessageResult.ToResult();

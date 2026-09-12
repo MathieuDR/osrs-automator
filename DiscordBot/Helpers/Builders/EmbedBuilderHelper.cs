@@ -62,13 +62,20 @@ public static class EmbedBuilderHelper {
             userName = guildUser.DisplayName();
         }
 
-        var footerText = $"Requested by {userName}.";
+        return builder.WithMessageAuthorFooter(userName, user.GetAvatarUrl(), appendToFooter);
+    }
+
+    public static EmbedBuilder WithMessageAuthorFooter(this EmbedBuilder builder, string displayName, string avatarUrl,
+        string appendToFooter = "") {
+        var footerText = $"Requested by {displayName}.";
         if (!string.IsNullOrWhiteSpace(appendToFooter)) {
-            footerText += $" · {appendToFooter}";
+            // Discord appends "• <timestamp>" to the very end of the footer text, so the
+            // shaming line goes first to keep the timestamp attached to "Requested by X".
+            footerText = $"{appendToFooter}\n{footerText}";
         }
 
         builder.Footer = new EmbedFooterBuilder {
-            IconUrl = user.GetAvatarUrl(),
+            IconUrl = avatarUrl,
             Text = footerText
         };
 
