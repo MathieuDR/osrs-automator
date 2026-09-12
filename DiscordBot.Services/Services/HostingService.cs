@@ -31,6 +31,8 @@ public class HostingService : BaseService, IHostingService {
 	private readonly object _cacheLock = new();
 	private volatile bool _cacheLoaded;
 
+	private readonly ConcurrentDictionary<DiscordGuildId, object> _guildLocks = new();
+
 	private readonly object _settingsLock = new();
 	private HostingSettings? _settingsCache;
 	private volatile bool _settingsLoaded;
@@ -348,6 +350,51 @@ public class HostingService : BaseService, IHostingService {
 		}
 
 		return result;
+	}
+
+	private object GuildLock(DiscordGuildId guildId) => _guildLocks.GetOrAdd(guildId, _ => new object());
+
+	private static string TemplateKey(string kind, int? tierMinDays, string text) => $"{kind}:{tierMinDays?.ToString() ?? "-"}:{text}";
+
+	private void IncrementTemplateUsage(string key) {
+		try {
+			lock (_settingsLock) {
+				var current = LoadSettings();
+				var counts = new Dictionary<string, int>(current.TemplateUsageCounts) {
+					[key] = current.TemplateUsageCounts.GetValueOrDefault(key) + 1
+				};
+				var updated = current with { TemplateUsageCounts = counts };
+
+				using var repo = _repositoryStrategy.GetOrCreateRepository<IHostingSettingsRepository>();
+				var result = repo.UpdateOrInsert(updated);
+				if (result.IsSuccess) {
+					_settingsCache = updated;
+					_settingsLoaded = true;
+				}
+			}
+		} catch (Exception ex) {
+			Logger.LogWarning(ex, "Failed to increment template usage for key {Key}", key);
+		}
+	}
+
+	public void RecordFooterShown(DiscordGuildId guildId, HostingStatus status, string? command) {
+		if (status.FooterTemplate is null) {
+			return;
+		}
+
+		try {
+			var kind = status.LastPayment is null ? "NeverPaid" : "Overdue";
+			IncrementTemplateUsage(TemplateKey(kind, status.FooterTierMinDays, status.FooterTemplate));
+
+			lock (GuildLock(guildId)) {
+				var state = GetOrCreateState(guildId);
+				var entry = new FooterHistoryEntry(_clock.UtcNow, command, status.FooterText!);
+				var history = state.FooterHistory.Append(entry).TakeLast(50).ToList();
+				Persist(state with { FooterHistory = history });
+			}
+		} catch (Exception ex) {
+			Logger.LogWarning(ex, "Failed to record footer usage for guild {GuildId}", guildId);
+		}
 	}
 
 	private HostingSettings LoadSettings() {

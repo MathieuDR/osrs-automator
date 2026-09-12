@@ -9,6 +9,7 @@ using DiscordBot.Data.Interfaces;
 using DiscordBot.Data.Repository.Migrations;
 using DiscordBot.Data.Strategies;
 using DiscordBot.Services.Helpers;
+using DiscordBot.Services.Models;
 using DiscordBot.Services.Services;
 using FluentAssertions;
 using FluentResults;
@@ -515,6 +516,54 @@ public class HostingServiceTests : IDisposable {
 		stored.Should().NotBeNull();
 		stored!.DueReminderSentForDueOn.Should().NotBeNull();
 		HostingDates.ToDateOnly(stored.DueReminderSentForDueOn!.Value).Should().Be(dueOn);
+	}
+
+	// --- footer history ---
+
+	[Fact]
+	public void RecordFooterShown_NoOp_WhenTemplateIsNull() {
+		var guildId = new DiscordGuildId(90);
+		var service = CreateService();
+		var status = new HostingStatus(guildId, true, null, null, null, null, null, null);
+
+		service.RecordFooterShown(guildId, status, "status");
+
+		service.GetAllStates().Should().NotContain(s => s.GuildId == guildId);
+	}
+
+	[Fact]
+	public void RecordFooterShown_AppendsHistoryAndIncrementsUsage() {
+		var guildId = new DiscordGuildId(91);
+		SeedPayment(guildId, new DateOnly(2026, 9, 12), 0); // due today, tier 0
+		var service = CreateService(messages: TestTierMessages());
+		var status = service.GetStatus(guildId, "Clan Q");
+
+		service.RecordFooterShown(guildId, status, "drop");
+
+		var state = service.GetAllStates().First(s => s.GuildId == guildId);
+		state.FooterHistory.Should().HaveCount(1);
+		state.FooterHistory[0].DisplayText.Should().Be(status.FooterText);
+		state.FooterHistory[0].Command.Should().Be("drop");
+
+		using var repo = _repositoryStrategy.GetOrCreateRepository<IHostingSettingsRepository>();
+		var settings = repo.GetSingle().Value;
+		var key = $"Overdue:0:{status.FooterTemplate}";
+		settings!.TemplateUsageCounts[key].Should().Be(1);
+	}
+
+	[Fact]
+	public void RecordFooterShown_CapsHistoryAtFifty() {
+		var guildId = new DiscordGuildId(92);
+		SeedPayment(guildId, new DateOnly(2026, 9, 12), 0); // due today, tier 0
+		var service = CreateService(messages: TestTierMessages());
+		var status = service.GetStatus(guildId, "Clan Q");
+
+		for (var i = 0; i < 55; i++) {
+			service.RecordFooterShown(guildId, status, "drop");
+		}
+
+		var state = service.GetAllStates().First(s => s.GuildId == guildId);
+		state.FooterHistory.Should().HaveCount(50);
 	}
 
 	// --- resilience ---
