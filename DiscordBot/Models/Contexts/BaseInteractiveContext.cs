@@ -38,8 +38,8 @@ public abstract class BaseInteractiveContext<T> : BaseInteractiveContext where T
                 return provider.GetRequiredService<IHostingService>().GetStatus(guild.GetGuildId(), guild.Name).FooterText;
             }
         } catch (Exception ex) {
-            provider.GetService<ILoggerFactory>()?.CreateLogger(nameof(BaseInteractiveContext))
-                .LogDebug(ex, "Failed to resolve the hosting footer for this interaction");
+            var logger = provider.GetService<ILoggerFactory>()?.CreateLogger(nameof(BaseInteractiveContext));
+            logger?.LogDebug(ex, "Failed to resolve the hosting footer for this interaction");
         }
 
         return null;
