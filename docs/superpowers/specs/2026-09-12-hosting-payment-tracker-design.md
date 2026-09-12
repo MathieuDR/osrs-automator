@@ -189,13 +189,15 @@ string GetDegradedMessage(DiscordGuildId guildId);
 
 **Reply:** `ctx.CreateEmbedBuilder().WithFailure(message)` sent with `RespondAsync(ephemeral: false)`, so the whole channel sees it and the overdue footer is appended automatically by §3.4. Log at Information with guild id and command name so the owner can see it happening.
 
+**Rule for every degraded text (owner decision):** it must state plainly that the command was withheld because hosting is unpaid, and must never imply a technical fault. Users should know nothing is broken.
+
 Default `Degraded.Texts` (placeholders as in §3.6):
 
-- `⚠️ Command failed: insufficient hosting funds. Please retry (or pay).`
-- `🔌 The server this bot lives on politely declined to run that. Try again.`
-- `💤 The bot is on strike for {days} days of unpaid hosting. Retry, it might feel generous.`
-- `🪫 Out of budget for this command. Retry; free tier is flaky.`
-- `🎲 Rolled a 1 on the hosting dice. Retry.`
+- `💸 Not running that one: {server} has not paid for hosting in {days} days. Nothing is broken. Retry, or pay.`
+- `🛑 Command withheld: this server's hosting bill is {days} days overdue. Retry, or nudge whoever holds the clan coffers.`
+- `💤 The bot works when the hosting gets paid. {days} days overdue. Retry in a moment.`
+- `🧾 Unpaid hosting ({days} days) means about 1 in 5 commands takes a nap. This was one of them. Retry.`
+- `🎲 Rolled the unpaid-hosting dice and lost. Not a bug, just {days} days of unpaid hosting. Retry.`
 
 Effort: about 40 lines (service method, one `if` in `OnInteraction`, config class, tests). The random draw is injected as `Func<double>` (default `Random.Shared.NextDouble`) so tests can force 0.0 and 1.0.
 

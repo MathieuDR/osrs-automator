@@ -16,6 +16,7 @@
 - Footer only when `DaysOverdue >= 0` and the guild's `FooterEnabled` is true and the interaction is in a guild. Never in DMs, never for autocomplete.
 - Degraded mode only for `SocketSlashCommand` interactions, never in the owner guild, never for the owner user, never for the `hosting` command, never when the guild's footer is disabled.
 - Reminders: exactly one "30 days left" and one "due" message per due date.
+- Every degraded-mode text must state plainly that the command was withheld because hosting is unpaid and must never imply a technical fault (owner decision; the defaults are in spec §3.7).
 - All shaming/degraded texts have code defaults and are overridable from `Bot:Messages:Hosting`; a missing config section must not break startup.
 - Every repository use is `using var repo = …` (repositories are `IDisposable`).
 - Build: `dotnet build OrsrDiscordAutomator.sln`; test: `dotnet test tests/DiscordBot.ServicesTests/DiscordBot.ServicesTests.csproj`. Do not increase the 5 pre-existing failures.
