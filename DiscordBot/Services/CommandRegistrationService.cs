@@ -1,21 +1,22 @@
 using DiscordBot.Commands.Interactive;
 using DiscordBot.Common.Models.Data.Configuration;
 using DiscordBot.Data.Interfaces;
+using DiscordBot.Data.Strategies;
 
 namespace DiscordBot.Services;
 
 public class CommandRegistrationService : ICommandRegistrationService {
-    private readonly IApplicationCommandInfoRepository _applicationCommandInfoRepository;
+    private readonly IRepositoryStrategy _repositoryStrategy;
     private readonly DiscordSocketClient _client;
     private readonly ILogger<CommandRegistrationService> _logger;
     private readonly ICommandStrategy _strategy;
 
     public CommandRegistrationService(ILogger<CommandRegistrationService> logger, ICommandStrategy strategy, DiscordSocketClient client,
-        IApplicationCommandInfoRepository applicationCommandInfoRepository) {
+        IRepositoryStrategy repositoryStrategy) {
         _logger = logger;
         _strategy = strategy;
         _client = client;
-        _applicationCommandInfoRepository = applicationCommandInfoRepository;
+        _repositoryStrategy = repositoryStrategy;
     }
 
 
@@ -37,7 +38,8 @@ public class CommandRegistrationService : ICommandRegistrationService {
             // Hash is different, so lets update
             _logger.LogInformation("Updating command info for {name} command", applicationCommandInfo.CommandName);
             applicationCommandInfo = applicationCommandInfo with { Hash = currentHash };
-            _applicationCommandInfoRepository.UpdateOrInsert(applicationCommandInfo);
+            using var repo = _repositoryStrategy.GetOrCreateRepository<IApplicationCommandInfoRepository>();
+            repo.UpdateOrInsert(applicationCommandInfo);
         }
 
         return Result.Ok();

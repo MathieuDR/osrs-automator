@@ -18,8 +18,6 @@ public static class ConfigurationExtensions {
             .AddTransient<AutomatedJobStateLiteDbRepositoryFactory>()
             .AddTransient<RunescapeDropDataRepositoryFactory>()
             .AddTransient<CommandInfoRepositoryFactory>()
-            .AddTransient(x => x.GetRequiredService<CommandInfoRepositoryFactory>().Create())
-            .AddTransient(x => x.GetRequiredService<RunescapeDropDataRepositoryFactory>().Create())
             .AddTransient<GraveyardLiteDbRepositoryFactory>()
             .AddTransient<ClanFundsLiteDbRepositoryFactory>()
             .AddTransient<ClanFundsLiteDbRepositoryFactory>()

@@ -8,7 +8,7 @@ using Microsoft.Extensions.DependencyInjection;
 namespace DiscordBot.Commands.Interactive;
 
 public class ManageCommandsApplicationCommandHandler : ApplicationCommandHandler {
-    private readonly IApplicationCommandInfoRepository _applicationCommandInfoRepository;
+    private readonly IRepositoryStrategy _repositoryStrategy;
     private readonly IServiceProvider _serviceProvider;
     private readonly ICommandDefinitionProvider _commandDefinitionProvider;
 
@@ -17,7 +17,7 @@ public class ManageCommandsApplicationCommandHandler : ApplicationCommandHandler
         "Manage commands", logger) {
         _serviceProvider = serviceProvider;
         _commandDefinitionProvider = commandDefinitionProvider;
-        _applicationCommandInfoRepository = repositoryStrategy.GetOrCreateRepository<IApplicationCommandInfoRepository>();
+        _repositoryStrategy = repositoryStrategy;
     }
 
     public override AuthorizationRoles MinimumAuthorizationRole => AuthorizationRoles.BotAdmin;
@@ -58,7 +58,8 @@ public class ManageCommandsApplicationCommandHandler : ApplicationCommandHandler
         var command = context.EmbedFields.First(x => x.Name == "Command").Value;
         var guild = GetGuild(context);
 
-        var commandInfo = (await _applicationCommandInfoRepository.GetByCommandName(command)).Value;
+        using var repo = _repositoryStrategy.GetOrCreateRepository<IApplicationCommandInfoRepository>();
+        var commandInfo = (await repo.GetByCommandName(command)).Value;
         if (commandInfo is null) {
             try {
                 var commandStrategy = _serviceProvider.GetRequiredService<ICommandStrategy>();
@@ -89,7 +90,7 @@ public class ManageCommandsApplicationCommandHandler : ApplicationCommandHandler
         commandInfo = commandInfo with { RegisteredGuilds = list };
         var registrationService = _serviceProvider.GetRequiredService<ICommandRegistrationService>();
         await registrationService.UpdateCommand(commandInfo);
-        _applicationCommandInfoRepository.UpdateOrInsert(commandInfo);
+        repo.UpdateOrInsert(commandInfo);
 
         var embed = context.CreateEmbedBuilder("Success!", embedDescription);
 
@@ -122,7 +123,8 @@ public class ManageCommandsApplicationCommandHandler : ApplicationCommandHandler
     private async Task<Result> HandleGlobalSubCommand(MessageComponentContext context) {
         var command = context.EmbedFields.First(x => x.Name == "Command").Value;
 
-        var commandInfo = (await _applicationCommandInfoRepository.GetByCommandName(command)).Value;
+        using var repo = _repositoryStrategy.GetOrCreateRepository<IApplicationCommandInfoRepository>();
+        var commandInfo = (await repo.GetByCommandName(command)).Value;
 
         if (commandInfo is null) {
             var commandStrategy = _serviceProvider.GetRequiredService<ICommandStrategy>();
@@ -131,7 +133,7 @@ public class ManageCommandsApplicationCommandHandler : ApplicationCommandHandler
         }
 
         commandInfo = commandInfo with { IsGlobal = !commandInfo.IsGlobal };
-        _applicationCommandInfoRepository.UpdateOrInsert(commandInfo);
+        repo.UpdateOrInsert(commandInfo);
         var registrationService = _serviceProvider.GetRequiredService<ICommandRegistrationService>();
         await registrationService.UpdateCommand(commandInfo);
 
@@ -148,7 +150,8 @@ public class ManageCommandsApplicationCommandHandler : ApplicationCommandHandler
     /// <returns></returns>
     private async Task<Result> HandleCommandSubCommand(MessageComponentContext context) {
         var command = context.SelectedMenuOptions.First();
-        var commandInfo = (await _applicationCommandInfoRepository.GetByCommandName(command)).Value ?? new ApplicationCommandInfo(command);
+        using var repo = _repositoryStrategy.GetOrCreateRepository<IApplicationCommandInfoRepository>();
+        var commandInfo = (await repo.GetByCommandName(command)).Value ?? new ApplicationCommandInfo(command);
 
         var guildSelector = GetGuildsSelectMenu(commandInfo.RegisteredGuilds)
             .WithButton("Back", SubCommand("reset"), ButtonStyle.Secondary)
