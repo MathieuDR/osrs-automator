@@ -36,14 +36,22 @@ private string GetGuildFileName(DiscordGuildId guildId) => CreateConnectionStrin
 Registered as an **`AddSingleton<LiteDbManager>()`** in `ConfigurationExtensions.UseLiteDbRepositories`.
 
 API:
-- `LiteDatabase GetCommonDatabase()` — lazily creates and caches the single common `LiteDatabase` in the field `_commonDatabase`, guarded by `_commonLock`.
-- `LiteDatabase GetDatabase(DiscordGuildId guildId)` — looks up `_databases` (a `Dictionary<DiscordGuildId, LiteDatabase>`), creating and caching a new instance per unseen guild, guarded by `_createLock`.
-- `void ClearDb()` — disposes the common database and every cached guild database, then clears `_databases`. Sets `_commonDatabase` back to `null` (so it will be recreated on next `GetCommonDatabase()`), but note the per-guild dictionary is cleared entirely, not repopulated.
-- `void Dispose()` — calls `ClearDb()`.
+- `DatabaseLease Lease(DiscordGuildId guildId)` — acquires a reference-counted lease to the per-guild `LiteDatabase`, lazily opening and caching one `LiteDatabase` instance per guild. Returns a disposable `DatabaseLease` handle. Each call to `Lease()` increments the reference count; `Dispose()` on the lease decrements it.
+- `DatabaseLease LeaseCommon()` — acquires a reference-counted lease to the common `LiteDatabase`, following the same lease/refcount pattern.
+- `int OpenDatabaseCount` — read-only property; returns the number of open `LiteDatabase` instances currently cached in memory. Useful for diagnostics/monitoring.
+- `void DisposeAll()` — force-disposes all open `LiteDatabase` instances and clears the cache. Used at process shutdown.
 
-**Caching / lifetime:** Once opened, a guild's (or the common) `LiteDatabase` stays open and cached for the lifetime of the singleton (i.e. effectively the app's lifetime) — there is no eviction, TTL, or LRU. The dictionary only grows as new guilds are seen; nothing ever removes a single entry except a full `ClearDb()`/`Dispose()`.
+**Reference counting & lifecycle:** `LiteDbManager` maintains an in-memory `_open` dictionary (`Dictionary<string, Entry>` where `Entry` holds the `LiteDatabase` plus its reference count). Each `Lease()` or `LeaseCommon()` call:
+1. Acquires the per-file lock (to prevent race conditions during open/close).
+2. Creates a new `LiteDatabase` if no entry exists for that file path; otherwise reuses the cached one.
+3. Increments the reference count.
+4. Returns a `DatabaseLease` that holds a backreference to the manager and file path.
 
-**Who calls `Dispose`/`ClearDb`:** Only `DiscordBot/Commands/Interactive/KillBotCommandHandler.cs`, which calls `_manager.Dispose()` right before `Environment.Exit(0)` (a bot-admin `/kill` slash command), and the test fixture `tests/DiscordBot.ServicesTests/Data/IdentityTests.cs` (test cleanup). In normal operation nothing ever closes a per-guild database until process exit.
+When the `DatabaseLease` is disposed, it calls `LiteDbManager.Release(filePath)`, which decrements the reference count. If the count falls to 0 **and** `LiteDbOptions.CloseWhenUnused` is true (the default), the `LiteDatabase` is removed from the cache and disposed.
+
+**`CloseWhenUnused` option** (`LiteDbOptions`, configurable in `appsettings.json`): when `true` (default), a database is closed as soon as its reference count reaches zero. When `false`, databases stay open after use (legacy behavior, effectively treating databases as singletons for the app's lifetime despite the lease interface).
+
+**Lock hierarchy:** A per-file lock guards the slow I/O of opening/disposing each `LiteDatabase`, allowing different guilds' databases to be independently managed without blocking each other. A gate lock (separate `_gate`) guards only the quick in-memory `_open` dictionary bookkeeping. This prevents the race where a `Lease()` slips in during another thread's final `Release()`, ensuring thread-safe refcount management and atomicity between the last decrement and the actual disposal.
 
 **BsonMapper global registrations** (`AddMappers`, run once in the constructor, so run once per singleton, mutating `LiteDB.BsonMapper.Global`):
 - Strongly-typed IDs `DiscordUserId`, `DiscordGuildId`, `DiscordChannelId`, `DiscordMessageId`, `DiscordRoleId` are each registered via `BsonMapper.RegisterType(...)`, serializing to/from the wrapped `long`/`Int64` BSON value.
@@ -104,10 +112,10 @@ Each concrete factory (e.g. `GuildConfigLiteDbRepositoryFactory`) overrides `Req
 
 ```csharp
 public override IGuildConfigRepository Create(DiscordGuildId guildId) =>
-    new GuildConfigRepository(GetLogger(), LiteDbManager.GetDatabase(guildId));
+    new GuildConfigRepository(GetLogger(), LiteDbManager.Lease(guildId));
 ```
 
-`LiteDbManager.GetDatabase(guildId)` returns the cached `LiteDatabase` (opening it on first use), so the repository object is cheap/throwaway but the underlying `LiteDatabase` connection is long-lived and shared.
+`LiteDbManager.Lease(guildId)` returns a disposable `DatabaseLease` (reference-counted handle to the cached `LiteDatabase`, opening it on first use). The repository object is cheap/throwaway, but crucially, it now **implements `IDisposable`** and must be disposed (typically via `using var repo = ...`) to release the lease. Once all leases to a database are disposed and `CloseWhenUnused` is true, that `LiteDatabase` is closed and removed from memory.
 
 `RepositoryStrategy` (`DiscordBot.Data/Strategies/RepositoryStrategy.cs`) holds an `IRepositoryFactory[]` and resolves by linear scan:
 
@@ -232,10 +240,11 @@ Using `AutomatedJobStateRepository` as the template (`DiscordBot.Data/Repository
 3. **Repository** — `DiscordBot.Data/Repository/YourModelRepository.cs`:
    ```csharp
    internal class YourModelRepository : BaseLiteDbRepository<YourModel>, IYourModelRepository {
-       public YourModelRepository(ILogger<YourModelRepository> logger, LiteDatabase database) : base(logger, database) { }
+       public YourModelRepository(ILogger<YourModelRepository> logger, DatabaseLease lease) : base(logger, lease) { }
        public override string CollectionName => "yourModelCollectionName";
    }
    ```
+   The repository is disposable (`IDisposable`, inherited from `BaseLiteDbRepository`); consumers must call `Dispose()` or use `using var repo = ...` to release the lease.
 
 4. **Factory** — `DiscordBot.Data/Factories/YourModelLiteDbRepositoryFactory.cs`:
    ```csharp
@@ -243,7 +252,7 @@ Using `AutomatedJobStateRepository` as the template (`DiscordBot.Data/Repository
        public YourModelLiteDbRepositoryFactory(ILoggerFactory loggerFactory, LiteDbManager liteDbManager) : base(loggerFactory, liteDbManager) { }
        public override bool RequiresGuildId => true;
        public override IYourModelRepository Create(DiscordGuildId guildId) =>
-           new YourModelRepository(GetLogger(), LiteDbManager.GetDatabase(guildId));
+           new YourModelRepository(GetLogger(), LiteDbManager.Lease(guildId));
        public override IRepository Create() => throw new NotImplementedException();
    }
    ```
@@ -253,7 +262,7 @@ Using `AutomatedJobStateRepository` as the template (`DiscordBot.Data/Repository
 6. **Consume** — inject `IRepositoryStrategy` into a service/job and call `RepositoryStrategy.GetOrCreateRepository<IYourModelRepository>(guildId)`.
 
 ### 7c. Add a new common-db collection
-Same as 7b, but base the model on plain `BaseModel`/`BaseRecord` (no `GuildId`), set `RequiresGuildId => false` in the factory, override `Create()` (not `Create(DiscordGuildId)`) to call `LiteDbManager.GetCommonDatabase()`, and have `Create(DiscordGuildId)` throw `NotImplementedException` — mirror `CommandInfoRepositoryFactory`/`RunescapeDropDataRepositoryFactory`. Optionally also register the interface directly as transient (`.AddTransient(x => x.GetRequiredService<YourFactory>().Create())`) if you want constructor injection in addition to `IRepositoryStrategy`.
+Same as 7b, but base the model on plain `BaseModel`/`BaseRecord` (no `GuildId`), set `RequiresGuildId => false` in the factory, override `Create()` (not `Create(DiscordGuildId)`) to call `LiteDbManager.LeaseCommon()`, and have `Create(DiscordGuildId)` throw `NotImplementedException` — mirror `CommandInfoRepositoryFactory`/`RunescapeDropDataRepositoryFactory`. The repository will still be disposable (via the `DatabaseLease`), so it must still be disposed by the caller via `using var`. Optionally also register the interface directly as transient (`.AddTransient(x => x.GetRequiredService<YourFactory>().Create())`) if you want constructor injection in addition to `IRepositoryStrategy`.
 
 ---
 
@@ -269,9 +278,10 @@ Guild enumeration is instead done via the **live Discord gateway connection**: `
 
 ## 9. Resource lifecycle observations (factual, no fixes attempted here)
 
-- **Per-guild `LiteDatabase` instances are opened once and never closed** except via the admin `/kill` command (`KillBotCommandHandler` → `LiteDbManager.Dispose()`) or process exit. `_databases` (the guild cache dict in `LiteDbManager`) only grows; there is no per-entry disposal/eviction, so a long-running bot that is added to many guilds accumulates that many open file handles + LiteDB in-memory page caches for the process's entire lifetime.
-- **Repositories are created fresh on every call** (`RepositoryStrategy.GetOrCreateRepository<T>()` → `factory.Create(...)` → `new XyzRepository(...)`), but they are lightweight wrappers (logger + `LiteDatabase` reference) with no `IDisposable` implementation and no unmanaged resources of their own — the actual resource (the open `LiteDatabase`/file handle) lives only in `LiteDbManager`'s cache, so this per-call allocation is not itself a leak, just churn.
+- **Per-guild `LiteDatabase` instances are now reference-counted and bounded by lease lifetime.** Each `LiteDbManager.Lease()` or `LeaseCommon()` call increments the reference count; disposing the returned `DatabaseLease` decrements it. When the count reaches zero and `LiteDbOptions.CloseWhenUnused` is true (default), the `LiteDatabase` is closed and removed from memory. This allows the bot to shed unused databases from memory rather than accumulating file handles + page caches indefinitely. The admin `/kill` command still calls `LiteDbManager.DisposeAll()` to force-close all open databases at shutdown.
+- **Repositories are created fresh on every call and now implement `IDisposable`.** (`RepositoryStrategy.GetOrCreateRepository<T>()` → `factory.Create(...)` → `new XyzRepository(..., DatabaseLease)`). Each repository owns a lease to the underlying `LiteDatabase`. Callers **must dispose repositories** (typically via `using var repo = ...`) to release their lease; failure to dispose leaks the lease reference and may prevent the database from closing. The lease mechanism provides a structured, scoped way to manage database access — repositories obtained within a scope (method, request handler, job, etc.) are disposed at scope exit, releasing their leases automatically.
 - **`IRepositoryStrategy` is a singleton that captures factory instances once at first resolution.** Because the factories close over the singleton `LiteDbManager` (constructor-injected once), and never get re-resolved, this is consistent — but it does mean the `AddTransient` lifetime declared for the factories is misleading; check §4.
+- **`GetAll()` now materializes the result.** To ensure the returned `IEnumerable<T>` is valid after the repository (and its lease) is disposed, `BaseLiteDbRepository.GetAll()` calls `.ToList()` to force-materialize the LiteDB query results before returning, rather than returning a lazy IEnumerable that holds an implicit reference to the collection.
 - **Duplicate/dead repository around `SelfCountConfiguration`:** both `ItemsRepository`/`IItemsRepository`/`ItemsLiteDbRepositoryFactory` (collection `"items"`) and `SelfCountConfigurationRepository`/`ISelfCountConfigurationRepository`/`SelfCountConfigurationLiteDbRepositoryFactory` (collection `"selfCountConfiguration"`) wrap the **same model**, `SelfCountConfiguration`. Only `ISelfCountConfigurationRepository` is actually consumed (by `DiscordBot.Services/Services/CountService.cs`); `IItemsRepository`/`ItemsRepository` is registered in DI (`ConfigurationExtensions`) but grep shows no consumer anywhere in `DiscordBot`/`DiscordBot.Services`/`DiscordBot.Dashboard` — it appears to be dead code / a copy-paste leftover (its name doesn't match the model it wraps, `Item` is a different, unrelated model). An AI agent should not assume `IItemsRepository` is the repository for the `Item` model.
 - **Interface/implementation surface mismatch** on `IRuneScapeDropDataRepository` vs `RuneScapeDropDataRepository` — see §3. Extending the interface (rather than only the concrete class) is required to expose `HasActiveDrop`/`EndpointId`-overloads to DI-injected consumers.
 - **Two separate DI root compositions** (`DiscordBot/Program.cs` and `DiscordBot.Dashboard/StartupHelper.cs`) both call `UseLiteDbRepositories`, each building an independent singleton `LiteDbManager`. Currently the repo's dashboard run configuration hosts the bot in the same process (avoiding file-lock conflicts), but nothing in `LiteDbManager`/`LiteDbOptions` prevents misconfiguration where two separate processes point at the same `PathPrefix` — Direct-mode LiteDB would then fail to open a file already locked by the other process.
@@ -287,9 +297,9 @@ Guild enumeration is instead done via the **live Discord gateway connection**: `
 3. **`BsonMapper.Global` is mutated as global, static, process-wide state** in the `LiteDbManager` constructor — not scoped to the instance. Multiple `LiteDbManager` instances (e.g. in tests) re-run `AddMappers()`, but `RegisterType`/dict-mapper registrations are idempotent overwrites, not additive duplicates, so this is safe but worth knowing when writing tests that construct `LiteDbManager` more than once.
 4. **Repositories are always obtained through `IRepositoryStrategy.GetOrCreateRepository<TInterface>([guildId])`, never `new`'d directly** by services/jobs (`RepositoryService.GetRepository<T>`, `BaseGuildConfigurationService`, `RepositoryJob`, etc. all funnel through it). The resolution is purely by **exact interface type match** (`typeof(TInterface).IsAssignableFrom(type)`) plus whether a `guildId` was supplied — if you add a new repository interface that extends an *existing* repository interface (rather than the raw `IRepository`/`IRecordRepository<T>`/`ISingleRecordRepository<T>` bases), make sure your factory's `AppliesTo` still resolves unambiguously; the strategy uses `FirstOrDefault`, so factory order in the registration array matters if multiple factories could match a requested type.
 5. **`Create()` vs `Create(DiscordGuildId)` — exactly one is implemented per factory, the other throws `NotImplementedException`.** Calling `GetOrCreateRepository<T>()` for a guild-scoped repository (or vice versa) throws at runtime, not compile time — there is no static guarantee tying a repository interface to whether it needs a guild id.
-6. **Never call `.Dispose()` directly on a `LiteDatabase` obtained from `LiteDbManager.GetDatabase`/`GetCommonDatabase`** in production code — it is a shared, cached instance; disposing it out from under other callers leaves a disposed object cached in `LiteDbManager`'s dictionary until `ClearDb()` is called. (The unit test `IdentityTests` does this deliberately inside `using` blocks and then calls `_dbManager.ClearDb()` immediately after to reset the cache — don't copy that pattern into non-test code without the accompanying `ClearDb()`.)
+6. **Always dispose repositories (via `using var repo = ...`) to release their database leases.** Repositories now own a `DatabaseLease` to the underlying `LiteDatabase`. If you obtain a repository and don't dispose it, its lease stays active, keeping the database open in memory. The lease is reference-counted — when the count reaches zero and `CloseWhenUnused` is true, the database is closed. Forgetting to dispose is a leak, not a crash, but it defeats the purpose of the lease-based lifecycle.
 7. **Migrations operate on raw, untyped `BsonDocument`s**, not the current C# model — because by definition a migration exists to transform data from an *older* shape that the current model no longer represents. Don't "simplify" a migration to use `GetCollection<CurrentModel>()`.
-8. **Migrations run once per db file, at first-open, driven by the file's own `UserVersion`** — not on every operation, and not centrally/eagerly for all guild files at startup (a guild db is only opened, and thus only migrated, the first time some code path calls `GetDatabase(guildId)` for it in that process's lifetime).
+8. **Migrations run once per db file, at first-open, driven by the file's own `UserVersion`** — not on every operation, and not centrally/eagerly for all guild files at startup (a guild db is only opened, and thus only migrated, the first time some code path calls `LiteDbManager.Lease(guildId)` or `LeaseCommon()` for it in that process's lifetime).
 9. **There is no cross-guild query capability.** Any feature needing "all guilds" data must iterate live `IDiscordService.GetGuilds()` and query each guild's db individually (§8) — there's no aggregate index, and no directory scan of `.db` files exists to fall back on.
 10. **`FluentResults.Result`/`Result<T>` is the return convention throughout the repository layer** — don't introduce exceptions-as-control-flow or nullable-returning methods inconsistent with the rest of the stack; existing consumers pattern-match on `IsFailed`/`.Value`/`.ValueOrDefault`.
 11. **LiteDB `Direct` connection mode = exclusive file lock.** Don't assume multiple processes (or multiple `LiteDbManager` instances within one process pointed at the same `PathPrefix`) can safely share a `.db` file concurrently — they can't, without switching the connection string to `Connection=Shared` (which the code does not currently do, and which has different performance/consistency tradeoffs).

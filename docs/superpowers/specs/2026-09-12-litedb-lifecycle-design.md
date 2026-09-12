@@ -1,6 +1,6 @@
 # LiteDB lifecycle: close guild databases when not in use
 
-Date: 2026-09-12 · Status: **draft, awaiting owner review** · Scope: `DiscordBot.Data`, call sites in `DiscordBot` and `DiscordBot.Services`, tests.
+Date: 2026-09-12 · Status: **implemented on feature/hosting-tracker-and-litedb-lifecycle** · Scope: `DiscordBot.Data`, call sites in `DiscordBot` and `DiscordBot.Services`, tests.
 
 Background: `docs/codebase/03-data-layer.md`, `docs/codebase/06-memory-leak-investigation.md`.
 

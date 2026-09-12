@@ -20,7 +20,7 @@ referenced area changes, update the matching document.
 
 ## Quick facts that trip people up
 
-- The database is **LiteDB 5.0.16**, not SQLite. Direct connection mode, one file per guild, exclusive file lock while open.
+- The database is **LiteDB 5.0.16**, not SQLite. Direct connection mode, one file per guild, exclusive file lock while open. `LiteDbManager` uses reference-counted leases; databases are closed when no longer in use (default) or held open indefinitely (legacy option).
 - The bot process has **no `IHost`**: `Program.cs` builds a `ServiceProvider` and parks on `Task.Delay(-1)`. Nothing is disposed on shutdown.
 - There is **no persisted list of guilds**; "registered guilds" = whatever `DiscordSocketClient.Guilds` reports.
 - `Bot:TeamConfiguration` (`GuildId`, `OwnerId`) is the only "owner" concept. `OwnerId` bypasses all authorization; roles `BotOwner`/`BotAdmin`/`BotModerator` are effectively owner-only.

@@ -259,6 +259,7 @@ Concrete jobs:
 | `TopLeaderBoardJob` | `ConfigurableGuildJob` | `MonthlyTop` | For every queryable `MetricType`, fetches `IOsrsHighscoreService.GetLeaderboard(groupId, metric)`, then `DiscordService.MessageLeaderboards(configuration.ChannelId, tops)`. |
 | `MonthlyTopDeltasJob` | `ConfigurableGuildJob` | `MonthlyTopGains` | Same shape as above but `GetTopDeltasOfGroup(groupId, metric, Period.Month)`. |
 | `HandleRunescapeDropJob` | `RepositoryJob` | *(none — not guild-configurable)* | Reads the "active" `RunescapeDropData` for the endpoint's user (`Context.MergedJobDataMap.GetLongValue("endpoint")`), determines which guilds should see it (`GetGuildIdsForEndpoint` — currently **hardcoded** to a single guild id, `403539795944538122`), iterates that guild's `DropperGuildConfiguration.ChannelConfigurations`, and calls `_discordService.PrintRunescapeDataDrop(filteredData, guildId, channelId)` per channel. Deletes the active record once all configured guilds have been messaged. |
+| `MemoryReportJob` | `BaseJob` | *(none — diagnostic only)* | Logs process memory metrics (working set, GC heap, OS handle count) and the count of open LiteDB databases every 30 minutes. Used to monitor resource usage and verify that the lease-based lifecycle is properly closing unused databases. |
 
 ### Recipe: how a job finds its channel and posts — "periodically post into a guild channel"
 This is the closest existing pattern for "post a message into a guild channel
