@@ -1,8 +1,13 @@
+using DiscordBot.Common.Configuration;
+using DiscordBot.Data.Strategies;
 using DiscordBot.Services.ExternalServices;
+using DiscordBot.Services.Helpers;
 using DiscordBot.Services.HttpClients;
 using DiscordBot.Services.Interfaces;
 using DiscordBot.Services.Services;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using Refit;
 
 namespace DiscordBot.Services.Configuration;
@@ -36,7 +41,14 @@ public static partial class ServiceConfigurationExtensions {
             .AddTransient<IAuthorizationService, AuthorizationService>()
             .AddTransient<IGraveyardService, GraveyardService>()
             .AddTransient<IClanFundsService, ClanFundsService>()
-            .AddTransient<IConfirmationService, ConfirmationService>();
+            .AddTransient<IConfirmationService, ConfirmationService>()
+            .AddSingleton<IClock, SystemClock>()
+            .AddSingleton<IHostingService>(sp => new HostingService(
+                sp.GetRequiredService<ILogger<HostingService>>(),
+                sp.GetRequiredService<IRepositoryStrategy>(),
+                sp.GetRequiredService<MessageConfiguration>(),
+                sp.GetRequiredService<IOptions<BotTeamConfiguration>>(),
+                sp.GetRequiredService<IClock>()));
 
         return serviceCollection;
     }
