@@ -57,15 +57,12 @@ public class HostingService : BaseService, IHostingService {
 				daysOverdue = Today().DayNumber - dueOn.Value.DayNumber;
 			}
 
-			var footerText = BuildFooterText(guildId, guildName, footerEnabled, lastPayment, dueOn, daysOverdue);
-			return new HostingStatus(guildId, footerEnabled, lastPayment, dueOn, daysOverdue, footerText);
+			var (footerTemplate, footerTierMinDays, footerText) = BuildFooterText(guildId, guildName, footerEnabled, lastPayment, dueOn, daysOverdue);
+			return new HostingStatus(guildId, footerEnabled, lastPayment, dueOn, daysOverdue, footerText, footerTemplate, footerTierMinDays);
 		} catch (Exception ex) {
 			Logger.LogWarning(ex, "Failed to get hosting status for guild {GuildId}", guildId);
-			// Report the footer setting from whatever is already cached, rather than defaulting to
-			// `false`: a read failure here must not be misreported as "footer off" for a guild that
-			// actually has it on (or has never touched the setting, where the real default is `true`).
 			var footerEnabled = _cache.TryGetValue(guildId, out var cached) ? cached.FooterEnabled : true;
-			return new HostingStatus(guildId, footerEnabled, null, null, null, null);
+			return new HostingStatus(guildId, footerEnabled, null, null, null, null, null, null);
 		}
 	}
 
@@ -240,23 +237,24 @@ public class HostingService : BaseService, IHostingService {
 	private static HostingPayment? LastPaymentOf(GuildHostingState? state) =>
 		state is { Payments.Count: > 0 } ? state.Payments[^1] : null;
 
-	private string? BuildFooterText(DiscordGuildId guildId, string? guildName, bool footerEnabled, HostingPayment? lastPayment,
+	private (string? Template, int? TierMinDays, string? DisplayText) BuildFooterText(DiscordGuildId guildId, string? guildName, bool footerEnabled, HostingPayment? lastPayment,
 		DateOnly? dueOn, int? daysOverdue) {
 		if (!footerEnabled) {
-			return null;
+			return (null, null, null);
 		}
 
 		if (lastPayment is null) {
 			var neverPaid = _messages.Hosting.NeverPaid;
 			if (neverPaid is null || neverPaid.Count == 0) {
-				return null;
+				return (null, null, null);
 			}
 
-			return Substitute(PickRandom(neverPaid), guildId, guildName, null, null, null);
+			var neverPaidTemplate = PickRandom(neverPaid);
+			return (neverPaidTemplate, null, Substitute(neverPaidTemplate, guildId, guildName, null, null, null));
 		}
 
 		if (daysOverdue is null || daysOverdue < 0) {
-			return null;
+			return (null, null, null);
 		}
 
 		IReadOnlyList<HostingTier> tiers = _messages.Hosting.Overdue;
@@ -270,10 +268,11 @@ public class HostingService : BaseService, IHostingService {
 			.FirstOrDefault();
 
 		if (tier?.Texts is null || tier.Texts.Count == 0) {
-			return null;
+			return (null, null, null);
 		}
 
-		return Substitute(PickRandom(tier.Texts), guildId, guildName, daysOverdue, dueOn, lastPayment.PaidOn);
+		var tierTemplate = PickRandom(tier.Texts);
+		return (tierTemplate, tier.MinDays, Substitute(tierTemplate, guildId, guildName, daysOverdue, dueOn, lastPayment.PaidOn));
 	}
 
 	private static string Substitute(string template, DiscordGuildId guildId, string? guildName, int? days, DateOnly? dueOn, DateTime? paidOn) {

@@ -111,6 +111,7 @@ public class HostingServiceTests : IDisposable {
 		var status = service.GetStatus(new DiscordGuildId(1));
 
 		status.FooterText.Should().BeNull();
+		status.FooterTemplate.Should().BeNull();
 	}
 
 	[Fact]
@@ -121,6 +122,8 @@ public class HostingServiceTests : IDisposable {
 		var status = service.GetStatus(new DiscordGuildId(2), "Clan X");
 
 		status.FooterText.Should().Be("never paid Clan X");
+		status.FooterTemplate.Should().Be("never paid {server}");
+		status.FooterTierMinDays.Should().BeNull();
 	}
 
 	[Fact]
@@ -145,6 +148,8 @@ public class HostingServiceTests : IDisposable {
 
 		status.DaysOverdue.Should().Be(0);
 		status.FooterText.Should().StartWith("T0 ");
+		status.FooterTemplate.Should().Be("T0 {server} {days} {date}");
+		status.FooterTierMinDays.Should().Be(0);
 	}
 
 	[Fact]
@@ -181,6 +186,7 @@ public class HostingServiceTests : IDisposable {
 
 		status.DaysOverdue.Should().Be(30);
 		status.FooterText.Should().StartWith("T30 ");
+		status.FooterTierMinDays.Should().Be(30);
 	}
 
 	[Fact]
@@ -217,6 +223,8 @@ public class HostingServiceTests : IDisposable {
 
 		status.FooterText.Should().BeNull();
 		status.FooterEnabled.Should().BeFalse();
+		status.FooterTemplate.Should().BeNull();
+		status.FooterTierMinDays.Should().BeNull();
 	}
 
 	[Fact]

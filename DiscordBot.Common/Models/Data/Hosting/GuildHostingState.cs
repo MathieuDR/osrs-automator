@@ -9,4 +9,7 @@ public record GuildHostingState : BaseRecord {
 	public List<HostingPayment> Payments { get; init; } = new();
 	public DateTime? UpcomingReminderSentForDueOn { get; init; }
 	public DateTime? DueReminderSentForDueOn { get; init; }
+	public List<FooterHistoryEntry> FooterHistory { get; init; } = new();
+	public int DegradeDeniedCount { get; init; }
+	public int DegradeAllowedCount { get; init; }
 }
