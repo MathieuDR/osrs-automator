@@ -31,6 +31,7 @@ ssh root@$SERVER_IP
 systemctl stop podman-osrs-automator.service
 tar czf /srv/osrs-automator/backups/data-$(date +%Y%m%d-%H%M).tgz -C /srv/osrs-automator data
 systemctl start podman-osrs-automator.service   # optional; update-… restarts anyway
+podman login ghcr.io -u MathieuDR --password-stdin < /run/agenix/common/ghp   # the update script does a bare pull; without this it fails "unauthorized"
 update-osrs-automator                   # pulls :latest, restarts, logs the rollback command
 podman logs --tail 50 osrs-automator
 ```
