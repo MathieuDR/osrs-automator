@@ -294,6 +294,10 @@ public class HostingServiceTests : IDisposable {
 		var service = CreateService(randomSource: ThrowingRandom());
 
 		service.ShouldDegrade(guildId, new DiscordUserId(999)).Should().BeFalse();
+
+		var state = service.GetAllStates().First(s => s.GuildId == guildId);
+		state.DegradeDeniedCount.Should().Be(0);
+		state.DegradeAllowedCount.Should().Be(0);
 	}
 
 	[Fact]
@@ -303,6 +307,10 @@ public class HostingServiceTests : IDisposable {
 		var service = CreateService(randomSource: SequenceRandom(0.0));
 
 		service.ShouldDegrade(guildId, new DiscordUserId(999)).Should().BeTrue();
+
+		var state = service.GetAllStates().First(s => s.GuildId == guildId);
+		state.DegradeDeniedCount.Should().Be(1);
+		state.DegradeAllowedCount.Should().Be(0);
 	}
 
 	[Fact]
@@ -312,6 +320,10 @@ public class HostingServiceTests : IDisposable {
 		var service = CreateService(randomSource: SequenceRandom(1.0));
 
 		service.ShouldDegrade(guildId, new DiscordUserId(999)).Should().BeFalse();
+
+		var state = service.GetAllStates().First(s => s.GuildId == guildId);
+		state.DegradeDeniedCount.Should().Be(0);
+		state.DegradeAllowedCount.Should().Be(1);
 	}
 
 	[Fact]
@@ -361,6 +373,21 @@ public class HostingServiceTests : IDisposable {
 		var service = CreateService(randomSource: SequenceRandom(0.0));
 
 		service.ShouldDegrade(guildId, new DiscordUserId(999)).Should().BeTrue();
+	}
+
+	[Fact]
+	public void ShouldDegrade_AccumulatesCountsAcrossCalls() {
+		var guildId = new DiscordGuildId(38);
+		SeedPayment(guildId, new DateOnly(2026, 5, 15), 0); // 120 days overdue
+		var service = CreateService(randomSource: SequenceRandom(0.0, 1.0, 0.0));
+
+		service.ShouldDegrade(guildId, new DiscordUserId(999));
+		service.ShouldDegrade(guildId, new DiscordUserId(999));
+		service.ShouldDegrade(guildId, new DiscordUserId(999));
+
+		var state = service.GetAllStates().First(s => s.GuildId == guildId);
+		state.DegradeDeniedCount.Should().Be(2);
+		state.DegradeAllowedCount.Should().Be(1);
 	}
 
 	// --- degraded message ---

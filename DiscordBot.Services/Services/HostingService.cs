@@ -195,10 +195,26 @@ public class HostingService : BaseService, IHostingService {
 				return false;
 			}
 
-			return _randomSource() < degraded.FailureChance;
+			var denied = _randomSource() < degraded.FailureChance;
+			RecordDegradeOutcome(guildId, denied);
+			return denied;
 		} catch (Exception ex) {
 			Logger.LogWarning(ex, "Failed to evaluate degraded mode for guild {GuildId}", guildId);
 			return false;
+		}
+	}
+
+	private void RecordDegradeOutcome(DiscordGuildId guildId, bool denied) {
+		try {
+			lock (GuildLock(guildId)) {
+				var state = GetOrCreateState(guildId);
+				var updated = denied
+					? state with { DegradeDeniedCount = state.DegradeDeniedCount + 1 }
+					: state with { DegradeAllowedCount = state.DegradeAllowedCount + 1 };
+				Persist(updated);
+			}
+		} catch (Exception ex) {
+			Logger.LogWarning(ex, "Failed to record degrade outcome for guild {GuildId}", guildId);
 		}
 	}
 
