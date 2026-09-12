@@ -109,7 +109,17 @@ Folder `DiscordBot/Commands/Interactive2/Hosting/`, shapes as in `Ping/`, `Job/C
 All Interactive2 replies, paginator pages, and the dispatcher's failure embed build through `BaseInteractiveContext<T>` (`DiscordBot/Models/Contexts/BaseInteractiveContext.cs`). In its constructor, if `InGuild`, resolve `IHostingService` from the `IServiceProvider` it already receives and store `FooterText = GetStatus(Guild.Id).FooterText` once per interaction (`null` in DMs). Then:
 
 1. `CreateEmbedBuilder(title, content)`: pass `FooterText` as the existing `appendToFooter` argument of `WithMessageAuthorFooter` (`EmbedBuilderHelper.cs`); change the separator from `", "` to `" · "`.
-2. `CreatePageBuilder(...)`: `.WithFooter(FooterText)` when non-null (Fergun appends page numbers; total stays far under the 2048-char limit).
+2. `CreatePageBuilder(...)`: **not** `.WithFooter(FooterText)`. Fergun's
+   `StaticPaginatorBuilder.WithFooter(PaginatorFooter.Users | PaginatorFooter.PageNumber)` (set once in
+   `GetBaseStaticPaginatorBuilder`) overrides any per-page embed footer when it renders the paginator, so a
+   footer set on an individual `PageBuilder` never shows. Instead, when `FooterText` is non-null, append it
+   as Discord subtext to the end of the page **description**: `description + "\n-# " + FooterText`. This
+   keeps Fergun's own users/page-number footer intact while still surfacing the hosting line on every page.
+   Applies to both `CreatePageBuilder` overloads and to every page-producing path in
+   `InteractionPaginatorReplyBuilder` (`CreatePagesFromLines`, used by both `WithLines` and
+   `WithLeaderboard`), where the subtext length is reserved in the page-length accounting the same way the
+   existing `footer` parameter is, so a page can never exceed Discord's 4096-char description limit; when a
+   caller also passes a `footer`, the hosting line is appended after it.
 3. `RespondAsync`/`FollowupAsync` overrides: when there are no embeds and `FooterText` is non-null, append `"\n-# " + FooterText` to the text (Discord subtext markdown). Covers text-only replies like `ping2 normal`.
 
 `AutocompleteCommandContext` never builds embeds; the constructor lookup is a dictionary read, so no measurable cost there.
@@ -298,3 +308,10 @@ Where the built code differs from the design above (all committed on
   `daysOverdue is >= -30 and < 0` (a closed range) for the "upcoming" condition rather than
   `DaysOverdue == -30 or (-30 < DaysOverdue < 0 and ...)`; both admit every day from 30-days-out through
   the day before due, gated by "not already sent for this `DueOn`" either way.
+- **Paginated replies show the hosting line as subtext in the description, not as a page footer** (final
+  review fix wave). §3.4 item 2 originally called for `.WithFooter(FooterText)` on each `PageBuilder`, but
+  Fergun's `StaticPaginatorBuilder.WithFooter(PaginatorFooter.Users | PaginatorFooter.PageNumber)`
+  (`BaseInteractiveContext.GetBaseStaticPaginatorBuilder`) overrides any footer an individual page sets, so
+  that footer never rendered. The fix appends `"\n-# " + FooterText` to the page description instead
+  (`BaseInteractiveContext.CreatePageBuilder` and `InteractionPaginatorReplyBuilder.CreatePagesFromLines`),
+  reserving its length in the same max-page-length accounting used for the existing `footer` parameter.

@@ -24,12 +24,18 @@ autocomplete, since it was never registered there.
    months:12`. This backdates the due date to one month in the past (overdue).
 2. In that dev/test clan server (not the owner guild), run `ping2 normal` (a plain text-only reply).
 3. In the same server, run `count ranking` (or any other embed-based command).
+4. In the same overdue server, trigger a paginated reply (e.g. `count ranking` with enough entries to span
+   multiple pages, or `graveyard shames` — any command that goes through `InteractionPaginatorReplyBuilder`
+   or `CreatePageBuilder`).
 
 **Expected:**
 - `ping2 normal`'s reply ends with a `-#` subtext line matching one of the `Bot:Messages:Hosting:Overdue`
   tier texts for ~30 days overdue (the `MinDays: 0` tier applies to any `DaysOverdue >= 0`).
 - `count ranking`'s embed footer reads `Requested by <you> · <same overdue text>`.
 - Both texts include the substituted `{server}`/`{days}`/`{date}` values, not literal placeholders.
+- The paginated reply's embed body ends with the same `-#` subtext line as its last line, on every page —
+  not in the embed footer, since Fergun's own users/page-number footer occupies that slot and overrides
+  anything a page sets there.
 
 ## 2. Degraded mode fires roughly 1 in 5 times once ~90 days overdue
 

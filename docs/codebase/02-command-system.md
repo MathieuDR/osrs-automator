@@ -345,8 +345,18 @@ never breaks command dispatch) and stores it as `HostingFooter`. It is then surf
 1. `CreateEmbedBuilder(title, content)` passes `HostingFooter ?? string.Empty` as the `appendToFooter`
    argument of `WithMessageAuthorFooter` (`EmbedBuilderHelper.cs`), which joins it onto the "Requested by
    …" footer with `" · "` as separator when non-empty.
-2. `CreatePageBuilder(...)` (both overloads) calls `.WithFooter(HostingFooter)` when non-null, unless an
-   embed-derived page already has its own footer.
+2. `CreatePageBuilder(...)` (both overloads) does **not** call `.WithFooter(HostingFooter)`: Fergun's
+   `StaticPaginatorBuilder.WithFooter(PaginatorFooter.Users | PaginatorFooter.PageNumber)`, set once in
+   `GetBaseStaticPaginatorBuilder` below, overrides any footer an individual page sets when it renders the
+   paginator, so a `.WithFooter` call on a `PageBuilder` never actually shows. Instead, when `HostingFooter`
+   is non-null, it is appended as Discord subtext to the end of the page **description** (`description +
+   "\n-# " + HostingFooter`) — this keeps Fergun's own users/page-number footer intact while still
+   surfacing the hosting line at the bottom of every page's body. The same subtext-in-description approach
+   is used by every page-producing path in `InteractionPaginatorReplyBuilder`
+   (`DiscordBot/Helpers/Builders/InteractionPaginatorReplyBuilder.cs`) — `CreatePagesFromLines`, which both
+   `WithLines` and `WithLeaderboard` build on — where the subtext's length is reserved in the page-length
+   accounting exactly like the existing `footer` parameter, so a page can never exceed Discord's 4096-char
+   description limit; when a caller also passes a `footer`, the hosting line goes after it.
 3. `RespondAsync`/`FollowupAsync` overrides: `AppendHostingFooter` appends `"\n-# " + HostingFooter`
    (Discord subtext markdown) to the reply text when there are no embeds and the text is non-empty —
    covers text-only replies (e.g. `ping2 normal`).
@@ -360,6 +370,12 @@ runs. `ShouldDegrade` itself (in `HostingService`) is what excludes the owner gu
 guild with `FooterEnabled == false`, plus the "not overdue enough"/"degraded mode disabled" cases — the
 `OnInteraction` check only excludes autocomplete/button interactions (pattern-matched on
 `SocketSlashCommand`) and the `hosting` command name itself.
+
+**Config layering gotcha for `Bot:Messages:Hosting:Overdue`:** the .NET configuration binder merges JSON
+array elements by index, not by replacing the whole array, so an environment-specific `appsettings.*.json`
+that overrides `Overdue` with fewer tier entries than the base `appsettings.json` still ends up with the
+base file's extra trailing tiers merged in — to fully replace the tier list, override every index (or keep
+`MinDays` consistent across files so the merge lands on the intended tier).
 
 ---
 
