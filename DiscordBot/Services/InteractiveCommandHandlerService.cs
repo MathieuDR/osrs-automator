@@ -97,10 +97,10 @@ public class InteractiveCommandHandlerService {
 
 		_logger.LogInformation("[{ctx}] Command triggered", ctx);
 
-		if (arg is SocketSlashCommand && ctx is ApplicationCommandContext appCtx && appCtx.InGuild
+		if (arg is SocketSlashCommand && ctx is ApplicationCommandContext appCtx && appCtx.Guild is SocketGuild guild
 			&& !string.Equals(appCtx.Command, "hosting", StringComparison.OrdinalIgnoreCase)
-			&& _hostingService.ShouldDegrade(appCtx.Guild.GetGuildId(), appCtx.User.GetUserId())) {
-			var degradedMsg = _hostingService.GetDegradedMessage(appCtx.Guild.GetGuildId(), appCtx.Guild.Name);
+			&& _hostingService.ShouldDegrade(guild.GetGuildId(), appCtx.User.GetUserId())) {
+			var degradedMsg = _hostingService.GetDegradedMessage(guild.GetGuildId(), guild.Name);
 			_logger.LogInformation("[{ctx}] degraded mode: refusing command", ctx);
 			await appCtx.RespondAsync(embeds: new[] { appCtx.CreateEmbedBuilder().WithFailure(degradedMsg).Build() });
 			return;

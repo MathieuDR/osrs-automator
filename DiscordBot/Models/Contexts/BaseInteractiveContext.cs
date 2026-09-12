@@ -22,15 +22,28 @@ public abstract class BaseInteractiveContext<T> : BaseInteractiveContext where T
         ServiceProvider = provider;
         InteractiveService = provider.GetRequiredService<InteractiveService>();
         Client = provider.GetRequiredService<DiscordSocketClient>();
-        HostingFooter = InnerContext.Channel is IGuildChannel
-            ? provider.GetRequiredService<IHostingService>().GetStatus(Guild.GetGuildId(), Guild.Name).FooterText
-            : null;
+        HostingFooter = ResolveHostingFooter(provider);
     }
 
     public T InnerContext { get; }
     public IServiceProvider ServiceProvider { get; }
     public DiscordSocketClient Client { get; }
     public string HostingFooter { get; }
+
+    // A footer lookup problem (guild not yet cached during a gateway resume, a broken common DB,
+    // ...) must never break command dispatch: resolve it defensively and swallow/log any failure.
+    private string ResolveHostingFooter(IServiceProvider provider) {
+        try {
+            if (InnerContext.Channel is IGuildChannel && Guild is SocketGuild guild) {
+                return provider.GetRequiredService<IHostingService>().GetStatus(guild.GetGuildId(), guild.Name).FooterText;
+            }
+        } catch (Exception ex) {
+            provider.GetService<ILoggerFactory>()?.CreateLogger(nameof(BaseInteractiveContext))
+                .LogDebug(ex, "Failed to resolve the hosting footer for this interaction");
+        }
+
+        return null;
+    }
 
     public SocketGuild Guild => Client.GetGuild(InnerContext.Channel.Cast<IGuildChannel>().GuildId);
     public bool InGuild => Guild != null;
