@@ -35,7 +35,14 @@ public abstract class BaseInteractiveContext<T> : BaseInteractiveContext where T
     private string ResolveHostingFooter(IServiceProvider provider) {
         try {
             if (InnerContext.Channel is IGuildChannel && Guild is SocketGuild guild) {
-                return provider.GetRequiredService<IHostingService>().GetStatus(guild.GetGuildId(), guild.Name).FooterText;
+                var hostingService = provider.GetRequiredService<IHostingService>();
+                var status = hostingService.GetStatus(guild.GetGuildId(), guild.Name);
+
+                if (status.FooterText is not null) {
+                    hostingService.RecordFooterShown(guild.GetGuildId(), status, Command);
+                }
+
+                return status.FooterText;
             }
         } catch (Exception ex) {
             var logger = provider.GetService<ILoggerFactory>()?.CreateLogger(nameof(BaseInteractiveContext));
