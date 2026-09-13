@@ -618,11 +618,42 @@ public class HostingServiceTests : IDisposable {
 		var status = service.GetStatus(guildId, "Clan Q");
 
 		for (var i = 0; i < 55; i++) {
-			service.RecordFooterShown(guildId, status, "drop");
+			service.RecordFooterShown(guildId, status, $"drop{i}");
 		}
 
 		var state = service.GetAllStates().First(s => s.GuildId == guildId);
 		state.FooterHistory.Should().HaveCount(50);
+		// 55 calls - 50 cap = 5 dropped: the oldest survivor is the 6th call (index 5), and the
+		// newest is the last call made (index 54), proving this actually kept the newest 50
+		// rather than some other 50.
+		state.FooterHistory[0].Command.Should().Be("drop5");
+		state.FooterHistory[^1].Command.Should().Be("drop54");
+	}
+
+	[Fact]
+	public void RecordFooterShown_PersistenceFailure_DoesNotThrow() {
+		var guildId = new DiscordGuildId(93);
+
+		var failingStateRepo = Substitute.For<IGuildHostingStateRepository>();
+		failingStateRepo.GetAll().Returns(Result.Ok<IEnumerable<GuildHostingState>>(new List<GuildHostingState>()));
+		failingStateRepo.UpdateOrInsert(Arg.Any<GuildHostingState>()).Returns(Result.Fail("simulated persistence failure"));
+
+		var failingSettingsRepo = Substitute.For<IHostingSettingsRepository>();
+		failingSettingsRepo.GetSingle().Returns(Result.Ok(new HostingSettings()));
+		failingSettingsRepo.UpdateOrInsert(Arg.Any<HostingSettings>()).Returns(Result.Fail("simulated persistence failure"));
+
+		var strategy = Substitute.For<IRepositoryStrategy>();
+		strategy.GetOrCreateRepository<IGuildHostingStateRepository>().Returns(failingStateRepo);
+		strategy.GetOrCreateRepository<IHostingSettingsRepository>().Returns(failingSettingsRepo);
+
+		var service = new HostingService(NullLogger<HostingService>.Instance, strategy, TestTierMessages(),
+			Options.Create(new BotTeamConfiguration()), new FakeClock(FixedNow));
+
+		var status = new HostingStatus(guildId, true, null, null, null, "some footer text", "some template", null);
+
+		var act = () => service.RecordFooterShown(guildId, status, "drop");
+
+		act.Should().NotThrow();
 	}
 
 	// --- resilience ---

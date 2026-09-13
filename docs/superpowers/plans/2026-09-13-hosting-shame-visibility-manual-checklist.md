@@ -10,7 +10,10 @@ yet (new subcommands need re-registration, same as the original hosting feature)
 3. `/hosting footers <that server>` — confirm it lists the commands run, newest first,
    paginated once you pass 10 entries.
 4. `/hosting templates` (no server) — confirm every configured Never-paid/Overdue-tier/
-   Degraded text shows up with a non-zero count for whichever ones you just triggered.
+   Degraded text shows up with a non-zero count for whichever ones you just triggered
+   (NeverPaid has no default fallback — "stay silent" when unconfigured, by design — so
+   seeing zero NeverPaid rows is expected and correct if the deployment hasn't configured
+   any NeverPaid texts; don't chase that as a bug).
 5. `/hosting templates <that server>` — confirm the front page states the correct current
    tier for that guild.
 6. If that guild is old enough to be in degraded-mode range (90+ days overdue by default),

@@ -30,9 +30,15 @@ public abstract class BaseInteractiveContext<T> : BaseInteractiveContext where T
     public DiscordSocketClient Client { get; }
     public string HostingFooter { get; }
 
+    protected virtual bool ShowsHostingFooter => true;
+
     // A footer lookup problem (guild not yet cached during a gateway resume, a broken common DB,
     // ...) must never break command dispatch: resolve it defensively and swallow/log any failure.
     private string ResolveHostingFooter(IServiceProvider provider) {
+        if (!ShowsHostingFooter) {
+            return null;
+        }
+
         try {
             if (InnerContext.Channel is IGuildChannel && Guild is SocketGuild guild) {
                 var hostingService = provider.GetRequiredService<IHostingService>();
