@@ -5,6 +5,8 @@ namespace DiscordBot.Models.Contexts;
 public class AutocompleteCommandContext : BaseInteractiveContext<SocketAutocompleteInteraction> {
     public AutocompleteCommandContext(SocketAutocompleteInteraction interaction, IServiceProvider provider) : base(interaction, provider) { }
 
+    protected override bool ShowsHostingFooter => false;
+
     public string CurrentOptionAsString => Current.Value.ToString();
 
     public AutocompleteOption Current => InnerContext.Data.Current;

@@ -9,6 +9,7 @@ using DiscordBot.Data.Interfaces;
 using DiscordBot.Data.Repository.Migrations;
 using DiscordBot.Data.Strategies;
 using DiscordBot.Services.Helpers;
+using DiscordBot.Services.Models;
 using DiscordBot.Services.Services;
 using FluentAssertions;
 using FluentResults;
@@ -111,6 +112,7 @@ public class HostingServiceTests : IDisposable {
 		var status = service.GetStatus(new DiscordGuildId(1));
 
 		status.FooterText.Should().BeNull();
+		status.FooterTemplate.Should().BeNull();
 	}
 
 	[Fact]
@@ -121,6 +123,8 @@ public class HostingServiceTests : IDisposable {
 		var status = service.GetStatus(new DiscordGuildId(2), "Clan X");
 
 		status.FooterText.Should().Be("never paid Clan X");
+		status.FooterTemplate.Should().Be("never paid {server}");
+		status.FooterTierMinDays.Should().BeNull();
 	}
 
 	[Fact]
@@ -145,6 +149,8 @@ public class HostingServiceTests : IDisposable {
 
 		status.DaysOverdue.Should().Be(0);
 		status.FooterText.Should().StartWith("T0 ");
+		status.FooterTemplate.Should().Be("T0 {server} {days} {date}");
+		status.FooterTierMinDays.Should().Be(0);
 	}
 
 	[Fact]
@@ -181,6 +187,7 @@ public class HostingServiceTests : IDisposable {
 
 		status.DaysOverdue.Should().Be(30);
 		status.FooterText.Should().StartWith("T30 ");
+		status.FooterTierMinDays.Should().Be(30);
 	}
 
 	[Fact]
@@ -217,6 +224,8 @@ public class HostingServiceTests : IDisposable {
 
 		status.FooterText.Should().BeNull();
 		status.FooterEnabled.Should().BeFalse();
+		status.FooterTemplate.Should().BeNull();
+		status.FooterTierMinDays.Should().BeNull();
 	}
 
 	[Fact]
@@ -285,6 +294,10 @@ public class HostingServiceTests : IDisposable {
 		var service = CreateService(randomSource: ThrowingRandom());
 
 		service.ShouldDegrade(guildId, new DiscordUserId(999)).Should().BeFalse();
+
+		var state = service.GetAllStates().First(s => s.GuildId == guildId);
+		state.DegradeDeniedCount.Should().Be(0);
+		state.DegradeAllowedCount.Should().Be(0);
 	}
 
 	[Fact]
@@ -294,6 +307,10 @@ public class HostingServiceTests : IDisposable {
 		var service = CreateService(randomSource: SequenceRandom(0.0));
 
 		service.ShouldDegrade(guildId, new DiscordUserId(999)).Should().BeTrue();
+
+		var state = service.GetAllStates().First(s => s.GuildId == guildId);
+		state.DegradeDeniedCount.Should().Be(1);
+		state.DegradeAllowedCount.Should().Be(0);
 	}
 
 	[Fact]
@@ -303,6 +320,10 @@ public class HostingServiceTests : IDisposable {
 		var service = CreateService(randomSource: SequenceRandom(1.0));
 
 		service.ShouldDegrade(guildId, new DiscordUserId(999)).Should().BeFalse();
+
+		var state = service.GetAllStates().First(s => s.GuildId == guildId);
+		state.DegradeDeniedCount.Should().Be(0);
+		state.DegradeAllowedCount.Should().Be(1);
 	}
 
 	[Fact]
@@ -313,6 +334,10 @@ public class HostingServiceTests : IDisposable {
 		var service = CreateService(team: team, randomSource: ThrowingRandom());
 
 		service.ShouldDegrade(guildId, new DiscordUserId(999)).Should().BeFalse();
+
+		var state = service.GetAllStates().First(s => s.GuildId == guildId);
+		state.DegradeDeniedCount.Should().Be(0);
+		state.DegradeAllowedCount.Should().Be(0);
 	}
 
 	[Fact]
@@ -324,6 +349,10 @@ public class HostingServiceTests : IDisposable {
 		var service = CreateService(team: team, randomSource: ThrowingRandom());
 
 		service.ShouldDegrade(guildId, ownerId).Should().BeFalse();
+
+		var state = service.GetAllStates().First(s => s.GuildId == guildId);
+		state.DegradeDeniedCount.Should().Be(0);
+		state.DegradeAllowedCount.Should().Be(0);
 	}
 
 	[Fact]
@@ -333,6 +362,10 @@ public class HostingServiceTests : IDisposable {
 		var service = CreateService(randomSource: ThrowingRandom());
 
 		service.ShouldDegrade(guildId, new DiscordUserId(999)).Should().BeFalse();
+
+		var state = service.GetAllStates().First(s => s.GuildId == guildId);
+		state.DegradeDeniedCount.Should().Be(0);
+		state.DegradeAllowedCount.Should().Be(0);
 	}
 
 	[Fact]
@@ -343,6 +376,10 @@ public class HostingServiceTests : IDisposable {
 		var service = CreateService(messages: messages, randomSource: ThrowingRandom());
 
 		service.ShouldDegrade(guildId, new DiscordUserId(999)).Should().BeFalse();
+
+		var state = service.GetAllStates().First(s => s.GuildId == guildId);
+		state.DegradeDeniedCount.Should().Be(0);
+		state.DegradeAllowedCount.Should().Be(0);
 	}
 
 	[Fact]
@@ -352,6 +389,21 @@ public class HostingServiceTests : IDisposable {
 		var service = CreateService(randomSource: SequenceRandom(0.0));
 
 		service.ShouldDegrade(guildId, new DiscordUserId(999)).Should().BeTrue();
+	}
+
+	[Fact]
+	public void ShouldDegrade_AccumulatesCountsAcrossCalls() {
+		var guildId = new DiscordGuildId(38);
+		SeedPayment(guildId, new DateOnly(2026, 5, 15), 0); // 120 days overdue
+		var service = CreateService(randomSource: SequenceRandom(0.0, 1.0, 0.0));
+
+		service.ShouldDegrade(guildId, new DiscordUserId(999));
+		service.ShouldDegrade(guildId, new DiscordUserId(999));
+		service.ShouldDegrade(guildId, new DiscordUserId(999));
+
+		var state = service.GetAllStates().First(s => s.GuildId == guildId);
+		state.DegradeDeniedCount.Should().Be(2);
+		state.DegradeAllowedCount.Should().Be(1);
 	}
 
 	// --- degraded message ---
@@ -398,6 +450,22 @@ public class HostingServiceTests : IDisposable {
 		};
 
 		seen.Should().BeEquivalentTo(new[] { "alpha 120", "beta 120" });
+	}
+
+	[Fact]
+	public void GetDegradedMessage_IncrementsTemplateUsage() {
+		var guildId = new DiscordGuildId(73);
+		SeedPayment(guildId, new DateOnly(2026, 5, 15), 0); // 120 days overdue
+		var messages = new MessageConfiguration {
+			Hosting = new HostingMessages { Degraded = new DegradedMode { Texts = new List<string> { "{server} owes {days} days" } } }
+		};
+		var service = CreateService(messages: messages, randomSource: SequenceRandom(0.0));
+
+		service.GetDegradedMessage(guildId, "Clan Z");
+
+		using var repo = _repositoryStrategy.GetOrCreateRepository<IHostingSettingsRepository>();
+		var settings = repo.GetSingle().Value;
+		settings!.TemplateUsageCounts["Degraded:-:{server} owes {days} days"].Should().Be(1);
 	}
 
 	// --- overview ---
@@ -509,6 +577,85 @@ public class HostingServiceTests : IDisposable {
 		HostingDates.ToDateOnly(stored.DueReminderSentForDueOn!.Value).Should().Be(dueOn);
 	}
 
+	// --- footer history ---
+
+	[Fact]
+	public void RecordFooterShown_NoOp_WhenTemplateIsNull() {
+		var guildId = new DiscordGuildId(90);
+		var service = CreateService();
+		var status = new HostingStatus(guildId, true, null, null, null, null, null, null);
+
+		service.RecordFooterShown(guildId, status, "status");
+
+		service.GetAllStates().Should().NotContain(s => s.GuildId == guildId);
+	}
+
+	[Fact]
+	public void RecordFooterShown_AppendsHistoryAndIncrementsUsage() {
+		var guildId = new DiscordGuildId(91);
+		SeedPayment(guildId, new DateOnly(2026, 9, 12), 0); // due today, tier 0
+		var service = CreateService(messages: TestTierMessages());
+		var status = service.GetStatus(guildId, "Clan Q");
+
+		service.RecordFooterShown(guildId, status, "drop");
+
+		var state = service.GetAllStates().First(s => s.GuildId == guildId);
+		state.FooterHistory.Should().HaveCount(1);
+		state.FooterHistory[0].DisplayText.Should().Be(status.FooterText);
+		state.FooterHistory[0].Command.Should().Be("drop");
+
+		using var repo = _repositoryStrategy.GetOrCreateRepository<IHostingSettingsRepository>();
+		var settings = repo.GetSingle().Value;
+		var key = $"Overdue:0:{status.FooterTemplate}";
+		settings!.TemplateUsageCounts[key].Should().Be(1);
+	}
+
+	[Fact]
+	public void RecordFooterShown_CapsHistoryAtFifty() {
+		var guildId = new DiscordGuildId(92);
+		SeedPayment(guildId, new DateOnly(2026, 9, 12), 0); // due today, tier 0
+		var service = CreateService(messages: TestTierMessages());
+		var status = service.GetStatus(guildId, "Clan Q");
+
+		for (var i = 0; i < 55; i++) {
+			service.RecordFooterShown(guildId, status, $"drop{i}");
+		}
+
+		var state = service.GetAllStates().First(s => s.GuildId == guildId);
+		state.FooterHistory.Should().HaveCount(50);
+		// 55 calls - 50 cap = 5 dropped: the oldest survivor is the 6th call (index 5), and the
+		// newest is the last call made (index 54), proving this actually kept the newest 50
+		// rather than some other 50.
+		state.FooterHistory[0].Command.Should().Be("drop5");
+		state.FooterHistory[^1].Command.Should().Be("drop54");
+	}
+
+	[Fact]
+	public void RecordFooterShown_PersistenceFailure_DoesNotThrow() {
+		var guildId = new DiscordGuildId(93);
+
+		var failingStateRepo = Substitute.For<IGuildHostingStateRepository>();
+		failingStateRepo.GetAll().Returns(Result.Ok<IEnumerable<GuildHostingState>>(new List<GuildHostingState>()));
+		failingStateRepo.UpdateOrInsert(Arg.Any<GuildHostingState>()).Returns(Result.Fail("simulated persistence failure"));
+
+		var failingSettingsRepo = Substitute.For<IHostingSettingsRepository>();
+		failingSettingsRepo.GetSingle().Returns(Result.Ok(new HostingSettings()));
+		failingSettingsRepo.UpdateOrInsert(Arg.Any<HostingSettings>()).Returns(Result.Fail("simulated persistence failure"));
+
+		var strategy = Substitute.For<IRepositoryStrategy>();
+		strategy.GetOrCreateRepository<IGuildHostingStateRepository>().Returns(failingStateRepo);
+		strategy.GetOrCreateRepository<IHostingSettingsRepository>().Returns(failingSettingsRepo);
+
+		var service = new HostingService(NullLogger<HostingService>.Instance, strategy, TestTierMessages(),
+			Options.Create(new BotTeamConfiguration()), new FakeClock(FixedNow));
+
+		var status = new HostingStatus(guildId, true, null, null, null, "some footer text", "some template", null);
+
+		var act = () => service.RecordFooterShown(guildId, status, "drop");
+
+		act.Should().NotThrow();
+	}
+
 	// --- resilience ---
 
 	[Fact]
@@ -546,5 +693,38 @@ public class HostingServiceTests : IDisposable {
 		second.LastPayment.Should().NotBeNull();
 		second.DaysOverdue.Should().Be(120);
 		second.FooterText.Should().StartWith("T90 ");
+	}
+
+	// --- template catalog ---
+
+	[Fact]
+	public void GetTemplateCatalog_ReflectsConfigAndCounts() {
+		var messages = new MessageConfiguration {
+			Hosting = new HostingMessages {
+				NeverPaid = new List<string> { "np1" },
+				Overdue = new List<HostingTier> { new() { MinDays = 0, Texts = new List<string> { "t0" } } },
+				Degraded = new DegradedMode { Texts = new List<string> { "d1" } }
+			}
+		};
+		var service = CreateService(messages: messages, randomSource: SequenceRandom(0.0));
+
+		service.GetDegradedMessage(new DiscordGuildId(100), "X"); // increments "d1" once
+
+		var catalog = service.GetTemplateCatalog();
+
+		catalog.Should().ContainSingle(e => e.Kind == "NeverPaid" && e.Text == "np1" && e.UsageCount == 0);
+		catalog.Should().ContainSingle(e => e.Kind == "Overdue" && e.TierMinDays == 0 && e.Text == "t0" && e.UsageCount == 0);
+		catalog.Should().ContainSingle(e => e.Kind == "Degraded" && e.Text == "d1" && e.UsageCount == 1);
+	}
+
+	[Fact]
+	public void GetTemplateCatalog_UsesDefaultsWhenOverdueAndDegradedEmpty_NeverPaidStaysEmpty() {
+		var service = CreateService();
+
+		var catalog = service.GetTemplateCatalog();
+
+		catalog.Count(e => e.Kind == "Overdue").Should().Be(HostingDefaults.Overdue.Sum(t => t.Texts.Count));
+		catalog.Count(e => e.Kind == "Degraded").Should().Be(HostingDefaults.Degraded.Count);
+		catalog.Count(e => e.Kind == "NeverPaid").Should().Be(0);
 	}
 }

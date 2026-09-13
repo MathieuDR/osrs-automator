@@ -29,7 +29,7 @@ public class HostingReminderJobTests {
 	};
 
 	private static HostingStatus StatusWithDaysOverdue(int? daysOverdue, DateOnly? dueOn = null) =>
-		new(new DiscordGuildId(1), true, null, daysOverdue is null ? null : dueOn ?? DueOn, daysOverdue, null);
+		new(new DiscordGuildId(1), true, null, daysOverdue is null ? null : dueOn ?? DueOn, daysOverdue, null, null, null);
 
 	private static GuildHostingState StateWith(SentState upcomingSent, SentState dueSent, DateOnly? dueOn = null) => new() {
 		GuildId = new DiscordGuildId(1),
@@ -109,8 +109,8 @@ public class HostingReminderJobTests {
 		var fineState = new GuildHostingState { GuildId = fineGuild.Id };
 		hosting.GetAllStates().Returns(new List<GuildHostingState> { dueState, fineState });
 
-		var dueStatus = new HostingStatus(dueGuild.Id, true, null, DueOn, 0, null);
-		var fineStatus = new HostingStatus(fineGuild.Id, true, null, DueOn.AddMonths(3), -90, null);
+		var dueStatus = new HostingStatus(dueGuild.Id, true, null, DueOn, 0, null, null, null);
+		var fineStatus = new HostingStatus(fineGuild.Id, true, null, DueOn.AddMonths(3), -90, null, null, null);
 		hosting.GetStatus(dueGuild.Id, dueGuild.Name).Returns(dueStatus);
 		hosting.GetStatus(fineGuild.Id, fineGuild.Name).Returns(fineStatus);
 
@@ -139,7 +139,7 @@ public class HostingReminderJobTests {
 		var dueState = new GuildHostingState { GuildId = dueGuild.Id };
 		hosting.GetAllStates().Returns(new List<GuildHostingState> { dueState });
 
-		var dueStatus = new HostingStatus(dueGuild.Id, true, null, DueOn, 0, null);
+		var dueStatus = new HostingStatus(dueGuild.Id, true, null, DueOn, 0, null, null, null);
 		hosting.GetStatus(dueGuild.Id, dueGuild.Name).Returns(dueStatus);
 
 		discord.SendMentionEmbed(channel, team.OwnerId, Arg.Any<string>(), Arg.Any<EmbedFieldDto[]>(), Arg.Any<bool>())
@@ -178,7 +178,7 @@ public class HostingReminderJobTests {
 		var upcomingState = new GuildHostingState { GuildId = upcomingGuild.Id };
 		hosting.GetAllStates().Returns(new List<GuildHostingState> { upcomingState });
 
-		var upcomingStatus = new HostingStatus(upcomingGuild.Id, true, null, DueOn, -30, null);
+		var upcomingStatus = new HostingStatus(upcomingGuild.Id, true, null, DueOn, -30, null, null, null);
 		hosting.GetStatus(upcomingGuild.Id, upcomingGuild.Name).Returns(upcomingStatus);
 
 		discord.SendMentionEmbed(channel, team.OwnerId, Arg.Any<string>(), Arg.Any<EmbedFieldDto[]>(), Arg.Any<bool>())

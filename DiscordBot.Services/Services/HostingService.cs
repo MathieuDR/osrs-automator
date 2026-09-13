@@ -31,6 +31,8 @@ public class HostingService : BaseService, IHostingService {
 	private readonly object _cacheLock = new();
 	private volatile bool _cacheLoaded;
 
+	private readonly ConcurrentDictionary<DiscordGuildId, object> _guildLocks = new();
+
 	private readonly object _settingsLock = new();
 	private HostingSettings? _settingsCache;
 	private volatile bool _settingsLoaded;
@@ -57,15 +59,15 @@ public class HostingService : BaseService, IHostingService {
 				daysOverdue = Today().DayNumber - dueOn.Value.DayNumber;
 			}
 
-			var footerText = BuildFooterText(guildId, guildName, footerEnabled, lastPayment, dueOn, daysOverdue);
-			return new HostingStatus(guildId, footerEnabled, lastPayment, dueOn, daysOverdue, footerText);
+			var (footerTemplate, footerTierMinDays, footerText) = BuildFooterText(guildId, guildName, footerEnabled, lastPayment, dueOn, daysOverdue);
+			return new HostingStatus(guildId, footerEnabled, lastPayment, dueOn, daysOverdue, footerText, footerTemplate, footerTierMinDays);
 		} catch (Exception ex) {
 			Logger.LogWarning(ex, "Failed to get hosting status for guild {GuildId}", guildId);
 			// Report the footer setting from whatever is already cached, rather than defaulting to
 			// `false`: a read failure here must not be misreported as "footer off" for a guild that
 			// actually has it on (or has never touched the setting, where the real default is `true`).
 			var footerEnabled = _cache.TryGetValue(guildId, out var cached) ? cached.FooterEnabled : true;
-			return new HostingStatus(guildId, footerEnabled, null, null, null, null);
+			return new HostingStatus(guildId, footerEnabled, null, null, null, null, null, null);
 		}
 	}
 
@@ -89,16 +91,18 @@ public class HostingService : BaseService, IHostingService {
 		}
 
 		try {
-			var state = GetOrCreateState(guildId);
-			var payment = new HostingPayment {
-				PaidOn = HostingDates.ToStorage(paidOn),
-				TermMonths = termMonths,
-				Note = note,
-				RecordedBy = by
-			};
+			lock (GuildLock(guildId)) {
+				var state = GetOrCreateState(guildId);
+				var payment = new HostingPayment {
+					PaidOn = HostingDates.ToStorage(paidOn),
+					TermMonths = termMonths,
+					Note = note,
+					RecordedBy = by
+				};
 
-			var updated = state with { Payments = state.Payments.Append(payment).ToList() };
-			return Persist(updated);
+				var updated = state with { Payments = state.Payments.Append(payment).ToList() };
+				return Persist(updated);
+			}
 		} catch (Exception ex) {
 			Logger.LogWarning(ex, "Failed to record a hosting payment for guild {GuildId}", guildId);
 			return Result.Fail("Could not record the payment");
@@ -107,9 +111,11 @@ public class HostingService : BaseService, IHostingService {
 
 	public Result SetFooterEnabled(DiscordGuildId guildId, bool enabled) {
 		try {
-			var state = GetOrCreateState(guildId);
-			var updated = state with { FooterEnabled = enabled };
-			return Persist(updated);
+			lock (GuildLock(guildId)) {
+				var state = GetOrCreateState(guildId);
+				var updated = state with { FooterEnabled = enabled };
+				return Persist(updated);
+			}
 		} catch (Exception ex) {
 			Logger.LogWarning(ex, "Failed to set footer enabled for guild {GuildId}", guildId);
 			return Result.Fail("Could not update the footer setting");
@@ -150,9 +156,11 @@ public class HostingService : BaseService, IHostingService {
 
 	public Result MarkUpcomingReminderSent(DiscordGuildId guildId, DateOnly dueOn) {
 		try {
-			var state = GetOrCreateState(guildId);
-			var updated = state with { UpcomingReminderSentForDueOn = HostingDates.ToStorage(dueOn) };
-			return Persist(updated);
+			lock (GuildLock(guildId)) {
+				var state = GetOrCreateState(guildId);
+				var updated = state with { UpcomingReminderSentForDueOn = HostingDates.ToStorage(dueOn) };
+				return Persist(updated);
+			}
 		} catch (Exception ex) {
 			Logger.LogWarning(ex, "Failed to mark the upcoming reminder sent for guild {GuildId}", guildId);
 			return Result.Fail("Could not mark the upcoming reminder sent");
@@ -161,9 +169,11 @@ public class HostingService : BaseService, IHostingService {
 
 	public Result MarkDueReminderSent(DiscordGuildId guildId, DateOnly dueOn) {
 		try {
-			var state = GetOrCreateState(guildId);
-			var updated = state with { DueReminderSentForDueOn = HostingDates.ToStorage(dueOn) };
-			return Persist(updated);
+			lock (GuildLock(guildId)) {
+				var state = GetOrCreateState(guildId);
+				var updated = state with { DueReminderSentForDueOn = HostingDates.ToStorage(dueOn) };
+				return Persist(updated);
+			}
 		} catch (Exception ex) {
 			Logger.LogWarning(ex, "Failed to mark the due reminder sent for guild {GuildId}", guildId);
 			return Result.Fail("Could not mark the due reminder sent");
@@ -193,10 +203,26 @@ public class HostingService : BaseService, IHostingService {
 				return false;
 			}
 
-			return _randomSource() < degraded.FailureChance;
+			var denied = _randomSource() < degraded.FailureChance;
+			RecordDegradeOutcome(guildId, denied);
+			return denied;
 		} catch (Exception ex) {
 			Logger.LogWarning(ex, "Failed to evaluate degraded mode for guild {GuildId}", guildId);
 			return false;
+		}
+	}
+
+	private void RecordDegradeOutcome(DiscordGuildId guildId, bool denied) {
+		try {
+			lock (GuildLock(guildId)) {
+				var state = GetOrCreateState(guildId);
+				var updated = denied
+					? state with { DegradeDeniedCount = state.DegradeDeniedCount + 1 }
+					: state with { DegradeAllowedCount = state.DegradeAllowedCount + 1 };
+				Persist(updated);
+			}
+		} catch (Exception ex) {
+			Logger.LogWarning(ex, "Failed to record degrade outcome for guild {GuildId}", guildId);
 		}
 	}
 
@@ -218,6 +244,7 @@ public class HostingService : BaseService, IHostingService {
 			}
 
 			var chosen = PickRandom(texts);
+			IncrementTemplateUsage(TemplateKey("Degraded", null, chosen));
 			return Substitute(chosen, guildId, guildName, days, dueOn, lastPayment?.PaidOn);
 		} catch (Exception ex) {
 			Logger.LogWarning(ex, "Failed to build the degraded message for guild {GuildId}", guildId);
@@ -235,28 +262,67 @@ public class HostingService : BaseService, IHostingService {
 		return _cache.Values.ToList();
 	}
 
+	public IReadOnlyList<TemplateCatalogEntry> GetTemplateCatalog() {
+		try {
+			var settings = LoadSettings();
+			var counts = settings.TemplateUsageCounts;
+			var entries = new List<TemplateCatalogEntry>();
+
+			var neverPaid = _messages.Hosting.NeverPaid;
+			if (neverPaid is not null) {
+				foreach (var text in neverPaid) {
+					entries.Add(new TemplateCatalogEntry("NeverPaid", null, text, counts.GetValueOrDefault(TemplateKey("NeverPaid", null, text))));
+				}
+			}
+
+			IReadOnlyList<HostingTier> tiers = _messages.Hosting.Overdue;
+			if (tiers is null || tiers.Count == 0) {
+				tiers = HostingDefaults.Overdue;
+			}
+			foreach (var tier in tiers.OrderBy(t => t.MinDays)) {
+				foreach (var text in tier.Texts) {
+					entries.Add(new TemplateCatalogEntry("Overdue", tier.MinDays, text, counts.GetValueOrDefault(TemplateKey("Overdue", tier.MinDays, text))));
+				}
+			}
+
+			IReadOnlyList<string> degraded = _messages.Hosting.Degraded.Texts;
+			if (degraded is null || degraded.Count == 0) {
+				degraded = HostingDefaults.Degraded;
+			}
+			foreach (var text in degraded) {
+				entries.Add(new TemplateCatalogEntry("Degraded", null, text, counts.GetValueOrDefault(TemplateKey("Degraded", null, text))));
+			}
+
+			return entries;
+		} catch (Exception ex) {
+			Logger.LogWarning(ex, "Failed to build the template catalog");
+			return Array.Empty<TemplateCatalogEntry>();
+		}
+	}
+
 	private DateOnly Today() => HostingDates.ToDateOnly(_clock.UtcNow);
 
 	private static HostingPayment? LastPaymentOf(GuildHostingState? state) =>
 		state is { Payments.Count: > 0 } ? state.Payments[^1] : null;
 
-	private string? BuildFooterText(DiscordGuildId guildId, string? guildName, bool footerEnabled, HostingPayment? lastPayment,
+	private (string? Template, int? TierMinDays, string? DisplayText) BuildFooterText(DiscordGuildId guildId, string? guildName, bool footerEnabled, HostingPayment? lastPayment,
 		DateOnly? dueOn, int? daysOverdue) {
 		if (!footerEnabled) {
-			return null;
+			return (null, null, null);
 		}
 
 		if (lastPayment is null) {
 			var neverPaid = _messages.Hosting.NeverPaid;
 			if (neverPaid is null || neverPaid.Count == 0) {
-				return null;
+				return (null, null, null);
 			}
 
-			return Substitute(PickRandom(neverPaid), guildId, guildName, null, null, null);
+			var neverPaidTemplate = PickRandom(neverPaid);
+			return (neverPaidTemplate, null, Substitute(neverPaidTemplate, guildId, guildName, null, null, null));
 		}
 
 		if (daysOverdue is null || daysOverdue < 0) {
-			return null;
+			return (null, null, null);
 		}
 
 		IReadOnlyList<HostingTier> tiers = _messages.Hosting.Overdue;
@@ -270,10 +336,11 @@ public class HostingService : BaseService, IHostingService {
 			.FirstOrDefault();
 
 		if (tier?.Texts is null || tier.Texts.Count == 0) {
-			return null;
+			return (null, null, null);
 		}
 
-		return Substitute(PickRandom(tier.Texts), guildId, guildName, daysOverdue, dueOn, lastPayment.PaidOn);
+		var tierTemplate = PickRandom(tier.Texts);
+		return (tierTemplate, tier.MinDays, Substitute(tierTemplate, guildId, guildName, daysOverdue, dueOn, lastPayment.PaidOn));
 	}
 
 	private static string Substitute(string template, DiscordGuildId guildId, string? guildName, int? days, DateOnly? dueOn, DateTime? paidOn) {
@@ -346,6 +413,51 @@ public class HostingService : BaseService, IHostingService {
 		}
 
 		return result;
+	}
+
+	private object GuildLock(DiscordGuildId guildId) => _guildLocks.GetOrAdd(guildId, _ => new object());
+
+	private static string TemplateKey(string kind, int? tierMinDays, string text) => $"{kind}:{tierMinDays?.ToString() ?? "-"}:{text}";
+
+	private void IncrementTemplateUsage(string key) {
+		try {
+			lock (_settingsLock) {
+				var current = LoadSettings();
+				var counts = new Dictionary<string, int>(current.TemplateUsageCounts) {
+					[key] = current.TemplateUsageCounts.GetValueOrDefault(key) + 1
+				};
+				var updated = current with { TemplateUsageCounts = counts };
+
+				using var repo = _repositoryStrategy.GetOrCreateRepository<IHostingSettingsRepository>();
+				var result = repo.UpdateOrInsert(updated);
+				if (result.IsSuccess) {
+					_settingsCache = updated;
+					_settingsLoaded = true;
+				}
+			}
+		} catch (Exception ex) {
+			Logger.LogWarning(ex, "Failed to increment template usage for key {Key}", key);
+		}
+	}
+
+	public void RecordFooterShown(DiscordGuildId guildId, HostingStatus status, string? command) {
+		if (status.FooterTemplate is null) {
+			return;
+		}
+
+		try {
+			var kind = status.LastPayment is null ? "NeverPaid" : "Overdue";
+			IncrementTemplateUsage(TemplateKey(kind, status.FooterTierMinDays, status.FooterTemplate));
+
+			lock (GuildLock(guildId)) {
+				var state = GetOrCreateState(guildId);
+				var entry = new FooterHistoryEntry(_clock.UtcNow, command, status.FooterText!);
+				var history = state.FooterHistory.Append(entry).TakeLast(50).ToList();
+				Persist(state with { FooterHistory = history });
+			}
+		} catch (Exception ex) {
+			Logger.LogWarning(ex, "Failed to record footer usage for guild {GuildId}", guildId);
+		}
 	}
 
 	private HostingSettings LoadSettings() {

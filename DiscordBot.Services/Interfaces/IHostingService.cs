@@ -18,4 +18,6 @@ public interface IHostingService {
 	bool ShouldDegrade(DiscordGuildId guildId, DiscordUserId userId); // random draw inside
 	string GetDegradedMessage(DiscordGuildId guildId, string? guildName = null);
 	IReadOnlyList<GuildHostingState> GetAllStates(); // for the reminder job
+	void RecordFooterShown(DiscordGuildId guildId, HostingStatus status, string? command); // no-op if status.FooterTemplate is null
+	IReadOnlyList<TemplateCatalogEntry> GetTemplateCatalog();
 }

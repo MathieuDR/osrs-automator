@@ -80,6 +80,13 @@ public class StatusSubCommandHandler : ApplicationCommandHandlerBase<StatusSubCo
 			description.AppendLine($"Current footer: {status.FooterText}");
 		}
 
+		if (state is not null && state.DegradeDeniedCount + state.DegradeAllowedCount > 0) {
+			var total = state.DegradeDeniedCount + state.DegradeAllowedCount;
+			var percent = (double)state.DegradeDeniedCount / total * 100;
+			description.AppendLine();
+			description.AppendLine($"Degraded mode: {state.DegradeDeniedCount} denied / {state.DegradeAllowedCount} allowed ({percent:0.#}%) — excludes your own commands");
+		}
+
 		description.AppendLine();
 		description.AppendLine("Payment history (most recent first):");
 		if (history.Count == 0) {
